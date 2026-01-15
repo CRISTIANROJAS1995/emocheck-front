@@ -1,0 +1,21 @@
+<div class="module-card" [ngClass]="module.colorClass">
+    <div class="flex items-center gap-3 mb-3">
+        <div class="module-icon" [ngClass]="module.iconClass">
+            <mat-icon [svgIcon]="module.icon"></mat-icon>
+        </div>
+        <h3 class="module-title">{{ module.title }}</h3>
+    </div>
+
+    <p class="module-description">{{ module.description }}</p>
+
+    <div class="flex gap-3">
+        <emo-button [variant]="getButtonVariant()" size="medium" class="flex-1" [disabled]="module.disabled"
+            (clicked)="startEvaluation()">
+            Comenzar evaluación
+        </emo-button>
+
+        <emo-button variant="secondary" size="medium" (clicked)="viewPlan()">
+            Ver mi plan
+        </emo-button>
+    </div>
+</div>

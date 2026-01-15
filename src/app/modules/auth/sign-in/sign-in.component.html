@@ -1,0 +1,110 @@
+<div class="page-gradient-bg relative flex min-h-screen w-full items-center justify-center overflow-hidden px-6 py-10">
+
+    <!-- Decorative background circles -->
+    <app-background-circles></app-background-circles>
+
+    <div class="w-full max-w-[576px]">
+        <div class="signin-card h-[704px] overflow-hidden rounded-3xl border border-teal-100 bg-white/90 shadow-2xl"
+            style="font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+            <div class="flex h-full flex-col items-center px-0 py-6 text-center">
+                <img class="mt-0 w-40 max-w-full" src="images/logo/emocheck-logo.png" alt="EmoCheck" />
+
+                <div class="mt-4 text-lg font-bold text-blue-600">Iniciar Sesión</div>
+
+                <div
+                    class="mt-2 inline-flex items-center gap-2 whitespace-nowrap text-[13px] font-bold leading-[18.5714px] text-teal-600">
+                    <img class="h-4 w-4" src="icons/Icon.svg" alt="" aria-hidden="true" />
+                    <span>Tu bienestar también es parte de la productividad</span>
+                    <img class="h-4 w-4" src="icons/Icon.svg" alt="" aria-hidden="true" />
+                </div>
+
+                <!-- Sign in form -->
+                <form class="mt-6 w-[510.667px] max-w-full px-0 text-left" [formGroup]="signInForm"
+                    #signInNgForm="ngForm">
+                    <!-- Email field -->
+                    <div class="mb-4">
+                        <label class="mb-2 block text-[14px] font-medium leading-[14px] text-[#2D3748]"
+                            style="font-family: Montserrat;">Usuario
+                            o correo electrónico</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <img class="h-5 w-5" src="icons/user-login.svg" alt="" aria-hidden="true" />
+                            </div>
+                            <input type="email" [formControlName]="'email'" placeholder="usuario@empresa.com"
+                                class="h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-3 py-1 pl-[44px] text-[14px] font-normal leading-[20px] text-[#0A0A0A] placeholder:text-slate-400 focus:border-[#96F7E4] focus:outline-none focus:ring-0" />
+                        </div>
+                        @if (signInForm.get('email').hasError('required')) {
+                        <div class="mt-1 text-sm text-red-600">El Correo Electrónico es requerido.</div>
+                        }
+                        @if (signInForm.get('email').hasError('email')) {
+                        <div class="mt-1 text-sm text-red-600">Por favor, introduce una dirección de correo electrónico
+                            válida</div>
+                        }
+                    </div>
+
+                    <!-- Password field -->
+                    <div class="mb-4">
+                        <label class="mb-2 block text-[14px] font-medium leading-[14px] text-[#2D3748]"
+                            style="font-family: Montserrat;">Contraseña
+                            o código único</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <img class="h-5 w-5" src="icons/password-login.svg" alt="" aria-hidden="true" />
+                            </div>
+                            <input type="password" [formControlName]="'password'" placeholder="•••••••"
+                                class="h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-3 py-1 pl-[44px] text-[14px] font-normal leading-[20px] text-[#0A0A0A] placeholder:text-slate-400 focus:border-[#96F7E4] focus:outline-none focus:ring-0" />
+                        </div>
+                        @if (signInForm.get('password').hasError('required')) {
+                        <div class="mt-1 text-sm text-red-600">La contraseña es requerida.</div>
+                        }
+                    </div>
+
+                    <!-- Remember me and Forgot password -->
+                    <div class="mb-6 flex items-center justify-between">
+                        <label class="flex items-center">
+                            <input type="checkbox" [formControlName]="'rememberMe'"
+                                class="mr-2 h-3 w-3 border-slate-300 accent-slate-800 focus:ring-0">
+                            <span
+                                class="text-montserrat-480 text-[14px] leading-[20px] text-[#4A5565]">Recordarme</span>
+                        </label>
+                        <a class="text-montserrat-480 text-[14px] leading-[20px] text-[#009689]" href="#">¿Olvidaste tu
+                            contraseña?</a>
+                    </div>
+
+                    <!-- Submit button -->
+                    <emo-button variant="primary" size="medium" [fullWidth]="true" [loading]="signInForm.disabled"
+                        [disabled]="signInForm.disabled" (clicked)="signIn()" class="mb-6">
+                        Ingresar
+                    </emo-button>
+
+                    <!-- Separator -->
+                    <div class="mt-5 flex items-center">
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                        <span class="mx-4 text-base font-medium text-slate-600">o</span>
+                        <div class="h-px flex-1 bg-slate-200"></div>
+                    </div>
+
+                    <!-- QR Code login -->
+                    <button type="button"
+                        class="mb-4 mt-2 h-[44px] w-full rounded-[14px] border-[3.5px] border-[#E5E7EB] bg-white px-5 text-[14px] font-medium leading-[20px] text-[#0A0A0A] transition-colors hover:border-teal-200 hover:bg-teal-50">
+                        Ingresar con código QR
+                    </button>
+
+                    <!-- Register link -->
+                    <div class="mb-0 text-center text-[14px] font-normal leading-[20px]"
+                        style="font-family: Montserrat;">
+                        <span class="text-[#4A5565]">¿Primera vez aquí? </span>
+                        <a class="text-[#009689]" href="#">Completa tu registro</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- Privacy notice (outside the card, like Figma) -->
+        <div class="mt-3 whitespace-nowrap text-center text-[14px] font-normal leading-[20px] text-[#4A5565]"
+            style="font-family: Montserrat;">
+            Tus datos están protegidos bajo los más altos estándares de confidencialidad
+        </div>
+    </div>
+</div>

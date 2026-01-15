@@ -1,0 +1,13 @@
+<button [type]="type" [class]="buttonClasses" [disabled]="disabled || loading" (click)="onClick($event)">
+
+    <span class="emo-button__content" [class.emo-button__content--hidden]="loading">
+        <ng-content></ng-content>
+    </span>
+
+    @if (loading) {
+    <div class="emo-button__loader">
+        <mat-progress-spinner [diameter]="size === 'small' ? 16 : size === 'large' ? 28 : 24" [mode]="'indeterminate'">
+        </mat-progress-spinner>
+    </div>
+    }
+</button>

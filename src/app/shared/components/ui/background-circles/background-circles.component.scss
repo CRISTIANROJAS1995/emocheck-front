@@ -1,0 +1,25 @@
+// Background decorative circles
+.blur-circle {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.blur-circle-teal {
+    width: 128px;
+    height: 128px;
+    background: rgba(0, 187, 167, 0.20);
+    filter: blur(64px);
+    left: 40px;
+    bottom: 80px;
+}
+
+.blur-circle-green {
+    width: 140px;
+    height: 130px;
+    background: rgba(154, 230, 0, 0.20);
+    filter: blur(64px);
+    right: 40px;
+    top: 80px;
+}

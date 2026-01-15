@@ -1,0 +1,87 @@
+// Informed Consent Page Styles
+
+// Page background
+.page-gradient-bg {
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFF 50%, #F0FDFA 100%);
+}
+
+// Main card
+.consent-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+// Icon container
+.icon-gradient {
+    background: linear-gradient(135deg, #00D5BE 0%, #009689 100%);
+}
+
+// Info box
+.info-box {
+    background: linear-gradient(135deg, #F0FDFA 0%, #EFF6FF 10%);
+}
+
+// Checkbox consent box
+.consent-box {
+    background: #F7FEE7;
+    border: 0.667px solid #D8F999;
+}
+
+// Button gradient
+.btn-primary-gradient {
+    background: linear-gradient(90deg, #7CCF00 0%, #5EA500 100%);
+}
+
+// Link style
+.link-teal {
+    color: #009689;
+    font-family: Montserrat;
+    text-decoration-line: underline;
+    text-decoration-style: solid;
+}
+
+// Text styles
+.text-montserrat {
+    font-family: Montserrat;
+}
+
+.text-privacy {
+    color: #4A5565;
+    font-family: Montserrat;
+}
+
+// Custom checkbox styles
+.consent-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: white;
+    border: 2px solid #D1D5DB;
+    cursor: pointer;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    &:checked {
+        background-color: #7CCF00;
+        border-color: #7CCF00;
+
+        &::after {
+            content: '✓';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            line-height: 1;
+        }
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+}

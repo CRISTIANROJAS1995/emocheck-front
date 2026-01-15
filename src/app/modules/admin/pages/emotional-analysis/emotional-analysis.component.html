@@ -1,0 +1,241 @@
+<div class="page-gradient-bg relative flex min-h-screen w-full items-center justify-center overflow-hidden px-6 py-10">
+
+    <!-- Decorative background circles -->
+    <!-- Círculo azul superior derecho -->
+    <div class="blur-circle-blue pointer-events-none absolute right-[80px] top-[160px] h-[96px] w-[96px] rounded-full">
+    </div>
+    <!-- Círculo turquesa inferior derecho -->
+    <div
+        class="blur-circle-teal pointer-events-none absolute right-[60px] bottom-[100px] h-[160px] w-[160px] rounded-full">
+    </div>
+    <!-- Círculo verde superior izquierdo -->
+    <div
+        class="blur-circle-green pointer-events-none absolute left-[100px] top-[120px] h-[128px] w-[128px] rounded-full">
+    </div>
+
+    <!-- Analysis Screen -->
+    <div *ngIf="isAnalyzing && !showResults" class="w-full max-w-[768px]">
+        <div
+            class="analysis-card flex flex-col items-start gap-4 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
+
+            <div class="flex w-full flex-col items-center text-center">
+                <!-- Heart Icon -->
+                <div class="icon-gradient flex h-[56px] w-[56px] items-center justify-center rounded-[16px]">
+                    <img src="icons/instrucciones-emocional.svg" alt="Heart" class="h-[32px] w-[32px]" />
+                </div>
+
+                <!-- Title -->
+                <h2 class="text-montserrat-bold mt-6 text-center text-[16px] leading-[24px] text-[#155DFC]">Registro
+                    emocional en progreso</h2>
+
+                <!-- Subtitle -->
+                <p class="text-montserrat-semibold mt-2 text-center text-[14px] leading-[20px] text-[#009689]">Sigue las
+                    instrucciones en pantalla</p>
+
+                <!-- Progress -->
+                <div class="mt-4 w-full">
+                    <div class="text-montserrat flex justify-between text-[12px]">
+                        <span class="progress-step">Paso {{ currentStep }} de {{
+                            totalSteps }}</span>
+                        <span class="progress-percent">{{ progress }}%
+                            completado</span>
+                    </div>
+                    <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                        <div class="h-full rounded-full bg-[#009689] transition-all duration-500"
+                            [style.width.%]="progress"></div>
+                    </div>
+                </div>
+
+                <!-- Camera Preview -->
+                <div
+                    class="video-container mt-6 w-full overflow-hidden rounded-[16px] border-4 border-[#00BBA7] flex items-center justify-center">
+                    <video #videoElement autoplay playsinline class="video-flipped h-full object-cover"
+                        [class.hidden]="cameraError"></video>
+
+                    <!-- Mensaje de error si no hay cámara -->
+                    <div *ngIf="cameraError" class="flex h-full items-center justify-center">
+                        <p class="text-montserrat text-center text-white px-4">{{ cameraError }}</p>
+                    </div>
+                </div>
+
+                <!-- Instruction -->
+                <p class="privacy-note mt-4 flex items-center justify-center gap-2 text-center text-[12px]">
+                    <img src="icons/Icon (11).svg" alt="Info" class="privacy-icon flex-shrink-0" />
+                    Mantén la cámara y respira naturalmente
+                </p>
+
+                <!-- Steps Container -->
+                <div class="status-card mt-6 w-full rounded-[16px]" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.10), 0 2px 4px -2px rgba(0, 0, 0, 0.10);
+                           padding: 12.667px 12.667px 8.667px 12.667px; display: flex; flex-direction: column;
+                           align-items: flex-start; flex-shrink: 0; align-self: stretch;">
+                    <!-- Steps -->
+                    <div class="flex w-full items-center justify-center gap-0">
+                        <ng-container *ngFor="let step of steps; let i = index; let isLast = last">
+                            <div class="status-item flex flex-col items-center">
+                                <!-- Círculo del indicador -->
+                                <div class="status-icon flex items-center justify-center rounded-full transition-all duration-300"
+                                    [ngStyle]="{
+                                    'background': step.status === 'completed' ? 'linear-gradient(135deg, #00BBA7 0%, #00786F 100%)' :
+                                                  step.status === 'active' ? 'linear-gradient(135deg, #9AE600 0%, #5EA500 100%)' : '#D1D5DC',
+                                    'box-shadow': step.status === 'completed' ? '0 0 0 4px #CBFBF1, 0 28px 25px -5px rgba(0, 0, 0, 0.10)' :
+                                                  step.status === 'active' ? '0 0 0 4px #D0F999, 0 28px 25px -5px rgba(0, 0, 0, 0.10)' : 'none'
+                                }">
+
+                                    <!-- CÍRCULO 1: SIEMPRE Icon (17).svg - solo cambia opacidad -->
+                                    <img *ngIf="step.id === 1" src="icons/Icon (17).svg" alt="Atención" class="h-4 w-4"
+                                        [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+
+                                    <!-- CÍRCULO 2: Flecha pending, Icon 18 active/completed -->
+                                    <img *ngIf="step.id === 2 && step.status === 'pending'" src="icons/Icon (23).svg"
+                                        alt="Concentración pendiente" class="status-icon-pending h-4 w-4" />
+                                    <img *ngIf="step.id === 2 && (step.status === 'active' || step.status === 'completed')"
+                                        src="icons/Icon (18).svg" alt="Concentración" class="h-4 w-4" />
+
+                                    <!-- CÍRCULO 3: Flecha pending, Icon 19 active/completed -->
+                                    <img *ngIf="step.id === 3 && step.status === 'pending'" src="icons/Icon (24).svg"
+                                        alt="Equilibrio pendiente" class="status-icon-pending h-4 w-4" />
+                                    <img *ngIf="step.id === 3 && (step.status === 'active' || step.status === 'completed')"
+                                        src="icons/Icon (19).svg" alt="Equilibrio" class="h-4 w-4" />
+
+                                    <!-- CÍRCULO 4: SIEMPRE Icon (20).svg - solo cambia opacidad -->
+                                    <img *ngIf="step.id === 4" src="icons/Icon (20).svg" alt="Positividad"
+                                        class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+
+                                    <!-- CÍRCULO 5: SIEMPRE Icon (21).svg - solo cambia opacidad -->
+                                    <img *ngIf="step.id === 5" src="icons/Icon (21).svg" alt="Calma" class="h-4 w-4"
+                                        [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                </div>
+                                <!-- Nombre de la emoción -->
+                                <span class="step-name mt-2 text-[11px] font-semibold text-center leading-tight"
+                                    [ngClass]="{
+                                    'text-[#00BBA7]': step.status === 'completed' || step.status === 'active',
+                                    'text-[#9CA3AF]': step.status === 'pending'
+                                }">{{ step.name }}</span>
+                            </div>
+
+                            <!-- Línea de progreso entre círculos -->
+                            <div *ngIf="!isLast" class="step-connector flex items-center">
+                                <div class="step-connector-line">
+                                    <div class="step-connector-progress h-full transition-all duration-500"
+                                        [style.width.%]="step.status === 'completed' ? 100 : 0"></div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <!-- Privacy Notice -->
+                <div class="info-message-box mt-6 w-full rounded-[16px] flex items-center justify-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-[12px]">🔒</span>
+                        <p class="info-message-text text-center text-[11px] leading-[14.667px]">Tus
+                            datos son privados y anónimos</p>
+                    </div>
+                </div>
+
+                <!-- Skip Button -->
+                <button type="button" (click)="skipAnalysis()"
+                    class="text-montserrat-medium mt-4 h-[40px] w-full rounded-[8px] border-[0.667px] border-[#D1D5DC] bg-white px-4 text-[14px] font-medium leading-[20px] text-[#4A5565] transition-all hover:border-[#6B7280] hover:text-[#111827]">
+                    Saltar análisis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div *ngIf="showResults" class="w-full max-w-[672px]">
+        <div
+            class="analysis-card flex flex-col gap-6 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
+
+            <div class="flex flex-col items-center text-center">
+                <!-- Heart Icon (Dynamic) -->
+                <div class="flex h-[64px] w-[64px] items-center justify-center rounded-[16px]"
+                    [style.background]="resultConfig.iconGradient" [style.box-shadow]="resultConfig.iconShadow">
+                    <img src="icons/instrucciones-emocional.svg" alt="Heart" class="h-[36px] w-[36px]" />
+                </div>
+
+                <!-- Title (Dynamic) -->
+                <h2 class="mt-6 text-center font-bold text-[#155DFC]" [style.font-size]="resultConfig.titleSize"
+                    [style.line-height]="resultConfig.titleLineHeight"
+                    style="font-family: Montserrat; font-weight: 700;">{{ resultConfig.title }}</h2>
+
+                <!-- Breathing Container (Dynamic) -->
+                <div class="mt-6 w-full rounded-[16px] flex flex-col items-center"
+                    [style.border]="resultConfig.containerBorderWidth + ' solid ' + resultConfig.containerBorder"
+                    [style.background]="resultConfig.containerBackground"
+                    [style.padding]="resultConfig.containerPadding" [style.gap]="resultConfig.containerGap">
+                    <p class="w-full text-center" [style.color]="resultConfig.messageColor"
+                        [style.font-size]="resultConfig.messageSize"
+                        [style.line-height]="resultConfig.messageLineHeight"
+                        style="font-family: Montserrat; font-weight: 400;">
+                        {{ resultConfig.messageText }}
+                    </p>
+
+                    <!-- Button (Dynamic) -->
+                    <button type="button" (click)="startGuidedPause()"
+                        class="w-full rounded-[8px] text-white transition-all hover:brightness-90 flex items-center justify-center gap-2 whitespace-nowrap"
+                        [style.background]="resultConfig.buttonGradient" [style.box-shadow]="resultConfig.buttonShadow"
+                        [style.font-size]="resultConfig.buttonFontSize"
+                        [style.font-weight]="resultConfig.buttonFontWeight"
+                        [style.line-height]="resultConfig.buttonLineHeight" [style.padding]="resultConfig.buttonPadding"
+                        style="font-family: Montserrat;">
+                        <span>{{ resultConfig.buttonEmoji }}</span>
+                        <span>{{ resultConfig.buttonText }}</span>
+                        <img [src]="resultConfig.buttonIcon" alt="" class="h-4 w-4"
+                            style="filter: brightness(0) invert(1);" />
+                    </button>
+                </div>
+
+                <!-- Summary -->
+                <div class="mt-3 w-full rounded-[16px] flex flex-col"
+                    style="border: 0.667px solid #D8F999; background: linear-gradient(135deg, #F7FEE7 0%, #F0FDFA 10%); padding: 16px 40px 12px 40px; gap: 8px;">
+                    <h3 class="text-center text-[#00786F]"
+                        style="font-family: Montserrat; font-size: 12px; font-weight: 700; line-height: 16px;">Resumen
+                        de Análisis Emocional</h3>
+
+                    <div class="flex items-center justify-between ">
+                        <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center gap-2">
+                            <div class="flex h-[32px] w-[32px]  items-center justify-center"
+                                [style.background]="getStepColor(i)" style="border-radius: 10px;">
+                                <img [src]="getStepIcon(step.id)" [alt]="step.name" class="h-4 w-4" />
+                            </div>
+                            <span class="text-center"
+                                style="font-family: Montserrat; font-size: 9px; font-weight: 400; line-height: 13.5px; color: #4A5565;">{{
+                                step.name }}</span>
+                            <span class="text-center"
+                                style="font-family: Montserrat; font-size: 9px; font-weight: 700; line-height: 13.5px; color: #00786F;">{{
+                                step.percentage }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Message -->
+                <p class="mt-4 text-center text-[12px] text-[#009689]"
+                    style="font-family: Montserrat; font-weight: 600; line-height: 16px;">
+                    ✓ Tu estado emocional fue registrado. Tus próximos contenidos se adaptarán a lo que necesitas hoy.
+                </p>
+
+                <!-- Reminder -->
+                <p class="mt-2 text-center"
+                    style="font-family: Montserrat; font-size: 12px; font-style: italic; font-weight: 400; line-height: 16px; color: #4A5565;">
+                    Recuerda: conocerte es el primer paso para cuidarte.
+                </p>
+
+                <!-- Go to Evaluations Button -->
+                <button type="button" (click)="goToEvaluations()"
+                    class="mt-6 h-[38px] w-full rounded-[8px] px-5 text-[15px] font-bold leading-[22px] text-white shadow-lg transition-all hover:brightness-90"
+                    style="background: linear-gradient(90deg, #00BBA7 0%, #155DFC 100%); font-family: Montserrat; font-weight: 700;">
+                    Ir a mis evaluaciones
+                    <span class="ml-2">→</span>
+                </button>
+
+                <!-- Privacy Notice -->
+                <div class="mt-4 flex items-center justify-center gap-2">
+                    <span class="text-[12px]">🔒</span>
+                    <p class="text-montserrat-normal text-center text-[11px] text-[#4A5565]">Todas tus respuestas son
+                        confidenciales y están protegidas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

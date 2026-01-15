@@ -1,0 +1,59 @@
+// Estilos personalizados para el menú vertical
+::ng-deep {
+    .fuse-vertical-navigation {
+
+        // Ajustar espaciado general
+        .fuse-vertical-navigation-content {
+            padding-top: 1rem !important;
+        }
+
+        // Estilo de los items del menú
+        .fuse-vertical-navigation-item-wrapper {
+            margin-bottom: 0.5rem !important;
+
+            .fuse-vertical-navigation-item {
+                padding: 0.875rem 1.5rem !important;
+                min-height: 48px !important;
+                border-radius: 0.5rem !important;
+                margin: 0 0.75rem !important;
+
+                // Fuente del título
+                .fuse-vertical-navigation-item-title-wrapper {
+                    .fuse-vertical-navigation-item-title {
+                        font-family: 'Montserrat', sans-serif !important;
+                        font-size: 0.9375rem !important;
+                        font-weight: 500 !important;
+                        letter-spacing: 0.01em !important;
+                    }
+                }
+
+                // Icono
+                .fuse-vertical-navigation-item-icon {
+                    width: 20px !important;
+                    height: 20px !important;
+                    min-width: 20px !important;
+                    margin-right: 0.875rem !important;
+                }
+
+                // Hover
+                &:hover {
+                    background-color: rgba(59, 130, 246, 0.08) !important;
+                }
+
+                // Active state
+                &.fuse-vertical-navigation-item-active,
+                &.fuse-vertical-navigation-item-active-forced {
+                    background-color: rgba(59, 130, 246, 0.12) !important;
+
+                    .fuse-vertical-navigation-item-title {
+                        color: #3B82F6 !important;
+                    }
+
+                    .fuse-vertical-navigation-item-icon {
+                        color: #3B82F6 !important;
+                    }
+                }
+            }
+        }
+    }
+}

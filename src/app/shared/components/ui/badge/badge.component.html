@@ -1,0 +1,10 @@
+<div class="emo-badge">
+    @if (icon) {
+    <mat-icon class="emo-badge__icon" [svgIcon]="icon" [style.width.px]="iconSize" [style.height.px]="iconSize"
+        [style.font-size.px]="iconSize">
+    </mat-icon>
+    }
+    <span class="emo-badge__text">
+        <ng-content></ng-content>
+    </span>
+</div>

@@ -1,0 +1,23 @@
+.emo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    color: #FFFFFF;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+
+    &__icon {
+        color: #FFFFFF;
+        flex-shrink: 0;
+    }
+
+    &__text {
+        line-height: 1.2;
+    }
+}

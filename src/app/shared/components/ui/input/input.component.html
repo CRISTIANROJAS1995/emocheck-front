@@ -1,0 +1,21 @@
+<div class="emo-input-wrapper">
+    @if (label) {
+    <label class="emo-input-label">{{ label }}</label>
+    }
+
+    <div class="emo-input-container" [class.emo-input-container--error]="errorMessage">
+        @if (icon) {
+        <div class="emo-input-icon">
+            <img [src]="'icons/' + icon" alt="" class="emo-input-icon__img" />
+        </div>
+        }
+
+        <input [type]="type" [placeholder]="placeholder" [value]="value" [disabled]="disabled"
+            [class]="icon ? 'emo-input emo-input--with-icon' : 'emo-input'" (input)="onInputChange($event)"
+            (blur)="onBlur()" />
+    </div>
+
+    @if (errorMessage) {
+    <div class="emo-input-error">{{ errorMessage }}</div>
+    }
+</div>

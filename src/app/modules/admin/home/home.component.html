@@ -1,0 +1,72 @@
+<div class="relative w-full min-h-screen overflow-hidden"
+    style="background: linear-gradient(180deg, #F0FDF4 0%, #FEFEFE 40%, #F0FDFA 100%);">
+    <!-- Decorative blur circles -->
+    <div class="blur-circle blur-circle--white-large"></div>
+    <div class="blur-circle blur-circle--blue-small"></div>
+
+    <!-- Main content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-10">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner rounded-3xl">
+            <div class="welcome-banner-glow welcome-banner-glow--bottom-left"></div>
+            <div>
+                <div class="flex items-center gap-2 mb-0.5">
+                    <mat-icon class="text-white" style="width: 16px; height: 16px; font-size: 16px;"
+                        svgIcon="heroicons_outline:sparkles"></mat-icon>
+                    <h1 class="welcome-banner-title">Hola, {{ userName }}</h1>
+                </div>
+                <p class="welcome-banner-subtitle mb-2">Personas sanas, organizaciones fuertes</p>
+                <p class="welcome-banner-text">
+                    Gracias por cuidar de ti. EmoCheck te acompañará en un recorrido breve para conocer tu bienestar y
+                    salud mental. Cada paso que das hacia el autocuidado fortalece no solo tu vida, sino también el
+                    ambiente en el que trabajas.
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+                <emo-badge icon="heroicons_outline:lock-closed" [iconSize]="12">
+                    Todas tus respuestas son confidenciales
+                </emo-badge>
+                <emo-badge icon="heroicons_outline:check-circle" [iconSize]="12">
+                    Tu bienestar es nuestra prioridad
+                </emo-badge>
+            </div>
+        </div>
+
+        <!-- Modules section -->
+        <div class="mb-10 mt-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6" style="font-family: 'Montserrat', sans-serif;">
+                Selecciona un módulo para comenzar
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                @for (module of modules; track module.id) {
+                <emo-module-card [module]="module" (onStartEvaluation)="startEvaluation($event)"
+                    (onViewPlan)="viewPlan($event)">
+                </emo-module-card>
+                }
+            </div>
+        </div>
+
+        <!-- Resources section -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-6" style="font-family: 'Montserrat', sans-serif;">
+                Centro de Recursos de Bienestar
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                @for (resource of resources; track resource.id) {
+                <div class="resource-card">
+                    <div class="resource-icon" [ngClass]="resource.iconClass">
+                        <mat-icon [svgIcon]="resource.icon"></mat-icon>
+                    </div>
+                    <h3 class="resource-title">{{ resource.title }}</h3>
+                    <p class="resource-description">{{ resource.description }}</p>
+                    <button class="resource-button" (click)="resource.action()">
+                        {{ resource.buttonText }}
+                    </button>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

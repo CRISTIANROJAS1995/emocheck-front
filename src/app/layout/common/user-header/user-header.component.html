@@ -1,0 +1,70 @@
+<div class="bg-card">
+    <div class="mx-auto flex w-full max-w-screen-xl flex-col px-6 sm:px-8">
+        <div class="my-8 ml-10  flex min-w-0 flex-auto flex-col sm:my-8 sm:flex-row sm:items-center ">
+            <!-- Avatar and name -->
+            <div class="flex min-w-0 flex-auto items-center">
+                <!-- Avatar -->
+                <div class="h-16 w-16 flex-0 overflow-hidden rounded-full bg-gray-200">
+                    <!-- 🔧 Avatar por defecto siempre visible -->
+                    <img [src]="(user?.avatar || 'images/avatars/male-01.jpg')" 
+                         class="h-full w-full object-cover"
+                         alt="Avatar Usuario" 
+                         onError="this.src='images/avatars/male-01.jpg'" />
+                </div>
+
+                <!-- Info -->
+                <div class="ml-4 flex min-w-0 flex-col">
+                    <!-- Nombre -->
+                    <div class="truncate text-3xl font-bold leading-none tracking-tight md:text-3xl md:leading-snug">
+                        Bienvenido, {{ user?.name || 'Usuario' }}
+                    </div>
+
+                    <!-- Información básica -->
+                    <div class="mt-2 flex flex-wrap gap-x-4 text-secondary leading-6">
+                        <div class="flex">
+                            <div class="font-semibold">Compañía:</div>
+                            <div class="ml-1 truncate">
+                                {{ user?.company || 'Motion IQ Solutions' }}
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="font-semibold">Área:</div>
+                            <div class="ml-1 truncate">
+                                {{ user?.role || 'Administración' }}
+                            </div>
+                        </div>
+                        <div class="flex">
+                            <div class="font-semibold">Email:</div>
+                            <div class="ml-1 truncate">
+                                {{ user?.email || 'admin@motioniq.com' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Roles -->
+                    <div class="mt-2 flex flex-wrap gap-2">
+                        <div class="font-semibold">Rol:</div>
+                        <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                            {{ user?.role || 'Admin' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <!-- <div class="mt-6 flex items-center space-x-3 sm:ml-2 sm:mt-0">
+                    <button class="bg-accent" mat-flat-button [color]="'accent'">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
+                        <span class="ml-2">Messages</span>
+                    </button>
+                    <button mat-flat-button [color]="'primary'">
+                        <mat-icon class="icon-size-5" [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
+                        <span class="ml-2">Configuración</span>
+                    </button>
+                </div> -->
+        </div>
+
+
+
+    </div>
+</div>

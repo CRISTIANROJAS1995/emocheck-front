@@ -1,0 +1,142 @@
+<div class="page-gradient-bg relative flex min-h-screen w-full items-center justify-center overflow-hidden px-6 py-10">
+
+    <!-- Decorative background circles -->
+    <app-background-circles></app-background-circles>
+
+    <div class="w-full max-w-[576px]">
+        <div
+            class="profile-card flex flex-col gap-6 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
+            <div class="flex flex-col items-center text-center">
+                <!-- Logo -->
+                <div class="flex items-center justify-center">
+                    <img src="images/logo/emocheck-logo.png" alt="EmoCheck" class="w-[150px] h-auto" />
+                </div>
+
+                <!-- Title -->
+                <h2 class="text-montserrat-bold mt-5 text-center text-[16px] font-bold leading-[24px] text-[#155DFC]">
+                    Completa tu perfil</h2>
+
+                <!-- Subtitle -->
+                <div
+                    class="text-montserrat mt-2 flex items-center justify-center gap-2 text-center text-[13px] font-bold leading-[18.571px] text-[#009689]">
+                    <img src="icons/Icon.svg" alt="" class="h-[14px] w-[14px]" />
+                    <span>Tu primer paso hacia un espacio de cuidado y escucha</span>
+                    <img src="icons/Icon.svg" alt="" class="h-[14px] w-[14px]" />
+                </div>
+
+                <!-- Form -->
+                <form [formGroup]="profileForm" class="mt-6 w-full">
+                    <!-- Full Name and ID Document (side by side) -->
+                    <div class="mb-4 flex gap-4">
+                        <!-- Full Name -->
+                        <div class="flex-1">
+                            <label
+                                class="form-label mb-2 block text-left text-[14px] font-medium leading-[14px] text-[#0A0A0A]">Nombre
+                                completo</label>
+                            <input type="text" formControlName="fullName" placeholder="María Gómez"
+                                [class.border-red-500]="profileForm.get('fullName')?.invalid && profileForm.get('fullName')?.touched"
+                                class="form-input h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-4 text-[14px] font-normal leading-[20px] text-[#0A0A0A] placeholder:text-slate-400 focus:border-[#96F7E4] focus:outline-none focus:ring-0" />
+                            <span *ngIf="profileForm.get('fullName')?.invalid && profileForm.get('fullName')?.touched"
+                                class="mt-1 block text-[12px] text-red-500">Este campo es requerido</span>
+                        </div>
+
+                        <!-- ID Document -->
+                        <div class="flex-1">
+                            <label
+                                class="form-label mb-2 block text-left text-[14px] font-medium leading-[14px] text-[#0A0A0A]">Documento
+                                de identidad</label>
+                            <input type="text" formControlName="idDocument" placeholder="1234567890"
+                                [class.border-red-500]="profileForm.get('idDocument')?.invalid && profileForm.get('idDocument')?.touched"
+                                class="form-input h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-4 text-[14px] font-normal leading-[20px] text-[#0A0A0A] placeholder:text-slate-400 focus:border-[#96F7E4] focus:outline-none focus:ring-0" />
+                            <span
+                                *ngIf="profileForm.get('idDocument')?.invalid && profileForm.get('idDocument')?.touched"
+                                class="mt-1 block text-[12px] text-red-500">Este campo es requerido</span>
+                        </div>
+                    </div>
+
+                    <!-- Area and Sede (side by side) -->
+                    <div class="mb-4 flex gap-4">
+                        <!-- Area -->
+                        <div class="flex-1">
+                            <label
+                                class="form-label mb-2 block text-left text-[14px] font-medium leading-[14px] text-[#0A0A0A]">Área</label>
+                            <select formControlName="area"
+                                [class.border-red-500]="profileForm.get('area')?.invalid && profileForm.get('area')?.touched"
+                                class="form-select h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-4 text-[14px] font-normal leading-[20px] text-[#0A0A0A] focus:border-[#96F7E4] focus:outline-none focus:ring-0">
+                                <option value="" disabled selected>Selecciona tu área</option>
+                                <option value="ventas">Ventas</option>
+                                <option value="marketing">Marketing</option>
+                                <option value="rrhh">Recursos Humanos</option>
+                                <option value="ti">Tecnología</option>
+                            </select>
+                            <span *ngIf="profileForm.get('area')?.invalid && profileForm.get('area')?.touched"
+                                class="mt-1 block text-[12px] text-red-500">Este campo es requerido</span>
+                        </div>
+
+                        <!-- Sede -->
+                        <div class="flex-1">
+                            <label
+                                class="form-label mb-2 block text-left text-[14px] font-medium leading-[14px] text-[#0A0A0A]">Sede</label>
+                            <select formControlName="sede"
+                                [class.border-red-500]="profileForm.get('sede')?.invalid && profileForm.get('sede')?.touched"
+                                class="form-select h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-4 text-[14px] font-normal leading-[20px] text-[#0A0A0A] focus:border-[#96F7E4] focus:outline-none focus:ring-0">
+                                <option value="" disabled selected>Selecciona tu sede</option>
+                                <option value="bogota">Bogotá</option>
+                                <option value="medellin">Medellín</option>
+                                <option value="cali">Cali</option>
+                                <option value="barranquilla">Barranquilla</option>
+                            </select>
+                            <span *ngIf="profileForm.get('sede')?.invalid && profileForm.get('sede')?.touched"
+                                class="mt-1 block text-[12px] text-red-500">Este campo es requerido</span>
+                        </div>
+                    </div>
+
+                    <!-- Position -->
+                    <div class="mb-4">
+                        <label
+                            class="form-label mb-2 block text-left text-[14px] font-medium leading-[14px] text-[#0A0A0A]">Tipo
+                            de cargo</label>
+                        <select formControlName="position"
+                            [class.border-red-500]="profileForm.get('position')?.invalid && profileForm.get('position')?.touched"
+                            class="form-select h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-4 text-[14px] font-normal leading-[20px] text-[#0A0A0A] focus:border-[#96F7E4] focus:outline-none focus:ring-0">
+                            <option value="" disabled selected>Selecciona tu tipo de cargo</option>
+                            <option value="operativo">Operativo</option>
+                            <option value="administrativo">Administrativo</option>
+                            <option value="directivo">Directivo</option>
+                            <option value="gerencial">Gerencial</option>
+                        </select>
+                        <span *ngIf="profileForm.get('position')?.invalid && profileForm.get('position')?.touched"
+                            class="mt-1 block text-[12px] text-red-500">Este campo es requerido</span>
+                    </div>
+
+                    <!-- Corporate Email -->
+                    <div class="mb-6">
+                        <label
+                            class="form-label mb-2 block text-left text-[14px] font-medium leading-[14px] text-[#0A0A0A]">Correo
+                            electrónico corporativo</label>
+                        <input type="email" formControlName="email" placeholder="maria.gomez@empresa.com"
+                            [class.border-red-500]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+                            class="form-input h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-4 text-[14px] font-normal leading-[20px] text-[#0A0A0A] placeholder:text-slate-400 focus:border-[#96F7E4] focus:outline-none focus:ring-0" />
+                        <span *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched"
+                            class="mt-1 block text-[12px] text-red-500">
+                            <span *ngIf="profileForm.get('email')?.hasError('required')">Este campo es requerido</span>
+                            <span *ngIf="profileForm.get('email')?.hasError('email')">Por favor ingresa un correo
+                                válido</span>
+                        </span>
+                    </div>
+
+                    <!-- Submit button -->
+                    <button type="button" (click)="completeRegistration()"
+                        class="btn-primary-gradient h-[44px] w-full rounded-[14px] px-5 text-[14px] font-medium leading-[20px] text-white shadow-lg transition-all hover:brightness-90">
+                        Completar registro e ingresar
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Privacy notice -->
+        <div class="text-privacy mt-3 text-center text-[11px] font-normal leading-[15.714px]">
+            Tus datos están protegidos bajo los más altos estándares de confidencialidad
+        </div>
+    </div>
+</div>

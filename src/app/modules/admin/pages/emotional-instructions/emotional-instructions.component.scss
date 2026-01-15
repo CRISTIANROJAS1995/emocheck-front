@@ -1,0 +1,90 @@
+// Estilos específicos del componente
+.page-gradient-bg {
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFF 50%, #F0FDFA 100%);
+}
+
+// Blur circles
+.blur-circle-blue {
+    background: rgba(43, 127, 255, 0.20);
+    filter: blur(40px);
+}
+
+.blur-circle-teal {
+    background: rgba(0, 187, 167, 0.20);
+    filter: blur(64px);
+}
+
+.blur-circle-green {
+    background: rgba(154, 230, 0, 0.20);
+    filter: blur(64px);
+}
+
+// Card principal
+.instructions-card {
+    max-height: 95vh;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+// Icon gradient
+.icon-gradient {
+    background: linear-gradient(135deg, #00D5BE 0%, #009689 100%);
+}
+
+// Instruction box
+.instruction-box {
+    background: linear-gradient(135deg, #F7FEE7 0%, #FEFCE8 100%);
+}
+
+// Instruction icons
+.instruction-icon-teal {
+    background: linear-gradient(135deg, #00D5BE 0%, #009689 100%);
+}
+
+.instruction-icon-green {
+    background: linear-gradient(135deg, #9AE600 0%, #5EA500 100%);
+}
+
+.instruction-icon-blue {
+    background: linear-gradient(135deg, #51A2FF 0%, #155DFC 100%);
+}
+
+// Warning box
+.warning-box {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+}
+
+// Privacy notice box
+.privacy-box {
+    background: linear-gradient(135deg, #EFF6FF 0%, #F0F9FF 100%);
+}
+
+// Buttons
+.btn-turquoise-gradient {
+    background: linear-gradient(90deg, #00BBA7 0%, #155DFC 100%);
+}
+
+.btn-gray {
+    background: #F3F4F6;
+}
+
+// Typography - Montserrat family
+.text-montserrat {
+    font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.text-montserrat-bold {
+    font-family: Montserrat;
+    font-weight: 700;
+}
+
+.text-montserrat-semibold {
+    font-family: Montserrat;
+    font-weight: 600;
+}
+
+.text-montserrat-normal {
+    font-family: Montserrat;
+    font-weight: 400;
+}

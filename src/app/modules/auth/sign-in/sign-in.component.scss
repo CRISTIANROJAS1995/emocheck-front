@@ -1,0 +1,41 @@
+// Sign In Page Styles
+
+// Page background with gradient
+.page-gradient-bg {
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFF 50%, #F0FDFA 100%);
+}
+
+// Card container
+.signin-card {
+    // No aplicar font-family aquí para no afectar todo globalmente
+}
+
+// Título principal
+.signin-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+// Subtítulo
+.signin-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+}
+
+// Form labels
+.form-label {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+}
+
+// Textos con weight 480 (botones secundarios, links, footer)
+.text-montserrat-480 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+}
+
+// Privacy notice
+.privacy-notice {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+}

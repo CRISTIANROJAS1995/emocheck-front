@@ -1,0 +1,232 @@
+// Estilos específicos del componente
+.page-gradient-bg {
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFF 50%, #F0FDFA 100%);
+}
+
+// Blur circles
+.blur-circle-blue {
+    background: rgba(43, 127, 255, 0.20);
+    filter: blur(40px);
+}
+
+.blur-circle-teal {
+    background: rgba(0, 187, 167, 0.20);
+    filter: blur(64px);
+}
+
+.blur-circle-green {
+    background: rgba(154, 230, 0, 0.20);
+    filter: blur(64px);
+}
+
+// Card principal
+.analysis-card {
+    max-height: 95vh;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+// Icon gradient
+.icon-gradient {
+    background: linear-gradient(135deg, #00D5BE 0%, #009689 100%);
+}
+
+// Typography
+.text-montserrat {
+    font-family: Montserrat;
+}
+
+.text-montserrat-bold {
+    font-family: Montserrat;
+    font-weight: 700;
+}
+
+.text-montserrat-semibold {
+    font-family: Montserrat;
+    font-weight: 600;
+}
+
+.text-montserrat-normal {
+    font-family: Montserrat;
+    font-weight: 400;
+}
+
+// Progress text
+.progress-step {
+    color: #4A5565;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+.progress-percent {
+    color: #009689;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+// Video section
+.video-container {
+    height: 272px;
+    flex-shrink: 0;
+    align-self: stretch;
+    background: #1E293B;
+}
+
+.video-flipped {
+    transform: scaleX(-1);
+    width: auto;
+    max-width: 100%;
+}
+
+// Privacy notice
+.privacy-note {
+    color: #6A7282;
+    font-family: Montserrat;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 16px;
+}
+
+.privacy-icon {
+    width: 12px;
+    height: 12px;
+}
+
+// Status card
+.status-card {
+    border: 0.667px solid #96F7E4;
+    background: rgba(255, 255, 255, 0.90);
+    box-shadow: 0px 0px 24px 0px rgba(0, 0, 0, 0.04);
+}
+
+// Status card
+.status-card {
+    border: 0.667px solid #96F7E4;
+    background: rgba(255, 255, 255, 0.90);
+    box-shadow: 0px 0px 24px 0px rgba(0, 0, 0, 0.04);
+}
+
+.step-connector {
+    flex: 0 0 auto;
+    margin: 0 -4px;
+    margin-top: -24px;
+}
+
+.step-connector-line {
+    width: 30px;
+    height: 2px;
+    background: #D1D5DC;
+    border-radius: 2px;
+}
+
+.step-connector-progress {
+    background: #00BBA7;
+    border-radius: 2px;
+}
+
+.step-name {
+    font-family: Montserrat;
+}
+
+// Info message box
+.info-message-box {
+    height: 40px;
+    padding: 12.667px;
+    border: 0.667px solid rgba(190, 219, 255, 0.50);
+    background: rgba(239, 246, 255, 0.50);
+}
+
+.info-message-text {
+    color: #4A5565;
+    font-family: Montserrat;
+    font-style: italic;
+    font-weight: 400;
+}
+
+// Results screen
+.results-subtitle {
+    font-family: Montserrat;
+    font-weight: 400;
+}
+
+.results-message {
+    font-family: Montserrat;
+}
+
+.results-icon-filter {
+    filter: brightness(0) invert(1);
+}
+
+.results-summary-card {
+    border: 0.667px solid #D8F999;
+    background: linear-gradient(135deg, #F7FEE7 0%, #F0FDFA 10%);
+    padding: 16px 40px 12px 40px;
+    gap: 8px;
+}
+
+.results-summary-title {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.results-step-icon {
+    border-radius: 10px;
+}
+
+.results-step-label {
+    font-family: Montserrat;
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 13.5px;
+    color: #4A5565;
+}
+
+.results-step-value {
+    font-family: Montserrat;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 13.5px;
+    color: #00786F;
+}
+
+.results-next-title {
+    font-family: Montserrat;
+    font-weight: 600;
+    line-height: 16px;
+}
+
+.results-next-text {
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 16px;
+    color: #4A5565;
+}
+
+.btn-turquoise-gradient {
+    background: linear-gradient(90deg, #00BBA7 0%, #155DFC 100%);
+    font-family: Montserrat;
+    font-weight: 700;
+}
+
+.text-montserrat-medium {
+    font-family: Montserrat;
+    font-weight: 500;
+}
+
+.status-item {
+    flex: 1 0 0;
+}
+
+.status-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.status-icon-pending {
+    opacity: 0.5;
+}

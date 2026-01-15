@@ -1,0 +1,64 @@
+// Estilos específicos del componente
+.page-gradient-bg {
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFF 50%, #F0FDFA 100%);
+}
+
+// Card principal
+.profile-card {
+    max-height: 95vh;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+// Typography
+.text-montserrat {
+    font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.text-montserrat-bold {
+    font-family: Montserrat;
+    font-weight: 700;
+}
+
+.text-montserrat-medium {
+    font-family: Montserrat;
+    font-weight: 500;
+}
+
+// Form elements
+.form-label {
+    font-family: Montserrat;
+    font-weight: 500;
+}
+
+.form-input {
+    font-family: Montserrat;
+}
+
+.form-select {
+    font-family: Montserrat;
+}
+
+// Button
+.btn-primary-gradient {
+    background: linear-gradient(90deg, #7CCF00 0%, #5EA500 100%);
+    font-family: Montserrat;
+}
+
+// Privacy text
+.text-privacy {
+    color: #4A5565;
+    font-family: Montserrat;
+}
+
+// Hacer el icono del select más opaco
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999999' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 12px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
