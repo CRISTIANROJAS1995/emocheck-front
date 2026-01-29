@@ -13,8 +13,10 @@
     white-space: nowrap;
 
     &__icon {
-        color: #FFFFFF;
+        color: #FFF !important;
+        fill: #FFF !important;
         flex-shrink: 0;
+        filter: brightness(0) invert(1);
     }
 
     &__text {

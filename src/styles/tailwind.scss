@@ -2,3 +2,35 @@
 /*  @ Main Tailwind file for injecting utilities.
 /* ----------------------------------------------------------------------------------------------------- */
 @tailwind utilities;
+
+/* ----------------------------------------------------------------------------------------------------- */
+/*  @ EmoCheck - Vertical navigation hover colors (must be AFTER utilities)
+/* ----------------------------------------------------------------------------------------------------- */
+
+/* Default hover: teal (#1C887F) */
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item:not(.fuse-vertical-navigation-item-disabled):hover {
+    background-color: rgba(28, 136, 127, 0.16) !important;
+}
+
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item:not(.fuse-vertical-navigation-item-disabled):hover .fuse-vertical-navigation-item-title,
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item:not(.fuse-vertical-navigation-item-disabled):hover .fuse-vertical-navigation-item-title span {
+    color: #1C887F !important;
+}
+
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item:not(.fuse-vertical-navigation-item-disabled):hover .fuse-vertical-navigation-item-icon {
+    color: #1C887F !important;
+}
+
+/* Special hover: green (#A2BF77) only for marked items */
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item.nav-hover-green-item:not(.fuse-vertical-navigation-item-disabled):hover {
+    background-color: rgba(162, 191, 119, 0.18) !important;
+}
+
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item.nav-hover-green-item:not(.fuse-vertical-navigation-item-disabled):hover .fuse-vertical-navigation-item-title,
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item.nav-hover-green-item:not(.fuse-vertical-navigation-item-disabled):hover .fuse-vertical-navigation-item-title span {
+    color: #A2BF77 !important;
+}
+
+fuse-vertical-navigation .fuse-vertical-navigation-item.nav-item.nav-hover-green-item:not(.fuse-vertical-navigation-item-disabled):hover .fuse-vertical-navigation-item-icon {
+    color: #A2BF77 !important;
+}

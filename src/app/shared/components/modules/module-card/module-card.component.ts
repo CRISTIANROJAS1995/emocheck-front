@@ -35,4 +35,22 @@ export class ModuleCardComponent {
         };
         return variantMap[this.module.colorClass] || 'primary';
     }
+
+    getTitleClass(): string {
+        const titleClassMap: Record<string, string> = {
+            'module-card--mental-health': 'module-title--blue',
+            'module-card--work-fatigue': 'module-title--green',
+            'module-card--organizational-climate': 'module-title--teal',
+            'module-card--psychosocial-risk': 'module-title--orange'
+        };
+        return titleClassMap[this.module.colorClass] || 'module-title--blue';
+    }
+
+    getStatusClass(): string {
+        if (!this.module.status) {
+            return '';
+        }
+
+        return `module-status--${this.module.status.tone}`;
+    }
 }

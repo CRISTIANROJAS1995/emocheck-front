@@ -6,11 +6,10 @@
     [navigation]="navigation.default">
     <!-- Navigation header hook -->
     <ng-container fuseVerticalNavigationContentHeader>
-        <div class="flex h-24 items-center justify-between px-6">
-            <img class="h-36 mt-8 w-auto mx-auto" src="images/logo/emocheck-logo.png" alt="EmoCheck" />
+        <div class="flex items-center justify-between px-6 pt-8 pb-10">
+            <img class="h-32 w-auto" src="images/logo/emocheck-logo.png" alt="EmoCheck" />
 
-            <button class="absolute right-4 top-4" mat-icon-button (click)="toggleNavigation('mainNavigation')"
-                aria-label="Cerrar menú">
+            <button mat-icon-button (click)="toggleNavigation('mainNavigation')" aria-label="Cerrar menú">
                 <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
             </button>
         </div>
@@ -18,11 +17,12 @@
 
     <!-- Navigation footer hook -->
     <ng-container fuseVerticalNavigationContentFooter>
-        <div class="px-4 pb-4">
-            <div class="my-3 border-t"></div>
-            <a class="flex items-center gap-3 text-secondary" routerLink="/sign-out">
-                <mat-icon class="text-secondary" [svgIcon]="'heroicons_outline:arrow-right-on-rectangle'"></mat-icon>
-                <span class="font-medium">Cerrar Sesión</span>
+        <div class="px-3 pb-4">
+            <div class="my-4 border-t"></div>
+            <a class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-secondary transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200 dark:hover:bg-red-500/10 dark:hover:text-red-400 dark:focus-visible:ring-red-500/30"
+                routerLink="/sign-out">
+                <mat-icon class="!text-current" [svgIcon]="'heroicons_outline:arrow-right-on-rectangle'"></mat-icon>
+                <span class="text-[17px] font-normal text-current">Cerrar Sesión</span>
             </a>
         </div>
     </ng-container>
@@ -47,13 +47,16 @@
             <!-- Right: actions -->
             <div class="ml-auto flex items-center gap-2">
                 <button mat-icon-button aria-label="Notificaciones">
-                    <mat-icon svgIcon="heroicons_outline:bell"></mat-icon>
+                    <mat-icon svgIcon="heroicons_outline:bell"
+                        style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
                 </button>
                 <button mat-icon-button aria-label="Ayuda">
-                    <mat-icon svgIcon="heroicons_outline:question-mark-circle"></mat-icon>
+                    <mat-icon svgIcon="heroicons_outline:question-mark-circle"
+                        style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
                 </button>
                 <button mat-icon-button aria-label="Configuración">
-                    <mat-icon svgIcon="heroicons_outline:cog-6-tooth"></mat-icon>
+                    <mat-icon svgIcon="heroicons_outline:cog-6-tooth"
+                        style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
                 </button>
                 <user></user>
             </div>
@@ -72,10 +75,10 @@
     </div>
 
     <!-- Footer -->
-    <div
+    <!-- <div
         class="bg-card relative z-49 flex h-14 w-full flex-0 items-center justify-start border-t px-4 dark:bg-transparent md:px-6 print:hidden">
         <span class="text-secondary font-medium">Fuse &copy; {{ currentYear }}</span>
-    </div>
+    </div> -->
 </div>
 
 <!-- Quick chat -->

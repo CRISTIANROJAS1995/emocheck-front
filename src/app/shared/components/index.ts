@@ -6,3 +6,6 @@ export * from './ui/card';
 
 // Module Components
 export * from './modules/module-card';
+
+// Questionnaire Components
+export * from './questionnaire';

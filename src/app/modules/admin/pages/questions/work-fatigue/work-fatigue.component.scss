@@ -1,0 +1,418 @@
+.questionnaire-page {
+    min-height: 100vh;
+    width: 100vw;
+    /* Full-bleed even if a parent container constrains width */
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 50%, #F0FDFA 100%);
+    font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+    padding: 0 20px 56px;
+}
+
+.questionnaire-shell {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.questionnaire-header {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    background: rgba(255, 255, 255, 0.80);
+    border-bottom: 0.667px solid #E5E7EB;
+}
+
+.questionnaire-header-inner {
+    max-width: 1022px;
+    margin: 0 auto;
+    height: 64px;
+    min-height: 64px;
+    padding: 2px 87px 0.667px 87px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.back-button {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    color: rgba(15, 23, 42, 0.70);
+    cursor: pointer;
+
+    svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+
+    &:hover {
+        background: rgba(15, 23, 42, 0.06);
+        color: rgba(15, 23, 42, 0.85);
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+}
+
+.header-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.module-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #84CC16 0%, #65A30D 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 10px 22px rgba(132, 204, 22, 0.20);
+}
+
+.module-badge-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    filter: brightness(0) invert(1);
+}
+
+.header-text {
+    min-width: 0;
+}
+
+.header-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    color: #1E2939;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-subtitle {
+    margin-top: 2px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #6A7282;
+    white-space: nowrap;
+}
+
+.progress-wrap {
+    padding-top: 6px;
+    display: flex;
+    justify-content: center;
+}
+
+.progress-track {
+    height: 8px;
+    width: min(850px, 100%);
+    background: rgba(3, 2, 19, 0.20);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #030213;
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+.questionnaire-main {
+    padding-top: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.question-card {
+    width: min(850px, 100%);
+    background: #F7FCE8;
+    border: 2px solid #E5E7EB;
+    border-radius: 24px;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.10),
+        0 8px 10px -6px rgba(0, 0, 0, 0.10);
+    padding: 50px 50px 2px 58px;
+    margin-top: 32px;
+    min-height: 688px;
+}
+
+.question-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #1E2939;
+    margin: 0;
+}
+
+.question-help {
+    margin: 14px 0 26px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #6A7282;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.option {
+    height: 68px;
+    width: 748px;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 22px;
+    background: rgba(255, 255, 255, 0.50);
+    border: 2px solid #E5E7EB;
+    border-radius: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.80);
+        border-color: #00D5BE;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        border-width: 2px;
+
+        .radio {
+            border-color: #00D5BE;
+            border-width: 2px;
+        }
+
+        .chevron {
+            fill: #00D5BE;
+
+        }
+    }
+
+    &:active,
+    &.selected {
+        border-color: #00D5BE;
+        background: rgba(255, 255, 255, 0.80);
+
+        .radio {
+            border-color: #00D5BE;
+        }
+
+        .chevron {
+            fill: #00D5BE;
+        }
+    }
+}
+
+.radio {
+    width: 24px;
+    height: 24px;
+    border-radius: 22369600px;
+    border: 2px solid #D1D5DC;
+    background: rgba(255, 255, 255, 0.95);
+    flex: 0 0 auto;
+    transition: border-color 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.radio-inner {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #00D5BE;
+    transition: all 0.2s ease;
+}
+
+.option-label {
+    flex: 1;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: #364153;
+}
+
+.chevron {
+    width: 23px;
+    height: 23px;
+    fill: rgba(100, 116, 139, 0.65);
+    flex-shrink: 0;
+    transition: fill 0.2s ease;
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 26px;
+}
+
+.prev-button {
+    height: 36px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    transition: all 0.2s ease;
+
+    // Estado habilitado (por defecto)
+    border: 1px solid #E5E7EB;
+    background: #FFFFFF;
+    color: #000000;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+
+    &:not(:disabled):hover {
+        background: #E5E7EB;
+        border-color: #E5E7EB;
+        color: #000000;
+    }
+
+    &:not(:disabled):active {
+        transform: translateY(1px);
+    }
+
+    // Estado deshabilitado
+    &:disabled {
+        border: 1px solid #E5E7EB;
+        background: #F9FAFB;
+        color: #6B7280;
+        cursor: not-allowed;
+    }
+}
+
+.answered-text {
+    width: 150px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #6A7282;
+}
+
+.reminder {
+    width: min(850px, 100%);
+    margin-top: 12px;
+    border-radius: 16px;
+    border: 0.667px solid #96F7E4;
+    background: rgba(255, 255, 255, 0.80);
+    padding: 16px 24px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    line-height: 20px;
+    text-align: center;
+}
+
+.reminder-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #009689;
+    margin-right: 4px;
+}
+
+.reminder-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #4A5565;
+}
+
+// Decorative background circles
+.blur-circle {
+    position: fixed;
+    border-radius: 9999px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.blur-circle-green {
+    width: 350px;
+    height: 320px;
+    background: rgba(154, 230, 0, 0.12);
+    filter: blur(60px);
+    right: 30px;
+    top: 20px;
+}
+
+.blur-circle-blue {
+    width: 320px;
+    height: 320px;
+    background: rgba(0, 187, 167, 0.10);
+    filter: blur(70px);
+    left: 20px;
+    bottom: 5px;
+}
+
+@media (min-width: 768px) {
+    .questionnaire-page {
+        padding: 26px 32px 70px;
+    }
+}
+
+@media (max-width: 520px) {
+    .question-card {
+        padding: 24px 18px 18px;
+        border-radius: 18px;
+        min-height: unset;
+    }
+
+    .option {
+        height: 54px;
+        padding: 0 14px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .questionnaire-header-inner {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}

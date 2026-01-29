@@ -1,0 +1,71 @@
+<div class="questionnaire-page" [ngStyle]="themeVars">
+    <div class="blur-circle blur-circle--white-large"></div>
+    <div class="blur-circle blur-circle--green-top-right"></div>
+    <div class="blur-circle blur-circle--blue-bottom-left"></div>
+
+    <div class="questionnaire-shell">
+        <header class="questionnaire-header">
+            <div class="questionnaire-header-inner">
+                <div class="header-top">
+                    <button class="back-button" type="button" (click)="goBack()" aria-label="Volver">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M10.5 19.5a1 1 0 0 1-.707-.293l-7-7a1 1 0 0 1 0-1.414l7-7a1 1 0 1 1 1.414 1.414L6.914 10.5H20a1 1 0 1 1 0 2H6.914l4.293 4.293A1 1 0 0 1 10.5 19.5Z" />
+                        </svg>
+                    </button>
+
+                    <div class="header-main">
+                        <div class="module-badge" aria-hidden="true">
+                            <img class="module-badge-icon" [src]="config.icon" alt="" />
+                        </div>
+
+                        <div class="header-text">
+                            <div class="header-title">{{ config.title }}</div>
+                            <div class="header-subtitle">{{ progressText }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="progress-wrap" aria-hidden="true">
+            <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="progress"></div>
+            </div>
+        </div>
+
+        <main class="questionnaire-main">
+            <section class="question-card">
+                <h2 class="question-title">{{ currentQuestion.text }}</h2>
+
+                <p class="question-help">Selecciona la opción que mejor describe tu situación</p>
+
+                <div class="options" role="list">
+                    <button *ngFor="let option of currentQuestion.options; let i = index" class="option"
+                        [class.selected]="isOptionSelected(i)" type="button" role="listitem" (click)="selectOption(i)">
+                        <span class="radio" aria-hidden="true">
+                            <span class="radio-inner" *ngIf="isOptionSelected(i)"></span>
+                        </span>
+                        <span class="option-label">{{ option }}</span>
+                        <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M9 18a1 1 0 0 1-.707-1.707L12.586 12 8.293 7.707A1 1 0 1 1 9.707 6.293l5 5a1 1 0 0 1 0 1.414l-5 5A1 1 0 0 1 9 18Z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="card-footer">
+                    <button class="prev-button" type="button" [disabled]="!canGoBack" (click)="previousQuestion()">
+                        Pregunta anterior
+                    </button>
+                    <div class="answered-text">{{ answeredText }}</div>
+                </div>
+            </section>
+
+            <section class="reminder" aria-label="Recuerda">
+                <span class="reminder-title">Recuerda:</span><span class="reminder-text"> No hay respuestas correctas o
+                    incorrectas. Sé honesto/a contigo mismo/a para obtener los mejores resultados.</span>
+            </section>
+        </main>
+    </div>
+</div>

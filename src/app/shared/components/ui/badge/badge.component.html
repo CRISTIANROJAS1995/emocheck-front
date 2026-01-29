@@ -1,8 +1,13 @@
 <div class="emo-badge">
     @if (icon) {
+    @if (icon.endsWith('.svg') || icon.includes('/')) {
+    <img [src]="icon" class="emo-badge__icon" [style.width.px]="iconSize" [style.height.px]="iconSize"
+        style="filter: brightness(0) invert(1);" alt="" />
+    } @else {
     <mat-icon class="emo-badge__icon" [svgIcon]="icon" [style.width.px]="iconSize" [style.height.px]="iconSize"
-        [style.font-size.px]="iconSize">
+        [style.font-size.px]="iconSize" style="color: #FFF;">
     </mat-icon>
+    }
     }
     <span class="emo-badge__text">
         <ng-content></ng-content>

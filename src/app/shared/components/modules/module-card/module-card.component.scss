@@ -1,85 +1,107 @@
 .module-card {
-    padding: 24px;
-    border-radius: 20px;
+    padding: 18px 22px;
+    border-radius: 24px;
     border: 2px solid;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    transition: box-shadow 0.3s ease;
     cursor: pointer;
 
     &:hover {
-        transform: translateY(-4px);
         box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.12);
+
+        .module-icon {
+            transform: scale(1.08);
+        }
+
+        .module-title {
+            transform: translateX(4px);
+        }
     }
 
     // Salud Mental - Azul claro
     &--mental-health {
-        background: #F0F7FF;
-        border-color: #3B82F6;
+        background: #EFF6FF;
+        border-color: #BEDBFF;
     }
 
     // Fatiga Laboral - Verde claro
     &--work-fatigue {
         background: #F7FEE7;
-        border-color: #7CCF00;
+        border-color: #D8F999;
     }
 
     // Clima Organizacional - Turquesa claro
     &--organizational-climate {
         background: #F0FDFA;
-        border-color: #00BBA7;
+        border-color: #96F7E4;
     }
 
     // Riesgo Psicosocial - Naranja claro
     &--psychosocial-risk {
         background: #FFF7EE;
-        border-color: #FF6B2C;
+        border-color: #FFDBB5;
     }
 }
 
 .module-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: transform 0.3s ease;
 
-    mat-icon {
-        width: 20px;
-        height: 20px;
-        font-size: 20px;
+    mat-icon,
+    img {
+        width: 28px;
+        height: 28px;
+        font-size: 28px;
+        flex-shrink: 0;
     }
 
     &--blue {
-        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        background: linear-gradient(135deg, #2B7FFF 0%, #155DFC 100%);
+        border: none;
 
-        mat-icon {
+        mat-icon,
+        img {
             color: #FFFFFF;
+            filter: brightness(0) invert(1);
         }
     }
 
     &--green {
         background: linear-gradient(135deg, #7CCF00 0%, #5EA500 100%);
+        border: none;
 
-        mat-icon {
+        mat-icon,
+        img {
             color: #FFFFFF;
+            filter: brightness(0) invert(1);
         }
     }
 
     &--teal {
         background: linear-gradient(135deg, #00BBA7 0%, #009689 100%);
+        border: none;
 
-        mat-icon {
+        mat-icon,
+        img {
             color: #FFFFFF;
+            filter: brightness(0) invert(1);
         }
     }
 
     &--orange {
-        background: linear-gradient(135deg, #FF6B2C 0%, #F97316 100%);
+        background: linear-gradient(135deg, #FF6900 0%, #F54900 100%);
+        border: none;
 
-        mat-icon {
+        mat-icon,
+        img {
             color: #FFFFFF;
+            filter: brightness(0) invert(1);
         }
     }
 }
@@ -89,16 +111,214 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 18px;
     font-weight: 700;
-    color: #0F172A;
+    color: #155DFC;
     margin: 0;
-    line-height: 1.2;
+    line-height: 27px;
+    flex: 1;
+    transition: transform 0.3s ease;
+
+    &--blue {
+        color: #155DFC;
+    }
+
+    &--green {
+        color: #497D00;
+    }
+
+    &--teal {
+        color: #009689;
+    }
+
+    &--orange {
+        color: #F54900;
+    }
+}
+
+.module-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+/* Ícono de estado (sin círculo) para Leve/Riesgo Alto */
+.module-outcome-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    display: block;
+    color: #94A3B8;
+}
+
+.module-outcome-icon--warn {
+    color: #F59E0B;
+}
+
+.module-outcome-icon--alert {
+    color: #EF4444;
+}
+
+.module-outcome-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    border: 2px solid rgba(0, 0, 0, 0.12);
+    background: transparent;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #94A3B8;
+
+    &__icon {
+        height: 14px;
+        width: 14px;
+        display: block;
+    }
+
+    &.module-status--success {
+        color: #22C55E;
+        border-color: currentColor;
+        background: transparent;
+    }
+
+    &.module-status--warning {
+        color: #F59E0B;
+        border-color: currentColor;
+        background: transparent;
+    }
+
+    &.module-status--danger {
+        color: #EF4444;
+        border-color: currentColor;
+        background: transparent;
+    }
 }
 
 .module-description {
     font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 400;
-    color: #64748B;
-    margin: 0 0 20px 0;
-    line-height: 1.5;
+    color: #4A5565;
+    margin: 8px 0 16px 0;
+    line-height: 20px;
+}
+
+.module-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 14px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #4A5565;
+    background: transparent;
+    border: none;
+
+    &__points {
+        color: #155DFC;
+        font-weight: 600;
+        width: 79px;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+    &__sep {
+        opacity: 0.9;
+    }
+
+    &__label {
+        color: #4A5565;
+        font-weight: 400;
+        width: 154px;
+        white-space: nowrap;
+    }
+}
+
+/* Puntos por color de módulo */
+.module-card--work-fatigue .module-meta__points {
+    color: #497D00;
+}
+
+.module-card--organizational-climate .module-meta__points {
+    color: #009689;
+}
+
+.module-card--psychosocial-risk .module-meta__points {
+    color: #F54900;
+}
+
+.module-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 9999px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.7);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1E2939;
+    margin: -6px 0 14px 0;
+
+    &__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 9999px;
+        background: #94A3B8;
+        flex-shrink: 0;
+    }
+
+    &--success {
+        border-color: rgba(34, 197, 94, 0.35);
+        background: rgba(34, 197, 94, 0.08);
+
+        .module-status__dot {
+            background: #22C55E;
+        }
+    }
+
+    &--warning {
+        border-color: rgba(245, 158, 11, 0.35);
+        background: rgba(245, 158, 11, 0.08);
+
+        .module-status__dot {
+            background: #F59E0B;
+        }
+    }
+
+    &--danger {
+        border-color: rgba(239, 68, 68, 0.35);
+        background: rgba(239, 68, 68, 0.08);
+
+        .module-status__dot {
+            background: #EF4444;
+        }
+    }
+}
+
+/* Botón 'Comenzar evaluación' (disabled) cuando ya hay resultado */
+:host ::ng-deep emo-button.module-start-btn .emo-button.emo-button--secondary.emo-button--disabled {
+    opacity: 1;
+    background: #E5E7EB;
+    color: #D1D5DB;
+    border: 1px solid #E5E7EB;
+    box-shadow: none;
+}
+
+/* Igualar ancho de ambos botones cuando hay resultado (evita que el secondary disabled "empuje" al otro) */
+.module-actions--has-status {
+    >emo-button {
+        flex: 1 1 0%;
+        min-width: 0;
+    }
+}
+
+/* El secondary tiene padding/min-width grandes por defecto; acá lo hacemos "compatto" solo en cards con resultado */
+:host ::ng-deep .module-actions--has-status emo-button .emo-button.emo-button--secondary {
+    padding: 0 42px;
+    min-width: 0;
 }

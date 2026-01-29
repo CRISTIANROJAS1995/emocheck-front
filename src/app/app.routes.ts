@@ -57,6 +57,26 @@ export const appRoutes: Route[] = [
         },
         children: [
             { path: 'home', loadChildren: () => import('app/modules/admin/home/home.routes') },
+            {
+                path: 'mental-health',
+                loadChildren: () => import('app/modules/admin/pages/questions/mental-health/mental-health.routes'),
+                data: { layout: 'empty' }
+            },
+            {
+                path: 'work-fatigue',
+                loadChildren: () => import('app/modules/admin/pages/questions/work-fatigue/work-fatigue.routes'),
+                data: { layout: 'empty' }
+            },
+            {
+                path: 'organizational-climate',
+                loadChildren: () => import('app/modules/admin/pages/questions/organizational-climate/organizational-climate.routes'),
+                data: { layout: 'empty' }
+            },
+            {
+                path: 'psychosocial-risk',
+                loadChildren: () => import('app/modules/admin/pages/questions/psychosocial-risk/psychosocial-risk.routes'),
+                data: { layout: 'empty' }
+            },
         ]
     }
 ];

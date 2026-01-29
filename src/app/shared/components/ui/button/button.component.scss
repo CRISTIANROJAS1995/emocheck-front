@@ -6,8 +6,8 @@
     font-family: 'Montserrat', sans-serif;
     font-weight: 500;
     border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    cursor: default;
+    transition: none;
     white-space: nowrap;
     text-align: center;
 
@@ -58,13 +58,22 @@
     }
 
     &--secondary {
-        background: #FFFFFF;
-        color: #0A0A0A;
-        border: 2px solid #E5E7EB;
+        background: #F9FAFB;
+        color: #99A1AF;
+        border: 1px solid #E5E7EB;
+        height: 36px;
+        padding: 0 72px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 20px;
+        border-radius: 12px;
+        min-width: 140px;
+        opacity: 0.7;
 
         &:hover:not(.emo-button--disabled) {
-            border-color: #96F7E4;
-            background: #F0FDFA;
+            background: #F3F4F6;
+            color: #6B7280;
+            opacity: 0.85;
         }
     }
 
@@ -90,38 +99,70 @@
     }
 
     &--blue {
-        background: linear-gradient(90deg, #3B82F6 0%, #2563EB 100%);
+        background: linear-gradient(90deg, #2B7FFF 0%, #155DFC 100%);
         color: #FFFFFF;
+        height: 36px;
+        padding: 0 42px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 20px;
+        border-radius: 22px;
 
         &:hover:not(.emo-button--disabled) {
-            filter: brightness(1.1);
+            // Sin animación
+        }
+
+        &:active:not(.emo-button--disabled) {
+            // Sin animación
         }
     }
 
     &--green {
         background: linear-gradient(90deg, #7CCF00 0%, #5EA500 100%);
         color: #FFFFFF;
+        height: 36px;
+        padding: 0 42px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 20px;
+        border-radius: 22px;
 
         &:hover:not(.emo-button--disabled) {
-            filter: brightness(1.1);
+            // Sin animación
+        }
+
+        &:active:not(.emo-button--disabled) {
+            // Sin animación
         }
     }
 
     &--teal {
         background: linear-gradient(90deg, #00BBA7 0%, #009689 100%);
         color: #FFFFFF;
+        height: 36px;
+        padding: 0 42px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 20px;
+        border-radius: 22px;
 
         &:hover:not(.emo-button--disabled) {
-            filter: brightness(1.1);
+            // Sin animación
         }
     }
 
     &--orange {
-        background: linear-gradient(90deg, #FF6B2C 0%, #F97316 100%);
+        background: linear-gradient(90deg, #FF6900 0%, #F54900 100%);
         color: #FFFFFF;
+        height: 36px;
+        padding: 0 42px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 20px;
+        border-radius: 22px;
 
         &:hover:not(.emo-button--disabled) {
-            filter: brightness(1.1);
+            // Sin animación
         }
     }
 

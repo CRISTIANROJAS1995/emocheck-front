@@ -7,10 +7,10 @@
 
 // Decorative blur circles
 .blur-circle {
-    position: absolute;
+    position: fixed;
     border-radius: 50%;
     pointer-events: none;
-    z-index: 1;
+    z-index: 0;
 
     // Círculo verde pequeño 48x48
     &--green-small {
@@ -46,12 +46,42 @@
 
     // Círculo azul pequeño 40x40
     &--blue-small {
-        right: 5%;
-        top: 35%;
-        width: 40px;
-        height: 40px;
-        background: rgba(81, 162, 255, 0.30);
-        filter: blur(10px);
+        right: 7%;
+        top: 45%;
+        width: 80px;
+        height: 80px;
+        background: rgba(135, 206, 250, 0.45);
+        filter: blur(30px);
+    }
+
+    // Círculo verde para sección de recursos (debajo de Riesgo Psicosocial)
+    &--green-resources {
+        right: 25%;
+        bottom: 280px;
+        width: 150px;
+        height: 140px;
+        background: rgba(187, 244, 81, 0.15);
+        filter: blur(45px);
+    }
+
+    // Círculo verde grande en esquina superior derecha
+    &--green-top-right {
+        right: 60px;
+        top: -80px;
+        width: 280px;
+        height: 500px;
+        background: rgba(154, 230, 0, 0.12);
+        filter: blur(60px);
+    }
+
+    // Círculo azul grande en esquina inferior izquierda
+    &--blue-bottom-left {
+        left: 10px;
+        bottom: 10px;
+        width: 320px;
+        height: 320px;
+        background: rgba(0, 187, 167, 0.10);
+        filter: blur(70px);
     }
 }
 
@@ -141,27 +171,30 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 18px;
     font-weight: 700;
-    color: #FFFFFF;
+    color: #FFF;
     margin: 0;
-    line-height: 1.2;
+    line-height: 27px;
+    /* 150% */
 }
 
 .welcome-banner-subtitle {
     font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
-    color: #FFFFFF;
+    color: #FFF;
     margin: 0;
-    line-height: 1.2;
+    line-height: 18px;
+    /* 150% */
     font-style: italic;
 }
 
 .welcome-banner-text {
     font-family: 'Montserrat', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 400;
-    color: #FFFFFF;
-    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 16px;
+    /* 133.333% */
     margin: 0;
 }
 
@@ -315,73 +348,94 @@
 // Resource Cards
 .resource-card {
     background: #FFFFFF;
-    border-radius: 16px;
+    border-radius: 14px;
     padding: 24px;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+    border: 0.667px solid #E5E7EB;
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
+    overflow: hidden;
 
     &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.12);
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    // Efecto hover para tarjetas específicas
+    &--with-hover-effect {
+        &::after {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: rgba(158, 247, 228, 0.40);
+            filter: blur(40px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        &:hover::after {
+            opacity: 1;
+        }
     }
 }
 
 .resource-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     margin-bottom: 16px;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
 
     mat-icon {
-        width: 24px;
-        height: 24px;
-        font-size: 24px;
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
+        color: #FFFFFF;
     }
 
     &--teal {
-        background: rgba(0, 187, 167, 0.15);
-        color: #00BBA7;
+        background: linear-gradient(135deg, #00D5BE 0%, #009689 100%);
     }
 
     &--purple {
-        background: rgba(139, 92, 246, 0.15);
-        color: #8B5CF6;
+        background: linear-gradient(135deg, #C27AFF 0%, #AD46FF 100%);
     }
 
     &--pink {
-        background: rgba(236, 72, 153, 0.15);
-        color: #EC4899;
+        background: linear-gradient(135deg, #FB64B6 0%, #F6339A 100%);
     }
 
     &--cyan {
-        background: rgba(6, 182, 212, 0.15);
-        color: #06B6D4;
+        background: linear-gradient(135deg, #00D3F2 0%, #00B8DB 100%);
     }
 }
 
 .resource-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 16px;
-    font-weight: 700;
-    color: #111827;
+    font-weight: 600;
+    color: #1E2939;
+    line-height: 24px;
     margin: 0 0 8px 0;
     text-align: left;
 }
 
 .resource-description {
     font-family: 'Montserrat', sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 400;
-    color: #6B7280;
+    color: #4A5565;
+    line-height: 20px;
     margin: 0 0 16px 0;
-    line-height: 1.5;
     flex: 1;
     text-align: left;
 }
@@ -389,15 +443,17 @@
 .resource-button {
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    background: #F3F4F6;
-    border: none;
-    border-radius: 8px;
+    font-weight: 600;
+    line-height: 20px;
+    color: #0A0A0A;
+    background: #F9FAFB;
+    border: 0.667px solid rgba(0, 0, 0, 0.10);
+    border-radius: 100px;
     padding: 10px 16px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    width: 100%;
+    transition: background 0.2s ease;
+    width: auto;
+    align-self: flex-start;
 
     &:hover {
         background: #E5E7EB;

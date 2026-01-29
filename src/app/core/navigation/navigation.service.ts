@@ -34,6 +34,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:clipboard-document-check',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3'
+                    }
                 },
                 {
                     id: 'mi-seguimiento',
@@ -41,6 +45,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:chart-bar-square',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3 nav-hover-green'
+                    }
                 },
                 {
                     id: 'mi-plan',
@@ -48,6 +56,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:calendar-days',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3'
+                    }
                 },
                 {
                     id: 'seguimiento-colaboradores',
@@ -55,6 +67,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:users',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3 nav-hover-green'
+                    }
                 },
                 {
                     id: 'mi-perfil',
@@ -62,6 +78,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:user-circle',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3'
+                    }
                 },
                 {
                     id: 'recursos',
@@ -69,6 +89,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:book-open',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3'
+                    }
                 },
                 {
                     id: 'configuracion',
@@ -76,6 +100,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:cog-8-tooth',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3'
+                    }
                 },
                 {
                     id: 'ayuda',
@@ -83,6 +111,10 @@ export class NavigationService {
                     type: 'basic',
                     icon: 'heroicons_outline:question-mark-circle',
                     link: '/home',
+                    classes: {
+                        title: '!text-[17px] !font-normal !text-gray-500',
+                        wrapper: '!mb-3'
+                    }
                 },
             ],
             compact: [],

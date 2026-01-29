@@ -1,21 +1,57 @@
 <div class="module-card" [ngClass]="module.colorClass">
-    <div class="flex items-center gap-3 mb-3">
+    <div class="flex items-start gap-3 mb-4">
         <div class="module-icon" [ngClass]="module.iconClass">
+            @if (module.icon.endsWith('.svg') || module.icon.includes('/')) {
+            <img [src]="module.icon" alt="" />
+            } @else {
             <mat-icon [svgIcon]="module.icon"></mat-icon>
+            }
         </div>
-        <h3 class="module-title">{{ module.title }}</h3>
-    </div>
+        <div class="flex-1">
+            <div class="module-header-row">
+                <h3 class="module-title" [ngClass]="getTitleClass()">{{ module.title }}</h3>
+                @if (module.status) {
+                @if (module.status.icon === 'check') {
+                <img class="module-outcome-icon module-outcome-icon--check" src="icons/Icon (6).svg" alt="" />
+                } @else if (module.status.icon === 'warn') {
+                <svg class="module-outcome-icon module-outcome-icon--warn" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
+                    <path d="M12 7v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none" />
+                    <circle cx="12" cy="17" r="1.25" fill="currentColor" />
+                </svg>
+                } @else {
+                <svg class="module-outcome-icon module-outcome-icon--alert" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3L22 21H2L12 3Z" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linejoin="round" />
+                    <path d="M12 9v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                    <circle cx="12" cy="17" r="1.25" fill="currentColor" />
+                </svg>
+                }
+                }
+            </div>
 
-    <p class="module-description">{{ module.description }}</p>
+            @if (module.status) {
+            <div class="module-meta">
+                <span class="module-meta__points">{{ module.points ?? 0 }} puntos</span>
+                <span class="module-meta__sep" aria-hidden="true">·</span>
+                <span class="module-meta__label">{{ module.status.label }}</span>
+            </div>
+            } @else {
+            <p class="module-description">{{ module.description }}</p>
+            }
 
-    <div class="flex gap-3">
-        <emo-button [variant]="getButtonVariant()" size="medium" class="flex-1" [disabled]="module.disabled"
-            (clicked)="startEvaluation()">
-            Comenzar evaluación
-        </emo-button>
-
-        <emo-button variant="secondary" size="medium" (clicked)="viewPlan()">
-            Ver mi plan
-        </emo-button>
+            <div class="flex gap-3" [class.module-actions--has-status]="!!module.status">
+                <emo-button [variant]="module.status ? 'secondary' : getButtonVariant()" size="medium"
+                    [fullWidth]="true" class="flex-1 module-start-btn" [disabled]="module.disabled || !!module.status"
+                    (clicked)="startEvaluation()">
+                    Comenzar evaluación
+                </emo-button>
+                <emo-button [variant]="module.status ? getButtonVariant() : 'secondary'" size="medium"
+                    [fullWidth]="true" class="flex-1 module-plan-btn" [disabled]="!module.status"
+                    (clicked)="viewPlan()">
+                    Ver mi plan
+                </emo-button>
+            </div>
+        </div>
     </div>
 </div>

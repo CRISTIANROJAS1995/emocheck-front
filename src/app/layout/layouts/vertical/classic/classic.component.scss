@@ -1,57 +1,88 @@
 // Estilos personalizados para el menú vertical
-::ng-deep {
-    .fuse-vertical-navigation {
+:host ::ng-deep fuse-vertical-navigation {
 
-        // Ajustar espaciado general
-        .fuse-vertical-navigation-content {
-            padding-top: 1rem !important;
-        }
+    // Ajustar espaciado general
+    .fuse-vertical-navigation-content {
+        padding-top: 0 !important;
+    }
 
-        // Estilo de los items del menú
-        .fuse-vertical-navigation-item-wrapper {
-            margin-bottom: 0.5rem !important;
+    // Estilo de los items del menú
+    .fuse-vertical-navigation-item-wrapper {
+        margin-bottom: 1.25rem !important;
 
-            .fuse-vertical-navigation-item {
-                padding: 0.875rem 1.5rem !important;
-                min-height: 48px !important;
-                border-radius: 0.5rem !important;
-                margin: 0 0.75rem !important;
+        .nav-item {
+            padding: 0.75rem 1rem !important;
+            min-height: 44px !important;
+            border-radius: 0.5rem !important;
+            margin: 0 0.75rem !important;
+            transition: all 0.2s ease-in-out !important;
 
-                // Fuente del título
-                .fuse-vertical-navigation-item-title-wrapper {
-                    .fuse-vertical-navigation-item-title {
-                        font-family: 'Montserrat', sans-serif !important;
-                        font-size: 0.9375rem !important;
-                        font-weight: 500 !important;
-                        letter-spacing: 0.01em !important;
+            // Fuente del título
+            .fuse-vertical-navigation-item-title-wrapper {
+                .fuse-vertical-navigation-item-title {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+
+                    span {
+                        font-size: 15px !important;
+                        font-weight: 400 !important;
+                        letter-spacing: 0 !important;
+                        line-height: 1.375rem !important;
+                        color: #4B5563 !important;
                     }
                 }
+            }
 
-                // Icono
+            // Icono
+            .fuse-vertical-navigation-item-icon {
+                width: 20px !important;
+                height: 20px !important;
+                min-width: 20px !important;
+                margin-right: 0.75rem !important;
+                color: #6B7280 !important;
+            }
+
+            // Hover
+            &:hover:not(.fuse-vertical-navigation-item-active):not(.fuse-vertical-navigation-item-active-forced) {
+                background-color: rgba(28, 136, 127, 0.10) !important;
+
+                .fuse-vertical-navigation-item-title span {
+                    color: #1C887F !important;
+                }
+
                 .fuse-vertical-navigation-item-icon {
-                    width: 20px !important;
-                    height: 20px !important;
-                    min-width: 20px !important;
-                    margin-right: 0.875rem !important;
+                    color: #1C887F !important;
+                }
+            }
+
+            // Active state
+            &.fuse-vertical-navigation-item-active,
+            &.fuse-vertical-navigation-item-active-forced {
+                background-color: rgba(59, 130, 246, 0.12) !important;
+
+                .fuse-vertical-navigation-item-title span {
+                    color: #3B82F6 !important;
+                    font-weight: 500 !important;
                 }
 
-                // Hover
-                &:hover {
-                    background-color: rgba(59, 130, 246, 0.08) !important;
+                .fuse-vertical-navigation-item-icon {
+                    color: #3B82F6 !important;
+                }
+            }
+        }
+    }
+
+    // Override: hover verde para items marcados con nav-hover-green
+    .fuse-vertical-navigation-item-wrapper.nav-hover-green {
+        .nav-item {
+            &:hover:not(.fuse-vertical-navigation-item-active):not(.fuse-vertical-navigation-item-active-forced) {
+                background-color: rgba(162, 191, 119, 0.10) !important;
+
+                .fuse-vertical-navigation-item-title span {
+                    color: #A2BF77 !important;
                 }
 
-                // Active state
-                &.fuse-vertical-navigation-item-active,
-                &.fuse-vertical-navigation-item-active-forced {
-                    background-color: rgba(59, 130, 246, 0.12) !important;
-
-                    .fuse-vertical-navigation-item-title {
-                        color: #3B82F6 !important;
-                    }
-
-                    .fuse-vertical-navigation-item-icon {
-                        color: #3B82F6 !important;
-                    }
+                .fuse-vertical-navigation-item-icon {
+                    color: #A2BF77 !important;
                 }
             }
         }

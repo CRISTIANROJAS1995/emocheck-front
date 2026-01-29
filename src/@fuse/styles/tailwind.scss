@@ -16,6 +16,10 @@
         &:focus {
             outline: none !important;
         }
+
+        &:focus-visible {
+            outline: none !important;
+        }
     }
 
     /* HTML and Body default styles */
@@ -126,6 +130,7 @@
 
     /* Print styles */
     @media print {
+
         /* Make the base font size smaller for print so everything is scaled nicely */
         html {
             font-size: 12px !important;
