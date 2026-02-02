@@ -1,0 +1,435 @@
+<div class="my-tracking-page">
+    <div class="my-tracking-container">
+        <!-- Header banner -->
+        <section class="tracking-hero">
+            <div class="tracking-hero__left">
+                <div class="tracking-hero__title-row">
+                    <img class="tracking-hero__logo" src="icons/Icon.svg" alt="" />
+                    <h1 class="tracking-hero__title">Mi Seguimiento</h1>
+                </div>
+                <p class="tracking-hero__subtitle">Aquí puedes ver tu evolución personal y resultados individuales</p>
+            </div>
+
+            <button class="tracking-hero__back" mat-button [routerLink]="['/home']">
+                <mat-icon class="tracking-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                <span class="tracking-hero__back-text">Volver a mis evaluaciones</span>
+                <span class="tracking-hero__back-spacer" aria-hidden="true"></span>
+            </button>
+        </section>
+
+        <!-- Thank you card -->
+        <section class="tracking-thanks">
+            <div class="tracking-thanks__icon">
+                <mat-icon svgIcon="heroicons_solid:heart"></mat-icon>
+            </div>
+
+            <div class="tracking-thanks__content">
+                <p class="tracking-thanks__text">
+                    <span class="tracking-thanks__text--purple">Te agradecemos por dedicar tiempo a reconocer cómo te
+                        sientes</span>
+                    <span> y por ser tan honesta/o contigo misma/o.</span>
+                </p>
+
+                <p class="tracking-thanks__text tracking-thanks__text--green">
+                    Cada paso de autoconocimiento fortalece tu equilibrio emocional.
+                </p>
+
+                <p class="tracking-thanks__text tracking-thanks__text--muted">
+                    Si has tenido días difíciles, recuerda que dispones de herramientas y actividades para retomar la
+                    calma y reconectarte contigo.
+                </p>
+            </div>
+
+            <div class="tracking-thanks__sparkles">
+                <mat-icon svgIcon="heroicons_outline:sparkles"></mat-icon>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="tracking-filters">
+            <div class="tracking-filters__title">
+                <mat-icon svgIcon="heroicons_outline:funnel"></mat-icon>
+                <span>Filtros de Visualización</span>
+            </div>
+
+            <div class="tracking-filters__grid">
+                <div class="tracking-filters__field">
+                    <label class="tracking-filters__label">Período de tiempo</label>
+                    <mat-form-field appearance="outline" class="tracking-filters__mat">
+                        <mat-select [(value)]="selectedTimeRange">
+                            @for (range of timeRanges; track range.id) {
+                            <mat-option [value]="range.id">{{ range.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="tracking-filters__actions">
+                    <label class="tracking-filters__label">Acciones</label>
+                    <button class="tracking-filters__export" mat-button (click)="exportReport()">
+                        <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+                        Exportar Reporte
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- State + mini chart -->
+        <section class="tracking-state">
+            <div class="tracking-state__left">
+                <div class="tracking-state__badge">
+                    <mat-icon svgIcon="heroicons_outline:sparkles"></mat-icon>
+                    <span>Estado en Plenitud</span>
+                </div>
+
+                <div class="tracking-state__body">
+                    <div class="tracking-state__bigicon">
+                        <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                    </div>
+
+                    <div class="tracking-state__score">
+                        <div class="tracking-state__score-main">
+                            <span class="tracking-state__score-value">10.0/10</span>
+                            <mat-icon class="tracking-state__score-up"
+                                svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+                        </div>
+                        <p class="tracking-state__desc">
+                            Te encuentras en un equilibrio contigo mismo, concibes la importancia del cuidado mutuo.
+                        </p>
+
+                        <button class="tracking-state__cta" mat-button>
+                            <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                            ¿Cuéntanos cómo te sientes hoy?
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tracking-state__right">
+                <p class="tracking-state__chart-title">Seguimiento de tu estado de ánimo (Último mes)</p>
+
+                <apx-chart class="tracking-state__chart" [series]="moodTrackingChart.series"
+                    [chart]="moodTrackingChart.chart" [xaxis]="moodTrackingChart.xaxis"
+                    [yaxis]="moodTrackingChart.yaxis" [stroke]="moodTrackingChart.stroke"
+                    [grid]="moodTrackingChart.grid" [dataLabels]="moodTrackingChart.dataLabels"
+                    [markers]="moodTrackingChart.markers" [tooltip]="moodTrackingChart.tooltip"
+                    [colors]="moodTrackingChart.colors"></apx-chart>
+            </div>
+        </section>
+
+        <!-- Module progress -->
+        <section class="tracking-modules">
+            <div class="tracking-modules__header">
+                <div class="tracking-modules__title">
+                    <mat-icon svgIcon="heroicons_outline:bookmark"></mat-icon>
+                    <span>Tus Avances en los Diferentes Módulos</span>
+                </div>
+                <p class="tracking-modules__subtitle">
+                    Para una mayor exactitud debes responder las pruebas necesarias para cada módulo
+                </p>
+            </div>
+
+            <div class="tracking-modules__list">
+                @for (m of moduleProgress; track m.id) {
+                <div class="module-row">
+                    <div class="module-row__icon" [class]="'module-row__icon--' + m.tone">
+                        @switch (m.id) {
+                        @case ('mental-health') { <mat-icon svgIcon="heroicons_outline:beaker"></mat-icon> }
+                        @case ('work-fatigue') { <mat-icon svgIcon="heroicons_outline:computer-desktop"></mat-icon> }
+                        @case ('organizational-climate') { <mat-icon svgIcon="heroicons_outline:user-group"></mat-icon>
+                        }
+                        @case ('psychosocial-risk') { <mat-icon
+                            svgIcon="heroicons_outline:exclamation-triangle"></mat-icon> }
+                        }
+                    </div>
+
+                    <div class="module-row__content">
+                        <div class="module-row__top">
+                            <div class="module-row__name">{{ m.title }}</div>
+                            <div class="module-row__right">
+                                @if (m.id === 'work-fatigue') {
+                                <span class="module-row__pill">Bienestar Adecuado</span>
+                                <span class="module-row__pct">100%</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="module-row__status">{{ m.statusText }}</div>
+                        <div class="module-row__bar">
+                            <div class="module-row__bar-fill" [style.width.%]="m.percent"></div>
+                        </div>
+                    </div>
+
+                    <div class="module-row__more">—</div>
+                </div>
+                }
+            </div>
+        </section>
+
+        <!-- Small stats cards -->
+        <section class="tracking-stats">
+            <div class="stat-card stat-card--teal">
+                <div class="stat-card__icon"><mat-icon svgIcon="heroicons_outline:check-circle"></mat-icon></div>
+                <div class="stat-card__value">1/4</div>
+                <div class="stat-card__label">Módulos completados<br /><span>3 pendientes</span></div>
+                <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:calendar"></mat-icon>
+            </div>
+
+            <div class="stat-card stat-card--blue">
+                <div class="stat-card__icon"><mat-icon svgIcon="heroicons_outline:target"></mat-icon></div>
+                <div class="stat-card__value">100%</div>
+                <div class="stat-card__label">Bienestar promedio<br /><span>Tu puntuación general</span></div>
+                <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+            </div>
+
+            <div class="stat-card stat-card--lime">
+                <div class="stat-card__icon"><mat-icon svgIcon="heroicons_outline:trophy"></mat-icon></div>
+                <div class="stat-card__value">vs. Prom.</div>
+                <div class="stat-card__label">Comparación organizacional<br /><span>Por encima del promedio</span></div>
+                <div class="stat-card__chip">+5%</div>
+            </div>
+
+            <div class="stat-card stat-card--purple">
+                <div class="stat-card__icon"><mat-icon svgIcon="heroicons_outline:calendar-days"></mat-icon></div>
+                <div class="stat-card__value">6 meses</div>
+                <div class="stat-card__label">Tiempo en EmoCheck<br /><span>Mejora sostenida</span></div>
+                <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+            </div>
+        </section>
+
+        <!-- Results by module -->
+        <section class="tracking-results">
+            <div class="tracking-section-title">Mis Resultados por Módulo</div>
+            <div class="tracking-section-subtitle">Tus puntajes actuales en cada evaluación</div>
+
+            <div class="tracking-results__grid">
+                <div class="result-card result-card--disabled">
+                    <div class="result-card__head">
+                        <div class="result-card__icon"><mat-icon svgIcon="heroicons_outline:beaker"></mat-icon></div>
+                        <div>
+                            <div class="result-card__title">Salud Mental</div>
+                            <div class="result-card__meta">No completado</div>
+                        </div>
+                    </div>
+                    <div class="result-card__hint">Completa esta evaluación para ver tus resultados</div>
+                </div>
+
+                <div class="result-card result-card--green">
+                    <div class="result-card__head">
+                        <div class="result-card__icon"><mat-icon
+                                svgIcon="heroicons_outline:computer-desktop"></mat-icon></div>
+                        <div>
+                            <div class="result-card__title">Fatiga Laboral</div>
+                            <div class="result-card__meta">29 de enero de 2026</div>
+                        </div>
+                        <div class="result-card__eye"><mat-icon svgIcon="heroicons_outline:eye"></mat-icon></div>
+                    </div>
+
+                    <div class="result-card__body">
+                        <div class="result-card__row">
+                            <span>Tu puntaje:</span>
+                            <span class="result-card__pct">100%</span>
+                        </div>
+                        <div class="result-card__bar">
+                            <div class="result-card__bar-fill"></div>
+                        </div>
+                        <div class="result-card__footer">Bienestar Adecuado</div>
+                    </div>
+                </div>
+
+                <div class="result-card result-card--disabled">
+                    <div class="result-card__head">
+                        <div class="result-card__icon"><mat-icon svgIcon="heroicons_outline:user-group"></mat-icon>
+                        </div>
+                        <div>
+                            <div class="result-card__title">Clima Organizacional</div>
+                            <div class="result-card__meta">No completado</div>
+                        </div>
+                    </div>
+                    <div class="result-card__hint">Completa esta evaluación para ver tus resultados</div>
+                </div>
+
+                <div class="result-card result-card--disabled result-card--orange">
+                    <div class="result-card__head">
+                        <div class="result-card__icon"><mat-icon
+                                svgIcon="heroicons_outline:exclamation-triangle"></mat-icon></div>
+                        <div>
+                            <div class="result-card__title">Riesgo Psicosocial</div>
+                            <div class="result-card__meta">No completado</div>
+                        </div>
+                    </div>
+                    <div class="result-card__hint">Completa esta evaluación para ver tus resultados</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Evolution + radar comparison -->
+        <section class="tracking-charts">
+            <div class="chart-card">
+                <div class="chart-card__title">Mi Evolución en el Tiempo</div>
+                <div class="chart-card__subtitle">Progreso de tus puntajes en los últimos 6 meses</div>
+                <div class="chart-card__placeholder"></div>
+                <div class="chart-card__legend">
+                    <span class="lg-item lg-item--teal">Clima Org.</span>
+                    <span class="lg-item lg-item--lime">Fatiga Laboral</span>
+                    <span class="lg-item lg-item--orange">Riesgo Psico.</span>
+                    <span class="lg-item lg-item--purple">Salud Mental</span>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-card__title">Comparación con Promedio Organizacional</div>
+                <div class="chart-card__subtitle">Tu desempeño vs. promedio de la organización</div>
+                <apx-chart [series]="radarComparisonChart.series" [chart]="radarComparisonChart.chart"
+                    [xaxis]="radarComparisonChart.xaxis" [yaxis]="radarComparisonChart.yaxis"
+                    [stroke]="radarComparisonChart.stroke" [fill]="radarComparisonChart.fill"
+                    [markers]="radarComparisonChart.markers" [dataLabels]="radarComparisonChart.dataLabels"
+                    [tooltip]="radarComparisonChart.tooltip" [colors]="radarComparisonChart.colors"
+                    [legend]="radarComparisonChart.legend" [plotOptions]="radarComparisonChart.plotOptions"></apx-chart>
+            </div>
+        </section>
+
+        <!-- Follow-ups -->
+        <section class="tracking-followups">
+            <div class="tracking-followups__title">
+                <mat-icon svgIcon="heroicons_outline:calendar-days"></mat-icon>
+                <span>Seguimientos Psicosociales</span>
+            </div>
+            <div class="tracking-followups__subtitle">Aquí encontrarás las fechas estimadas de tu próximo seguimiento
+                con un profesional</div>
+
+            <div class="tracking-followups__grid">
+                <div class="follow-card follow-card--purple">
+                    <div class="follow-card__icon"><mat-icon svgIcon="heroicons_outline:check-circle"></mat-icon></div>
+                    <div class="follow-card__content">
+                        <div class="follow-card__k">Último seguimiento</div>
+                        <div class="follow-card__v">15 de octubre, 2025</div>
+                        <div class="follow-card__hint">Tu última sesión con el profesional de salud mental fue hace
+                            <b>16 días</b>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="follow-card follow-card--orange">
+                    <div class="follow-card__icon"><mat-icon svgIcon="heroicons_outline:calendar"></mat-icon></div>
+                    <div class="follow-card__content">
+                        <div class="follow-card__k">Próximo seguimiento</div>
+                        <div class="follow-card__v follow-card__v--orange">30 de noviembre, 2025</div>
+                        <div class="follow-card__hint">Faltan <b>30 días</b> para tu próxima evaluación programada</div>
+
+                        <button class="follow-card__cta" mat-button>
+                            <mat-icon svgIcon="heroicons_outline:calendar"></mat-icon>
+                            Agendar Cita
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed module section -->
+        <section class="tracking-detail">
+            <div class="tracking-detail__head">
+                <div class="tracking-detail__title">
+                    <mat-icon svgIcon="heroicons_outline:computer-desktop"></mat-icon>
+                    <span>Fatiga Laboral</span>
+                </div>
+                <div class="tracking-detail__meta">Evaluación completada el 29 de enero de 2026</div>
+            </div>
+
+            <div class="tracking-detail__card">
+                <div class="tracking-detail__progress">
+                    <div class="tracking-detail__progress-title">Progreso de Evaluación</div>
+                    <div class="tracking-detail__progress-grid">
+                        <div class="pd-item">
+                            <div class="pd-item__value">{{ progressDetails.answered }}</div>
+                            <div class="pd-item__label">Preguntas respondidas</div>
+                        </div>
+                        <div class="pd-item">
+                            <div class="pd-item__value">{{ progressDetails.missing }}</div>
+                            <div class="pd-item__label">Preguntas faltantes</div>
+                        </div>
+                        <div class="pd-item pd-item--right">
+                            <div class="pd-item__value pd-item__value--green">{{ progressDetails.progressPercent }}%
+                            </div>
+                            <div class="pd-item__label">Avance total</div>
+                        </div>
+                        <div class="pd-pill">{{ progressDetails.completedLabel }}</div>
+                    </div>
+                </div>
+
+                <div class="tracking-detail__section-title">
+                    <mat-icon svgIcon="heroicons_outline:information-circle"></mat-icon>
+                    <span>Hallazgos</span>
+                </div>
+
+                <div class="tracking-findings">
+                    @for (f of findings; track f.label) {
+                    <div class="finding-row">
+                        <div class="finding-row__top">
+                            <span class="finding-row__label">{{ f.label }}</span>
+                            <span class="finding-row__badge">{{ f.badge }}</span>
+                            <span class="finding-row__pct">{{ f.value }}%</span>
+                        </div>
+                        <div class="finding-row__bar">
+                            <div class="finding-row__bar-fill" [style.width.%]="f.value"></div>
+                        </div>
+                    </div>
+                    }
+                </div>
+
+                <div class="tracking-detail__section-title">
+                    <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                    <span>Recomendaciones</span>
+                </div>
+
+                <div class="tracking-recs">
+                    @for (r of recommendations; track r) {
+                    <div class="rec-item">
+                        <span class="rec-item__dot"></span>
+                        <span class="rec-item__text">{{ r }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <!-- Personalized recommendations -->
+        <section class="tracking-personal">
+            <div class="tracking-personal__title">
+                <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                <span>Recomendaciones Personalizadas para Ti</span>
+            </div>
+            <div class="tracking-personal__subtitle">Basadas en tus resultados actuales</div>
+
+            <div class="tracking-personal__list">
+                @for (p of personalized; track p.title) {
+                <div class="personal-card">
+                    <div class="personal-card__icon" [class]="'personal-card__icon--' + p.tone">
+                        <mat-icon [svgIcon]="p.icon"></mat-icon>
+                    </div>
+                    <div class="personal-card__content">
+                        <div class="personal-card__title">{{ p.title }}</div>
+                        <div class="personal-card__text">{{ p.text }}</div>
+                        <button class="personal-card__btn" mat-button>{{ p.button }}</button>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <div class="tracking-personal__footer">
+                <button class="footer-btn footer-btn--teal" mat-button>
+                    <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+                    Descargar Mi Reporte
+                </button>
+                <button class="footer-btn footer-btn--lime" mat-button>
+                    <mat-icon svgIcon="heroicons_outline:calendar"></mat-icon>
+                    Agendar Seguimiento
+                </button>
+                <button class="footer-btn footer-btn--blue" mat-button>
+                    <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                    Contactar Apoyo Profesional
+                </button>
+            </div>
+        </section>
+    </div>
+</div>

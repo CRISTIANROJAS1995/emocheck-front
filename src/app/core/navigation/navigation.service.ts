@@ -32,20 +32,22 @@ export class NavigationService {
                     id: 'mis-evaluaciones',
                     title: 'Mis Evaluaciones',
                     type: 'basic',
-                    icon: 'heroicons_outline:clipboard-document-check',
+                    icon: 'emocheck:mis-evaluaciones',
                     link: '/home',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3'
                     }
                 },
                 {
-                    id: 'mi-seguimiento',
+                    id: 'my-tracking',
                     title: 'Mi Seguimiento',
                     type: 'basic',
                     icon: 'heroicons_outline:chart-bar-square',
-                    link: '/home',
+                    link: '/my-tracking',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3 nav-hover-green'
                     }
@@ -54,9 +56,10 @@ export class NavigationService {
                     id: 'mi-plan',
                     title: 'Mi Plan',
                     type: 'basic',
-                    icon: 'heroicons_outline:calendar-days',
+                    icon: 'emocheck:mi-plan',
                     link: '/home',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3'
                     }
@@ -65,9 +68,10 @@ export class NavigationService {
                     id: 'seguimiento-colaboradores',
                     title: 'Seguimiento Colaboradores',
                     type: 'basic',
-                    icon: 'heroicons_outline:users',
+                    icon: 'heroicons_outline:chart-bar-square',
                     link: '/home',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3 nav-hover-green'
                     }
@@ -76,9 +80,10 @@ export class NavigationService {
                     id: 'mi-perfil',
                     title: 'Mi Perfil',
                     type: 'basic',
-                    icon: 'heroicons_outline:user-circle',
+                    icon: 'emocheck:mi-perfil',
                     link: '/home',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3'
                     }
@@ -87,9 +92,10 @@ export class NavigationService {
                     id: 'recursos',
                     title: 'Recursos',
                     type: 'basic',
-                    icon: 'heroicons_outline:book-open',
+                    icon: 'emocheck:recursos',
                     link: '/home',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3'
                     }
@@ -101,6 +107,7 @@ export class NavigationService {
                     icon: 'heroicons_outline:cog-8-tooth',
                     link: '/home',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3'
                     }
@@ -112,6 +119,7 @@ export class NavigationService {
                     icon: 'heroicons_outline:question-mark-circle',
                     link: '/home',
                     classes: {
+                        icon: '!text-gray-500 !opacity-100',
                         title: '!text-[17px] !font-normal !text-gray-500',
                         wrapper: '!mb-3'
                     }

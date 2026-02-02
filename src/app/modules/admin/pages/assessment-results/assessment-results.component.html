@@ -12,6 +12,15 @@
                 </svg>
             </button>
             <div class="results-title">{{ moduleDef.resultsTitle }}</div>
+
+            <div class="results-header-actions" aria-label="Acciones">
+                <button class="icon-action" type="button" (click)="downloadResults()" aria-label="Descargar">
+                    <img class="icon-action__img" src="icons/Icon (35).svg" alt="" aria-hidden="true" />
+                </button>
+                <button class="icon-action" type="button" (click)="shareResults()" aria-label="Compartir">
+                    <img class="icon-action__img" src="icons/Icon (36).svg" alt="" aria-hidden="true" />
+                </button>
+            </div>
         </div>
     </header>
 

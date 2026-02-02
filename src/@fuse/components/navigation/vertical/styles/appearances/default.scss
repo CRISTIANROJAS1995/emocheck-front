@@ -419,9 +419,9 @@ fuse-vertical-navigation {
     right: 0;
     z-index: 170;
     opacity: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 
     +.fuse-vertical-navigation-aside-overlay {
         background-color: transparent;
@@ -439,7 +439,9 @@ fuse-vertical-navigation {
     right: 0;
     z-index: 169;
     opacity: 0;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 /* ----------------------------------------------------------------------------------------------------- */

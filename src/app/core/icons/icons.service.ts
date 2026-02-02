@@ -51,5 +51,35 @@ export class IconsService {
                 'icons/heroicons-mini.svg'
             )
         );
+
+        // EmoCheck custom navigation icons
+        matIconRegistry.addSvgIconInNamespace(
+            'emocheck',
+            'mis-evaluaciones',
+            domSanitizer.bypassSecurityTrustResourceUrl(
+                'icons/emocheck-nav-mis-evaluaciones.svg'
+            )
+        );
+        matIconRegistry.addSvgIconInNamespace(
+            'emocheck',
+            'mi-plan',
+            domSanitizer.bypassSecurityTrustResourceUrl(
+                'icons/emocheck-nav-mi-plan.svg'
+            )
+        );
+        matIconRegistry.addSvgIconInNamespace(
+            'emocheck',
+            'mi-perfil',
+            domSanitizer.bypassSecurityTrustResourceUrl(
+                'icons/emocheck-nav-mi-perfil.svg'
+            )
+        );
+        matIconRegistry.addSvgIconInNamespace(
+            'emocheck',
+            'recursos',
+            domSanitizer.bypassSecurityTrustResourceUrl(
+                'icons/emocheck-nav-recursos.svg'
+            )
+        );
     }
 }

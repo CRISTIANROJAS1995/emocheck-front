@@ -57,6 +57,37 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         this.router.navigate(['/home']);
     }
 
+    downloadResults(): void {
+        // Simple, cross-browser way to let the user "download" the results as PDF.
+        // Users can choose "Save as PDF" in the print dialog.
+        window.print();
+    }
+
+    async shareResults(): Promise<void> {
+        const url = window.location.href;
+        const title = this.moduleDef?.resultsTitle ?? 'Resultados';
+
+        try {
+            const navAny = navigator as unknown as { share?: (data: { title?: string; text?: string; url?: string }) => Promise<void> };
+
+            if (typeof navAny.share === 'function') {
+                await navAny.share({ title, url });
+                return;
+            }
+
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(url);
+                // Minimal feedback without adding extra dependencies
+                window.alert('Enlace copiado para compartir');
+                return;
+            }
+
+            window.prompt('Copia este enlace para compartir:', url);
+        } catch {
+            // User cancelled or sharing not available
+        }
+    }
+
     get evaluatedDateLabel(): string {
         if (!this.result?.evaluatedAt) return '';
         const date = new Date(this.result.evaluatedAt);

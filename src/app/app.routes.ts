@@ -57,6 +57,7 @@ export const appRoutes: Route[] = [
         },
         children: [
             { path: 'home', loadChildren: () => import('app/modules/admin/home/home.routes') },
+            { path: 'my-tracking', loadChildren: () => import('app/modules/admin/pages/my-tracking/my-tracking.routes') },
             {
                 path: 'mental-health',
                 loadChildren: () => import('app/modules/admin/pages/questions/mental-health/mental-health.routes'),
