@@ -73,7 +73,8 @@
                         </ng-template>
 
                         <div class="support-card__actions">
-                            <button mat-button class="support-btn support-btn--danger" type="button" (click)="createEmergencyRequest()">
+                            <button mat-button class="support-btn support-btn--danger" type="button"
+                                (click)="createEmergencyRequest()">
                                 Solicitar ayuda inmediata
                             </button>
                         </div>
@@ -113,7 +114,8 @@
                                 </div>
                                 <div class="support-request__meta" *ngIf="r.assignedToPsychologistName">
                                     Asignado a: {{ r.assignedToPsychologistName }}
-                                    <span *ngIf="r.assignedToPsychologistPhone">({{ r.assignedToPsychologistPhone }})</span>
+                                    <span *ngIf="r.assignedToPsychologistPhone">({{ r.assignedToPsychologistPhone
+                                        }})</span>
                                 </div>
                             </div>
                         </div>

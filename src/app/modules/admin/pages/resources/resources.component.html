@@ -25,11 +25,13 @@
             </div>
 
             <div class="resources-top-actions" *ngIf="!loading">
-                <button mat-button class="resources-top-actions__btn" type="button" *ngIf="!useMockData" (click)="enableMockView()">
+                <button mat-button class="resources-top-actions__btn" type="button" *ngIf="!useMockData"
+                    (click)="enableMockView()">
                     Ver vista de ejemplo
                 </button>
 
-                <button mat-button class="resources-top-actions__btn" type="button" *ngIf="useMockData" (click)="disableMockView()">
+                <button mat-button class="resources-top-actions__btn" type="button" *ngIf="useMockData"
+                    (click)="disableMockView()">
                     Ver datos reales
                 </button>
             </div>
@@ -87,7 +89,8 @@
                 <div class="resources-section__subtitle">Atajos rápidos para tu bienestar</div>
 
                 <div class="quick-grid">
-                    <button class="quick-card quick-card--purple" type="button" (click)="openQuickAccess('emotional-calibration')">
+                    <button class="quick-card quick-card--purple" type="button"
+                        (click)="openQuickAccess('emotional-calibration')">
                         <div class="quick-card__head">
                             <div class="quick-card__glyph">
                                 <mat-icon svgIcon="heroicons_outline:sparkles"></mat-icon>
@@ -98,7 +101,8 @@
                         <span class="quick-card__cta">Abrir</span>
                     </button>
 
-                    <button class="quick-card quick-card--teal" type="button" [disabled]="backendDisabled" (click)="openQuickAccess('mindfulness')">
+                    <button class="quick-card quick-card--teal" type="button" [disabled]="backendDisabled"
+                        (click)="openQuickAccess('mindfulness')">
                         <div class="quick-card__head">
                             <div class="quick-card__glyph">
                                 <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
@@ -109,7 +113,8 @@
                         <span class="quick-card__cta">Explorar</span>
                     </button>
 
-                    <button class="quick-card quick-card--lime" type="button" [disabled]="backendDisabled" (click)="openQuickAccess('neuropauses')">
+                    <button class="quick-card quick-card--lime" type="button" [disabled]="backendDisabled"
+                        (click)="openQuickAccess('neuropauses')">
                         <div class="quick-card__head">
                             <div class="quick-card__glyph">
                                 <mat-icon svgIcon="heroicons_outline:bolt"></mat-icon>
@@ -120,7 +125,8 @@
                         <span class="quick-card__cta">Explorar</span>
                     </button>
 
-                    <button class="quick-card quick-card--blue" type="button" (click)="openQuickAccess('professional-support')">
+                    <button class="quick-card quick-card--blue" type="button"
+                        (click)="openQuickAccess('professional-support')">
                         <div class="quick-card__head">
                             <div class="quick-card__glyph">
                                 <mat-icon svgIcon="heroicons_outline:chat-bubble-left-right"></mat-icon>
@@ -146,19 +152,21 @@
                 <ng-container *ngIf="!(backendDisabled && !useMockData)">
                     <div class="resources-categories">
                         <button mat-button class="resources-chip" type="button"
-                            [class.is-active]="selectedCategoryId === null"
-                            (click)="selectCategory(null)">
+                            [class.is-active]="selectedCategoryId === null" (click)="selectCategory(null)">
                             Todas
                         </button>
 
                         <button mat-button class="resources-chip" type="button" *ngFor="let c of categories"
-                            [class.is-active]="selectedCategoryId === c.resourceCategoryId" (click)="selectCategory(c.resourceCategoryId)">
+                            [class.is-active]="selectedCategoryId === c.resourceCategoryId"
+                            (click)="selectCategory(c.resourceCategoryId)">
                             {{ c.categoryName }}
-                            <span class="resources-chip__count" *ngIf="c.resourceCount != null">({{ c.resourceCount }})</span>
+                            <span class="resources-chip__count" *ngIf="c.resourceCount != null">({{ c.resourceCount
+                                }})</span>
                         </button>
                     </div>
 
-                    <div class="resources-empty" *ngIf="!loading && !error && !backendDisabled && !(categories?.length)">
+                    <div class="resources-empty"
+                        *ngIf="!loading && !error && !backendDisabled && !(categories?.length)">
                         No hay categorías disponibles por ahora.
                     </div>
                 </ng-container>
@@ -166,19 +174,23 @@
 
             <section class="resources-section">
                 <div class="resources-section__title">Recomendados para ti</div>
-                <div class="resources-section__subtitle" *ngIf="recommended?.recommendationReason">{{ recommended?.recommendationReason }}</div>
+                <div class="resources-section__subtitle" *ngIf="recommended?.recommendationReason">{{
+                    recommended?.recommendationReason }}</div>
 
                 <div class="resources-placeholder" *ngIf="!loading && !error && backendDisabled && !useMockData">
                     <div class="resources-placeholder__title">Próximamente</div>
                     <div class="resources-placeholder__text">Aquí verás recursos sugeridos según tu seguimiento.</div>
                 </div>
 
-                <div class="resources-empty" *ngIf="!loading && !error && !(backendDisabled && !useMockData) && !(recommended?.resources?.length)">
+                <div class="resources-empty"
+                    *ngIf="!loading && !error && !(backendDisabled && !useMockData) && !(recommended?.resources?.length)">
                     No hay recomendados disponibles por ahora.
                 </div>
 
-                <div class="resources-grid" *ngIf="!(backendDisabled && !useMockData) && recommended?.resources?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)" *ngFor="let r of recommended!.resources">
+                <div class="resources-grid"
+                    *ngIf="!(backendDisabled && !useMockData) && recommended?.resources?.length">
+                    <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)"
+                        *ngFor="let r of recommended!.resources">
                         <div class="resource-card__top">
                             <div class="resource-card__title">{{ r.title }}</div>
                             <button mat-button class="resource-card__open" type="button"
@@ -186,7 +198,8 @@
                         </div>
 
                         <div class="resource-card__meta">
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
+                            <mat-icon class="resource-type-icon"
+                                [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
                             <span class="resource-badge">{{ r.resourceType }}</span>
                             <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
@@ -203,10 +216,12 @@
 
                 <div class="resources-placeholder" *ngIf="!loading && !error && backendDisabled && !useMockData">
                     <div class="resources-placeholder__title">Próximamente</div>
-                    <div class="resources-placeholder__text">Los destacados se cargarán automáticamente cuando esté listo el servicio.</div>
+                    <div class="resources-placeholder__text">Los destacados se cargarán automáticamente cuando esté
+                        listo el servicio.</div>
                 </div>
 
-                <div class="resources-empty" *ngIf="!loading && !error && !(backendDisabled && !useMockData) && !(featured?.length)">
+                <div class="resources-empty"
+                    *ngIf="!loading && !error && !(backendDisabled && !useMockData) && !(featured?.length)">
                     No hay recursos destacados por ahora.
                 </div>
 
@@ -214,11 +229,13 @@
                     <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)" *ngFor="let r of featured">
                         <div class="resource-card__top">
                             <div class="resource-card__title">{{ r.title }}</div>
-                            <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
+                            <button mat-button class="resource-card__open" type="button"
+                                (click)="openResource(r)">Abrir</button>
                         </div>
 
                         <div class="resource-card__meta">
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
+                            <mat-icon class="resource-type-icon"
+                                [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
                             <span class="resource-badge">{{ r.resourceType }}</span>
                             <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
@@ -231,26 +248,32 @@
 
             <section class="resources-section">
                 <div class="resources-section__title">Todos los recursos</div>
-                <div class="resources-section__subtitle" *ngIf="selectedCategoryId !== null">Filtrando por categoría</div>
+                <div class="resources-section__subtitle" *ngIf="selectedCategoryId !== null">Filtrando por categoría
+                </div>
 
                 <div class="resources-placeholder" *ngIf="!loading && !error && backendDisabled && !useMockData">
                     <div class="resources-placeholder__title">Listado en preparación</div>
-                    <div class="resources-placeholder__text">Cuando el backend esté disponible, podrás buscar y filtrar recursos desde aquí.</div>
+                    <div class="resources-placeholder__text">Cuando el backend esté disponible, podrás buscar y filtrar
+                        recursos desde aquí.</div>
                 </div>
 
-                <div class="resources-empty" *ngIf="!loading && !error && !backendDisabled && !resources?.length">No hay recursos para mostrar.</div>
+                <div class="resources-empty" *ngIf="!loading && !error && !backendDisabled && !resources?.length">No hay
+                    recursos para mostrar.</div>
 
                 <div class="resources-grid" *ngIf="!(backendDisabled && !useMockData) && resources?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)" *ngFor="let r of resources">
+                    <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)"
+                        *ngFor="let r of resources">
                         <div class="resource-card__top">
                             <div class="resource-card__title">{{ r.title }}</div>
-                            <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
+                            <button mat-button class="resource-card__open" type="button"
+                                (click)="openResource(r)">Abrir</button>
                         </div>
 
                         <div class="resource-card__meta">
                             <span class="resource-category" *ngIf="r.categoryName">{{ r.categoryName }}</span>
                             <span class="resource-dot" *ngIf="r.categoryName">•</span>
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
+                            <mat-icon class="resource-type-icon"
+                                [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
                             <span class="resource-badge">{{ r.resourceType }}</span>
                             <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
@@ -263,9 +286,11 @@
 
             <section class="resources-section">
                 <div class="resources-section__title">Apoyo profesional</div>
-                <div class="resources-section__subtitle">Si necesitas hablar con alguien, aquí tienes opciones de contacto</div>
+                <div class="resources-section__subtitle">Si necesitas hablar con alguien, aquí tienes opciones de
+                    contacto</div>
 
-                <div class="resources-empty" *ngIf="!loading && !error && !(professionals?.length || emergencyContacts?.length)">
+                <div class="resources-empty"
+                    *ngIf="!loading && !error && !(professionals?.length || emergencyContacts?.length)">
                     No hay contactos disponibles por ahora.
                 </div>
 
@@ -276,7 +301,8 @@
                             <div class="support-item__name">{{ p.name }}</div>
                             <div class="support-item__meta" *ngIf="p.phone">Tel: {{ p.phone }}</div>
                             <div class="support-item__meta" *ngIf="p.email">Email: {{ p.email }}</div>
-                            <div class="support-item__meta" *ngIf="p.availableHours">Horario: {{ p.availableHours }}</div>
+                            <div class="support-item__meta" *ngIf="p.availableHours">Horario: {{ p.availableHours }}
+                            </div>
                         </div>
                     </div>
 
@@ -287,7 +313,8 @@
                             <div class="support-item__meta" *ngIf="p.specialty">{{ p.specialty }}</div>
                             <div class="support-item__meta" *ngIf="p.phone">Tel: {{ p.phone }}</div>
                             <div class="support-item__meta" *ngIf="p.email">Email: {{ p.email }}</div>
-                            <div class="support-item__meta" *ngIf="p.availableHours">Horario: {{ p.availableHours }}</div>
+                            <div class="support-item__meta" *ngIf="p.availableHours">Horario: {{ p.availableHours }}
+                            </div>
                         </div>
                     </div>
                 </div>
