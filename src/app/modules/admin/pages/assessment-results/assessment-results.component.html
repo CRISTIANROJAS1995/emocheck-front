@@ -94,6 +94,12 @@
                     <div class="bar-fill" [ngClass]="getBarTone(d.percent)" [style.width.%]="d.percent"></div>
                 </div>
             </div>
+
+            <p *ngIf="(r.dimensions ?? []).length === 0">
+                <ng-container *ngIf="isHydrating">Cargando desglose por dimensiones...</ng-container>
+                <ng-container *ngIf="!isHydrating && hydrationAttempted">No hay desglose por dimensiones disponible para
+                    este resultado.</ng-container>
+            </p>
         </section>
 
         <section class="card card--recommendations">
@@ -105,6 +111,12 @@
                 <div class="rec-badge">{{ idx + 1 }}</div>
                 <div class="rec-text">{{ item }}</div>
             </div>
+
+            <p *ngIf="(r.recommendations ?? []).length === 0">
+                <ng-container *ngIf="isHydrating">Cargando recomendaciones...</ng-container>
+                <ng-container *ngIf="!isHydrating && hydrationAttempted">No hay recomendaciones disponibles para este
+                    resultado.</ng-container>
+            </p>
         </section>
 
         <section class="actions">
@@ -114,7 +126,7 @@
                 </div>
                 <div class="action-title">Agendar Seguimiento</div>
                 <div class="action-desc">Programa una nueva evaluación en 30 días</div>
-                <button class="action-btn" type="button">Agendar</button>
+                <button class="action-btn" type="button" (click)="scheduleFollowUp()">Agendar</button>
             </div>
 
             <div class="action-card">
@@ -123,7 +135,7 @@
                 </div>
                 <div class="action-title">Apoyo Psicológico</div>
                 <div class="action-desc">Conecta con un profesional de la salud</div>
-                <button class="action-btn" type="button">Solicitar</button>
+                <button class="action-btn" type="button" (click)="requestSupport()">Solicitar</button>
             </div>
 
             <div class="action-card">
@@ -132,7 +144,7 @@
                 </div>
                 <div class="action-title">Recursos de Autocuidado</div>
                 <div class="action-desc">Accede a herramientas y ejercicios</div>
-                <button class="action-btn" type="button">Explorar</button>
+                <button class="action-btn" type="button" (click)="openResources()">Explorar</button>
             </div>
         </section>
 
@@ -152,8 +164,10 @@
                 Si sientes que necesitas apoyo urgente, no dudes en contactarnos. Estamos aquí para ayudarte.
             </div>
             <div class="help-actions">
-                <button class="help-btn help-btn--primary" type="button">Línea 123 - Emergencias</button>
-                <button class="help-btn help-btn--secondary" type="button">Chat de apoyo</button>
+                <button class="help-btn help-btn--primary" type="button" (click)="callEmergencyLine()">Línea 123 -
+                    Emergencias</button>
+                <button class="help-btn help-btn--secondary" type="button" (click)="openSupportChat()">Chat de
+                    apoyo</button>
             </div>
         </section>
 

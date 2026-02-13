@@ -42,7 +42,8 @@
 
                 <div class="options" role="list">
                     <button *ngFor="let option of currentQuestion.options; let i = index" class="option"
-                        [class.selected]="isOptionSelected(i)" type="button" role="listitem" (click)="selectOption(i)">
+                        [class.selected]="isOptionSelected(i)" type="button" role="listitem" (click)="selectOption(i)"
+                        [disabled]="isLocked || hasSubmitted">
                         <span class="radio" aria-hidden="true">
                             <span class="radio-inner" *ngIf="isOptionSelected(i)"></span>
                         </span>

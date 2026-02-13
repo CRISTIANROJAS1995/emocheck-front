@@ -8,6 +8,9 @@ import { User } from 'app/core/user/user.types';
 import { ModuleCardComponent, ModuleCardData, EmoBadgeComponent } from 'app/shared/components';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AssessmentOutcome, AssessmentModuleId } from 'app/core/models/assessment.model';
+import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
+import { AssessmentService } from 'app/core/services/assessment.service';
+import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 
 interface Module extends ModuleCardData {
     route: string;
@@ -33,44 +36,13 @@ interface Resource {
 export class HomeComponent implements OnInit {
     user: User;
 
-    modules: Module[] = [
-        {
-            id: 'mental-health',
-            title: 'Salud Mental',
-            description: 'Tamizaje de ansiedad, depresión, trastorno del sueño y desgaste emocional',
-            icon: 'icons/Icon (18).svg',
-            colorClass: 'module-card--mental-health',
-            iconClass: 'module-icon--blue',
-            route: '/mental-health'
-        },
-        {
-            id: 'work-fatigue',
-            title: 'Fatiga Laboral',
-            description: 'Evaluación rápida de energía cognitiva y emocional',
-            icon: 'icons/Icon (27).svg',
-            colorClass: 'module-card--work-fatigue',
-            iconClass: 'module-icon--green',
-            route: '/work-fatigue'
-        },
-        {
-            id: 'organizational-climate',
-            title: 'Clima Organizacional',
-            description: 'Percepción del entorno, liderazgo y propósito',
-            icon: 'icons/Icon (28).svg',
-            colorClass: 'module-card--organizational-climate',
-            iconClass: 'module-icon--teal',
-            route: '/organizational-climate'
-        },
-        {
-            id: 'psychosocial-risk',
-            title: 'Riesgo Psicosocial',
-            description: 'Factores intralaborales y extralaborales según Batería Ministerio del Trabajo',
-            icon: 'icons/Icon (29).svg',
-            colorClass: 'module-card--psychosocial-risk',
-            iconClass: 'module-icon--orange',
-            route: '/psychosocial-risk'
-        }
-    ];
+    loadingModules = true;
+    modulesError: string | null = null;
+
+    private baseModules: Module[] = [];
+    private latestResults: Partial<Record<AssessmentModuleId, import('app/core/models/assessment.model').AssessmentResult>> = {};
+
+    modules: Module[] = [];
 
     resources: Resource[] = [
         {
@@ -114,10 +86,41 @@ export class HomeComponent implements OnInit {
     constructor(
         private router: Router,
         private userService: UserService,
-        private assessmentState: AssessmentStateService
+        private assessmentState: AssessmentStateService,
+        private assessmentHydration: AssessmentHydrationService,
+        private assessmentService: AssessmentService
     ) { }
 
     ngOnInit(): void {
+        // Rehydrate module statuses from backend so they persist across reloads.
+        this.assessmentHydration.hydrateLatestCompletedResults().subscribe();
+
+        this.assessmentService.getActiveModuleIds().subscribe({
+            next: (ids) => {
+                this.baseModules = ids.map((id) => {
+                    const def = getAssessmentModuleDefinition(id);
+                    return {
+                        id: def.id,
+                        title: def.title,
+                        description: def.description,
+                        icon: def.icon,
+                        colorClass: def.colorClass,
+                        iconClass: def.iconClass,
+                        route: def.route,
+                    };
+                });
+                this.loadingModules = false;
+                this.modulesError = null;
+                this.applyResultsToModules();
+            },
+            error: () => {
+                this.baseModules = [];
+                this.modules = [];
+                this.loadingModules = false;
+                this.modulesError = 'No fue posible cargar los módulos disponibles';
+            },
+        });
+
         // Subscribe to user data
         this.userService.user$.subscribe((user) => {
             this.user = user;
@@ -125,21 +128,26 @@ export class HomeComponent implements OnInit {
 
         // Subscribe to evaluation results and reflect completion state on cards
         this.assessmentState.results$.subscribe((results) => {
-            this.modules = this.modules.map((module) => {
-                const result = results[module.id as AssessmentModuleId];
-                return {
-                    ...module,
-                    points: result?.score,
-                    disabled: !!result,
-                    status: result
-                        ? {
-                            label: this.getOutcomeLabel(result.outcome),
-                            tone: this.getOutcomeTone(result.outcome),
-                            icon: this.getOutcomeIcon(result.outcome),
-                        }
-                        : undefined,
-                };
-            });
+            this.latestResults = results as any;
+            this.applyResultsToModules();
+        });
+    }
+
+    private applyResultsToModules(): void {
+        this.modules = this.baseModules.map((module) => {
+            const result = this.latestResults[module.id as AssessmentModuleId];
+            return {
+                ...module,
+                points: result?.score,
+                disabled: !!result,
+                status: result
+                    ? {
+                        label: this.getOutcomeLabel(result.outcome),
+                        tone: this.getOutcomeTone(result.outcome),
+                        icon: this.getOutcomeIcon(result.outcome),
+                    }
+                    : undefined,
+            };
         });
     }
 
@@ -188,7 +196,17 @@ export class HomeComponent implements OnInit {
     }
 
     navigateToResource(resourceId: string): void {
-        this.router.navigate(['/resources', resourceId]);
+        switch ((resourceId ?? '').toLowerCase()) {
+            case 'emotional-calibration':
+                this.router.navigate(['/emotional-analysis']);
+                return;
+            case 'professional-support':
+                this.router.navigate(['/support']);
+                return;
+            default:
+                this.router.navigate(['/resources']);
+                return;
+        }
     }
 
     get userName(): string {

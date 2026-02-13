@@ -21,6 +21,13 @@ export interface AssessmentDimensionBreakdown {
 
 export interface AssessmentResult {
     moduleId: AssessmentModuleId;
+
+    /** Backend evaluation identifier (optional; used for Support and tracking). */
+    evaluationId?: number;
+
+    /** Backend evaluation result identifier (optional; used for Support requests). */
+    evaluationResultId?: number;
+
     outcome: AssessmentOutcome;
     /** 0-100 */
     score: number;

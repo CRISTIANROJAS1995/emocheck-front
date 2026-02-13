@@ -1,0 +1,181 @@
+<div class="team-tracking-page">
+    <app-background-circles></app-background-circles>
+
+    <div class="team-tracking-container">
+        <!-- Hero -->
+        <section class="tracking-hero">
+            <div class="tracking-hero__left">
+                <div class="tracking-hero__title-row">
+                    <img class="tracking-hero__logo" src="icons/Icon.svg" alt="" />
+                    <h1 class="tracking-hero__title">Seguimiento Colaboradores</h1>
+                </div>
+                <p class="tracking-hero__subtitle">Panel de monitoreo agregado (Psicología / HSE)</p>
+            </div>
+
+            <a class="tracking-hero__back" mat-button [routerLink]="['/home']">
+                <span class="tracking-hero__back-content">
+                    <mat-icon class="tracking-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                    <span class="tracking-hero__back-text">Volver</span>
+                </span>
+            </a>
+        </section>
+
+        <!-- Loading / Error -->
+        <div class="team-state" *ngIf="loading">
+            <mat-progress-spinner diameter="28" mode="indeterminate"></mat-progress-spinner>
+            <span>Cargando dashboard...</span>
+        </div>
+
+        <div class="team-error" *ngIf="!loading && error">
+            <mat-icon svgIcon="heroicons_outline:exclamation-triangle"></mat-icon>
+            <span>{{ error }}</span>
+            <button mat-button type="button" (click)="load()">Reintentar</button>
+        </div>
+
+        <ng-container *ngIf="!loading && !error">
+            <!-- Filters -->
+            <section class="tracking-filters">
+                <div class="tracking-filters__title">
+                    <mat-icon svgIcon="heroicons_outline:funnel"></mat-icon>
+                    <span>Filtros de Visualización</span>
+                </div>
+
+                <div class="tracking-filters__grid">
+                    <div class="tracking-filters__field">
+                        <label class="tracking-filters__label">Período de tiempo</label>
+                        <mat-form-field appearance="outline" class="tracking-filters__mat">
+                            <mat-select [(value)]="selectedTimeRange">
+                                @for (range of timeRanges; track range.id) {
+                                <mat-option [value]="range.id">{{ range.label }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="tracking-filters__field">
+                        <label class="tracking-filters__label">Agrupar tendencias</label>
+                        <mat-form-field appearance="outline" class="tracking-filters__mat">
+                            <mat-select [(value)]="selectedGroupBy">
+                                @for (g of groupByOptions; track g.id) {
+                                <mat-option [value]="g.id">{{ g.label }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="tracking-filters__actions">
+                        <label class="tracking-filters__label">Acciones</label>
+                        <div class="tracking-filters__actions-row">
+                            <button class="tracking-filters__export" mat-button type="button" (click)="exportReport()">
+                                <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+                                Exportar
+                            </button>
+
+                            <button class="tracking-filters__apply" mat-button type="button" (click)="applyFilters()">
+                                <mat-icon svgIcon="heroicons_outline:arrow-path"></mat-icon>
+                                Actualizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- KPIs -->
+            <section class="team-kpis" *ngIf="indicators as kpi">
+                <div class="kpi-card kpi-card--teal">
+                    <div class="kpi-card__icon"><mat-icon svgIcon="heroicons_outline:users"></mat-icon></div>
+                    <div class="kpi-card__value">{{ kpi.totalUsers }}</div>
+                    <div class="kpi-card__label">Total colaboradores</div>
+                    <div class="kpi-card__meta">Evaluaciones completadas: {{ kpi.totalEvaluationsCompleted }}</div>
+                </div>
+
+                <div class="kpi-card kpi-card--blue">
+                    <div class="kpi-card__icon"><mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon></div>
+                    <div class="kpi-card__value">{{ kpi.participationRate }}%</div>
+                    <div class="kpi-card__label">Participación</div>
+                    <div class="kpi-card__meta">Alertas sin atender: {{ kpi.unattendedAlerts }}</div>
+                </div>
+
+                <div class="kpi-card kpi-card--amber">
+                    <div class="kpi-card__icon"><mat-icon svgIcon="heroicons_outline:bell-alert"></mat-icon></div>
+                    <div class="kpi-card__value">{{ kpi.unattendedAlerts }}</div>
+                    <div class="kpi-card__label">Alertas sin atender</div>
+                    <div class="kpi-card__meta">Evaluaciones completadas: {{ kpi.totalEvaluationsCompleted }}</div>
+                </div>
+            </section>
+
+            <!-- Charts -->
+            <section class="team-charts">
+                <div class="chart-card">
+                    <div class="chart-card__title">Distribución de Riesgo</div>
+                    <div class="chart-card__subtitle">Resumen agregado del período seleccionado</div>
+
+                    <div class="chart-card__body" *ngIf="riskDonutChart">
+                        <apx-chart class="team-chart" [series]="riskDonutChart.series" [chart]="riskDonutChart.chart"
+                            [labels]="riskDonutChart.labels" [colors]="riskDonutChart.colors"
+                            [legend]="riskDonutChart.legend" [dataLabels]="riskDonutChart.dataLabels"
+                            [plotOptions]="riskDonutChart.plotOptions" [stroke]="riskDonutChart.stroke"
+                            [tooltip]="riskDonutChart.tooltip"></apx-chart>
+                    </div>
+
+                    <div class="chart-card__empty" *ngIf="!riskDonutChart">Sin datos para graficar</div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-card__title">Tendencias</div>
+                    <div class="chart-card__subtitle">Evolución (verde/amarillo/rojo)</div>
+
+                    <div class="chart-card__body" *ngIf="riskTrendChart">
+                        <apx-chart class="team-chart" [series]="riskTrendChart.series" [chart]="riskTrendChart.chart"
+                            [xaxis]="riskTrendChart.xaxis" [yaxis]="riskTrendChart.yaxis"
+                            [stroke]="riskTrendChart.stroke" [grid]="riskTrendChart.grid"
+                            [dataLabels]="riskTrendChart.dataLabels" [markers]="riskTrendChart.markers"
+                            [tooltip]="riskTrendChart.tooltip" [colors]="riskTrendChart.colors"
+                            [fill]="riskTrendChart.fill" [legend]="riskTrendChart.legend"></apx-chart>
+                    </div>
+
+                    <div class="chart-card__empty" *ngIf="!riskTrendChart">Sin datos para graficar</div>
+                </div>
+            </section>
+
+            <!-- Module Statistics -->
+            <section class="team-table-card" *ngIf="moduleStatistics as stats">
+                <div class="team-table-card__header">
+                    <div>
+                        <div class="team-table-card__title">Estadísticas por Módulo</div>
+                        <div class="team-table-card__subtitle">Promedio y distribución de riesgo</div>
+                    </div>
+                </div>
+
+                <div class="team-table" *ngIf="stats?.length; else noAreas">
+                    <div class="team-table__head">
+                        <div>Módulo</div>
+                        <div class="team-table__right">Evaluaciones</div>
+                        <div class="team-table__right">Puntaje</div>
+                        <div class="team-table__right">Verde</div>
+                        <div class="team-table__right">Amarillo</div>
+                        <div class="team-table__right">Rojo</div>
+                    </div>
+
+                    @for (m of stats; track m.moduleName) {
+                    <div class="team-table__row">
+                        <div class="team-table__area">
+                            <div class="team-table__area-name">{{ m.moduleName || 'N/D' }}</div>
+                        </div>
+
+                        <div class="team-table__right">{{ m.totalEvaluations }}</div>
+                        <div class="team-table__right">{{ m.averageScore }}</div>
+                        <div class="team-table__right">{{ m.riskDistribution?.greenCount }}</div>
+                        <div class="team-table__right">{{ m.riskDistribution?.yellowCount }}</div>
+                        <div class="team-table__right">{{ m.riskDistribution?.redCount }}</div>
+                    </div>
+                    }
+                </div>
+
+                <ng-template #noAreas>
+                    <div class="team-table__empty">No hay módulos para mostrar</div>
+                </ng-template>
+            </section>
+        </ng-container>
+    </div>
+</div>

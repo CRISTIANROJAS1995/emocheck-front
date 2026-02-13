@@ -1,0 +1,1972 @@
+{
+  "info": {
+    "_postman_id": "61b02c86-72b3-4e95-bf8f-a079271726df",
+    "name": "EmoCheck API - v2.0 Complete",
+    "description": "Colección completa actualizada de EmoCheck API. Incluye todos los endpoints organizados por flujo de usuario y panel administrativo. Actualizado: Febrero 3, 2026",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3661335"
+  },
+  "item": [
+    {
+      "name": "🔐 1. Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('token', jsonData.data.token);",
+                  "        pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                  "        pm.environment.set('userId', jsonData.data.user.userId);",
+                  "        pm.environment.set('userEmail', jsonData.data.user.email);",
+                  "        pm.environment.set('userFullName', jsonData.data.user.fullName);",
+                  "        console.log('✅ Token guardado:', jsonData.data.token.substring(0, 20) + '...');",
+                  "    }",
+                  "}",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success=true', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has token', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.token).to.exist;",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user-employee2@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Autenticación de usuario. Devuelve JWT token y refresh token."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cristianjoseroj@gmail.com\",\n  \"otpCode\": \"8678\",\n  \"newPassword\": \"NewPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/otp/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "otp",
+                "reset-password"
+              ]
+            },
+            "description": "Restablecer contraseña con token de email"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('token', jsonData.data.token);",
+                  "        pm.environment.set('refreshToken', jsonData.data.refreshToken);",
+                  "        console.log('✅ Token renovado');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Renovar JWT token usando refresh token"
+          },
+          "response": []
+        },
+        {
+          "name": "Enviar OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"cristianjoseroj@gmail.com\",\r\n  \"purpose\": \"recovery\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/otp/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "otp",
+                "request"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"cristianjoseroj@gmail.com\",\r\n  \"otpCode\": \"2329\",\r\n  \"purpose\": \"recovery\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/otp/validate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "otp",
+                "validate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reenviar OTP",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"cristianjoseroj@gmail.com\",\r\n  \"purpose\": \"PasswordReset\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/otp/resend",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "otp",
+                "resend"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints de autenticación: Login, Registro, Recuperación de contraseña y Refresh Token"
+    },
+    {
+      "name": "👤 2. Users",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('newUserId', jsonData.data.userId);",
+                  "    }",
+                  "}",
+                  "",
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJjcmlzdGlhbmpvc2Vyb2pAZ21haWwuY29tIiwibmFtZSI6IkNyaXN0aWFuIFJvamFzIiwiZG9jdW1lbnQiOiIxMDc1MjkyMTQ1Iiwicm9sZSI6IlNZU1RFTV9BRE1JTiIsIm5iZiI6MTc3MDIyMjY3MywiZXhwIjoxNzcwMjUxNDczLCJpYXQiOjE3NzAyMjI2NzMsImlzcyI6Imh0dHBzOi8vZW1vY2hlY2suY29tIiwiYXVkIjoiaHR0cHM6Ly9lbW9jaGVjay5jb20ifQ.m-Yqmztdcr9CpBDlY3W1uqXdv0rvrRgURK8gTlYjMgke1Jj56jkrKxzsJKeUTQwG7GPDnSpJoWQ2xz0R9ac8tA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Juan Pablo Rojas\",\n  \"documentNumber\": \"10752921456\",\n  \"email\": \"user-employee2@example.com\",\n  \"password\": \"Password123!\",\n  \"companyId\": 2,\n  \"siteId\": 1,\n  \"areaId\": 1,\n  \"jobTypeId\": 1,\n  \"roleIDs\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ""
+              ]
+            },
+            "description": "Registrar nuevo usuario en el sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Obtener información de un usuario específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"María García Pérez\",\n  \"documentNumber\": \"1234567890\",\n  \"email\": \"maria.garcia@empresa.com\",\n  \"siteId\": 3,\n  \"areaId\": 4,\n  \"jobTypeId\": 6\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Actualizar información de usuario"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users?companyId=1&search=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "1"
+                },
+                {
+                  "key": "siteId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "areaId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "stateId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Listar todos los usuarios (solo Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Eliminar usuario (solo Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJjcmlzdGlhbmpvc2Vyb2pAZ21haWwuY29tIiwibmFtZSI6IkNyaXN0aWFuIFJvamFzIiwiZG9jdW1lbnQiOiIxMDc1MjkyMTQ1Iiwicm9sZSI6IlNZU1RFTV9BRE1JTiIsIm5iZiI6MTc3MDIzOTA0NywiZXhwIjoxNzcwMjY3ODQ3LCJpYXQiOjE3NzAyMzkwNDcsImlzcyI6Imh0dHBzOi8vZW1vY2hlY2suY29tIiwiYXVkIjoiaHR0cHM6Ly9lbW9jaGVjay5jb20ifQ.zSMzXxwjGdOfXN_2DW-vyG1QU4JB5tjFUSyx6z1tllpdFXpGr6ZAaskWsW3voiSis0uzHZUbsHEH8ZCgYbiC9A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "current"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de usuarios: Registro, perfil, actualización"
+    },
+    {
+      "name": "📋 3. Consent",
+      "item": [
+        {
+          "name": "Check Consent Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/consent/has-accepted",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "consent",
+                "has-accepted"
+              ]
+            },
+            "description": "Verificar si el usuario ha aceptado el consentimiento informado"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Consent",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/consent/my-consent",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "consent",
+                "my-consent"
+              ]
+            },
+            "description": "Obtener mi consentimiento informado aceptado"
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Consent",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('consentId', jsonData.data.consentId);",
+                  "        console.log('✅ Consentimiento aceptado');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consentText\": \"He leído y acepto los términos del consentimiento informado. Autorizo el tratamiento de mis datos personales según la Ley 1581 de 2012.\",\n  \"ipAddress\": \"192.168.1.100\",\n  \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/consent/accept",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "consent",
+                "accept"
+              ]
+            },
+            "description": "Aceptar consentimiento informado digital"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de consentimientos informados"
+    },
+    {
+      "name": "📝 4. Assessment Modules",
+      "item": [
+        {
+          "name": "Get All Modules",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data && jsonData.data.length > 0) {",
+                  "        pm.environment.set('moduleId', jsonData.data[0].assessmentModuleId);",
+                  "        console.log('✅ Primer módulo guardado:', jsonData.data[0].moduleName);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assessmentmodule/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assessmentmodule",
+                ""
+              ]
+            },
+            "description": "Obtener lista de módulos de evaluación disponibles"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Module Details (with Questions)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assessment-modules/{{moduleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assessment-modules",
+                "{{moduleId}}"
+              ]
+            },
+            "description": "Obtener detalles de un módulo incluyendo todas sus preguntas y opciones"
+          },
+          "response": []
+        },
+        {
+          "name": "Módulos activos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assessmentmodule/active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assessmentmodule",
+                "active"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Módulo con Evaluaciones con preguntas y opciones",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/assessmentmodule/1/with-questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "assessmentmodule",
+                "1",
+                "with-questions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Módulos de evaluación disponibles"
+    },
+    {
+      "name": "✅ 5. Evaluations",
+      "item": [
+        {
+          "name": "Start Evaluation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('evaluationId', jsonData.data.evaluationId);",
+                  "        console.log('✅ Evaluación iniciada ID:', jsonData.data.evaluationId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assessmentModuleId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/evaluation/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "evaluation",
+                "start"
+              ]
+            },
+            "description": "Iniciar nueva evaluación"
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Response",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluationId\": 1,\n  \"questionId\": 1,\n  \"questionOptionId\": 4  // \"Casi todos los días\" = 3 puntos\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/evaluation/submit-response",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "evaluation",
+                "submit-response"
+              ]
+            },
+            "description": "Enviar respuesta a una pregunta"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Evaluation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('evaluationResultId', jsonData.data.evaluationResultId);",
+                  "        pm.environment.set('riskLevel', jsonData.data.riskLevel);",
+                  "        console.log('✅ Evaluación completada');",
+                  "        console.log('📊 Nivel de riesgo:', jsonData.data.riskLevel);",
+                  "        console.log('📈 Puntaje:', jsonData.data.totalScore);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluationId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/evaluation/2/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "evaluation",
+                "2",
+                "complete"
+              ]
+            },
+            "description": "Completar evaluación y calcular resultado"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Evaluations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/evaluation/my-evaluations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "evaluation",
+                "my-evaluations"
+              ],
+              "query": [
+                {
+                  "key": "moduleId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "startDate",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Obtener historial de mis evaluaciones"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Result",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/evaluation/result/{{evaluationResultId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "evaluation",
+                "result",
+                "{{evaluationResultId}}"
+              ]
+            },
+            "description": "Obtener resultado de una evaluación"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Detailed Result (with Dimensions)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/evaluation/{{evaluationId}}/detailed-result",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "evaluation",
+                "{{evaluationId}}",
+                "detailed-result"
+              ]
+            },
+            "description": "Obtener resultado detallado con puntajes por dimensión"
+          },
+          "response": []
+        }
+      ],
+      "description": "Flujo completo de evaluaciones"
+    },
+    {
+      "name": "💡 6. Recommendations",
+      "item": [
+        {
+          "name": "Get My Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/recommendations/my-recommendations?isRead=false",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "recommendations",
+                "my-recommendations"
+              ],
+              "query": [
+                {
+                  "key": "isRead",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Obtener mis recomendaciones personalizadas"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recommendations by Result",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/recommendations/by-result/{{evaluationResultId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "recommendations",
+                "by-result",
+                "{{evaluationResultId}}"
+              ]
+            },
+            "description": "Obtener recomendaciones de un resultado específico"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Recommendation as Read",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/recommendations/{{recommendationId}}/mark-read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "recommendations",
+                "{{recommendationId}}",
+                "mark-read"
+              ]
+            },
+            "description": "Marcar recomendación como leída"
+          },
+          "response": []
+        }
+      ],
+      "description": "Recomendaciones personalizadas según resultados"
+    },
+    {
+      "name": "🎯 7. Wellness Resources",
+      "item": [
+        {
+          "name": "Get Resource Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/resources/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "resources",
+                "categories"
+              ]
+            },
+            "description": "Obtener categorías de recursos de bienestar"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/resources?targetAudience=All&isFeatured=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "resourceType",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "targetAudience",
+                  "value": "All"
+                },
+                {
+                  "key": "isFeatured",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Obtener recursos de bienestar con filtros opcionales"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Resources by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/resources/category/{{categoryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "resources",
+                "category",
+                "{{categoryId}}"
+              ]
+            },
+            "description": "Obtener recursos de una categoría específica"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Featured Resources",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/resources/featured",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "resources",
+                "featured"
+              ]
+            },
+            "description": "Obtener recursos destacados"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recommended Resources (based on risk)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/resources/recommended",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "resources",
+                "recommended"
+              ]
+            },
+            "description": "Obtener recursos recomendados según mi nivel de riesgo"
+          },
+          "response": []
+        },
+        {
+          "name": "Track Resource Access",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"durationSeconds\": 180,\n  \"completedPercentage\": 100,\n  \"rating\": 5,\n  \"feedback\": \"Muy útil, me ayudó a relajarme\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/resources/{{resourceId}}/track-access",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "resources",
+                "{{resourceId}}",
+                "track-access"
+              ]
+            },
+            "description": "Registrar acceso a un recurso (analytics)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Centro de recursos de bienestar"
+    },
+    {
+      "name": "🆘 8. Professional Support",
+      "item": [
+        {
+          "name": "Get Professionals",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/support/professionals",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "support",
+                "professionals"
+              ]
+            },
+            "description": "Obtener lista de profesionales de apoyo psicológico"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Emergency Contacts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/support/professionals/emergency",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "support",
+                "professionals",
+                "emergency"
+              ]
+            },
+            "description": "Obtener contactos de emergencia 24/7"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Support Request",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('supportRequestId', jsonData.data.supportRequestId);",
+                  "        console.log('✅ Solicitud de apoyo creada ID:', jsonData.data.supportRequestId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"evaluationResultId\": {{evaluationResultId}},\n  \"requestType\": \"Consultation\",\n  \"urgencyLevel\": \"Medium\",\n  \"subject\": \"Necesito ayuda con manejo de estrés\",\n  \"description\": \"He estado sintiendo mucha presión en el trabajo y me gustaría hablar con un profesional\",\n  \"preferredContactMethod\": \"VideoCall\",\n  \"preferredSchedule\": \"Lunes o Miércoles por la tarde\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/support/requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "support",
+                "requests"
+              ]
+            },
+            "description": "Crear solicitud de apoyo psicológico"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Support Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/support/requests/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "support",
+                "requests",
+                "my"
+              ]
+            },
+            "description": "Obtener mis solicitudes de apoyo"
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Request to Psychologist (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"psychologistId\": 10,\n  \"notes\": \"Asignado según especialidad en estrés laboral\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/support/requests/{{supportRequestId}}/assign",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "support",
+                "requests",
+                "{{supportRequestId}}",
+                "assign"
+              ]
+            },
+            "description": "Asignar solicitud a psicólogo (Admin/Psychologist)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Apoyo psicológico profesional"
+    },
+    {
+      "name": "🚨 9. Alerts (Admin)",
+      "item": [
+        {
+          "name": "Get All Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/alerts?status=Pending&alertLevel=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "alerts"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Pending"
+                },
+                {
+                  "key": "alertLevel",
+                  "value": ""
+                },
+                {
+                  "key": "startDate",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "endDate",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Obtener todas las alertas (Admin/Psychologist)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pending Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/alerts/pending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "alerts",
+                "pending"
+              ]
+            },
+            "description": "Obtener alertas pendientes de atención"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Critical Alerts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/alerts/critical",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "alerts",
+                "critical"
+              ]
+            },
+            "description": "Obtener alertas críticas (nivel rojo)"
+          },
+          "response": []
+        },
+        {
+          "name": "Attend Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionTaken\": \"Se contactó al usuario vía telefónica. Se programó cita con psicólogo para el 5 de febrero.\",\n  \"notes\": \"Usuario mostró disposición a recibir apoyo. Se activó protocolo de seguimiento.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/alerts/{{alertId}}/attend",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "alerts",
+                "{{alertId}}",
+                "attend"
+              ]
+            },
+            "description": "Atender una alerta"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Alert",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionTaken\": \"Segunda sesión realizada. Usuario reporta mejoría en estado de ánimo.\",\n  \"notes\": \"Continuar seguimiento semanal por 2 semanas más.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/alerts/{{alertId}}/update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "alerts",
+                "{{alertId}}",
+                "update"
+              ]
+            },
+            "description": "Actualizar seguimiento de alerta"
+          },
+          "response": []
+        }
+      ],
+      "description": "Gestión de alertas críticas"
+    },
+    {
+      "name": "📁 10. Case Tracking (Admin)",
+      "item": [
+        {
+          "name": "Get All Cases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/case-tracking?status=InProgress&priority=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "case-tracking"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "InProgress"
+                },
+                {
+                  "key": "priority",
+                  "value": ""
+                },
+                {
+                  "key": "psychologistId",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Obtener casos de seguimiento"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Case",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('caseTrackingId', jsonData.data.caseTrackingId);",
+                  "        console.log('✅ Caso creado:', jsonData.data.caseNumber);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alertId\": {{alertId}},\n  \"userId\": {{userId}},\n  \"assignedToPsychologistId\": 10,\n  \"priority\": \"High\",\n  \"initialAssessment\": \"Usuario presenta síntomas moderados de depresión según PHQ-9. Puntaje de 12/27.\",\n  \"interventionPlan\": \"Plan de 6 sesiones de terapia cognitivo-conductual. Frecuencia semanal.\",\n  \"nextFollowUpDate\": \"2026-02-10T10:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/case-tracking",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "case-tracking"
+              ]
+            },
+            "description": "Crear nuevo caso de seguimiento"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Case by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/case-tracking/{{caseTrackingId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "case-tracking",
+                "{{caseTrackingId}}"
+              ]
+            },
+            "description": "Obtener detalles de un caso"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Case",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"InProgress\",\n  \"progressNotes\": \"Sesión 2 completada. Usuario reporta mejoría en patrón de sueño. Aplicadas técnicas de reestructuración cognitiva.\",\n  \"nextFollowUpDate\": \"2026-02-17T10:00:00Z\",\n  \"requiresExternalReferral\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/case-tracking/{{caseTrackingId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "case-tracking",
+                "{{caseTrackingId}}"
+              ]
+            },
+            "description": "Actualizar progreso de caso"
+          },
+          "response": []
+        },
+        {
+          "name": "Close Case",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"finalOutcome\": \"Usuario completó exitosamente 6 sesiones de terapia. Mejoría significativa en puntaje PHQ-9 (de 12 a 4). Usuario reporta estrategias adquiridas y compromiso con seguimiento preventivo mensual.\",\n  \"requiresExternalReferral\": false,\n  \"externalReferralDetails\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/case-tracking/{{caseTrackingId}}/close",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "case-tracking",
+                "{{caseTrackingId}}",
+                "close"
+              ]
+            },
+            "description": "Cerrar caso de seguimiento"
+          },
+          "response": []
+        }
+      ],
+      "description": "Seguimiento de casos psicológicos"
+    },
+    {
+      "name": "📊 11. Dashboard (Admin)",
+      "item": [
+        {
+          "name": "Get Dashboard Indicators (KPIs)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/indicators?companyId=1&startDate=2026-01-01T00:00:00Z&endDate=2026-02-03T23:59:59Z",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "indicators"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "1"
+                },
+                {
+                  "key": "siteId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "areaId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "startDate",
+                  "value": "2026-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-02-03T23:59:59Z"
+                }
+              ]
+            },
+            "description": "Obtener indicadores principales del dashboard"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Risk Distribution",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/risk-distribution?companyId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "risk-distribution"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "1"
+                },
+                {
+                  "key": "siteId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "areaId",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Obtener distribución de riesgo por área, sede y módulo"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/trends?startDate=2026-01-01T00:00:00Z&endDate=2026-02-03T23:59:59Z&groupBy=week",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "trends"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "moduleId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "startDate",
+                  "value": "2026-01-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-02-03T23:59:59Z"
+                },
+                {
+                  "key": "groupBy",
+                  "value": "week",
+                  "description": "day, week, month"
+                }
+              ]
+            },
+            "description": "Obtener tendencias de evaluaciones en el tiempo"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Area Comparisons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/comparisons?companyId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "comparisons"
+              ],
+              "query": [
+                {
+                  "key": "companyId",
+                  "value": "1"
+                },
+                {
+                  "key": "moduleId",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Obtener comparativos entre áreas"
+          },
+          "response": []
+        }
+      ],
+      "description": "Panel administrativo con indicadores y estadísticas"
+    },
+    {
+      "name": "📤 12. Export",
+      "item": [
+        {
+          "name": "Request Data Export",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.success && jsonData.data) {",
+                  "        pm.environment.set('dataExportId', jsonData.data.dataExportId);",
+                  "        console.log('✅ Exportación solicitada ID:', jsonData.data.dataExportId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exportType\": \"Full\",\n  \"fileFormat\": \"JSON\",\n  \"startDate\": \"2026-01-01T00:00:00Z\",\n  \"endDate\": \"2026-02-03T23:59:59Z\",\n  \"reason\": \"Solicitud de datos personales (GDPR)\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/export/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "export",
+                "request"
+              ]
+            },
+            "description": "Solicitar exportación de datos personales"
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Exports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/export/my",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "export",
+                "my"
+              ]
+            },
+            "description": "Obtener mis exportaciones de datos"
+          },
+          "response": []
+        },
+        {
+          "name": "Download Export",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/export/{{dataExportId}}/download",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "export",
+                "{{dataExportId}}",
+                "download"
+              ]
+            },
+            "description": "Descargar archivo de exportación"
+          },
+          "response": []
+        }
+      ],
+      "description": "Exportación de datos (GDPR compliance)"
+    },
+    {
+      "name": "🔍 13. System Logs (Admin)",
+      "item": [
+        {
+          "name": "Get System Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system-logs?logLevel=Error&startDate=&endDate=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "system-logs"
+              ],
+              "query": [
+                {
+                  "key": "logLevel",
+                  "value": "Error",
+                  "description": "Information, Warning, Error, Critical"
+                },
+                {
+                  "key": "userId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "startDate",
+                  "value": ""
+                },
+                {
+                  "key": "endDate",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "Obtener logs del sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Error Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system-logs/errors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "system-logs",
+                "errors"
+              ]
+            },
+            "description": "Obtener solo logs de errores"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Logs by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/system-logs/by-date-range?startDate=2026-02-01T00:00:00Z&endDate=2026-02-03T23:59:59Z",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "system-logs",
+                "by-date-range"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-02-01T00:00:00Z"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-02-03T23:59:59Z"
+                }
+              ]
+            },
+            "description": "Obtener logs en un rango de fechas"
+          },
+          "response": []
+        }
+      ],
+      "description": "Logs del sistema y auditoría"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-refresh token si está próximo a expirar",
+          "const token = pm.environment.get('token');",
+          "if (!token) {",
+          "    console.log('⚠️ No hay token. Ejecuta Login primero.');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Log general de respuesta",
+          "console.log('📡 Status:', pm.response.code);",
+          "console.log('⏱️ Tiempo:', pm.response.responseTime + 'ms');",
+          "",
+          "// Detectar errores",
+          "if (pm.response.code >= 400) {",
+          "    console.log('❌ Error:', pm.response.json());",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7001",
+      "type": "string"
+    }
+  ]
+}

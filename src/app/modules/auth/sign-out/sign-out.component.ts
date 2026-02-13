@@ -1,7 +1,7 @@
 import { I18nPluralPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from 'app/core/auth/auth.service';
+import { AuthService } from 'app/core/services/auth.service';
 import { Subject, finalize, takeUntil, takeWhile, tap, timer } from 'rxjs';
 
 @Component({
@@ -24,7 +24,7 @@ export class AuthSignOutComponent implements OnInit, OnDestroy {
     constructor(
         private _authService: AuthService,
         private _router: Router
-    ) {}
+    ) { }
 
     // -----------------------------------------------------------------------------------------------------
     // @ Lifecycle hooks
@@ -35,7 +35,7 @@ export class AuthSignOutComponent implements OnInit, OnDestroy {
      */
     ngOnInit(): void {
         // Sign out
-        this._authService.signOut();
+        this._authService.logout();
 
         // Redirect after the countdown
         timer(1000, 1000)

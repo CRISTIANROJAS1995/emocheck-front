@@ -41,6 +41,13 @@
                 Selecciona un módulo para comenzar
             </h2>
 
+            @if (loadingModules) {
+            <div class="text-sm text-slate-500">Cargando módulos...</div>
+            } @else if (modulesError) {
+            <div class="text-sm text-red-600">{{ modulesError }}</div>
+            } @else if (!modules?.length) {
+            <div class="text-sm text-slate-500">No hay módulos disponibles</div>
+            } @else {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 @for (module of modules; track module.id) {
                 <emo-module-card [module]="module" (onStartEvaluation)="startEvaluation($event)"
@@ -48,6 +55,7 @@
                 </emo-module-card>
                 }
             </div>
+            }
         </div>
 
         <!-- Resources section -->

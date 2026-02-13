@@ -67,7 +67,7 @@ export class AuthSignInComponent implements OnInit {
         this.signInForm = this._formBuilder.group({
             email: [
                 'admin@motioniq.com',
-                [Validators.required, Validators.email],
+                [Validators.required],
             ],
             password: ['Admin123!', Validators.required],
             rememberMe: [''],
@@ -99,7 +99,7 @@ export class AuthSignInComponent implements OnInit {
             error: (error) => {
                 this.loading = false;
                 this.signInForm.enable();
-                const msg = error?.message || 'Credenciales inválidas';
+                const msg = error?.message || error?.body?.message || 'Credenciales inválidas';
                 this.alertService.error(msg);
             }
         });

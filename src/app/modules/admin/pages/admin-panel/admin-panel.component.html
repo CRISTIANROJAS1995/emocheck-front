@@ -1,0 +1,223 @@
+<div class="admin-page">
+    <app-background-circles></app-background-circles>
+
+    <div class="admin-container">
+        <section class="admin-hero">
+            <div class="admin-hero__left">
+                <div class="admin-hero__title-row">
+                    <img class="admin-hero__logo" src="icons/Icon.svg" alt="" />
+                    <h1 class="admin-hero__title">Configuración</h1>
+                </div>
+                <p class="admin-hero__subtitle">Gestión de usuarios (Admin / CompanyAdmin)</p>
+            </div>
+
+            <a class="admin-hero__back" mat-button [routerLink]="['/home']">
+                <span class="admin-hero__back-content">
+                    <mat-icon class="admin-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                    <span class="admin-hero__back-text">Volver</span>
+                </span>
+            </a>
+        </section>
+
+        <!-- Filters -->
+        <section class="admin-filters" [formGroup]="filterForm">
+            <div class="admin-filters__title">
+                <mat-icon svgIcon="heroicons_outline:funnel"></mat-icon>
+                <span>Filtros</span>
+            </div>
+
+            <div class="admin-filters__grid">
+                <div class="admin-field">
+                    <label class="admin-label">Buscar</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="search" placeholder="Nombre o email" />
+                    </mat-form-field>
+                </div>
+
+                <div class="admin-field">
+                    <label class="admin-label">companyId</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="companyId" placeholder="1" />
+                    </mat-form-field>
+                </div>
+
+                <div class="admin-field">
+                    <label class="admin-label">siteId</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="siteId" placeholder="2" />
+                    </mat-form-field>
+                </div>
+
+                <div class="admin-field">
+                    <label class="admin-label">areaId</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="areaId" placeholder="3" />
+                    </mat-form-field>
+                </div>
+
+                <div class="admin-field">
+                    <label class="admin-label">stateId</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="stateId" placeholder="1" />
+                    </mat-form-field>
+                </div>
+
+                <div class="admin-actions">
+                    <label class="admin-label">Acciones</label>
+                    <div class="admin-actions__row">
+                        <button mat-button type="button" class="admin-btn" (click)="loadUsers()"
+                            [disabled]="loading || saving">
+                            <mat-icon svgIcon="heroicons_outline:arrow-path"></mat-icon>
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Create user -->
+        <section class="admin-create" [formGroup]="createForm">
+            <div class="admin-create__header">
+                <div>
+                    <div class="admin-create__title">Crear usuario</div>
+                    <div class="admin-create__subtitle">Crea un usuario con contraseña temporal y roles</div>
+                </div>
+                <button mat-button type="button" class="admin-btn admin-btn--primary" (click)="createUser()"
+                    [disabled]="saving">
+                    <mat-icon svgIcon="heroicons_outline:user-plus"></mat-icon>
+                    Crear
+                </button>
+            </div>
+
+            <div class="admin-create__grid">
+                <div class="admin-field">
+                    <label class="admin-label">Nombre completo</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="fullName" placeholder="Pedro López" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field">
+                    <label class="admin-label">Documento</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="documentNumber" placeholder="9876543210" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field">
+                    <label class="admin-label">Email</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="email" placeholder="pedro.lopez@empresa.com" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field">
+                    <label class="admin-label">Password temporal</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="password" placeholder="TempPassword123!" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field">
+                    <label class="admin-label">companyID (opcional)</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="companyID" placeholder="1" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field">
+                    <label class="admin-label">siteID (opcional)</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="siteID" placeholder="2" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field">
+                    <label class="admin-label">areaID (opcional)</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="areaID" placeholder="3" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field">
+                    <label class="admin-label">jobTypeID</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <input matInput formControlName="jobTypeID" placeholder="5" />
+                    </mat-form-field>
+                </div>
+                <div class="admin-field admin-field--wide">
+                    <label class="admin-label">Roles</label>
+                    <mat-form-field appearance="outline" class="admin-mat">
+                        <mat-select formControlName="roleIDs" multiple>
+                            @for (r of roleOptions; track r.id) {
+                            <mat-option [value]="r.id">{{ r.name }} ({{ r.id }})</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+
+            @if (created) {
+            <div class="admin-created">
+                <mat-icon svgIcon="heroicons_outline:check-circle"></mat-icon>
+                <div>
+                    <div class="admin-created__title">Usuario creado</div>
+                    <div class="admin-created__meta">{{ created.fullName }} — {{ created.email }}</div>
+                    <div class="admin-created__meta">ID: <b>{{ created.userId }}</b></div>
+                    @if (created.roles?.length) {
+                    <div class="admin-created__meta">Roles: {{ created.roles.join(', ') }}</div>
+                    }
+                </div>
+            </div>
+            }
+        </section>
+
+        <!-- Users list -->
+        <section class="admin-list">
+            <div class="admin-list__header">
+                <div>
+                    <div class="admin-list__title">Usuarios</div>
+                    <div class="admin-list__subtitle">Listado (GET /api/users)</div>
+                </div>
+                @if (loading) {
+                <div class="admin-list__loading">
+                    <mat-progress-spinner diameter="22" mode="indeterminate"></mat-progress-spinner>
+                    <span>Cargando...</span>
+                </div>
+                }
+            </div>
+
+            @if (!loading && !users?.length) {
+            <div class="admin-empty">No hay usuarios para mostrar con los filtros actuales.</div>
+            }
+
+            @if (users?.length) {
+            <div class="admin-table">
+                <div class="admin-table__head">
+                    <div>Usuario</div>
+                    <div>Empresa</div>
+                    <div class="admin-right">Roles</div>
+                    <div class="admin-right">Riesgo</div>
+                    <div class="admin-right">Eval.</div>
+                    <div class="admin-right">Acciones</div>
+                </div>
+
+                @for (u of users; track u.userId) {
+                <div class="admin-table__row">
+                    <div class="admin-user">
+                        <div class="admin-user__name">{{ u.fullName }}</div>
+                        <div class="admin-user__meta">{{ u.email }}</div>
+                    </div>
+                    <div class="admin-user__meta">{{ u.companyName || '—' }}</div>
+                    <div class="admin-right admin-user__meta">{{ (u.roles || []).join(', ') || '—' }}</div>
+                    <div class="admin-right">
+                        <span [class]="riskChipClass(u.lastRiskLevel)">{{ riskLabel(u.lastRiskLevel) }}</span>
+                    </div>
+                    <div class="admin-right admin-user__meta">{{ u.evaluationsCompleted ?? 0 }}</div>
+                    <div class="admin-right">
+                        <button mat-button type="button" class="admin-btn admin-btn--danger" (click)="deleteUser(u)"
+                            [disabled]="saving">
+                            <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </section>
+    </div>
+</div>

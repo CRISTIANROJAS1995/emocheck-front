@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, finalize, switchMap } from 'rxjs';
 import { EmoButtonComponent } from 'app/shared/components';
 import { AssessmentModuleDefinition, getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 import { AssessmentResult } from 'app/core/models/assessment.model';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
+import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
 
 @Component({
     selector: 'app-assessment-results',
@@ -20,12 +21,16 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
 
     result?: AssessmentResult;
 
-    private subscription?: Subscription;
+    hydrationAttempted = false;
+    isHydrating = false;
+
+    private readonly subscriptions = new Subscription();
 
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly state: AssessmentStateService
+        private readonly state: AssessmentStateService,
+        private readonly assessmentHydration: AssessmentHydrationService
     ) { }
 
     ngOnInit(): void {
@@ -38,23 +43,123 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         this.moduleId = moduleId;
         this.moduleDef = getAssessmentModuleDefinition(moduleId);
 
-        this.subscription = this.state.results$.subscribe(() => {
+        this.subscriptions.add(this.state.results$.subscribe(() => {
             this.result = this.state.getResult(this.moduleId);
-        });
+        }));
 
-        // If user refreshes on results and there is no state, go back to module.
+        // If user refreshes on results and there is no state, hydrate from backend.
+        // Supports deep-linking via `?evaluationId=123`.
         this.result = this.state.getResult(this.moduleId);
         if (!this.result) {
-            this.router.navigate([this.moduleDef.route]);
+            const rawEvaluationId = this.route.snapshot.queryParamMap.get('evaluationId');
+            const evaluationId = rawEvaluationId ? Number(rawEvaluationId) : undefined;
+            const safeEvaluationId = Number.isFinite(evaluationId as any) && (evaluationId as any) > 0 ? (evaluationId as number) : undefined;
+
+            this.isHydrating = true;
+            this.hydrationAttempted = true;
+
+            this.subscriptions.add(
+                this.assessmentHydration
+                    .hydrateModuleResultFromCompletedEvaluations(this.moduleId, safeEvaluationId)
+                    .pipe(
+                        finalize(() => {
+                            this.isHydrating = false;
+                        })
+                    )
+                    .subscribe({
+                        next: () => {
+                            this.result = this.state.getResult(this.moduleId);
+                            if (!this.result) {
+                                this.router.navigate([this.moduleDef.route]);
+                            }
+                        },
+                        error: () => {
+                            this.isHydrating = false;
+                            this.router.navigate([this.moduleDef.route]);
+                        },
+                    })
+            );
+
+            return;
+        }
+
+        // If backend omitted recommendations/dimensions in the completion response,
+        // hydrate from real API sources (no fallback/mock values).
+        const shouldHydrate =
+            (this.result.dimensions ?? []).length === 0 ||
+            (this.result.recommendations ?? []).length === 0;
+
+        this.hydrationAttempted = shouldHydrate;
+
+        if (shouldHydrate) {
+            this.isHydrating = true;
+            this.subscriptions.add(
+                this.assessmentHydration
+                    .hydrateCurrentModuleResultIfMissing(this.moduleId)
+                    .pipe(
+                        switchMap(() => this.assessmentHydration.hydrateRecommendationsIfMissing(this.moduleId)),
+                        finalize(() => {
+                            this.isHydrating = false;
+                        })
+                    )
+                    .subscribe({
+                        error: () => {
+                            this.isHydrating = false;
+                        },
+                    })
+            );
         }
     }
 
     ngOnDestroy(): void {
-        this.subscription?.unsubscribe();
+        this.subscriptions.unsubscribe();
     }
 
     goBack(): void {
         this.router.navigate(['/home']);
+    }
+
+    scheduleFollowUp(): void {
+        this.router.navigate(['/my-tracking']);
+    }
+
+    requestSupport(): void {
+        const evaluationResultId = this.result?.evaluationResultId;
+        this.router.navigate(['/support'], {
+            queryParams: evaluationResultId ? { evaluationResultId } : undefined,
+        });
+    }
+
+    openResources(): void {
+        this.router.navigate(['/resources']);
+    }
+
+    callEmergencyLine(): void {
+        // Universal default as per UI copy.
+        try {
+            window.open('tel:123', '_self');
+        } catch {
+            // ignore
+        }
+
+        // Also offer in-app support center.
+        const evaluationResultId = this.result?.evaluationResultId;
+        this.router.navigate(['/support'], {
+            queryParams: {
+                ...(evaluationResultId ? { evaluationResultId } : {}),
+                mode: 'emergency',
+            },
+        });
+    }
+
+    openSupportChat(): void {
+        const evaluationResultId = this.result?.evaluationResultId;
+        this.router.navigate(['/support'], {
+            queryParams: {
+                ...(evaluationResultId ? { evaluationResultId } : {}),
+                mode: 'chat',
+            },
+        });
     }
 
     downloadResults(): void {

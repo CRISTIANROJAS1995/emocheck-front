@@ -1,0 +1,129 @@
+<div class="support-page">
+    <app-background-circles></app-background-circles>
+
+    <div class="support-shell">
+        <section class="support-hero">
+            <div class="support-hero__left">
+                <div class="support-hero__title-row">
+                    <img class="support-hero__logo" src="icons/Icon.svg" alt="" />
+                    <h1 class="support-hero__title">Ayuda</h1>
+                </div>
+                <p class="support-hero__subtitle">Apoyo psicológico y contactos de emergencia</p>
+            </div>
+
+            <a class="support-hero__back" mat-button [routerLink]="['/home']">
+                <span class="support-hero__back-content">
+                    <mat-icon class="support-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                    <span class="support-hero__back-text">Volver</span>
+                </span>
+            </a>
+        </section>
+
+        <div class="support-container">
+            <div class="support-surface">
+                <div class="support-loading" *ngIf="loading">
+                    <mat-progress-spinner diameter="28" mode="indeterminate"></mat-progress-spinner>
+                </div>
+
+                <div class="support-callout support-callout--danger" *ngIf="!loading && error">
+                    <div class="support-callout__icon">
+                        <mat-icon svgIcon="heroicons_outline:exclamation-triangle"></mat-icon>
+                    </div>
+                    <div class="support-callout__body">
+                        <div class="support-callout__title">No pudimos cargar la información</div>
+                        <div class="support-callout__text">{{ error }}</div>
+                    </div>
+                </div>
+
+                <div class="support-grid">
+                    <section class="support-card support-card--emergency">
+                        <div class="support-card__header">
+                            <div class="support-card__title">
+                                <span class="support-card__glyph" aria-hidden="true">
+                                    <mat-icon svgIcon="heroicons_outline:exclamation-triangle"></mat-icon>
+                                </span>
+                                <span>Emergencias</span>
+                            </div>
+                            <button mat-button class="support-card__cta" type="button" (click)="call123()">
+                                Línea 123
+                            </button>
+                        </div>
+
+                        <div class="support-card__body" *ngIf="emergencyContacts?.length; else noEmergency">
+                            <div class="support-contact" *ngFor="let c of emergencyContacts">
+                                <div class="support-contact__name">{{ c.fullName }}</div>
+                                <div class="support-contact__meta">
+                                    <span *ngIf="c.phone">Tel: {{ c.phone }}</span>
+                                    <span *ngIf="c.emergencyLine"> • Línea: {{ c.emergencyLine }}</span>
+                                    <span *ngIf="c.availability"> • {{ c.availability }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ng-template #noEmergency>
+                            <div class="support-empty">
+                                <div class="support-empty__icon" aria-hidden="true">
+                                    <mat-icon svgIcon="heroicons_outline:phone"></mat-icon>
+                                </div>
+                                <div class="support-empty__content">
+                                    <div class="support-empty__title">Sin contactos disponibles</div>
+                                    <div class="support-empty__text">Si necesitas ayuda urgente, usa la Línea 123.</div>
+                                </div>
+                            </div>
+                        </ng-template>
+
+                        <div class="support-card__actions">
+                            <button mat-button class="support-btn support-btn--danger" type="button" (click)="createEmergencyRequest()">
+                                Solicitar ayuda inmediata
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="support-card support-card--chat">
+                        <div class="support-card__header">
+                            <div class="support-card__title">
+                                <span class="support-card__glyph" aria-hidden="true">
+                                    <mat-icon svgIcon="heroicons_outline:chat-bubble-left-right"></mat-icon>
+                                </span>
+                                <span>Apoyo psicológico</span>
+                            </div>
+                            <button mat-button class="support-card__cta" type="button" (click)="createChatRequest()">
+                                Crear solicitud
+                            </button>
+                        </div>
+
+                        <div class="support-card__body">
+                            <div class="support-empty" *ngIf="!myRequests?.length">
+                                <div class="support-empty__icon" aria-hidden="true">
+                                    <mat-icon svgIcon="heroicons_outline:chat-bubble-left-right"></mat-icon>
+                                </div>
+                                <div class="support-empty__content">
+                                    <div class="support-empty__title">Aún no tienes solicitudes</div>
+                                    <div class="support-empty__text">Crea una solicitud y te contactaremos pronto.</div>
+                                </div>
+                            </div>
+
+                            <div class="support-request" *ngFor="let r of myRequests">
+                                <div class="support-request__row">
+                                    <div class="support-request__subject">{{ r.subject }}</div>
+                                    <div class="support-request__status">{{ r.status }}</div>
+                                </div>
+                                <div class="support-request__meta">
+                                    {{ r.requestType }} • {{ r.urgencyLevel }} • {{ r.requestedAt | date: 'medium' }}
+                                </div>
+                                <div class="support-request__meta" *ngIf="r.assignedToPsychologistName">
+                                    Asignado a: {{ r.assignedToPsychologistName }}
+                                    <span *ngIf="r.assignedToPsychologistPhone">({{ r.assignedToPsychologistPhone }})</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="support-hint" *ngIf="evaluationResultId">
+                    Resultado asociado: <strong>#{{ evaluationResultId }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

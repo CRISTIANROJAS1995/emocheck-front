@@ -1,16 +1,7 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import {
-    EnvironmentProviders,
-    Provider,
-    inject,
-    provideEnvironmentInitializer,
-} from '@angular/core';
-import { authInterceptor } from 'app/core/auth/auth.interceptor';
-import { AuthService } from 'app/core/auth/auth.service';
+import { EnvironmentProviders, Provider } from '@angular/core';
 
-export const provideAuth = (): Array<Provider | EnvironmentProviders> => {
-    return [
-        provideHttpClient(withInterceptors([authInterceptor])),
-        provideEnvironmentInitializer(() => inject(AuthService)),
-    ];
-};
+/**
+ * @deprecated Auth is configured in app.config.ts via provideHttpClient(withInterceptors([authInterceptor])).
+ * Keeping this function as a no-op prevents accidentally registering duplicate interceptors/providers.
+ */
+export const provideAuth = (): Array<Provider | EnvironmentProviders> => [];

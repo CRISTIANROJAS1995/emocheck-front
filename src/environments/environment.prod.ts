@@ -1,7 +1,8 @@
 export const environment = {
     production: true,
-    apiUrl: 'https://api.emocheck.com/api',
+    apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
     apiBaseUrl: 'https://emocheck.com',
+    apiTimeout: 30000,
     appName: 'EmoCheck',
     version: '1.0.0',
 
@@ -12,6 +13,7 @@ export const environment = {
 
     // Configuración de autenticación
     tokenStorageKey: 'emocheck_token',
+    refreshTokenStorageKey: 'emocheck_refreshToken',
     userStorageKey: 'emocheck_user',
     tokenExpirationWarning: 300000, // 5 minutos en ms
 

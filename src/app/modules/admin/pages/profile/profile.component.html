@@ -1,0 +1,116 @@
+<div class="profile-page">
+    <!-- Decorative background circles -->
+    <app-background-circles></app-background-circles>
+
+    <div class="profile-shell">
+        <section class="profile-hero">
+            <div class="profile-hero__left">
+                <div class="profile-hero__title-row">
+                    <img class="profile-hero__logo" src="icons/Icon.svg" alt="" />
+                    <h1 class="profile-hero__title">Mi Perfil</h1>
+                </div>
+                <p class="profile-hero__subtitle">Actualiza tu información personal</p>
+            </div>
+
+            <a class="profile-hero__back" mat-button [routerLink]="['/home']">
+                <span class="profile-hero__back-content">
+                    <mat-icon class="profile-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                    <span class="profile-hero__back-text">Volver</span>
+                </span>
+            </a>
+        </section>
+
+        <div class="profile-loading" *ngIf="loading">Cargando…</div>
+        <div class="profile-error" *ngIf="!loading && error">{{ error }}</div>
+
+        <form class="profile-grid" [formGroup]="form" (ngSubmit)="save()" *ngIf="!loading">
+            <div class="profile-card profile-card--avatar">
+                <div class="avatar-title">Foto de perfil</div>
+                <div class="avatar-subtitle">Sube una imagen para personalizar tu cuenta</div>
+
+                <div class="avatar-row">
+                    <div class="avatar" [class.avatar--has-photo]="!!photoPreviewUrl">
+                        <img *ngIf="photoPreviewUrl" class="avatar__img" [src]="photoPreviewUrl" alt="" />
+                        <span *ngIf="!photoPreviewUrl" class="avatar__initials">{{ initials }}</span>
+                    </div>
+
+                    <div class="avatar-actions">
+                        <input #photoInput class="sr-only" type="file" accept="image/*"
+                            (change)="onPhotoSelected($event)" />
+                        <button class="avatar-btn" mat-button type="button" (click)="triggerPhotoInput(photoInput)">
+                            <mat-icon svgIcon="heroicons_outline:camera"></mat-icon>
+                            <span>{{ photoPreviewUrl ? 'Actualizar foto' : 'Cargar foto' }}</span>
+                        </button>
+
+                        <div class="avatar-hint" *ngIf="photoFile">Archivo: {{ photoFile.name }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-card profile-card--info">
+                <div class="card-title">Información personal</div>
+                <div class="card-subtitle">Revisa y actualiza tus datos básicos</div>
+
+                <div class="form-grid">
+                    <div class="profile-field">
+                        <label class="profile-label">Nombre</label>
+                        <input class="profile-input" type="text" formControlName="firstName" />
+                    </div>
+
+                    <div class="profile-field">
+                        <label class="profile-label">Apellidos</label>
+                        <input class="profile-input" type="text" formControlName="lastName" />
+                    </div>
+
+                    <div class="profile-field">
+                        <label class="profile-label">Documento</label>
+                        <input class="profile-input" type="text" formControlName="documentNumber" />
+                    </div>
+
+                    <div class="profile-field">
+                        <label class="profile-label">Correo</label>
+                        <input class="profile-input" type="email" formControlName="email" />
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <button mat-button type="button" (click)="load()">Recargar</button>
+                    <button class="primary-btn" mat-button type="submit">Actualizar</button>
+                </div>
+            </div>
+        </form>
+
+        <form class="profile-card profile-card--password" [formGroup]="passwordForm" (ngSubmit)="changePassword()"
+            *ngIf="!loading">
+            <div class="card-title">Cambiar contraseña</div>
+            <div class="card-subtitle">Usa una contraseña segura y fácil de recordar</div>
+
+            <div class="form-grid form-grid--password">
+                <div class="profile-field">
+                    <label class="profile-label">Contraseña actual</label>
+                    <input class="profile-input" type="password" formControlName="currentPassword" />
+                </div>
+                <div class="profile-field">
+                    <label class="profile-label">Nueva contraseña</label>
+                    <input class="profile-input" type="password" formControlName="newPassword" />
+                </div>
+                <div class="profile-field">
+                    <label class="profile-label">Confirmar nueva contraseña</label>
+                    <input class="profile-input" type="password" formControlName="confirmPassword" />
+                </div>
+            </div>
+
+            <div class="profile-error" *ngIf="passwordForm.errors?.['passwordsMismatch']">
+                Las contraseñas no coinciden.
+            </div>
+
+            <div class="profile-actions">
+                <button class="primary-btn" mat-button type="submit">Actualizar contraseña</button>
+            </div>
+        </form>
+
+        <div class="profile-meta" *ngIf="profile?.companyName">
+            Empresa: {{ profile?.companyName }} <span *ngIf="profile?.siteName">• Sede: {{ profile?.siteName }}</span>
+        </div>
+    </div>
+</div>

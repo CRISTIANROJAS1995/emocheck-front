@@ -3,6 +3,7 @@
     "compileOnSave": false,
     "compilerOptions": {
         "baseUrl": "./src",
+        "rootDir": "./src",
         "outDir": "./dist/out-tsc",
         "esModuleInterop": true,
         "sourceMap": true,

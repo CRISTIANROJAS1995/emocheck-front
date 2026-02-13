@@ -19,11 +19,22 @@ export class EmoQuestionnaireComponent implements OnChanges {
     selectedAnswer: number | null = null;
     answers: (number | null)[] = [];
 
+    private advanceTimer: number | null = null;
+    isLocked = false;
+    hasSubmitted = false;
+
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['config'] && this.config?.questions?.length) {
             this.currentQuestionIndex = 0;
             this.answers = new Array(this.config.questions.length).fill(null);
             this.selectedAnswer = this.answers[this.currentQuestionIndex];
+
+            this.hasSubmitted = false;
+            this.isLocked = false;
+            if (this.advanceTimer != null) {
+                clearTimeout(this.advanceTimer);
+                this.advanceTimer = null;
+            }
         }
     }
 
@@ -40,12 +51,21 @@ export class EmoQuestionnaireComponent implements OnChanges {
     }
 
     selectOption(optionIndex: number): void {
+        if (this.isLocked || this.hasSubmitted) return;
+
+        this.isLocked = true;
         this.selectedAnswer = optionIndex;
         this.answers[this.currentQuestionIndex] = optionIndex;
 
-        setTimeout(() => {
+        if (this.advanceTimer != null) {
+            clearTimeout(this.advanceTimer);
+            this.advanceTimer = null;
+        }
+
+        this.advanceTimer = window.setTimeout(() => {
+            this.isLocked = false;
             this.nextQuestion();
-        }, 300);
+        }, 250);
     }
 
     previousQuestion(): void {
@@ -56,6 +76,7 @@ export class EmoQuestionnaireComponent implements OnChanges {
     }
 
     nextQuestion(): void {
+        if (this.hasSubmitted) return;
         if (this.currentQuestionIndex < this.config.questions.length - 1) {
             this.currentQuestionIndex++;
             this.selectedAnswer = this.answers[this.currentQuestionIndex];
@@ -65,6 +86,8 @@ export class EmoQuestionnaireComponent implements OnChanges {
     }
 
     submit(): void {
+        if (this.hasSubmitted) return;
+        this.hasSubmitted = true;
         const answers = this.answers.map((a) => (a ?? 0));
         this.completed.emit(answers);
     }

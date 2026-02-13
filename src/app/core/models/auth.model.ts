@@ -6,6 +6,8 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
+  refreshToken: string;
+  expiresIn: number;
   user: User;
 }
 
@@ -13,24 +15,19 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: UserRole;
-  company?: string;
-  isActive: boolean;
-  createdAt: string;
+  roles: string[];
+  companyId?: number;
+  companyName?: string;
+  isActive?: boolean;
+  createdAt?: string;
   avatar?: string; // 🖼️ URL del avatar (opcional)
-}
-
-export enum UserRole {
-  Admin = 'Admin',
-  Technician = 'Technician', 
-  User = 'User'
 }
 
 // 📊 Response wrapper para APIs
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
-  message?: string;
+  message: string;
   errors?: string[];
 }
 

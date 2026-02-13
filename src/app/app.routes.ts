@@ -2,6 +2,7 @@ import { Route } from '@angular/router';
 import { initialDataResolver } from 'app/app.resolvers';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
+import { RoleGuard } from 'app/core/auth/guards/role.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 
 export const appRoutes: Route[] = [
@@ -9,7 +10,7 @@ export const appRoutes: Route[] = [
     // Redirect empty path to '/example'
     { path: '', pathMatch: 'full', redirectTo: 'welcome' },
 
-    { path: 'signed-in-redirect', pathMatch: 'full', redirectTo: 'informed-consent' },
+    { path: 'signed-in-redirect', canActivate: [AuthGuard], loadChildren: () => import('app/modules/auth/signed-in-redirect/signed-in-redirect.routes') },
 
     // Auth routes for guests
     {
@@ -58,6 +59,21 @@ export const appRoutes: Route[] = [
         children: [
             { path: 'home', loadChildren: () => import('app/modules/admin/home/home.routes') },
             { path: 'my-tracking', loadChildren: () => import('app/modules/admin/pages/my-tracking/my-tracking.routes') },
+            { path: 'support', loadChildren: () => import('app/modules/admin/pages/support/support.routes') },
+            { path: 'profile', loadChildren: () => import('app/modules/admin/pages/profile/profile.routes') },
+            { path: 'resources', loadChildren: () => import('app/modules/admin/pages/resources/resources.routes') },
+            {
+                path: 'team-tracking',
+                canActivate: [RoleGuard],
+                data: { roles: ['Psychologist', 'HSE', 'Admin', 'CompanyAdmin'] },
+                loadChildren: () => import('app/modules/admin/pages/team-tracking/team-tracking.routes'),
+            },
+            {
+                path: 'admin',
+                canActivate: [RoleGuard],
+                data: { roles: ['Admin', 'CompanyAdmin'] },
+                loadChildren: () => import('app/modules/admin/pages/admin-panel/admin-panel.routes'),
+            },
             {
                 path: 'mental-health',
                 loadChildren: () => import('app/modules/admin/pages/questions/mental-health/mental-health.routes'),
