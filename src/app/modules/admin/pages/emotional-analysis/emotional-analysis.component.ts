@@ -22,17 +22,18 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     showResults: boolean = false;
     cameraError: string = '';
     capturedFrames: string[] = [];
+    analysisError: string = '';
 
     steps = [
-        { id: 1, name: 'Atención', status: 'active', percentage: 67 },
-        { id: 2, name: 'Concentración', status: 'pending', percentage: 70 },
-        { id: 3, name: 'Equilibrio', status: 'pending', percentage: 79 },
-        { id: 4, name: 'Positividad', status: 'pending', percentage: 68 },
-        { id: 5, name: 'Calma', status: 'pending', percentage: 63 }
+        { id: 1, name: 'Atención', status: 'pending', percentage: 0 },
+        { id: 2, name: 'Concentración', status: 'pending', percentage: 0 },
+        { id: 3, name: 'Equilibrio', status: 'pending', percentage: 0 },
+        { id: 4, name: 'Positividad', status: 'pending', percentage: 0 },
+        { id: 5, name: 'Calma', status: 'pending', percentage: 0 }
     ];
 
     // Propiedades dinámicas para los resultados
-    resultType: 'alert' | 'emotional-load' = 'alert'; // Por defecto alerta roja
+    resultType: 'alert' | 'emotional-load' = 'emotional-load';
 
     // Configuración dinámica según el tipo de resultado
     get resultConfig() {
@@ -93,8 +94,11 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
 
     analysisResult: EmotionalAnalysisResult | null = null;
 
-    private progressInterval: any;
     private captureInterval: any;
+    private readonly captureEveryMs = 2000;
+    private readonly maxCapturedFrames = 8;
+    private readonly framesToSend = 3;
+    private analysisStarted = false;
 
     constructor(
         private _router: Router,
@@ -106,12 +110,8 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         // Verificar soporte de cámara
         if (!this._cameraService.isCameraSupported()) {
             this.cameraError = 'Tu navegador no soporta acceso a la cámara';
+            this.isAnalyzing = false;
         }
-
-        // Iniciar progreso mock inmediatamente para ver el diseño
-        setTimeout(() => {
-            this.startAnalysis();
-        }, 500);
     }
 
     ngAfterViewInit(): void {
@@ -125,6 +125,30 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         this.cleanup();
     }
 
+    private getCameraErrorMessage(error: unknown): string {
+        const anyErr = error as any;
+        const name: string | undefined = typeof anyErr?.name === 'string' ? anyErr.name : undefined;
+        const message: string | undefined = typeof anyErr?.message === 'string' ? anyErr.message : undefined;
+
+        // Errores estándar de getUserMedia / MediaDevices
+        if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+            return 'No se encontró ninguna cámara en tu dispositivo.';
+        }
+        if (name === 'NotAllowedError' || name === 'SecurityError') {
+            return 'Permiso de cámara denegado. Por favor, permite el acceso a la cámara.';
+        }
+        if (name === 'NotReadableError') {
+            return 'La cámara está siendo utilizada por otra aplicación.';
+        }
+
+        // Mensajes lanzados manualmente (HTTPS/localhost, soporte, etc.)
+        if (message && message.trim().length > 0) {
+            return message;
+        }
+
+        return 'No se pudo acceder a la cámara.';
+    }
+
     /**
      * Inicializa la cámara y comienza el análisis
      */
@@ -134,10 +158,16 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
             await this._cameraService.startCamera(videoEl);
             console.log('Cámara iniciada correctamente');
 
+            // Solo iniciamos el análisis cuando la cámara está realmente activa.
+            if (!this.analysisStarted) {
+                this.analysisStarted = true;
+                this.startAnalysis();
+            }
+
         } catch (error) {
             console.error('Error al inicializar cámara:', error);
-            this.cameraError = 'No se pudo acceder a la cámara';
-            // El progreso continúa aunque falle la cámara
+            this.cameraError = this.getCameraErrorMessage(error);
+            this.isAnalyzing = false;
         }
     }
 
@@ -145,66 +175,92 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
      * Inicia el proceso de análisis
      */
     startAnalysis(): void {
-        // Capturar frames cada 2 segundos (solo si hay cámara)
-        if (this._cameraService.isCameraSupported() && this.videoElement) {
-            this.captureInterval = setInterval(() => {
-                const frame = this._cameraService.captureFrame(this.videoElement.nativeElement);
-                if (frame) {
-                    this.capturedFrames.push(frame);
-                }
-            }, 2000);
+        if (this.cameraError) {
+            this.isAnalyzing = false;
+            return;
         }
 
-        // Progreso de pasos
-        this.progressInterval = setInterval(() => {
-            if (this.currentStep <= this.totalSteps) {
-                // Incrementar progreso en cada paso (20% por paso)
-                this.progress = (this.currentStep / this.totalSteps) * 100;
+        // Reset estado
+        this.analysisError = '';
+        this.showResults = false;
+        this.isAnalyzing = true;
+        this.currentStep = 1;
+        this.progress = 0;
+        this.capturedFrames = [];
+        this.steps.forEach((s, i) => {
+            s.status = i === 0 ? 'active' : 'pending';
+            s.percentage = 0;
+        });
 
-                // Marcar el paso anterior como completado
-                if (this.currentStep > 1) {
-                    this.steps[this.currentStep - 2].status = 'completed';
+        // Capturar frames (solo si hay cámara y video listo)
+        if (this._cameraService.isCameraSupported() && this.videoElement) {
+            this.captureInterval = setInterval(() => {
+                const videoEl = this.videoElement?.nativeElement;
+                if (!videoEl || videoEl.readyState < 2 || !videoEl.videoWidth) return;
+
+                const frame = this._cameraService.captureFrame(videoEl, { maxWidth: 1024, quality: 0.8 });
+                if (!frame) return;
+
+                this.capturedFrames.push(frame);
+                if (this.capturedFrames.length > this.maxCapturedFrames) {
+                    this.capturedFrames = this.capturedFrames.slice(-this.maxCapturedFrames);
                 }
 
-                // Activar el paso actual
-                if (this.currentStep <= this.totalSteps) {
-                    this.steps[this.currentStep - 1].status = 'active';
-                }
+                // Progreso real: cuando ya tenemos suficientes frames, paramos y analizamos.
+                const needed = this.framesToSend;
+                const got = Math.min(this.capturedFrames.length, needed);
+                this.progress = Math.min(60, Math.round((got / needed) * 60));
+                this.currentStep = 1 + Math.min(2, got); // 2-3 pasos visuales mientras captura
 
-                // Incrementar al siguiente paso
-                this.currentStep++;
-
-                // Si ya completamos todos los pasos
-                if (this.currentStep > this.totalSteps) {
+                if (this.capturedFrames.length >= needed) {
                     this.finishAnalysis();
                 }
-            }
-        }, 3000); // Cada paso toma 3 segundos para que se vea bien
+            }, this.captureEveryMs);
+        }
     }
 
     /**
      * Finaliza el análisis y procesa resultados
      */
     async finishAnalysis(): Promise<void> {
-        // Marcar el último paso como completado
-        this.steps[this.totalSteps - 1].status = 'completed';
-        this.progress = 100;
-        this.isAnalyzing = false;
-
-        // Detener captura de frames
         if (this.captureInterval) {
             clearInterval(this.captureInterval);
+            this.captureInterval = null;
         }
 
-        if (this.progressInterval) {
-            clearInterval(this.progressInterval);
-        }
+        // Estado visual: "analizando"
+        this.progress = 70;
+        this.currentStep = 4;
+        this.steps.forEach((s, idx) => {
+            if (idx < 3) s.status = 'completed';
+            else if (idx === 3) s.status = 'active';
+            else s.status = 'pending';
+        });
 
         // Procesar análisis con los frames capturados
-        if (this.capturedFrames.length > 0) {
-            this._emotionalAnalysisService.performFullAnalysis(this.capturedFrames)
-                .subscribe(result => {
+        const frames = this.capturedFrames.slice(-this.framesToSend);
+        if (frames.length === 0) {
+            this.analysisError = 'No se pudieron capturar frames de cámara.';
+            this.isAnalyzing = false;
+            return;
+        }
+
+        this._emotionalAnalysisService.performFullAnalysis(frames)
+            .subscribe({
+                next: (result) => {
                     this.analysisResult = result;
+
+                    // Cambiar el tipo de resultado (naranja vs rojo) basado en datos reales.
+                    // 1) Si backend creó alerta, UI debe mostrar rojo.
+                    // 2) Si hay fatigueScore (0..1) y supera el umbral default del backend (0.75), UI debe mostrar rojo.
+                    // 3) Si no, usamos la regla de promedio (misma del servicio front).
+                    const fatigueThreshold = 0.75;
+                    const state = this._emotionalAnalysisService.evaluateEmotionalState(result);
+                    const isRed =
+                        result.alertCreated === true ||
+                        (typeof result.fatigueScore === 'number' && result.fatigueScore >= fatigueThreshold) ||
+                        state === 'critical';
+                    this.resultType = isRed ? 'alert' : 'emotional-load';
 
                     // Actualizar porcentajes en los steps
                     this.steps[0].percentage = result.attention;
@@ -213,27 +269,29 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                     this.steps[3].percentage = result.positivity;
                     this.steps[4].percentage = result.calm;
 
-                    // Mostrar resultados después de 1 segundo
+                    this.steps.forEach((s) => (s.status = 'completed'));
+                    this.progress = 100;
+                    this.currentStep = this.totalSteps;
+                    this.isAnalyzing = false;
+
                     setTimeout(() => {
                         this.showResults = true;
-                    }, 1000);
-                });
-        } else {
-            // Si no hay frames, mostrar resultados de todos modos
-            setTimeout(() => {
-                this.showResults = true;
-            }, 1000);
-        }
+                    }, 300);
+                },
+                error: (err) => {
+                    console.error('Error al analizar emociones:', err);
+                    const msg = err?.error?.message || err?.error?.title || err?.message || 'No se pudo analizar el rostro.';
+                    this.analysisError = msg;
+                    this.isAnalyzing = false;
+                    // No mostramos resultados si falló: se queda en la pantalla con el error.
+                },
+            });
     }
 
     /**
      * Limpia recursos
      */
     cleanup(): void {
-        if (this.progressInterval) {
-            clearInterval(this.progressInterval);
-        }
-
         if (this.captureInterval) {
             clearInterval(this.captureInterval);
         }

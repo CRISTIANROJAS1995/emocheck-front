@@ -69,14 +69,16 @@
 .video-container {
     height: 272px;
     flex-shrink: 0;
-    align-self: stretch;
+    margin-left: auto;
+    margin-right: auto;
     background: #1E293B;
 }
 
 .video-flipped {
     transform: scaleX(-1);
-    width: auto;
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 // Privacy notice

@@ -28,23 +28,55 @@ export class CameraService {
     /**
      * Inicia la cámara y retorna el stream
      */
-    async startCamera(videoElement: HTMLVideoElement): Promise<void> {
+    async startCamera(
+        videoElement: HTMLVideoElement,
+        options?: {
+            facingMode?: 'user' | 'environment';
+            widthIdeal?: number;
+            heightIdeal?: number;
+            deviceId?: string;
+        }
+    ): Promise<void> {
         try {
             this.cameraStatus$.next('requesting');
 
+            if (!this.isCameraSupported()) {
+                throw new Error('El navegador no soporta acceso a la cámara');
+            }
+
+            // En la mayoría de navegadores la cámara solo funciona en contextos seguros (HTTPS) o localhost.
+            const isLocalhost = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '[::1]');
+            const secure = (typeof window !== 'undefined' && (window.isSecureContext === true)) || isLocalhost;
+            if (!secure) {
+                throw new Error('Para usar la cámara, abre la app en HTTPS o en localhost.');
+            }
+
+            // iOS/Safari: ayuda a evitar que el video se abra en fullscreen y mejora autoplay.
+            videoElement.setAttribute('playsinline', 'true');
+            videoElement.muted = true;
+            videoElement.autoplay = true;
+
             // Solicitar acceso a la cámara
-            this.stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                    facingMode: 'user'
-                },
-                audio: false
-            });
+            const facingMode = options?.facingMode ?? 'user';
+            const widthIdeal = options?.widthIdeal ?? 1280;
+            const heightIdeal = options?.heightIdeal ?? 720;
+
+            const videoConstraints: MediaTrackConstraints = {
+                width: { ideal: widthIdeal },
+                height: { ideal: heightIdeal },
+                facingMode,
+            };
+
+            if (options?.deviceId) {
+                videoConstraints.deviceId = { exact: options.deviceId };
+            }
+
+            this.stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: false });
 
 
             videoElement.srcObject = this.stream;
 
+            await this.waitForVideoReady(videoElement);
             await videoElement.play();
 
             this.cameraStatus$.next('active');
@@ -60,6 +92,8 @@ export class CameraService {
                     this.errorMessage$.next('No se encontró ninguna cámara en tu dispositivo.');
                 } else if (error.name === 'NotReadableError') {
                     this.errorMessage$.next('La cámara está siendo utilizada por otra aplicación.');
+                } else if (error.message) {
+                    this.errorMessage$.next(error.message);
                 } else {
                     this.errorMessage$.next('Error al acceder a la cámara: ' + error.message);
                 }
@@ -79,26 +113,49 @@ export class CameraService {
             this.stream.getTracks().forEach(track => track.stop());
             this.stream = null;
             this.cameraStatus$.next('idle');
+            this.errorMessage$.next('');
         }
     }
 
     /**
      * Captura un frame del video como imagen base64
      */
-    captureFrame(videoElement: HTMLVideoElement): string | null {
+    captureFrame(
+        videoElement: HTMLVideoElement,
+        options?: {
+            maxWidth?: number;
+            quality?: number;
+        }
+    ): string | null {
         if (!this.stream) {
             return null;
         }
 
         try {
+            if (!videoElement.videoWidth || !videoElement.videoHeight) {
+                return null;
+            }
+
+            const maxWidth = options?.maxWidth;
+            const quality = typeof options?.quality === 'number' ? options.quality : 0.8;
+
             const canvas = document.createElement('canvas');
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
+            const srcW = videoElement.videoWidth;
+            const srcH = videoElement.videoHeight;
+
+            if (maxWidth && srcW > maxWidth) {
+                const ratio = maxWidth / srcW;
+                canvas.width = Math.round(srcW * ratio);
+                canvas.height = Math.round(srcH * ratio);
+            } else {
+                canvas.width = srcW;
+                canvas.height = srcH;
+            }
 
             const context = canvas.getContext('2d');
             if (context) {
                 context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-                return canvas.toDataURL('image/jpeg', 0.8);
+                return canvas.toDataURL('image/jpeg', quality);
             }
 
             return null;
@@ -120,5 +177,22 @@ export class CameraService {
      */
     getCurrentStream(): MediaStream | null {
         return this.stream;
+    }
+
+    private waitForVideoReady(videoElement: HTMLVideoElement): Promise<void> {
+        // Si ya tiene metadata, seguimos.
+        if (videoElement.readyState >= HTMLMediaElement.HAVE_METADATA && videoElement.videoWidth > 0) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+            const onReady = () => {
+                videoElement.removeEventListener('loadedmetadata', onReady);
+                videoElement.removeEventListener('canplay', onReady);
+                resolve();
+            };
+            videoElement.addEventListener('loadedmetadata', onReady, { once: true });
+            videoElement.addEventListener('canplay', onReady, { once: true });
+        });
     }
 }

@@ -1,0 +1,10 @@
+@use '../alerts/admin-alerts.component.scss' as alerts;
+
+.admin-link {
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.admin-row {
+    grid-template-columns: 80px 1fr 120px 140px 140px;
+}

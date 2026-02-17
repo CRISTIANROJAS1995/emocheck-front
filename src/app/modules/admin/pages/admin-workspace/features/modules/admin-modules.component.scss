@@ -1,0 +1,5 @@
+@use '../alerts/admin-alerts.component.scss' as alerts;
+
+.admin-row {
+    grid-template-columns: 80px 1fr 140px 100px 80px;
+}

@@ -14,7 +14,7 @@
     </div>
 
     <!-- Analysis Screen -->
-    <div *ngIf="isAnalyzing && !showResults" class="w-full max-w-[768px]">
+    <div *ngIf="!showResults" class="w-full max-w-[768px]">
         <div
             class="analysis-card flex flex-col items-start gap-4 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
 
@@ -25,12 +25,14 @@
                 </div>
 
                 <!-- Title -->
-                <h2 class="text-montserrat-bold mt-6 text-center text-[16px] leading-[24px] text-[#155DFC]">Registro
-                    emocional en progreso</h2>
+                <h2 class="text-montserrat-bold mt-6 text-center text-[16px] leading-[24px] text-[#155DFC]">
+                    {{ cameraError ? 'Cámara no encontrada' : 'Registro emocional en progreso' }}
+                </h2>
 
                 <!-- Subtitle -->
-                <p class="text-montserrat-semibold mt-2 text-center text-[14px] leading-[20px] text-[#009689]">Sigue las
-                    instrucciones en pantalla</p>
+                <p class="text-montserrat-semibold mt-2 text-center text-[14px] leading-[20px] text-[#009689]">
+                    {{ cameraError ? 'Conecta una cámara e inténtalo de nuevo.' : 'Sigue las instrucciones en pantalla' }}
+                </p>
 
                 <!-- Progress -->
                 <div class="mt-4 w-full">
@@ -47,14 +49,18 @@
                 </div>
 
                 <!-- Camera Preview -->
-                <div
-                    class="video-container mt-6 w-full overflow-hidden rounded-[16px] border-4 border-[#00BBA7] flex items-center justify-center">
-                    <video #videoElement autoplay playsinline class="video-flipped h-full object-cover"
-                        [class.hidden]="cameraError"></video>
+                <div class="mt-6 w-full flex justify-center">
+                    <div
+                        class="video-container relative w-full max-w-[560px] overflow-hidden rounded-[16px] border-4 border-[#00BBA7] flex items-center justify-center">
+                        <video #videoElement autoplay playsinline class="video-flipped" [class.hidden]="cameraError"></video>
 
-                    <!-- Mensaje de error si no hay cámara -->
-                    <div *ngIf="cameraError" class="flex h-full items-center justify-center">
-                        <p class="text-montserrat text-center text-white px-4">{{ cameraError }}</p>
+                        <!-- Mensaje de error si no hay cámara / falla análisis (overlay) -->
+                        <div *ngIf="cameraError || analysisError"
+                            class="absolute inset-0 flex items-center justify-center bg-slate-900/70">
+                            <p class="text-montserrat text-center text-white px-4">
+                                {{ cameraError || analysisError }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 

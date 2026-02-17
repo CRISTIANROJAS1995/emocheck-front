@@ -1,0 +1,20 @@
+<section class="admin-workspace">
+    <header class="admin-workspace__header">
+        <div>
+            <div class="admin-workspace__badge">PANEL EXPERTO</div>
+            <h1 class="admin-workspace__title">Centro de Administración</h1>
+            <p class="admin-workspace__subtitle">Gestiona alertas, casos, reportes, módulos y usuarios desde un único
+                espacio.</p>
+        </div>
+        <a class="admin-workspace__cta" routerLink="/team-tracking">Ver Dashboard Analítico</a>
+    </header>
+
+    <div class="admin-workspace__grid" *ngIf="!loading; else loadingTpl">
+        <app-admin-feature-card *ngFor="let card of cards" [title]="card.title" [description]="card.description"
+            [icon]="card.icon" [route]="card.route" [metric]="card.metric" />
+    </div>
+
+    <ng-template #loadingTpl>
+        <div class="admin-workspace__loading">Cargando centro de administración...</div>
+    </ng-template>
+</section>

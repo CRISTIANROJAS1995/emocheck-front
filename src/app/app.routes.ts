@@ -72,7 +72,7 @@ export const appRoutes: Route[] = [
                 path: 'admin',
                 canActivate: [RoleGuard],
                 data: { roles: ['Admin', 'CompanyAdmin'] },
-                loadChildren: () => import('app/modules/admin/pages/admin-panel/admin-panel.routes'),
+                loadChildren: () => import('app/modules/admin/pages/admin-workspace/admin-workspace.routes'),
             },
             {
                 path: 'mental-health',

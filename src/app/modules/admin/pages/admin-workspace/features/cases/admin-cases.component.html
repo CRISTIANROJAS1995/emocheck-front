@@ -1,0 +1,113 @@
+<section class="admin-page">
+    <header class="admin-page__header">
+        <div>
+            <h2>Gestión de Casos</h2>
+            <p>Coordina creación, evolución y cierre de casos con trazabilidad operativa.</p>
+        </div>
+        <a routerLink="/admin" class="admin-page__back">Volver al Centro Admin</a>
+    </header>
+
+    <div class="admin-editor">
+        <div class="admin-editor__title">Crear caso</div>
+        <div class="admin-form-grid">
+            <label>
+                AlertId *
+                <input type="number" [(ngModel)]="form.alertId" />
+            </label>
+            <label>
+                Psicólogo asignado (ID) *
+                <input type="number" [(ngModel)]="form.assignedToPsychologistId" />
+            </label>
+            <label>
+                Prioridad
+                <select [(ngModel)]="form.priority">
+                    <option value="Low">Baja</option>
+                    <option value="Medium">Media</option>
+                    <option value="High">Alta</option>
+                    <option value="Critical">Crítica</option>
+                </select>
+            </label>
+            <label>
+                Valoración inicial *
+                <textarea rows="3" [(ngModel)]="form.initialAssessment"></textarea>
+            </label>
+            <label>
+                Plan de intervención *
+                <textarea rows="3" [(ngModel)]="form.interventionPlan"></textarea>
+            </label>
+        </div>
+        <div class="admin-editor__actions">
+            <button mat-flat-button color="primary" [disabled]="saving" (click)="create()">Crear Caso</button>
+        </div>
+    </div>
+
+    <div class="admin-page__filters">
+        <label>
+            Estado
+            <select [(ngModel)]="status">
+                <option value="">Todos</option>
+                <option value="Open">Open</option>
+                <option value="InProgress">InProgress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+            </select>
+        </label>
+
+        <label>
+            Prioridad
+            <select [(ngModel)]="priority">
+                <option value="">Todas</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+            </select>
+        </label>
+
+        <button mat-flat-button color="primary" (click)="load()">Aplicar filtros</button>
+    </div>
+
+    <div class="admin-table" *ngIf="!loading">
+        <div class="admin-row admin-row--head">
+            <div>ID</div>
+            <div>Estado</div>
+            <div>Prioridad</div>
+            <div>Usuario</div>
+            <div>Acción</div>
+        </div>
+
+        <div class="admin-row" *ngFor="let row of cases"
+            [class.admin-row--active]="row.caseTrackingId === selectedCaseId">
+            <div>{{ row.caseTrackingId }}</div>
+            <div>{{ row.status || '-' }}</div>
+            <div>{{ row.priority || '-' }}</div>
+            <div>{{ row.userInitials || '-' }}</div>
+            <div>
+                <button mat-button (click)="selectCase(row)">Editar</button>
+            </div>
+        </div>
+
+        <div class="admin-empty" *ngIf="!cases.length">No hay casos para los filtros seleccionados.</div>
+    </div>
+
+    <div class="admin-empty" *ngIf="loading">Cargando casos...</div>
+
+    <div class="admin-editor" *ngIf="selectedCase as current">
+        <div class="admin-editor__title">Editar caso #{{ current.caseTrackingId }}</div>
+        <div class="admin-form-grid">
+            <label>
+                Estado *
+                <input [(ngModel)]="editStatus" />
+            </label>
+            <label>
+                Notas de progreso *
+                <textarea rows="3" [(ngModel)]="editProgressNotes"></textarea>
+            </label>
+        </div>
+        <div class="admin-editor__actions">
+            <button mat-stroked-button (click)="clearSelection()">Cancelar</button>
+            <button mat-flat-button color="primary" [disabled]="saving" (click)="updateSelectedCase()">Guardar</button>
+            <button mat-stroked-button color="warn" [disabled]="saving" (click)="closeSelectedCase()">Cerrar</button>
+        </div>
+    </div>
+</section>

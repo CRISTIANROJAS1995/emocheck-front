@@ -1,0 +1,71 @@
+<section class="admin-page">
+    <header class="admin-page__header">
+        <div>
+            <h2>Reportes y Exportes</h2>
+            <p>Gestiona solicitudes de extracción de datos con control de estado y descarga.</p>
+        </div>
+        <a routerLink="/admin" class="admin-page__back">Volver al Centro Admin</a>
+    </header>
+
+    <div class="admin-page__filters">
+        <label>
+            Tipo
+            <select [(ngModel)]="request.exportType">
+                <option value="Full">Completo</option>
+                <option value="Partial">Parcial</option>
+                <option value="EvaluationsOnly">Solo evaluaciones</option>
+                <option value="PersonalDataOnly">Solo datos personales</option>
+            </select>
+        </label>
+
+        <label>
+            Formato
+            <select [(ngModel)]="request.fileFormat">
+                <option value="CSV">CSV</option>
+                <option value="JSON">JSON</option>
+                <option value="PDF">PDF</option>
+            </select>
+        </label>
+
+        <label>
+            Fecha inicio
+            <input type="date" [(ngModel)]="request.startDate" />
+        </label>
+
+        <label>
+            Fecha fin
+            <input type="date" [(ngModel)]="request.endDate" />
+        </label>
+
+        <label>
+            Motivo *
+            <input [(ngModel)]="request.reason" placeholder="Motivo de exportación" />
+        </label>
+
+        <button mat-flat-button color="primary" [disabled]="saving" (click)="create()">Solicitar Exporte</button>
+    </div>
+
+    <div class="admin-table" *ngIf="!loading">
+        <div class="admin-row admin-row--head">
+            <div>ID</div>
+            <div>Tipo</div>
+            <div>Formato</div>
+            <div>Estado</div>
+            <div>Descargar</div>
+        </div>
+
+        <div class="admin-row" *ngFor="let row of exports">
+            <div>{{ row.dataExportId }}</div>
+            <div>{{ row.exportType || '-' }}</div>
+            <div>{{ row.fileFormat || '-' }}</div>
+            <div>{{ row.status || '-' }}</div>
+            <div>
+                <a class="admin-link" [href]="downloadUrl(row)">Descargar</a>
+            </div>
+        </div>
+
+        <div class="admin-empty" *ngIf="!exports.length">Aún no hay exportes solicitados.</div>
+    </div>
+
+    <div class="admin-empty" *ngIf="loading">Cargando exportes...</div>
+</section>

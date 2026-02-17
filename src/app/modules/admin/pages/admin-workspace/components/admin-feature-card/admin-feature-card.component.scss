@@ -1,0 +1,49 @@
+.admin-card {
+    display: block;
+    padding: 16px;
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.admin-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.admin-card__title {
+    font-weight: 800;
+}
+
+.admin-card__metric {
+    min-width: 36px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.admin-card__desc {
+    margin-top: 8px;
+    opacity: 0.75;
+}
+
+.admin-card__action {
+    margin-top: 10px;
+    font-weight: 700;
+    opacity: 0.9;
+}

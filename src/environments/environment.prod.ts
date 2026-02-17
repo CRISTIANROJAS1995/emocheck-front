@@ -2,6 +2,9 @@ export const environment = {
     production: true,
     apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
     apiBaseUrl: 'https://emocheck.com',
+
+    // En producción, análisis emocional usa el mismo backend del server
+    emotionalAnalysisApiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
     apiTimeout: 30000,
     appName: 'EmoCheck',
     version: '1.0.0',

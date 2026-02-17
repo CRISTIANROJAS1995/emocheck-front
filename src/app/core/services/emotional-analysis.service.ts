@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface EmotionalAnalysisResult {
     attention: number;
@@ -7,6 +10,9 @@ export interface EmotionalAnalysisResult {
     balance: number;
     positivity: number;
     calm: number;
+    fatigueScore?: number;
+    dominantEmotion?: string;
+    alertCreated?: boolean;
     timestamp: Date;
 }
 
@@ -17,49 +23,65 @@ export interface AnalysisProgress {
     stepName: string;
 }
 
+interface EmotionalAnalysisApiRequest {
+    evaluationID?: number;
+    framesBase64: string[];
+    audioBase64?: string;
+    createAlertOnFatigue: boolean;
+}
+
+interface EmotionalAnalysisApiResponse {
+    attention: number;
+    concentration: number;
+    balance: number;
+    positivity: number;
+    calm: number;
+    fatigueScore?: number;
+    dominantEmotion?: string;
+    alertCreated?: boolean;
+    timestamp?: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
 export class EmotionalAnalysisService {
+    private readonly apiUrl = (environment as any).emotionalAnalysisApiUrl || environment.apiUrl;
 
-    constructor() { }
+    constructor(private readonly http: HttpClient) { }
 
     /**
-     * Analiza una imagen y retorna los resultados emocionales (MOCK)
+     * Analiza una imagen y retorna los resultados emocionales
      */
     analyzeFrame(imageBase64: string): Observable<EmotionalAnalysisResult> {
-        // Simulamos valores aleatorios para el mock
-        const mockResult: EmotionalAnalysisResult = {
-            attention: this.getRandomScore(60, 90),
-            concentration: this.getRandomScore(65, 85),
-            balance: this.getRandomScore(70, 95),
-            positivity: this.getRandomScore(60, 85),
-            calm: this.getRandomScore(55, 75),
-            timestamp: new Date()
-        };
-
-        // Simulamos un delay como si fuera una llamada real
-        return of(mockResult).pipe(delay(500));
+        return this.performFullAnalysis([imageBase64]);
     }
 
     /**
-     * Realiza un análisis completo con múltiples capturas (MOCK)
+     * Realiza un análisis completo con múltiples capturas
      *
      */
     performFullAnalysis(frames: string[]): Observable<EmotionalAnalysisResult> {
-
-        // Por ahora retornamos promedios simulados
-
-        const mockResult: EmotionalAnalysisResult = {
-            attention: this.getRandomScore(67, 75),
-            concentration: this.getRandomScore(68, 78),
-            balance: this.getRandomScore(75, 85),
-            positivity: this.getRandomScore(65, 75),
-            calm: this.getRandomScore(60, 70),
-            timestamp: new Date()
+        const payload: EmotionalAnalysisApiRequest = {
+            framesBase64: frames,
+            createAlertOnFatigue: true,
         };
 
-        return of(mockResult).pipe(delay(1000));
+        return this.http
+            .post<EmotionalAnalysisApiResponse>(`${this.apiUrl}/evaluation/emotional-analysis`, payload)
+            .pipe(
+                map((res) => ({
+                    attention: this.clampScore(res.attention),
+                    concentration: this.clampScore(res.concentration),
+                    balance: this.clampScore(res.balance),
+                    positivity: this.clampScore(res.positivity),
+                    calm: this.clampScore(res.calm),
+                    fatigueScore: typeof res.fatigueScore === 'number' ? res.fatigueScore : undefined,
+                    dominantEmotion: typeof res.dominantEmotion === 'string' ? res.dominantEmotion : undefined,
+                    alertCreated: typeof res.alertCreated === 'boolean' ? res.alertCreated : undefined,
+                    timestamp: res.timestamp ? new Date(res.timestamp) : new Date(),
+                }))
+            );
     }
 
     /**
@@ -83,11 +105,9 @@ export class EmotionalAnalysisService {
         }
     }
 
-    /**
-     * Genera un score aleatorio en un rango (para el mock)
-     */
-    private getRandomScore(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    private clampScore(value: number | null | undefined): number {
+        if (typeof value !== 'number' || Number.isNaN(value)) return 0;
+        return Math.max(0, Math.min(100, Math.round(value)));
     }
 
     /**
