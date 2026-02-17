@@ -31,7 +31,8 @@
 
                 <!-- Subtitle -->
                 <p class="text-montserrat-semibold mt-2 text-center text-[14px] leading-[20px] text-[#009689]">
-                    {{ cameraError ? 'Conecta una cámara e inténtalo de nuevo.' : 'Sigue las instrucciones en pantalla' }}
+                    {{ cameraError ? 'Conecta una cámara e inténtalo de nuevo.' : 'Sigue las instrucciones en pantalla'
+                    }}
                 </p>
 
                 <!-- Progress -->
@@ -52,7 +53,8 @@
                 <div class="mt-6 w-full flex justify-center">
                     <div
                         class="video-container relative w-full max-w-[560px] overflow-hidden rounded-[16px] border-4 border-[#00BBA7] flex items-center justify-center">
-                        <video #videoElement autoplay playsinline class="video-flipped" [class.hidden]="cameraError"></video>
+                        <video #videoElement autoplay playsinline class="video-flipped"
+                            [class.hidden]="cameraError"></video>
 
                         <!-- Mensaje de error si no hay cámara / falla análisis (overlay) -->
                         <div *ngIf="cameraError || analysisError"
