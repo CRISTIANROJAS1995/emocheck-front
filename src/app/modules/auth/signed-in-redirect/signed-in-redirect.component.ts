@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'app/core/services/auth.service';
 import { ConsentService } from 'app/core/services/consent.service';
-import { UsersService } from 'app/core/services/users.service';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, of, switchMap, take } from 'rxjs';
 
 @Component({
     selector: 'auth-signed-in-redirect',
@@ -14,7 +13,6 @@ export class SignedInRedirectComponent implements OnInit {
     constructor(
         private readonly router: Router,
         private readonly auth: AuthService,
-        private readonly usersService: UsersService,
         private readonly consentService: ConsentService
     ) { }
 
@@ -26,29 +24,19 @@ export class SignedInRedirectComponent implements OnInit {
                 switchMap((user) => {
                     const roles = user?.roles ?? [];
                     const isSystemAdmin = roles.includes('SystemAdmin');
+                    const isAdmin = roles.includes('Admin') || roles.includes('CompanyAdmin');
                     const isEmployee = roles.includes('Employee');
 
-                    // Only SystemAdmin can bypass everything.
-                    if (isSystemAdmin) return of('/home');
+                    // Admin roles go straight to admin panel.
+                    if (isSystemAdmin || isAdmin) return of('/admin');
 
-                    // Everyone else: Consent -> Profile -> (Employee => Instructions) else Home.
+                    // Everyone else: Consent -> (Employee => Instructions) else Home.
+                    // Profile is completed by admin during user creation, no need to check here.
                     return this.consentService.hasAccepted().pipe(
                         take(1),
                         switchMap((hasAccepted) => {
                             if (!hasAccepted) return of('/informed-consent');
-
-                            return this.usersService.getMyProfile().pipe(
-                                take(1),
-                                map((profile) => {
-                                    // While site/area/job type lookup endpoints are pending,
-                                    // treat profile as complete if the backend has a document number.
-                                    const isProfileComplete = !!profile?.documentNumber;
-
-                                    if (!isProfileComplete) return '/complete-profile';
-                                    return isEmployee ? '/emotional-instructions' : '/home';
-                                }),
-                                catchError(() => of('/complete-profile'))
-                            );
+                            return of(isEmployee ? '/emotional-instructions' : '/home');
                         }),
                         catchError(() => of('/informed-consent'))
                     );

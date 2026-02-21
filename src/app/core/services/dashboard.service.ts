@@ -69,31 +69,109 @@ export class DashboardService {
         return [];
     }
 
+    /**
+     * Maps backend risk-distribution fields (low/moderate/high/severe)
+     * to frontend DTO fields (green/yellow/red).
+     */
+    private mapRiskDistribution(raw: any): RiskDistributionDto {
+        if (!raw || typeof raw !== 'object') {
+            return { greenCount: 0, yellowCount: 0, redCount: 0, greenPercentage: 0, yellowPercentage: 0, redPercentage: 0 };
+        }
+        // If the response already uses green/yellow/red field names, pass through
+        if ('greenCount' in raw) return raw as RiskDistributionDto;
+        // Map from backend low/moderate/high/severe
+        return {
+            greenCount: Number(raw.lowCount ?? 0),
+            yellowCount: Number(raw.moderateCount ?? 0),
+            redCount: Number(raw.highCount ?? 0) + Number(raw.severeCount ?? 0),
+            greenPercentage: Number(raw.lowPercentage ?? 0),
+            yellowPercentage: Number(raw.moderatePercentage ?? 0),
+            redPercentage: Number(raw.highPercentage ?? 0) + Number(raw.severePercentage ?? 0),
+        };
+    }
+
+    /**
+     * Maps backend indicator fields to frontend DashboardIndicatorsDto.
+     */
+    private mapIndicators(raw: any): DashboardIndicatorsDto {
+        if (!raw || typeof raw !== 'object') {
+            return {
+                totalUsers: 0, totalEvaluationsCompleted: 0, participationRate: 0,
+                unattendedAlerts: 0, riskDistribution: this.mapRiskDistribution(null),
+            };
+        }
+        // If already using frontend field names, pass through
+        if ('totalEvaluationsCompleted' in raw) return raw as DashboardIndicatorsDto;
+        return {
+            totalUsers: Number(raw.totalUsers ?? 0),
+            totalEvaluationsCompleted: Number(raw.completedEvaluations ?? raw.totalEvaluations ?? 0),
+            participationRate: Number(raw.participationRate ?? raw.completionRate ?? 0),
+            unattendedAlerts: Number(raw.activeAlerts ?? raw.unattendedAlerts ?? 0),
+            riskDistribution: raw.riskDistribution
+                ? this.mapRiskDistribution(raw.riskDistribution)
+                : this.mapRiskDistribution(null),
+            moduleStatistics: Array.isArray(raw.moduleStatistics)
+                ? raw.moduleStatistics.map((m: any) => this.mapModuleStat(m))
+                : null,
+        };
+    }
+
+    /**
+     * Maps backend module-statistics fields to frontend ModuleStatisticsDto.
+     */
+    private mapModuleStat(raw: any): ModuleStatisticsDto {
+        if (!raw || typeof raw !== 'object') {
+            return { moduleName: null, totalEvaluations: 0, averageScore: 0, riskDistribution: this.mapRiskDistribution(null) };
+        }
+        return {
+            moduleName: raw.moduleName ?? null,
+            totalEvaluations: Number(raw.evaluationCount ?? raw.totalEvaluations ?? 0),
+            averageScore: Number(raw.averageScore ?? 0),
+            riskDistribution: raw.riskDistribution
+                ? this.mapRiskDistribution(raw.riskDistribution)
+                : this.mapRiskDistribution(null),
+        };
+    }
+
+    /**
+     * Maps backend trend data fields to frontend TrendDataDto.
+     */
+    private mapTrend(raw: any): TrendDataDto {
+        if (!raw || typeof raw !== 'object') {
+            return { period: null, greenCount: 0, yellowCount: 0, redCount: 0, averageScore: 0 };
+        }
+        // If already using frontend field names, pass through
+        if ('greenCount' in raw) return raw as TrendDataDto;
+        return {
+            period: raw.period ?? null,
+            greenCount: Number(raw.lowCount ?? 0),
+            yellowCount: Number(raw.moderateCount ?? 0),
+            redCount: Number(raw.highCount ?? 0) + Number(raw.severeCount ?? 0),
+            averageScore: Number(raw.averageScore ?? 0),
+        };
+    }
+
     getIndicators(query?: DashboardQuery): Observable<DashboardIndicatorsDto> {
-        // Swagger: GET /api/dashboard/indicators -> DashboardIndicatorsDto (direct)
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/indicators`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.unwrapObject<DashboardIndicatorsDto>(res))
+            map((res) => this.mapIndicators(this.unwrapObject<any>(res)))
         );
     }
 
     getRiskDistribution(query?: DashboardQuery): Observable<RiskDistributionDto> {
-        // Swagger: GET /api/dashboard/risk-distribution -> RiskDistributionDto (direct)
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/risk-distribution`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.unwrapObject<RiskDistributionDto>(res))
+            map((res) => this.mapRiskDistribution(this.unwrapObject<any>(res)))
         );
     }
 
     getTrends(query: DashboardQuery): Observable<TrendDataDto[]> {
-        // Swagger: GET /api/dashboard/trends -> TrendDataDto[] (direct)
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/trends`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.unwrapArray<TrendDataDto>(res))
+            map((res) => this.unwrapArray<any>(res).map((t: any) => this.mapTrend(t)))
         );
     }
 
     getModuleStatistics(query?: Omit<DashboardQuery, 'periodType'>): Observable<ModuleStatisticsDto[]> {
-        // Swagger: GET /api/dashboard/module-statistics -> ModuleStatisticsDto[] (direct)
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/module-statistics`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.unwrapArray<ModuleStatisticsDto>(res))
+            map((res) => this.unwrapArray<any>(res).map((m: any) => this.mapModuleStat(m)))
         );
     }
 

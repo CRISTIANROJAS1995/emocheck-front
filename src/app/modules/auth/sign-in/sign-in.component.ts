@@ -66,7 +66,7 @@ export class AuthSignInComponent implements OnInit {
         // Create the form
         this.signInForm = this._formBuilder.group({
             email: [
-                'admin@motioniq.com',
+                'admin@emocheck.com',
                 [Validators.required],
             ],
             password: ['Admin123!', Validators.required],

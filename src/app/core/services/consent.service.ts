@@ -58,10 +58,10 @@ export class ConsentService {
     }
 
     hasAccepted(): Observable<boolean> {
-        // Swagger: GET /api/consent/has-accepted -> boolean
-        // Some deployments respond as text/plain with values like "True"/"False".
+        // Deployed backend uses /consent/check (not /consent/has-accepted)
+        // Response: { hasAccepted: boolean }
         return this.http
-            .get(`${this.apiUrl}/consent/has-accepted`, { responseType: 'text' })
+            .get(`${this.apiUrl}/consent/check`, { responseType: 'text' })
             .pipe(
                 map((raw) => {
                     const text = String(raw ?? '').trim();
@@ -98,14 +98,15 @@ export class ConsentService {
     }
 
     accept(consentVersion?: string | null): Observable<void> {
-        // Swagger: POST /api/consent/accept -> AcceptConsentDto { accepted: boolean, consentVersion?: string }
+        // Backend: POST /api/consent/accept -> AcceptConsentDto { accepted: bool, consentVersion: string }
         const version = (consentVersion ?? environment.version ?? '').trim();
 
         // Some deployments may respond as text/plain or an empty body; avoid JSON parse errors.
         return this.http
             .post(`${this.apiUrl}/consent/accept`, {
                 accepted: true,
-                consentVersion: version || null,
+                // The deployed backend expects "version" (not "consentVersion")
+                version: version || '1.0',
             }, { responseType: 'text' })
             .pipe(
                 map((raw) => {

@@ -1,223 +1,345 @@
-<div class="admin-page">
-    <app-background-circles></app-background-circles>
-
-    <div class="admin-container">
-        <section class="admin-hero">
-            <div class="admin-hero__left">
-                <div class="admin-hero__title-row">
-                    <img class="admin-hero__logo" src="icons/Icon.svg" alt="" />
-                    <h1 class="admin-hero__title">Configuración</h1>
-                </div>
-                <p class="admin-hero__subtitle">Gestión de usuarios (Admin / CompanyAdmin)</p>
-            </div>
-
-            <a class="admin-hero__back" mat-button [routerLink]="['/home']">
-                <span class="admin-hero__back-content">
-                    <mat-icon class="admin-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
-                    <span class="admin-hero__back-text">Volver</span>
-                </span>
+<section class="admin-page-wrapper">
+    <!-- Hero Header -->
+    <header class="admin-page-header">
+        <div class="admin-page-header__left">
+            <div class="admin-page-header__badge">ADMINISTRACION DE USUARIOS</div>
+            <h1>Gestion de Usuarios</h1>
+            <p>Administra usuarios, asigna roles y controla el estado de las cuentas del sistema.</p>
+        </div>
+        <div class="admin-page-header__actions">
+            <a routerLink="/admin" class="btn btn--outline btn--sm">
+                <mat-icon>arrow_back</mat-icon> Volver
             </a>
-        </section>
+        </div>
+    </header>
 
-        <!-- Filters -->
-        <section class="admin-filters" [formGroup]="filterForm">
-            <div class="admin-filters__title">
-                <mat-icon svgIcon="heroicons_outline:funnel"></mat-icon>
-                <span>Filtros</span>
+    <!-- KPIs -->
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>people</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ users.length }}</span>
+                <span class="kpi-card__label">Total Usuarios</span>
             </div>
-
-            <div class="admin-filters__grid">
-                <div class="admin-field">
-                    <label class="admin-label">Buscar</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="search" placeholder="Nombre o email" />
-                    </mat-form-field>
-                </div>
-
-                <div class="admin-field">
-                    <label class="admin-label">companyId</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="companyId" placeholder="1" />
-                    </mat-form-field>
-                </div>
-
-                <div class="admin-field">
-                    <label class="admin-label">siteId</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="siteId" placeholder="2" />
-                    </mat-form-field>
-                </div>
-
-                <div class="admin-field">
-                    <label class="admin-label">areaId</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="areaId" placeholder="3" />
-                    </mat-form-field>
-                </div>
-
-                <div class="admin-field">
-                    <label class="admin-label">stateId</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="stateId" placeholder="1" />
-                    </mat-form-field>
-                </div>
-
-                <div class="admin-actions">
-                    <label class="admin-label">Acciones</label>
-                    <div class="admin-actions__row">
-                        <button mat-button type="button" class="admin-btn" (click)="loadUsers()"
-                            [disabled]="loading || saving">
-                            <mat-icon svgIcon="heroicons_outline:arrow-path"></mat-icon>
-                            Actualizar
-                        </button>
-                    </div>
-                </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ activeCount }}</span>
+                <span class="kpi-card__label">Activos</span>
             </div>
-        </section>
-
-        <!-- Create user -->
-        <section class="admin-create" [formGroup]="createForm">
-            <div class="admin-create__header">
-                <div>
-                    <div class="admin-create__title">Crear usuario</div>
-                    <div class="admin-create__subtitle">Crea un usuario con contraseña temporal y roles</div>
-                </div>
-                <button mat-button type="button" class="admin-btn admin-btn--primary" (click)="createUser()"
-                    [disabled]="saving">
-                    <mat-icon svgIcon="heroicons_outline:user-plus"></mat-icon>
-                    Crear
-                </button>
+        </div>
+        <div class="kpi-card kpi-card--rose">
+            <div class="kpi-card__icon"><mat-icon>person_off</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ inactiveCount }}</span>
+                <span class="kpi-card__label">Inactivos</span>
             </div>
+        </div>
+        <div class="kpi-card kpi-card--amber">
+            <div class="kpi-card__icon"><mat-icon>filter_list</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ filteredUsers.length }}</span>
+                <span class="kpi-card__label">Resultados</span>
+            </div>
+        </div>
+    </div>
 
-            <div class="admin-create__grid">
-                <div class="admin-field">
-                    <label class="admin-label">Nombre completo</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="fullName" placeholder="Pedro López" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field">
-                    <label class="admin-label">Documento</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="documentNumber" placeholder="9876543210" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field">
-                    <label class="admin-label">Email</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="email" placeholder="pedro.lopez@empresa.com" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field">
-                    <label class="admin-label">Password temporal</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="password" placeholder="TempPassword123!" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field">
-                    <label class="admin-label">companyID (opcional)</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="companyID" placeholder="1" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field">
-                    <label class="admin-label">siteID (opcional)</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="siteID" placeholder="2" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field">
-                    <label class="admin-label">areaID (opcional)</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="areaID" placeholder="3" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field">
-                    <label class="admin-label">jobTypeID</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
-                        <input matInput formControlName="jobTypeID" placeholder="5" />
-                    </mat-form-field>
-                </div>
-                <div class="admin-field admin-field--wide">
-                    <label class="admin-label">Roles</label>
-                    <mat-form-field appearance="outline" class="admin-mat">
+    <!-- Create User Form -->
+    @if (showCreateForm) {
+    <div class="editor-panel">
+        <h3><mat-icon>person_add</mat-icon> Crear Nuevo Usuario</h3>
+        <form [formGroup]="createForm" (ngSubmit)="createUser()">
+            <div class="editor-panel__grid">
+                <label class="editor-panel__field">
+                    <span>Nombre completo *</span>
+                    <input formControlName="fullName" placeholder="Juan Perez" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Documento *</span>
+                    <input formControlName="documentNumber" placeholder="1234567890" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Email *</span>
+                    <input type="email" formControlName="email" placeholder="correo@empresa.com" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Contrasena temporal *</span>
+                    <input type="password" formControlName="password" placeholder="TempPass123!" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Empresa</span>
+                    <select formControlName="companyID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (c of companies; track c.companyID) {
+                        <option [ngValue]="c.companyID">{{ c.name }}</option>
+                        }
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Sede</span>
+                    <select formControlName="siteID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (s of filteredCreateSites; track s.siteID) {
+                        <option [ngValue]="s.siteID">{{ s.name }}</option>
+                        }
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Área</span>
+                    <select formControlName="areaID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (a of filteredCreateAreas; track a.areaID) {
+                        <option [ngValue]="a.areaID">{{ a.name }}</option>
+                        }
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Tipo de Cargo *</span>
+                    <select formControlName="jobTypeID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (j of jobTypes; track j.jobTypeID) {
+                        <option [ngValue]="j.jobTypeID">{{ j.name }}</option>
+                        }
+                    </select>
+                </label>
+                <div class="editor-panel__field editor-panel__field--full">
+                    <span>Roles *</span>
+                    <mat-form-field appearance="outline" style="width:100%">
                         <mat-select formControlName="roleIDs" multiple>
                             @for (r of roleOptions; track r.id) {
-                            <mat-option [value]="r.id">{{ r.name }} ({{ r.id }})</mat-option>
+                            <mat-option [value]="r.id">{{ r.name }}</mat-option>
                             }
                         </mat-select>
                     </mat-form-field>
                 </div>
             </div>
-
-            @if (created) {
-            <div class="admin-created">
-                <mat-icon svgIcon="heroicons_outline:check-circle"></mat-icon>
-                <div>
-                    <div class="admin-created__title">Usuario creado</div>
-                    <div class="admin-created__meta">{{ created.fullName }} — {{ created.email }}</div>
-                    <div class="admin-created__meta">ID: <b>{{ created.userId }}</b></div>
-                    @if (created.roles?.length) {
-                    <div class="admin-created__meta">Roles: {{ created.roles.join(', ') }}</div>
-                    }
-                </div>
+            <div class="editor-panel__actions">
+                <button type="button" class="btn btn--ghost" (click)="showCreateForm = false">Cancelar</button>
+                <button type="submit" class="btn btn--primary" [disabled]="saving">
+                    <mat-icon>save</mat-icon> Crear Usuario
+                </button>
             </div>
-            }
-        </section>
-
-        <!-- Users list -->
-        <section class="admin-list">
-            <div class="admin-list__header">
-                <div>
-                    <div class="admin-list__title">Usuarios</div>
-                    <div class="admin-list__subtitle">Listado (GET /api/users)</div>
-                </div>
-                @if (loading) {
-                <div class="admin-list__loading">
-                    <mat-progress-spinner diameter="22" mode="indeterminate"></mat-progress-spinner>
-                    <span>Cargando...</span>
-                </div>
-                }
-            </div>
-
-            @if (!loading && !users?.length) {
-            <div class="admin-empty">No hay usuarios para mostrar con los filtros actuales.</div>
-            }
-
-            @if (users?.length) {
-            <div class="admin-table">
-                <div class="admin-table__head">
-                    <div>Usuario</div>
-                    <div>Empresa</div>
-                    <div class="admin-right">Roles</div>
-                    <div class="admin-right">Riesgo</div>
-                    <div class="admin-right">Eval.</div>
-                    <div class="admin-right">Acciones</div>
-                </div>
-
-                @for (u of users; track u.userId) {
-                <div class="admin-table__row">
-                    <div class="admin-user">
-                        <div class="admin-user__name">{{ u.fullName }}</div>
-                        <div class="admin-user__meta">{{ u.email }}</div>
-                    </div>
-                    <div class="admin-user__meta">{{ u.companyName || '—' }}</div>
-                    <div class="admin-right admin-user__meta">{{ (u.roles || []).join(', ') || '—' }}</div>
-                    <div class="admin-right">
-                        <span [class]="riskChipClass(u.lastRiskLevel)">{{ riskLabel(u.lastRiskLevel) }}</span>
-                    </div>
-                    <div class="admin-right admin-user__meta">{{ u.evaluationsCompleted ?? 0 }}</div>
-                    <div class="admin-right">
-                        <button mat-button type="button" class="admin-btn admin-btn--danger" (click)="deleteUser(u)"
-                            [disabled]="saving">
-                            <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
-                            Eliminar
-                        </button>
-                    </div>
-                </div>
-                }
-            </div>
-            }
-        </section>
+        </form>
     </div>
-</div>
+    }
+
+    <!-- Edit User Form -->
+    @if (showEditForm && editingUser) {
+    <div class="editor-panel">
+        <h3><mat-icon>edit</mat-icon> Editar Usuario #{{ editingUser.userId }}</h3>
+        <form [formGroup]="editForm" (ngSubmit)="saveEditUser()">
+            <div class="editor-panel__grid">
+                <label class="editor-panel__field">
+                    <span>Nombre completo *</span>
+                    <input formControlName="fullName" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Documento</span>
+                    <input formControlName="documentNumber" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Email *</span>
+                    <input type="email" formControlName="email" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Teléfono</span>
+                    <input formControlName="phone" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Empresa</span>
+                    <select formControlName="companyID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (c of companies; track c.companyID) {
+                        <option [ngValue]="c.companyID">{{ c.name }}</option>
+                        }
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Sede</span>
+                    <select formControlName="siteID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (s of filteredEditSites; track s.siteID) {
+                        <option [ngValue]="s.siteID">{{ s.name }}</option>
+                        }
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Área</span>
+                    <select formControlName="areaID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (a of filteredEditAreas; track a.areaID) {
+                        <option [ngValue]="a.areaID">{{ a.name }}</option>
+                        }
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Tipo de Cargo</span>
+                    <select formControlName="jobTypeID">
+                        <option [ngValue]="null">-- Seleccionar --</option>
+                        @for (j of jobTypes; track j.jobTypeID) {
+                        <option [ngValue]="j.jobTypeID">{{ j.name }}</option>
+                        }
+                    </select>
+                </label>
+            </div>
+            <div class="editor-panel__actions">
+                <button type="button" class="btn btn--ghost" (click)="cancelEdit()">Cancelar</button>
+                <button type="submit" class="btn btn--primary" [disabled]="saving">
+                    <mat-icon>save</mat-icon> Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+    }
+
+    <!-- Filters -->
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
+                placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredUsers.length }} de {{ users.length }}</span>
+            <button class="btn btn--outline btn--sm" (click)="loadUsers()" [disabled]="loading">
+                <mat-icon>refresh</mat-icon> Actualizar
+            </button>
+            <button class="btn btn--primary btn--sm" (click)="showCreateForm = !showCreateForm; showEditForm = false">
+                <mat-icon>{{ showCreateForm ? 'close' : 'person_add' }}</mat-icon>
+                {{ showCreateForm ? 'Cerrar' : 'Nuevo Usuario' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando usuarios...</span>
+    </div>
+    }
+
+    <!-- Users Table -->
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th [class]="sortClass('userId')" (click)="toggleSort('userId')">ID</th>
+                    <th [class]="sortClass('fullName')" (click)="toggleSort('fullName')">Usuario</th>
+                    <th [class]="sortClass('companyName')" (click)="toggleSort('companyName')">Empresa</th>
+                    <th [class]="sortClass('siteName')" (click)="toggleSort('siteName')">Sede</th>
+                    <th [class]="sortClass('areaName')" (click)="toggleSort('areaName')">Area</th>
+                    <th>Roles</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (u of filteredUsers; track u.userId) {
+                <tr [class.row--selected]="selectedUser?.userId === u.userId" (click)="selectUser(u)">
+                    <td><strong>#{{ u.userId }}</strong></td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-cell__name">{{ u.fullName }}</div>
+                            <div class="user-cell__email">{{ u.email }}</div>
+                        </div>
+                    </td>
+                    <td>{{ u.companyName ?? '---' }}</td>
+                    <td>{{ u.siteName ?? '---' }}</td>
+                    <td>{{ u.areaName ?? '---' }}</td>
+                    <td>
+                        @for (role of (u.roles ?? []); track role) {
+                        <span class="badge badge--indigo" style="margin-right:4px;margin-bottom:2px">{{ role }}</span>
+                        }
+                        @if (!(u.roles ?? []).length) {
+                        <span class="badge badge--neutral">Sin rol</span>
+                        }
+                    </td>
+                    <td>
+                        <span [class]="u.isActive ? 'badge badge--success' : 'badge badge--danger'">
+                            {{ u.isActive ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()"
+                            title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()"
+                            [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
+                            <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
+                        </button>
+                        <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()"
+                            [disabled]="saving" title="Eliminar">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredUsers.length === 0) {
+        <div class="empty-state">
+            <mat-icon>search_off</mat-icon>
+            <p>No se encontraron usuarios con los filtros actuales.</p>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- User Detail -->
+    @if (selectedUser; as current) {
+    <div class="detail-panel">
+        <div class="detail-panel__header">
+            <h3>Detalle de Usuario #{{ current.userId }}</h3>
+            <button class="btn btn--ghost btn--sm" (click)="selectedUser = null">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div class="detail-panel__grid">
+            <div class="detail-panel__field">
+                <label>Nombre</label>
+                <span>{{ current.fullName }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Email</label>
+                <span>{{ current.email }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Documento</label>
+                <span>{{ current.documentNumber ?? '---' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Telefono</label>
+                <span>{{ current.phone ?? '---' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Empresa</label>
+                <span>{{ current.companyName ?? '---' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Sede</label>
+                <span>{{ current.siteName ?? '---' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Area</label>
+                <span>{{ current.areaName ?? '---' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Cargo</label>
+                <span>{{ current.jobTypeName ?? '---' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Registrado</label>
+                <span>{{ current.creationDate ?? '---' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Ultimo Login</label>
+                <span>{{ current.lastLoginAt ?? '---' }}</span>
+            </div>
+        </div>
+    </div>
+    }
+</section>

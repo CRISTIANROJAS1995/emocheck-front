@@ -39,32 +39,54 @@ export class UsersService {
 
     constructor(private readonly http: HttpClient, private readonly auth: AuthService) { }
 
+    /**
+     * Extract user ID from JWT token payload.
+     */
+    private getUserIdFromToken(): number | null {
+        const token = this.auth.getToken();
+        if (!token) return null;
+        try {
+            const payload = token.split('.')[1];
+            const decoded = JSON.parse(atob(payload));
+            const id = Number(decoded?.sub || decoded?.nameid || 0);
+            return id > 0 ? id : null;
+        } catch {
+            return null;
+        }
+    }
+
     getMyProfile(): Observable<UserProfileDto> {
+        const userId = this.getUserIdFromToken();
+        if (!userId) {
+            return throwError(() => ({ status: 401, message: 'No se pudo obtener el ID del usuario' }));
+        }
+
         return this.http
-            .get<ApiResponse<any>>(`${this.apiUrl}/users/current`)
+            .get<any>(`${this.apiUrl}/users/${userId}`)
             .pipe(
-                map((res) => {
-                    if (!res?.success) {
+                map((res: any) => {
+                    // Handle both wrapped (ApiResponse with data) and flat response
+                    if (typeof res?.success === 'boolean' && !res.success) {
                         throw { status: 400, message: res?.message || 'No fue posible obtener el perfil', errors: res?.errors };
                     }
 
-                    const data = res.data ?? {};
+                    const data = res?.data ?? res ?? {};
                     return {
                         userId: Number(data.userID ?? data.userId ?? 0),
                         fullName: String(data.fullName ?? ''),
                         documentNumber: data.documentNumber ?? undefined,
                         email: String(data.email ?? ''),
-                        companyId: data.company?.id ?? data.companyId ?? undefined,
-                        companyName: data.company?.name ?? data.companyName ?? undefined,
-                        siteId: data.site?.id ?? data.siteId ?? undefined,
-                        siteName: data.site?.name ?? data.siteName ?? undefined,
-                        areaId: data.area?.id ?? data.areaId ?? undefined,
-                        areaName: data.area?.name ?? data.areaName ?? undefined,
-                        jobTypeId: data.jobType?.id ?? data.jobTypeId ?? undefined,
-                        jobTypeName: data.jobType?.name ?? data.jobTypeName ?? undefined,
+                        companyId: data.companyID ?? data.company?.id ?? data.companyId ?? undefined,
+                        companyName: data.companyName ?? data.company?.name ?? undefined,
+                        siteId: data.siteID ?? data.site?.id ?? data.siteId ?? undefined,
+                        siteName: data.siteName ?? data.site?.name ?? undefined,
+                        areaId: data.areaID ?? data.area?.id ?? data.areaId ?? undefined,
+                        areaName: data.areaName ?? data.area?.name ?? undefined,
+                        jobTypeId: data.jobTypeID ?? data.jobType?.id ?? data.jobTypeId ?? undefined,
+                        jobTypeName: data.jobTypeName ?? data.jobType?.name ?? undefined,
                         stateId: data.stateID ?? data.stateId ?? undefined,
                         stateName: data.stateName ?? undefined,
-                        creationDate: data.creationDate ?? data.creationDate ?? undefined,
+                        creationDate: data.createdAt ?? data.creationDate ?? undefined,
                     } as UserProfileDto;
                 })
             );

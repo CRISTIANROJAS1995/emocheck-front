@@ -1,0 +1,768 @@
+<section class="admin-page-wrapper">
+    <!-- Hero Header -->
+    <header class="admin-page-header">
+        <div class="admin-page-header__left">
+            <div class="admin-page-header__badge">CONFIGURACIÓN ORGANIZACIONAL</div>
+            <h1>Gestión de Organización</h1>
+            <p>Administra empresas, sedes, áreas y tipos de cargo del sistema.</p>
+        </div>
+        <div class="admin-page-header__actions">
+            <a routerLink="/admin" class="btn btn--outline btn--sm">
+                <mat-icon>arrow_back</mat-icon> Volver
+            </a>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'companies'"
+            (click)="switchTab('companies')">
+            <mat-icon>business</mat-icon> Empresas
+        </button>
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'sites'"
+            (click)="switchTab('sites')">
+            <mat-icon>location_city</mat-icon> Sedes
+        </button>
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'areas'"
+            (click)="switchTab('areas')">
+            <mat-icon>account_tree</mat-icon> Áreas
+        </button>
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'jobtypes'"
+            (click)="switchTab('jobtypes')">
+            <mat-icon>work</mat-icon> Cargos
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         COMPANIES TAB
+         ═══════════════════════════════════════════════════════ -->
+    @if (activeTab === 'companies') {
+    <!-- KPIs -->
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>business</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ companies.length }}</span>
+                <span class="kpi-card__label">Total Empresas</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ activeCompanies }}</span>
+                <span class="kpi-card__label">Activas</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--rose">
+            <div class="kpi-card__icon"><mat-icon>cancel</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ companies.length - activeCompanies }}</span>
+                <span class="kpi-card__label">Inactivas</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Company -->
+    @if (showForm) {
+    <div class="editor-panel">
+        <h3><mat-icon>add_business</mat-icon> Nueva Empresa</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="companyForm.name" placeholder="Nombre de la empresa" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Razón Social</span>
+                <input [(ngModel)]="companyForm.businessName" placeholder="Razón social" />
+            </label>
+            <label class="editor-panel__field">
+                <span>NIT / Tax ID</span>
+                <input [(ngModel)]="companyForm.taxID" placeholder="900123456-1" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Email</span>
+                <input type="email" [(ngModel)]="companyForm.email" placeholder="info@empresa.com" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Teléfono</span>
+                <input [(ngModel)]="companyForm.phone" placeholder="+57 300 1234567" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Industria</span>
+                <input [(ngModel)]="companyForm.industry" placeholder="Tecnología, Salud..." />
+            </label>
+            <label class="editor-panel__field">
+                <span>Sitio Web</span>
+                <input [(ngModel)]="companyForm.website" placeholder="https://empresa.com" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Dirección</span>
+                <input [(ngModel)]="companyForm.address" placeholder="Dirección física" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="createCompany()">
+                <mat-icon>save</mat-icon> Crear Empresa
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- Filters -->
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="companySearch" (ngModelChange)="applyFilter()"
+                placeholder="Buscar por nombre, razón social, industria..." class="admin-filters__search" />
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredCompanies.length }} empresas</span>
+            <button class="btn btn--primary btn--sm" (click)="showForm = !showForm">
+                <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+                {{ showForm ? 'Cerrar' : 'Crear Nuevo' }}
+            </button>
+        </div>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando empresas...</span></div>
+    }
+
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Empresa</th>
+                    <th>Industria</th>
+                    <th>Email</th>
+                    <th>Sedes</th>
+                    <th>Áreas</th>
+                    <th>Usuarios</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (c of filteredCompanies; track c.companyID) {
+                <tr>
+                    <td><strong>#{{ c.companyID }}</strong></td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-cell__name">{{ c.name }}</div>
+                            <div class="user-cell__email">{{ c.businessName || c.taxID || '—' }}</div>
+                        </div>
+                    </td>
+                    <td>{{ c.industry || '—' }}</td>
+                    <td>{{ c.email || '—' }}</td>
+                    <td><span class="badge badge--info">{{ c.siteCount }}</span></td>
+                    <td><span class="badge badge--purple">{{ c.areaCount }}</span></td>
+                    <td><span class="badge badge--indigo">{{ c.userCount }}</span></td>
+                    <td>
+                        <span [class]="c.isActive ? 'badge badge--success' : 'badge badge--danger'">
+                            {{ c.isActive ? 'Activa' : 'Inactiva' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn btn--outline btn--xs" (click)="startEditCompany(c); $event.stopPropagation()"
+                            title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="btn btn--outline btn--xs" (click)="toggleCompany(c); $event.stopPropagation()"
+                            [title]="c.isActive ? 'Desactivar' : 'Activar'">
+                            <mat-icon>{{ c.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredCompanies.length === 0) {
+        <div class="empty-state">
+            <mat-icon>business</mat-icon>
+            <p>No hay empresas para mostrar.</p>
+        </div>
+        }
+    </div>
+
+    <!-- Edit Company -->
+    @if (showEditForm && editCompanyId !== null) {
+    <div class="editor-panel">
+        <h3><mat-icon>edit</mat-icon> Editar Empresa #{{ editCompanyId }}</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="editCompanyForm.name" placeholder="Nombre" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Razón Social</span>
+                <input [(ngModel)]="editCompanyForm.businessName" />
+            </label>
+            <label class="editor-panel__field">
+                <span>NIT / Tax ID</span>
+                <input [(ngModel)]="editCompanyForm.taxID" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Email</span>
+                <input type="email" [(ngModel)]="editCompanyForm.email" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Teléfono</span>
+                <input [(ngModel)]="editCompanyForm.phone" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Industria</span>
+                <input [(ngModel)]="editCompanyForm.industry" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Sitio Web</span>
+                <input [(ngModel)]="editCompanyForm.website" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Dirección</span>
+                <input [(ngModel)]="editCompanyForm.address" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="cancelEditCompany()">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="saveEditCompany()">
+                <mat-icon>save</mat-icon> Guardar Cambios
+            </button>
+        </div>
+    </div>
+    }
+    }
+    }
+
+    <!-- ═══════════════════════════════════════════════════════
+         SITES TAB
+         ═══════════════════════════════════════════════════════ -->
+    @if (activeTab === 'sites') {
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>location_city</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ sites.length }}</span>
+                <span class="kpi-card__label">Total Sedes</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ activeSites }}</span>
+                <span class="kpi-card__label">Activas</span>
+            </div>
+        </div>
+    </div>
+
+    @if (showForm) {
+    <div class="editor-panel">
+        <h3><mat-icon>add_location</mat-icon> Nueva Sede</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Empresa *</span>
+                <select [(ngModel)]="siteForm.companyID">
+                    <option [value]="0" disabled>Seleccione empresa</option>
+                    @for (comp of companies; track comp.companyID) {
+                    <option [value]="comp.companyID">{{ comp.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="siteForm.name" placeholder="Nombre de la sede" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Código</span>
+                <input [(ngModel)]="siteForm.code" placeholder="BOG-01" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Email</span>
+                <input type="email" [(ngModel)]="siteForm.email" placeholder="sede@empresa.com" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Teléfono</span>
+                <input [(ngModel)]="siteForm.phone" placeholder="+57 300 1234567" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Dirección</span>
+                <input [(ngModel)]="siteForm.address" placeholder="Dirección de la sede" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="createSite()">
+                <mat-icon>save</mat-icon> Crear Sede
+            </button>
+        </div>
+    </div>
+    }
+
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="siteSearch" (ngModelChange)="applyFilter()"
+                placeholder="Buscar por nombre, código, empresa..." class="admin-filters__search" />
+            <select [(ngModel)]="siteCompanyFilter" (ngModelChange)="loadTab()">
+                <option [value]="0">Todas las empresas</option>
+                @for (comp of companies; track comp.companyID) {
+                <option [value]="comp.companyID">{{ comp.name }}</option>
+                }
+            </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredSites.length }} sedes</span>
+            <button class="btn btn--primary btn--sm" (click)="showForm = !showForm">
+                <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+                {{ showForm ? 'Cerrar' : 'Crear Nuevo' }}
+            </button>
+        </div>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando sedes...</span></div>
+    }
+
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Sede</th>
+                    <th>Empresa</th>
+                    <th>Código</th>
+                    <th>Email</th>
+                    <th>Usuarios</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (s of filteredSites; track s.siteID) {
+                <tr>
+                    <td><strong>#{{ s.siteID }}</strong></td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-cell__name">{{ s.name }}</div>
+                            <div class="user-cell__email">{{ s.address || '—' }}</div>
+                        </div>
+                    </td>
+                    <td>{{ s.companyName }}</td>
+                    <td><span class="badge badge--info">{{ s.code || '—' }}</span></td>
+                    <td>{{ s.email || '—' }}</td>
+                    <td><span class="badge badge--indigo">{{ s.userCount }}</span></td>
+                    <td>
+                        <span [class]="s.isActive ? 'badge badge--success' : 'badge badge--danger'">
+                            {{ s.isActive ? 'Activa' : 'Inactiva' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn btn--outline btn--xs" (click)="startEditSite(s); $event.stopPropagation()"
+                            title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="btn btn--outline btn--xs" (click)="toggleSite(s); $event.stopPropagation()"
+                            [title]="s.isActive ? 'Desactivar' : 'Activar'">
+                            <mat-icon>{{ s.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredSites.length === 0) {
+        <div class="empty-state">
+            <mat-icon>location_city</mat-icon>
+            <p>No hay sedes para mostrar.</p>
+        </div>
+        }
+    </div>
+
+    <!-- Edit Site -->
+    @if (showEditForm && editSiteId !== null) {
+    <div class="editor-panel">
+        <h3><mat-icon>edit</mat-icon> Editar Sede #{{ editSiteId }}</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Empresa *</span>
+                <select [(ngModel)]="editSiteForm.companyID">
+                    @for (comp of companies; track comp.companyID) {
+                    <option [value]="comp.companyID">{{ comp.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="editSiteForm.name" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Código</span>
+                <input [(ngModel)]="editSiteForm.code" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Email</span>
+                <input type="email" [(ngModel)]="editSiteForm.email" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Teléfono</span>
+                <input [(ngModel)]="editSiteForm.phone" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Dirección</span>
+                <input [(ngModel)]="editSiteForm.address" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="cancelEditSite()">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="saveEditSite()">
+                <mat-icon>save</mat-icon> Guardar Cambios
+            </button>
+        </div>
+    </div>
+    }
+    }
+    }
+
+    <!-- ═══════════════════════════════════════════════════════
+         AREAS TAB
+         ═══════════════════════════════════════════════════════ -->
+    @if (activeTab === 'areas') {
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>account_tree</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ areas.length }}</span>
+                <span class="kpi-card__label">Total Áreas</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ activeAreas }}</span>
+                <span class="kpi-card__label">Activas</span>
+            </div>
+        </div>
+    </div>
+
+    @if (showForm) {
+    <div class="editor-panel">
+        <h3><mat-icon>add</mat-icon> Nueva Área</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Empresa *</span>
+                <select [(ngModel)]="areaForm.companyID">
+                    <option [value]="0" disabled>Seleccione empresa</option>
+                    @for (comp of companies; track comp.companyID) {
+                    <option [value]="comp.companyID">{{ comp.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="areaForm.name" placeholder="Nombre del área" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Código</span>
+                <input [(ngModel)]="areaForm.code" placeholder="RH-01" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Responsable</span>
+                <input [(ngModel)]="areaForm.managerName" placeholder="Nombre del responsable" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Email Responsable</span>
+                <input type="email" [(ngModel)]="areaForm.managerEmail" placeholder="responsable@empresa.com" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Descripción</span>
+                <textarea rows="2" [(ngModel)]="areaForm.description" placeholder="Descripción del área..."></textarea>
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="createArea()">
+                <mat-icon>save</mat-icon> Crear Área
+            </button>
+        </div>
+    </div>
+    }
+
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="areaSearch" (ngModelChange)="applyFilter()"
+                placeholder="Buscar por nombre, código, empresa..." class="admin-filters__search" />
+            <select [(ngModel)]="areaCompanyFilter" (ngModelChange)="loadTab()">
+                <option [value]="0">Todas las empresas</option>
+                @for (comp of companies; track comp.companyID) {
+                <option [value]="comp.companyID">{{ comp.name }}</option>
+                }
+            </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredAreas.length }} áreas</span>
+            <button class="btn btn--primary btn--sm" (click)="showForm = !showForm">
+                <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+                {{ showForm ? 'Cerrar' : 'Crear Nuevo' }}
+            </button>
+        </div>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando áreas...</span></div>
+    }
+
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Área</th>
+                    <th>Empresa</th>
+                    <th>Código</th>
+                    <th>Responsable</th>
+                    <th>Usuarios</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (a of filteredAreas; track a.areaID) {
+                <tr>
+                    <td><strong>#{{ a.areaID }}</strong></td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-cell__name">{{ a.name }}</div>
+                            <div class="user-cell__email">{{ a.description || '—' }}</div>
+                        </div>
+                    </td>
+                    <td>{{ a.companyName }}</td>
+                    <td><span class="badge badge--info">{{ a.code || '—' }}</span></td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-cell__name">{{ a.managerName || '—' }}</div>
+                            <div class="user-cell__email">{{ a.managerEmail || '' }}</div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge--indigo">{{ a.userCount }}</span></td>
+                    <td>
+                        <span [class]="a.isActive ? 'badge badge--success' : 'badge badge--danger'">
+                            {{ a.isActive ? 'Activa' : 'Inactiva' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn btn--outline btn--xs" (click)="startEditArea(a); $event.stopPropagation()"
+                            title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="btn btn--outline btn--xs" (click)="toggleArea(a); $event.stopPropagation()"
+                            [title]="a.isActive ? 'Desactivar' : 'Activar'">
+                            <mat-icon>{{ a.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredAreas.length === 0) {
+        <div class="empty-state">
+            <mat-icon>account_tree</mat-icon>
+            <p>No hay áreas para mostrar.</p>
+        </div>
+        }
+    </div>
+
+    <!-- Edit Area -->
+    @if (showEditForm && editAreaId !== null) {
+    <div class="editor-panel">
+        <h3><mat-icon>edit</mat-icon> Editar Área #{{ editAreaId }}</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Empresa *</span>
+                <select [(ngModel)]="editAreaForm.companyID">
+                    @for (comp of companies; track comp.companyID) {
+                    <option [value]="comp.companyID">{{ comp.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="editAreaForm.name" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Código</span>
+                <input [(ngModel)]="editAreaForm.code" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Responsable</span>
+                <input [(ngModel)]="editAreaForm.managerName" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Email Responsable</span>
+                <input type="email" [(ngModel)]="editAreaForm.managerEmail" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Descripción</span>
+                <textarea rows="2" [(ngModel)]="editAreaForm.description"></textarea>
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="cancelEditArea()">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="saveEditArea()">
+                <mat-icon>save</mat-icon> Guardar Cambios
+            </button>
+        </div>
+    </div>
+    }
+    }
+    }
+
+    <!-- ═══════════════════════════════════════════════════════
+         JOB TYPES TAB
+         ═══════════════════════════════════════════════════════ -->
+    @if (activeTab === 'jobtypes') {
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>work</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ jobTypes.length }}</span>
+                <span class="kpi-card__label">Total Cargos</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ activeJobTypes }}</span>
+                <span class="kpi-card__label">Activos</span>
+            </div>
+        </div>
+    </div>
+
+    @if (showForm) {
+    <div class="editor-panel">
+        <h3><mat-icon>work</mat-icon> Nuevo Tipo de Cargo</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="jobTypeForm.name" placeholder="Ej: Analista, Gerente..." />
+            </label>
+            <label class="editor-panel__field">
+                <span>Nivel</span>
+                <input [(ngModel)]="jobTypeForm.level" placeholder="Junior, Senior, Lead..." />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Descripción</span>
+                <textarea rows="2" [(ngModel)]="jobTypeForm.description"
+                    placeholder="Descripción del cargo..."></textarea>
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="createJobType()">
+                <mat-icon>save</mat-icon> Crear Cargo
+            </button>
+        </div>
+    </div>
+    }
+
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="jobTypeSearch" (ngModelChange)="applyFilter()"
+                placeholder="Buscar por nombre, descripción, nivel..." class="admin-filters__search" />
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredJobTypes.length }} cargos</span>
+            <button class="btn btn--primary btn--sm" (click)="showForm = !showForm">
+                <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
+                {{ showForm ? 'Cerrar' : 'Crear Nuevo' }}
+            </button>
+        </div>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando cargos...</span></div>
+    }
+
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Nivel</th>
+                    <th>Usuarios</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (j of filteredJobTypes; track j.jobTypeID) {
+                <tr>
+                    <td><strong>#{{ j.jobTypeID }}</strong></td>
+                    <td><strong style="color:#0f172a">{{ j.name }}</strong></td>
+                    <td class="truncate-cell">{{ j.description || '—' }}</td>
+                    <td><span class="badge badge--purple">{{ j.level || '—' }}</span></td>
+                    <td><span class="badge badge--indigo">{{ j.userCount }}</span></td>
+                    <td>
+                        <span [class]="j.isActive ? 'badge badge--success' : 'badge badge--danger'">
+                            {{ j.isActive ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn btn--outline btn--xs" (click)="startEditJobType(j); $event.stopPropagation()"
+                            title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="btn btn--outline btn--xs" (click)="toggleJobType(j); $event.stopPropagation()"
+                            [title]="j.isActive ? 'Desactivar' : 'Activar'">
+                            <mat-icon>{{ j.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredJobTypes.length === 0) {
+        <div class="empty-state">
+            <mat-icon>work</mat-icon>
+            <p>No hay tipos de cargo para mostrar.</p>
+        </div>
+        }
+    </div>
+
+    <!-- Edit JobType -->
+    @if (showEditForm && editJobTypeId !== null) {
+    <div class="editor-panel">
+        <h3><mat-icon>edit</mat-icon> Editar Cargo #{{ editJobTypeId }}</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="editJobTypeForm.name" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Nivel</span>
+                <input [(ngModel)]="editJobTypeForm.level" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Descripción</span>
+                <textarea rows="2" [(ngModel)]="editJobTypeForm.description"></textarea>
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="cancelEditJobType()">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="saveEditJobType()">
+                <mat-icon>save</mat-icon> Guardar Cambios
+            </button>
+        </div>
+    </div>
+    }
+    }
+    }
+</section>

@@ -6,8 +6,7 @@ import { BackgroundCirclesInvertedComponent } from 'app/shared/components/ui/bac
 import { AuthService } from 'app/core/services/auth.service';
 import { ConsentService } from 'app/core/services/consent.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
-import { UsersService } from 'app/core/services/users.service';
-import { catchError, map, of, switchMap, take } from 'rxjs';
+import { catchError, of, switchMap, take } from 'rxjs';
 
 @Component({
     selector: 'app-informed-consent',
@@ -32,7 +31,6 @@ export class InformedConsentComponent {
         private _router: Router,
         private readonly authService: AuthService,
         private readonly consentService: ConsentService,
-        private readonly usersService: UsersService,
         private readonly alert: AlertService
     ) {
         this.consentForm = this._formBuilder.group({
@@ -80,15 +78,8 @@ export class InformedConsentComponent {
                                             const isEmployee = roles.includes('Employee');
                                             if (isSystemAdmin) return of('/home');
 
-                                            return this.usersService.getMyProfile().pipe(
-                                                take(1),
-                                                map((profile) => {
-                                                    const isProfileComplete = !!profile?.documentNumber;
-                                                    if (!isProfileComplete) return '/complete-profile';
-                                                    return isEmployee ? '/emotional-instructions' : '/home';
-                                                }),
-                                                catchError(() => of('/complete-profile'))
-                                            );
+                                            // Profile is completed by admin during user creation.
+                                            return of(isEmployee ? '/emotional-instructions' : '/home');
                                         }),
                                         catchError(() => of('/home'))
                                     )

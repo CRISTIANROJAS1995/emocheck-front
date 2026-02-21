@@ -1,25 +1,76 @@
-<section class="admin-page">
-    <header class="admin-page__header">
-        <div>
-            <h2>Gestión de Casos</h2>
-            <p>Coordina creación, evolución y cierre de casos con trazabilidad operativa.</p>
+<section class="admin-page-wrapper">
+    <!-- Header -->
+    <header class="admin-page-header">
+        <div class="admin-page-header__left">
+            <div class="admin-page-header__badge">SEGUIMIENTO CLINICO</div>
+            <h1>Seguimiento de Casos</h1>
+            <p>Gestiona el ciclo de vida de casos clínicos con seguimientos detallados.</p>
         </div>
-        <a routerLink="/admin" class="admin-page__back">Volver al Centro Admin</a>
+        <div class="admin-page-header__actions">
+            <a routerLink="/admin" class="btn btn--outline btn--sm">
+                <mat-icon>arrow_back</mat-icon> Volver
+            </a>
+        </div>
     </header>
 
-    <div class="admin-editor">
-        <div class="admin-editor__title">Crear caso</div>
-        <div class="admin-form-grid">
-            <label>
-                AlertId *
-                <input type="number" [(ngModel)]="form.alertId" />
+    <!-- KPIs -->
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>folder</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ cases.length }}</span>
+                <span class="kpi-card__label">Total Casos</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--amber">
+            <div class="kpi-card__icon"><mat-icon>folder_open</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ openCount }}</span>
+                <span class="kpi-card__label">Abiertos</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--sky">
+            <div class="kpi-card__icon"><mat-icon>pending</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ inProgressCount }}</span>
+                <span class="kpi-card__label">En Progreso</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>task_alt</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ closedCount }}</span>
+                <span class="kpi-card__label">Cerrados</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Form -->
+    @if (activeTab === 'create') {
+    <div class="editor-panel">
+        <h3><mat-icon>add_circle</mat-icon> Crear Nuevo Caso</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Alerta *</span>
+                <select [(ngModel)]="form.alertId">
+                    <option [ngValue]="0" disabled>-- Seleccionar alerta --</option>
+                    @for (a of alerts; track a.alertId) {
+                    <option [ngValue]="a.alertId">#{{ a.alertId }} - {{ a.alertLevel ?? 'N/A' }} - {{ a.description ??
+                        'Sin descripción' | slice:0:50 }}</option>
+                    }
+                </select>
             </label>
-            <label>
-                Psicólogo asignado (ID) *
-                <input type="number" [(ngModel)]="form.assignedToPsychologistId" />
+            <label class="editor-panel__field">
+                <span>Psicólogo asignado *</span>
+                <select [(ngModel)]="form.assignedToPsychologistId">
+                    <option [ngValue]="0" disabled>-- Seleccionar psicólogo --</option>
+                    @for (p of psychologists; track p.userId) {
+                    <option [ngValue]="p.userId">{{ p.fullName }} ({{ p.email }})</option>
+                    }
+                </select>
             </label>
-            <label>
-                Prioridad
+            <label class="editor-panel__field">
+                <span>Prioridad</span>
                 <select [(ngModel)]="form.priority">
                     <option value="Low">Baja</option>
                     <option value="Medium">Media</option>
@@ -27,87 +78,226 @@
                     <option value="Critical">Crítica</option>
                 </select>
             </label>
-            <label>
-                Valoración inicial *
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Valoración inicial *</span>
                 <textarea rows="3" [(ngModel)]="form.initialAssessment"></textarea>
             </label>
-            <label>
-                Plan de intervención *
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Plan de intervención *</span>
                 <textarea rows="3" [(ngModel)]="form.interventionPlan"></textarea>
             </label>
         </div>
-        <div class="admin-editor__actions">
-            <button mat-flat-button color="primary" [disabled]="saving" (click)="create()">Crear Caso</button>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="activeTab = 'list'">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="createCase()">
+                <mat-icon>save</mat-icon> Crear Caso
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- List Tab -->
+    @if (activeTab === 'list') {
+    <!-- Filters -->
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">filter_list</mat-icon>
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
+                placeholder="Buscar por caso, usuario..." class="admin-filters__search" />
+            <select [(ngModel)]="statusFilter" (ngModelChange)="load()">
+                <option value="">Todos los estados</option>
+                <option value="Open">Abierto</option>
+                <option value="InProgress">En Progreso</option>
+                <option value="Resolved">Resuelto</option>
+                <option value="Closed">Cerrado</option>
+            </select>
+            <select [(ngModel)]="priorityFilter" (ngModelChange)="load()">
+                <option value="">Todas las prioridades</option>
+                <option value="Low">Baja</option>
+                <option value="Medium">Media</option>
+                <option value="High">Alta</option>
+                <option value="Critical">Crítica</option>
+            </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredCases.length }} casos</span>
+            <button class="btn btn--primary btn--sm" (click)="activeTab = activeTab === 'create' ? 'list' : 'create'">
+                <mat-icon>{{ activeTab === 'create' ? 'list' : 'add' }}</mat-icon>
+                {{ activeTab === 'create' ? 'Ver Lista' : 'Nuevo Caso' }}
+            </button>
         </div>
     </div>
 
-    <div class="admin-page__filters">
-        <label>
-            Estado
-            <select [(ngModel)]="status">
-                <option value="">Todos</option>
-                <option value="Open">Open</option>
-                <option value="InProgress">InProgress</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Closed">Closed</option>
-            </select>
-        </label>
-
-        <label>
-            Prioridad
-            <select [(ngModel)]="priority">
-                <option value="">Todas</option>
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-            </select>
-        </label>
-
-        <button mat-flat-button color="primary" (click)="load()">Aplicar filtros</button>
+    <!-- Loading -->
+    @if (loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando casos...</span>
     </div>
+    }
 
-    <div class="admin-table" *ngIf="!loading">
-        <div class="admin-row admin-row--head">
-            <div>ID</div>
-            <div>Estado</div>
-            <div>Prioridad</div>
-            <div>Usuario</div>
-            <div>Acción</div>
+    <!-- Table -->
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th (click)="toggleSort('caseTrackingId')" [class]="sortClass('caseTrackingId')">ID</th>
+                    <th (click)="toggleSort('caseNumber')" [class]="sortClass('caseNumber')">Caso #</th>
+                    <th (click)="toggleSort('status')" [class]="sortClass('status')">Estado</th>
+                    <th (click)="toggleSort('priority')" [class]="sortClass('priority')">Prioridad</th>
+                    <th>Usuario</th>
+                    <th>Psicólogo</th>
+                    <th (click)="toggleSort('openedAt')" [class]="sortClass('openedAt')">Apertura</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (c of filteredCases; track c.caseTrackingId) {
+                <tr [class.row--selected]="selectedCase?.caseTrackingId === c.caseTrackingId" (click)="selectCase(c)">
+                    <td><strong>#{{ c.caseTrackingId }}</strong></td>
+                    <td>{{ c.caseNumber || '-' }}</td>
+                    <td><span [class]="statusBadge(c.status)">{{ c.status || 'N/A' }}</span></td>
+                    <td><span [class]="priorityBadge(c.priority)">{{ c.priority || 'N/A' }}</span></td>
+                    <td>
+                        @if (c.userInitials) {
+                        <span class="avatar-sm">{{ c.userInitials }}</span>
+                        }
+                        {{ c.userName || '-' }}
+                    </td>
+                    <td>{{ c.assignedToPsychologistName || '-' }}</td>
+                    <td>{{ c.openedAt | date:'dd/MM/yyyy' }}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn--outline btn--xs" (click)="selectCase(c); $event.stopPropagation()">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                        @if (c.status !== 'Closed' && c.status !== 'Resolved') {
+                        <button class="btn btn--danger btn--xs"
+                            (click)="selectedCase = c; closeCase(); $event.stopPropagation()" [disabled]="saving">
+                            <mat-icon>lock</mat-icon>
+                        </button>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredCases.length === 0) {
+        <div class="empty-state">
+            <mat-icon>folder_off</mat-icon>
+            <p>No hay casos para los filtros seleccionados.</p>
         </div>
+        }
+    </div>
+    }
+    }
 
-        <div class="admin-row" *ngFor="let row of cases"
-            [class.admin-row--active]="row.caseTrackingId === selectedCaseId">
-            <div>{{ row.caseTrackingId }}</div>
-            <div>{{ row.status || '-' }}</div>
-            <div>{{ row.priority || '-' }}</div>
-            <div>{{ row.userInitials || '-' }}</div>
-            <div>
-                <button mat-button (click)="selectCase(row)">Editar</button>
+    <!-- Detail Panel -->
+    @if (selectedCase; as current) {
+    <div class="detail-panel">
+        <div class="detail-panel__header">
+            <h3>Caso #{{ current.caseTrackingId }} — {{ current.caseNumber || 'Sin número' }}</h3>
+            <button class="btn btn--ghost btn--sm" (click)="selectedCase = null">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div class="detail-panel__grid">
+            <div class="detail-panel__field">
+                <label>Estado</label>
+                <span [class]="statusBadge(current.status)">{{ current.status }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Prioridad</label>
+                <span [class]="priorityBadge(current.priority)">{{ current.priority }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Usuario</label>
+                <span>{{ current.userName || current.userInitials || current.userId }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Psicólogo</label>
+                <span>{{ current.assignedToPsychologistName || 'No asignado' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Apertura</label>
+                <span>{{ current.openedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Cierre</label>
+                <span>{{ current.closedAt ? (current.closedAt | date:'dd/MM/yyyy HH:mm') : 'Abierto' }}</span>
+            </div>
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Valoración Inicial</label>
+                <span>{{ current.initialAssessment || '-' }}</span>
+            </div>
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Plan de Intervención</label>
+                <span>{{ current.interventionPlan || '-' }}</span>
             </div>
         </div>
 
-        <div class="admin-empty" *ngIf="!cases.length">No hay casos para los filtros seleccionados.</div>
-    </div>
-
-    <div class="admin-empty" *ngIf="loading">Cargando casos...</div>
-
-    <div class="admin-editor" *ngIf="selectedCase as current">
-        <div class="admin-editor__title">Editar caso #{{ current.caseTrackingId }}</div>
-        <div class="admin-form-grid">
-            <label>
-                Estado *
-                <input [(ngModel)]="editStatus" />
-            </label>
-            <label>
-                Notas de progreso *
-                <textarea rows="3" [(ngModel)]="editProgressNotes"></textarea>
-            </label>
+        <!-- Edit section -->
+        @if (current.status !== 'Closed' && current.status !== 'Resolved') {
+        <div class="edit-section">
+            <h4>Actualizar caso</h4>
+            <div class="edit-section__row">
+                <label class="editor-panel__field">
+                    <span>Estado</span>
+                    <select [(ngModel)]="editStatus">
+                        <option value="Open">Abierto</option>
+                        <option value="InProgress">En Progreso</option>
+                        <option value="Resolved">Resuelto</option>
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Notas de progreso</span>
+                    <textarea rows="2" [(ngModel)]="editNotes"></textarea>
+                </label>
+            </div>
+            <div class="edit-section__actions">
+                <button class="btn btn--primary btn--sm" [disabled]="saving" (click)="updateCase()">
+                    <mat-icon>save</mat-icon> Guardar Cambios
+                </button>
+            </div>
         </div>
-        <div class="admin-editor__actions">
-            <button mat-stroked-button (click)="clearSelection()">Cancelar</button>
-            <button mat-flat-button color="primary" [disabled]="saving" (click)="updateSelectedCase()">Guardar</button>
-            <button mat-stroked-button color="warn" [disabled]="saving" (click)="closeSelectedCase()">Cerrar</button>
+        }
+
+        <!-- Follow-ups Timeline -->
+        <div class="follow-ups">
+            <h4><mat-icon>timeline</mat-icon> Seguimientos ({{ followUps.length }})</h4>
+            @if (followUpLoading) {
+            <div class="loading-state loading-state--sm">
+                <mat-spinner diameter="24"></mat-spinner>
+            </div>
+            }
+            @for (fu of followUps; track fu.followUpId) {
+            <div class="follow-up-item">
+                <div class="follow-up-item__dot"></div>
+                <div class="follow-up-item__content">
+                    <div class="follow-up-item__meta">
+                        <strong>{{ fu.createdByName || 'Sistema' }}</strong>
+                        <span>{{ fu.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <p>{{ fu.notes }}</p>
+                </div>
+            </div>
+            }
+            @if (!followUpLoading && followUps.length === 0) {
+            <p class="follow-ups-empty">No hay seguimientos registrados.</p>
+            }
+
+            <!-- Add follow-up -->
+            @if (current.status !== 'Closed' && current.status !== 'Resolved') {
+            <div class="follow-up-add">
+                <textarea rows="2" [(ngModel)]="newFollowUpNotes"
+                    placeholder="Agregar nota de seguimiento..."></textarea>
+                <button class="btn btn--primary btn--sm" [disabled]="saving || !newFollowUpNotes.trim()"
+                    (click)="addFollowUp()">
+                    <mat-icon>send</mat-icon> Agregar
+                </button>
+            </div>
+            }
         </div>
     </div>
+    }
 </section>

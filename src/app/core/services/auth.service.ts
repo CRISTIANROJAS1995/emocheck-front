@@ -29,7 +29,7 @@ export class AuthService {
             const v = (roleName ?? '').trim();
             const k = v.toLowerCase();
 
-            if (k === 'system admin') return 'SystemAdmin';
+            if (k === 'system admin' || k === 'superadmin' || k === 'super admin') return 'SystemAdmin';
             if (k === 'company admin') return 'CompanyAdmin';
             if (k === 'hse leader') return 'HSE';
             if (k === 'arl admin') return 'Admin';
@@ -59,21 +59,46 @@ export class AuthService {
             name: String(data?.fullName ?? data?.name ?? ''),
             email: String(data?.email ?? ''),
             roles,
-            companyId: data?.company?.id ?? undefined,
-            companyName: data?.company?.name ?? undefined,
+            companyId: data?.companyID ?? data?.company?.id ?? undefined,
+            companyName: data?.companyName ?? data?.company?.name ?? undefined,
         };
     }
 
+    /**
+     * Extract the user ID from the JWT token payload.
+     */
+    private getUserIdFromToken(): number | null {
+        const token = this.getToken();
+        if (!token) return null;
+        try {
+            const payload = token.split('.')[1];
+            const decoded = JSON.parse(atob(payload));
+            const id = Number(decoded?.sub || decoded?.nameid || 0);
+            return id > 0 ? id : null;
+        } catch {
+            return null;
+        }
+    }
+
     private fetchCurrentUserFromApi(): Observable<User> {
-        return this.httpClient.get<ApiResponse<any>>(`${this.apiUrl}/users/current`).pipe(
-            map((res) => {
-                if (!res?.success) {
+        const userId = this.getUserIdFromToken();
+        if (!userId) {
+            return throwError(() => ({ status: 401, message: 'No se pudo obtener el ID del usuario desde el token' }));
+        }
+
+        return this.httpClient.get<any>(`${this.apiUrl}/users/${userId}`).pipe(
+            map((res: any) => {
+                // Handle both wrapped (ApiResponse with data) and flat response formats
+                const userData = res?.data ?? res;
+
+                // If wrapped response, check success flag
+                if (typeof res?.success === 'boolean' && !res.success) {
                     throw { status: 400, message: res?.message || 'No fue posible obtener el usuario actual', errors: res?.errors };
                 }
 
-                const user = this.mapApiUserToAuthUser(res.data ?? {});
+                const user = this.mapApiUserToAuthUser(userData ?? {});
                 if (!user?.id || user.id <= 0) {
-                    throw { status: 500, message: 'Respuesta inválida de /users/current (userID)' };
+                    throw { status: 500, message: 'Respuesta inválida de /users (userID)' };
                 }
                 return user;
             })
@@ -177,13 +202,15 @@ export class AuthService {
                 password: passwordRaw,
             })
             .pipe(
-                map((response) => {
+                map((response: any) => {
                     if (!response?.success) {
                         const msg = response?.message || 'No fue posible iniciar sesión';
                         throw { status: 401, message: msg, errors: response?.errors };
                     }
 
-                    const data = response.data;
+                    // The backend may return the token inside `data` (ApiResponse<T> wrapper)
+                    // OR directly at root level (flat response). Handle both formats.
+                    const data = response.data ?? response;
                     const token = (data?.accessToken || data?.token || '').trim();
                     if (!token) {
                         throw { status: 500, message: 'El backend no devolvió un token válido' };
@@ -191,8 +218,9 @@ export class AuthService {
 
                     const refreshToken = (data?.refreshToken || '').trim();
                     const expiresIn = typeof data?.expiresIn === 'number' ? data.expiresIn : 0;
+                    const user = data?.user ?? response?.user;
 
-                    return { token, refreshToken, expiresIn };
+                    return { token, refreshToken, expiresIn, user };
                 }),
                 tap(({ token, refreshToken }) => {
                     // Prevent stale user-bound caches (e.g. assessment local state) from
@@ -278,13 +306,14 @@ export class AuthService {
                 refreshToken,
             })
             .pipe(
-                map((response) => {
+                map((response: any) => {
                     if (!response?.success) {
                         const msg = response?.message || 'No fue posible renovar la sesión';
                         throw { status: 401, message: msg, errors: response?.errors };
                     }
 
-                    const data = response.data;
+                    // Handle both wrapped (data.token) and flat (token) response formats
+                    const data = response.data ?? response;
                     const nextToken = (data?.accessToken || data?.token || '').trim();
                     const nextRefresh = (data?.refreshToken || '').trim();
 

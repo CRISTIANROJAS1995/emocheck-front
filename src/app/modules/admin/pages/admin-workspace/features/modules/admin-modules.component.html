@@ -1,39 +1,328 @@
-<section class="admin-page">
-    <header class="admin-page__header">
-        <div>
-            <h2>Módulos de Evaluación</h2>
-            <p>Consulta módulos activos y su configuración.</p>
+<section class="admin-page-wrapper">
+    <!-- Header -->
+    <header class="admin-page-header">
+        <div class="admin-page-header__left">
+            <div class="admin-page-header__badge">MODULOS Y EVALUACIONES</div>
+            @if (viewMode === 'list') {
+            <h1>Módulos de Evaluación</h1>
+            <p>Gestiona los módulos del sistema de evaluación.</p>
+            } @else {
+            <h1>{{ selectedModule?.module?.name ?? 'Módulo' }}</h1>
+            <p>{{ selectedModule?.module?.description ?? '' }}</p>
+            }
         </div>
-        <a routerLink="/admin" class="admin-page__back">Volver al Centro Admin</a>
+        <div class="admin-page-header__actions">
+            @if (viewMode === 'detail') {
+            <button class="btn btn--outline btn--sm" (click)="backToList()">
+                <mat-icon>arrow_back</mat-icon> Volver a Módulos
+            </button>
+            }
+            <a routerLink="/admin" class="btn btn--outline btn--sm">
+                <mat-icon>arrow_back</mat-icon> Admin
+            </a>
+        </div>
     </header>
 
-    <div class="admin-page__filters">
-        <label>
-            Buscar
-            <input [(ngModel)]="search" placeholder="Nombre o descripción" />
-        </label>
-        <button mat-flat-button color="primary" (click)="load()">Actualizar</button>
+    <!-- KPIs -->
+    @if (viewMode === 'list') {
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>view_module</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ modules.length }}</span>
+                <span class="kpi-card__label">Total Módulos</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ activeCount }}</span>
+                <span class="kpi-card__label">Activos</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--amber">
+            <div class="kpi-card__icon"><mat-icon>cancel</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ modules.length - activeCount }}</span>
+                <span class="kpi-card__label">Inactivos</span>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Module Detail KPIs -->
+    @if (viewMode === 'detail' && selectedModule) {
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--sky">
+            <div class="kpi-card__icon"><mat-icon>quiz</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ totalQuestions }}</span>
+                <span class="kpi-card__label">Preguntas</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>speed</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ selectedModule.module?.maxScore ?? 0 }}</span>
+                <span class="kpi-card__label">Puntaje Máximo</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>{{ selectedModule.module?.isActive ? 'check_circle' : 'cancel'
+                    }}</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ selectedModule.module?.isActive ? 'Sí' : 'No' }}</span>
+                <span class="kpi-card__label">Activo</span>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- ═══════════ CREATE MODULE FORM ═══════════ -->
+    @if (viewMode === 'list' && showCreateModule) {
+    <div class="editor-panel">
+        <h3><mat-icon>add_circle</mat-icon> Crear Nuevo Módulo</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="moduleForm.name" placeholder="Nombre del módulo" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Tipo de Instrumento</span>
+                <input [(ngModel)]="moduleForm.instrumentType" placeholder="Ej: Likert, Cuestionario..." />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Descripción</span>
+                <textarea [(ngModel)]="moduleForm.description" placeholder="Descripción del módulo..."
+                    rows="2"></textarea>
+            </label>
+            <label class="editor-panel__field">
+                <span>Puntaje Máximo</span>
+                <input type="number" [(ngModel)]="moduleForm.maxScore" placeholder="100" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Tiempo Estimado (min) *</span>
+                <input type="number" [(ngModel)]="moduleForm.estimatedMinutes" placeholder="10" min="1" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Orden de Visualización</span>
+                <input type="number" [(ngModel)]="moduleForm.orderIndex" placeholder="0" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showCreateModule = false">Cancelar</button>
+            <button class="btn btn--primary" (click)="createModule()" [disabled]="saving">
+                <mat-icon>save</mat-icon> Crear Módulo
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- ═══════════ LIST VIEW ═══════════ -->
+    @if (viewMode === 'list') {
+    <!-- Filters -->
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="search" placeholder="Buscar módulo por nombre..."
+                class="admin-filters__search" />
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredModules.length }} módulos</span>
+            <button class="btn btn--primary btn--sm" (click)="showCreateModule = !showCreateModule">
+                <mat-icon>{{ showCreateModule ? 'close' : 'add' }}</mat-icon>
+                {{ showCreateModule ? 'Cerrar' : 'Nuevo Módulo' }}
+            </button>
+        </div>
     </div>
 
-    <div class="admin-table" *ngIf="!loading">
-        <div class="admin-row admin-row--head">
-            <div>ID</div>
-            <div>Nombre</div>
-            <div>Tipo</div>
-            <div>Activo</div>
-            <div>Max</div>
-        </div>
-
-        <div class="admin-row" *ngFor="let row of filteredModules">
-            <div>{{ row.assessmentModuleID }}</div>
-            <div>{{ row.moduleName || '-' }}</div>
-            <div>{{ row.instrumentType || '-' }}</div>
-            <div>{{ row.isActive ? 'Sí' : 'No' }}</div>
-            <div>{{ row.maxScore ?? '-' }}</div>
-        </div>
-
-        <div class="admin-empty" *ngIf="!filteredModules.length">No hay módulos para mostrar.</div>
+    @if (loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando módulos...</span>
     </div>
+    }
 
-    <div class="admin-empty" *ngIf="loading">Cargando módulos...</div>
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th (click)="toggleSort('moduleID')" [class]="sortClass('moduleID')">ID</th>
+                    <th (click)="toggleSort('name')" [class]="sortClass('name')">Nombre</th>
+                    <th>Tipo</th>
+                    <th>Descripción</th>
+                    <th>Puntaje Máx</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (mod of filteredModules; track mod.moduleID) {
+                <tr>
+                    <td><strong>#{{ mod.moduleID }}</strong></td>
+                    <td>{{ mod.name || '-' }}</td>
+                    <td><span class="badge badge--info">{{ mod.instrumentType || '-' }}</span></td>
+                    <td class="truncate-cell">{{ mod.description || '-' }}</td>
+                    <td>{{ mod.maxScore ?? 0 }}</td>
+                    <td>
+                        <span [class]="mod.isActive ? 'badge badge--success' : 'badge badge--neutral'">
+                            {{ mod.isActive ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="actions-cell">
+                        <button class="btn btn--primary btn--xs" (click)="openDetail(mod)" title="Ver completo">
+                            <mat-icon>visibility</mat-icon>
+                        </button>
+                        <button class="btn btn--danger btn--xs" (click)="deleteModule(mod)" [disabled]="saving"
+                            title="Eliminar">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredModules.length === 0) {
+        <div class="empty-state">
+            <mat-icon>view_module</mat-icon>
+            <p>No hay módulos para mostrar.</p>
+        </div>
+        }
+    </div>
+    }
+    }
+
+    <!-- ═══════════ DETAIL VIEW ═══════════ -->
+    @if (viewMode === 'detail') {
+    @if (detailLoading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando módulo completo...</span>
+    </div>
+    }
+
+    @if (!detailLoading && selectedModule) {
+
+    <!-- Module info card (read mode) -->
+    @if (editingModuleId === null) {
+    <div class="detail-panel">
+        <div class="detail-panel__header">
+            <h3>Información del Módulo</h3>
+            <div style="display:flex;gap:6px">
+                <button class="btn btn--primary btn--xs" (click)="startEditModule()" title="Editar módulo">
+                    <mat-icon>edit</mat-icon> Editar
+                </button>
+                <button class="btn btn--danger btn--xs" (click)="deleteModule(selectedModule!.module)"
+                    [disabled]="saving" title="Eliminar módulo">
+                    <mat-icon>delete</mat-icon> Eliminar
+                </button>
+            </div>
+        </div>
+        <div class="detail-panel__grid">
+            <div class="detail-panel__field">
+                <label>Nombre</label>
+                <span>{{ selectedModule.module?.name }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Tipo de Instrumento</label>
+                <span>{{ selectedModule.module?.instrumentType || 'No especificado' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Puntaje Máximo</label>
+                <span>{{ selectedModule.module?.maxScore ?? 0 }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Tiempo Estimado</label>
+                <span>{{ selectedModule.module?.estimatedMinutes ?? 0 }} min</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Orden</label>
+                <span>{{ selectedModule.module?.orderIndex ?? 0 }}</span>
+            </div>
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Descripción</label>
+                <span>{{ selectedModule.module?.description || 'Sin descripción' }}</span>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Module info card (edit mode) -->
+    @if (editingModuleId !== null) {
+    <div class="editor-panel">
+        <h3><mat-icon>edit</mat-icon> Editar Módulo #{{ editingModuleId }}</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Nombre *</span>
+                <input [(ngModel)]="editModuleForm.name" placeholder="Nombre del módulo" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Tipo de Instrumento</span>
+                <input [(ngModel)]="editModuleForm.instrumentType" placeholder="Ej: Likert, Cuestionario..." />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Descripción</span>
+                <textarea [(ngModel)]="editModuleForm.description" placeholder="Descripción..." rows="2"></textarea>
+            </label>
+            <label class="editor-panel__field">
+                <span>Puntaje Máximo</span>
+                <input type="number" [(ngModel)]="editModuleForm.maxScore" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Tiempo Estimado (min)</span>
+                <input type="number" [(ngModel)]="editModuleForm.estimatedMinutes" min="1" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Orden</span>
+                <input type="number" [(ngModel)]="editModuleForm.orderIndex" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="cancelEditModule()">Cancelar</button>
+            <button class="btn btn--primary" (click)="saveEditModule()" [disabled]="saving">
+                <mat-icon>save</mat-icon> Guardar Cambios
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- Questions Section (read-only from backend) -->
+    @if (selectedModule.questions.length > 0) {
+    <div class="detail-panel" style="margin-top:16px">
+        <div class="detail-panel__header">
+            <h3><mat-icon>quiz</mat-icon> Preguntas ({{ selectedModule.questions.length }})</h3>
+        </div>
+        <table class="admin-table admin-table--nested">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Pregunta</th>
+                    <th>Tipo Respuesta</th>
+                    <th>Requerida</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (q of selectedModule.questions; track q.questionID; let i = $index) {
+                <tr>
+                    <td>{{ q.orderIndex ?? (i + 1) }}</td>
+                    <td>{{ q.questionText || '-' }}</td>
+                    <td><span class="badge badge--info">{{ q.responseType || 'N/A' }}</span></td>
+                    <td>{{ q.isRequired ? 'Sí' : 'No' }}</td>
+                    <td>{{ q.options?.length ?? 0 }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    } @else {
+    <div class="empty-state" style="margin-top:16px">
+        <mat-icon>quiz</mat-icon>
+        <p>Este módulo no tiene preguntas configuradas.</p>
+    </div>
+    }
+
+    }
+    }
 </section>

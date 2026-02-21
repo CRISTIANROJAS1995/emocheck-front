@@ -110,6 +110,22 @@ export class NavigationService {
                         link: '/admin/users',
                         classes: baseItemClasses,
                     },
+                    {
+                        id: 'admin-audit',
+                        title: 'Auditoría',
+                        type: 'basic',
+                        icon: 'heroicons_outline:clipboard-document-list',
+                        link: '/admin/audit',
+                        classes: baseItemClasses,
+                    },
+                    {
+                        id: 'admin-config',
+                        title: 'Organización',
+                        type: 'basic',
+                        icon: 'heroicons_outline:cog-6-tooth',
+                        link: '/admin/config',
+                        classes: baseItemClasses,
+                    },
                 ],
             });
         } else {

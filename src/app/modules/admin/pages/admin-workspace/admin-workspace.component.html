@@ -1,20 +1,68 @@
-<section class="admin-workspace">
-    <header class="admin-workspace__header">
-        <div>
-            <div class="admin-workspace__badge">PANEL EXPERTO</div>
-            <h1 class="admin-workspace__title">Centro de Administración</h1>
-            <p class="admin-workspace__subtitle">Gestiona alertas, casos, reportes, módulos y usuarios desde un único
-                espacio.</p>
+<section class="admin-hub">
+    <!-- Hero Header -->
+    <header class="admin-hub__header">
+        <div class="admin-hub__header-left">
+            <div class="admin-hub__badge">PANEL DE ADMINISTRACIÓN</div>
+            <h1 class="admin-hub__title">Centro de Control</h1>
+            <p class="admin-hub__subtitle">Gestiona alertas, casos, módulos, usuarios, reportes y auditoría desde un
+                único espacio centralizado.</p>
         </div>
-        <a class="admin-workspace__cta" routerLink="/team-tracking">Ver Dashboard Analítico</a>
+
     </header>
 
-    <div class="admin-workspace__grid" *ngIf="!loading; else loadingTpl">
-        <app-admin-feature-card *ngFor="let card of cards" [title]="card.title" [description]="card.description"
-            [icon]="card.icon" [route]="card.route" [metric]="card.metric" />
+    @if (!loading) {
+    <!-- KPI Cards -->
+    <div class="admin-hub__kpis">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>people</mat-icon></div>
+            <div class="kpi-card__info">
+                <span class="kpi-card__value">{{ indicators?.totalUsers ?? 0 }}</span>
+                <span class="kpi-card__label">Usuarios Totales</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>assignment_turned_in</mat-icon></div>
+            <div class="kpi-card__info">
+                <span class="kpi-card__value">{{ indicators?.totalEvaluationsCompleted ?? 0 }}</span>
+                <span class="kpi-card__label">Evaluaciones</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--amber">
+            <div class="kpi-card__icon"><mat-icon>trending_up</mat-icon></div>
+            <div class="kpi-card__info">
+                <span class="kpi-card__value">{{ (indicators?.participationRate ?? 0) | number:'1.0-1' }}%</span>
+                <span class="kpi-card__label">Participación</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--rose">
+            <div class="kpi-card__icon"><mat-icon>notifications_active</mat-icon></div>
+            <div class="kpi-card__info">
+                <span class="kpi-card__value">{{ alertStats?.totalAlerts ?? 0 }}</span>
+                <span class="kpi-card__label">Alertas Activas</span>
+            </div>
+        </div>
     </div>
 
-    <ng-template #loadingTpl>
-        <div class="admin-workspace__loading">Cargando centro de administración...</div>
-    </ng-template>
+    <!-- Feature Cards Grid -->
+    <div class="admin-hub__grid">
+        @for (card of cards; track card.route) {
+        <a class="feature-card feature-card--{{ card.color }}" [routerLink]="card.route">
+            <div class="feature-card__top">
+                <div class="feature-card__icon-wrap">
+                    <mat-icon [svgIcon]="card.icon"></mat-icon>
+                </div>
+                <span class="feature-card__metric">{{ card.metric }}</span>
+            </div>
+            <h3 class="feature-card__title">{{ card.title }}</h3>
+            <p class="feature-card__desc">{{ card.description }}</p>
+            <span class="feature-card__link">Gestionar <mat-icon>arrow_forward</mat-icon></span>
+        </a>
+        }
+    </div>
+    } @else {
+    <div class="admin-hub__loading">
+        <mat-spinner diameter="36"></mat-spinner>
+        <span>Cargando centro de administración...</span>
+    </div>
+    }
 </section>

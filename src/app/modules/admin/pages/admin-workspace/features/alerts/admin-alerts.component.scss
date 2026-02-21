@@ -1,104 +1,48 @@
-.admin-page {
-    padding: 24px;
+@use '../../admin-shared' as *;
+
+:host {
+    display: block;
+    width: 100%;
 }
 
-.admin-page__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 16px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.admin-page__back {
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.admin-page__filters {
-    margin-top: 14px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-    align-items: end;
-    padding: 14px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.admin-page__filters label {
-    display: grid;
-    gap: 6px;
-    font-size: 12px;
-}
-
-.admin-page__filters input,
-.admin-page__filters select,
-.admin-form-grid input,
-.admin-form-grid textarea {
-    padding: 10px 12px;
+.resolve-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid rgba(0, 0, 0, .12);
     border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    background: white;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+
+    &:focus {
+        border-color: #6366f1;
+        outline: none;
+    }
 }
 
-.admin-table {
-    margin-top: 14px;
-    padding: 14px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+.detail-panel__resolve {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(0, 0, 0, .1);
+
+    h4 {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
 }
 
-.admin-row {
-    display: grid;
-    grid-template-columns: 80px 120px 1fr 120px 140px;
-    gap: 10px;
-    padding: 10px 8px;
-    align-items: center;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.admin-row--head {
-    font-weight: 800;
-    border-top: none;
-}
-
-.admin-row--active {
-    background: rgba(0, 0, 0, 0.04);
-    border-radius: 10px;
-}
-
-.admin-editor {
-    margin-top: 14px;
-    padding: 14px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.admin-editor__title {
-    font-weight: 800;
-    margin-bottom: 10px;
-}
-
-.admin-form-grid {
-    display: grid;
-    gap: 10px;
-}
-
-.admin-editor__actions {
+.detail-panel__actions {
     margin-top: 12px;
     display: flex;
-    gap: 10px;
     justify-content: flex-end;
 }
 
-.admin-empty {
-    margin-top: 10px;
-    opacity: 0.7;
+.actions-cell {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.row--selected {
+    background: rgba(99, 102, 241, .06) !important;
 }

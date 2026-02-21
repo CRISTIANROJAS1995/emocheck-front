@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse } from 'app/core/models/auth.model';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 export interface AdminCaseQuery {
     status?: 'Open' | 'InProgress' | 'Resolved' | 'Closed' | string;
@@ -16,6 +16,7 @@ export interface CaseTrackingDto {
     alertId: number;
     userId: number;
     userInitials?: string;
+    userName?: string;
     assignedToPsychologistId?: number;
     assignedToPsychologistName?: string;
     caseNumber?: string;
@@ -28,6 +29,21 @@ export interface CaseTrackingDto {
     openedAt?: string;
     closedAt?: string;
     nextFollowUpDate?: string;
+}
+
+export interface FollowUpDto {
+    followUpId: number;
+    caseTrackingId: number;
+    notes?: string;
+    followUpDate?: string;
+    createdByUserId?: number;
+    createdByName?: string;
+    createdAt?: string;
+}
+
+export interface CreateFollowUpDto {
+    notes: string;
+    followUpDate?: string;
 }
 
 export interface CreateCaseTrackingDto {
@@ -65,6 +81,16 @@ type BackendCaseTrackingDto = {
     nextFollowUpDate?: string;
 };
 
+type BackendFollowUpDto = {
+    followUpID?: number;
+    caseTrackingID?: number;
+    notes?: string;
+    followUpDate?: string;
+    createdByUserID?: number;
+    createdByName?: string;
+    createdAt?: string;
+};
+
 @Injectable({ providedIn: 'root' })
 export class AdminCaseTrackingService {
     private readonly apiUrl = environment.apiUrl;
@@ -87,6 +113,7 @@ export class AdminCaseTrackingService {
             alertId: Number(row.alertID ?? 0),
             userId: Number(row.userID ?? 0),
             userInitials: this.toInitials(row.userFullName),
+            userName: row.userFullName,
             assignedToPsychologistId:
                 typeof row.assignedToPsychologistID === 'number' ? row.assignedToPsychologistID : undefined,
             assignedToPsychologistName: row.psychologistName,
@@ -103,13 +130,38 @@ export class AdminCaseTrackingService {
         };
     }
 
+    private mapFollowUp(row: BackendFollowUpDto): FollowUpDto {
+        return {
+            followUpId: Number(row.followUpID ?? 0),
+            caseTrackingId: Number(row.caseTrackingID ?? 0),
+            notes: row.notes,
+            followUpDate: row.followUpDate,
+            createdByUserId: typeof row.createdByUserID === 'number' ? row.createdByUserID : undefined,
+            createdByName: row.createdByName,
+            createdAt: row.createdAt,
+        };
+    }
+
+    // ── Cases CRUD ─────────────────────────────
     list(query?: AdminCaseQuery): Observable<CaseTrackingDto[]> {
         return this.http
             .get<unknown>(`${this.apiUrl}/casetracking`)
             .pipe(
                 map((res) => this.unwrapArray<BackendCaseTrackingDto>(res).map((x) => this.mapCase(x))),
-                map((rows) => this.applyClientFilters(rows, query))
+                map((rows) => this.applyClientFilters(rows, query)),
+                catchError(() => of([])),
             );
+    }
+
+    getById(caseId: number): Observable<CaseTrackingDto> {
+        return this.http
+            .get<unknown>(`${this.apiUrl}/casetracking/${caseId}`)
+            .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
+    }
+
+    /** Get cases by status — uses client-side filtering (backend status endpoint is not available) */
+    listByStatus(status: string): Observable<CaseTrackingDto[]> {
+        return this.list({ status });
     }
 
     create(payload: CreateCaseTrackingDto): Observable<CaseTrackingDto> {
@@ -122,7 +174,6 @@ export class AdminCaseTrackingService {
             interventionPlan: payload.interventionPlan,
             nextFollowUpDate: payload.nextFollowUpDate,
         };
-
         return this.http
             .post<unknown>(`${this.apiUrl}/casetracking`, backendPayload)
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
@@ -140,9 +191,28 @@ export class AdminCaseTrackingService {
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
     }
 
+    // ── Follow-ups ─────────────────────────────
+    getFollowUps(caseId: number): Observable<FollowUpDto[]> {
+        return this.http
+            .get<unknown>(`${this.apiUrl}/casetracking/${caseId}/follow-ups`)
+            .pipe(
+                map((res) => this.unwrapArray<BackendFollowUpDto>(res).map((x) => this.mapFollowUp(x))),
+                catchError(() => of([])),
+            );
+    }
+
+    createFollowUp(caseId: number, payload: CreateFollowUpDto): Observable<FollowUpDto | null> {
+        return this.http
+            .post<unknown>(`${this.apiUrl}/casetracking/${caseId}/follow-ups`, payload)
+            .pipe(
+                map((res) => this.mapFollowUp(this.unwrapObject<BackendFollowUpDto>(res))),
+                catchError(() => of(null)),
+            );
+    }
+
+    // ── Client-side filters ─────────────────────
     private applyClientFilters(rows: CaseTrackingDto[], query?: AdminCaseQuery): CaseTrackingDto[] {
         if (!query) return rows;
-
         let filtered = rows;
         if (query.status) {
             const st = String(query.status).toLowerCase();

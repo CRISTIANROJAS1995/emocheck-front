@@ -1,15 +1,22 @@
 import { inject } from '@angular/core';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { UserService } from 'app/core/user/user.service';
-import { forkJoin } from 'rxjs';
+import { AuthService } from 'app/core/services/auth.service';
+import { switchMap, forkJoin } from 'rxjs';
 
 export const initialDataResolver = () => {
     const navigationService = inject(NavigationService);
     const userService = inject(UserService);
+    const authService = inject(AuthService);
 
-    // Fork join multiple API endpoint calls to wait all of them to finish
-    return forkJoin([
-        navigationService.get(),
-        userService.get(),
-    ]);
+    // First ensure the current user (with roles) is loaded,
+    // THEN build navigation based on those roles.
+    return authService.ensureCurrentUserLoaded().pipe(
+        switchMap(() =>
+            forkJoin([
+                navigationService.get(),
+                userService.get(),
+            ])
+        )
+    );
 };

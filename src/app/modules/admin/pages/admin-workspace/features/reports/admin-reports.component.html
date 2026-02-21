@@ -1,71 +1,152 @@
-<section class="admin-page">
-    <header class="admin-page__header">
-        <div>
-            <h2>Reportes y Exportes</h2>
-            <p>Gestiona solicitudes de extracción de datos con control de estado y descarga.</p>
+<section class="admin-page-wrapper">
+    <!-- Header -->
+    <header class="admin-page-header">
+        <div class="admin-page-header__left">
+            <div class="admin-page-header__badge">REPORTES Y DATOS</div>
+            <h1>Reportes y Exportaciones</h1>
+            <p>Solicita y descarga extracciones de datos con trazabilidad completa.</p>
         </div>
-        <a routerLink="/admin" class="admin-page__back">Volver al Centro Admin</a>
+        <div class="admin-page-header__actions">
+            <a routerLink="/admin" class="btn btn--outline btn--sm">
+                <mat-icon>arrow_back</mat-icon> Volver
+            </a>
+        </div>
     </header>
 
-    <div class="admin-page__filters">
-        <label>
-            Tipo
-            <select [(ngModel)]="request.exportType">
-                <option value="Full">Completo</option>
-                <option value="Partial">Parcial</option>
-                <option value="EvaluationsOnly">Solo evaluaciones</option>
-                <option value="PersonalDataOnly">Solo datos personales</option>
-            </select>
-        </label>
-
-        <label>
-            Formato
-            <select [(ngModel)]="request.fileFormat">
-                <option value="CSV">CSV</option>
-                <option value="JSON">JSON</option>
-                <option value="PDF">PDF</option>
-            </select>
-        </label>
-
-        <label>
-            Fecha inicio
-            <input type="date" [(ngModel)]="request.startDate" />
-        </label>
-
-        <label>
-            Fecha fin
-            <input type="date" [(ngModel)]="request.endDate" />
-        </label>
-
-        <label>
-            Motivo *
-            <input [(ngModel)]="request.reason" placeholder="Motivo de exportación" />
-        </label>
-
-        <button mat-flat-button color="primary" [disabled]="saving" (click)="create()">Solicitar Exporte</button>
-    </div>
-
-    <div class="admin-table" *ngIf="!loading">
-        <div class="admin-row admin-row--head">
-            <div>ID</div>
-            <div>Tipo</div>
-            <div>Formato</div>
-            <div>Estado</div>
-            <div>Descargar</div>
-        </div>
-
-        <div class="admin-row" *ngFor="let row of exports">
-            <div>{{ row.dataExportId }}</div>
-            <div>{{ row.exportType || '-' }}</div>
-            <div>{{ row.fileFormat || '-' }}</div>
-            <div>{{ row.status || '-' }}</div>
-            <div>
-                <a class="admin-link" [href]="downloadUrl(row)">Descargar</a>
+    <!-- KPIs -->
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>cloud_download</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ exports.length }}</span>
+                <span class="kpi-card__label">Total Exportaciones</span>
             </div>
         </div>
-
-        <div class="admin-empty" *ngIf="!exports.length">Aún no hay exportes solicitados.</div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ completedCount }}</span>
+                <span class="kpi-card__label">Completadas</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--amber">
+            <div class="kpi-card__icon"><mat-icon>hourglass_empty</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ pendingCount }}</span>
+                <span class="kpi-card__label">En proceso</span>
+            </div>
+        </div>
     </div>
 
-    <div class="admin-empty" *ngIf="loading">Cargando exportes...</div>
+    <!-- Create Form -->
+    @if (showForm) {
+    <div class="editor-panel">
+        <h3><mat-icon>cloud_upload</mat-icon> Solicitar Exportación</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Tipo de exportación</span>
+                <select [(ngModel)]="request.exportType">
+                    <option value="Full">Completo</option>
+                    <option value="Partial">Parcial</option>
+                    <option value="EvaluationsOnly">Solo evaluaciones</option>
+                    <option value="PersonalDataOnly">Solo datos personales</option>
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Formato</span>
+                <select [(ngModel)]="request.fileFormat">
+                    <option value="CSV">CSV</option>
+                    <option value="JSON">JSON</option>
+                    <option value="PDF">PDF</option>
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Desde</span>
+                <input type="date" [(ngModel)]="request.startDate" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Hasta</span>
+                <input type="date" [(ngModel)]="request.endDate" />
+            </label>
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Motivo *</span>
+                <input [(ngModel)]="request.reason" placeholder="Describe el motivo de la exportación" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
+            <button class="btn btn--primary" [disabled]="saving" (click)="create()">
+                <mat-icon>send</mat-icon> Solicitar
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- Filters -->
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
+                placeholder="Buscar por tipo, formato, estado..." class="admin-filters__search" />
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filteredExports.length }} exportaciones</span>
+            <button class="btn btn--primary btn--sm" (click)="showForm = !showForm">
+                <mat-icon>{{ showForm ? 'list' : 'add' }}</mat-icon>
+                {{ showForm ? 'Ver lista' : 'Nueva Exportación' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando exportaciones...</span>
+    </div>
+    }
+
+    <!-- Table -->
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th (click)="toggleSort('dataExportId')" [class]="sortClass('dataExportId')">ID</th>
+                    <th (click)="toggleSort('exportType')" [class]="sortClass('exportType')">Tipo</th>
+                    <th (click)="toggleSort('fileFormat')" [class]="sortClass('fileFormat')">Formato</th>
+                    <th (click)="toggleSort('status')" [class]="sortClass('status')">Estado</th>
+                    <th>Solicitada</th>
+                    <th>Descarga</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (row of filteredExports; track row.dataExportId) {
+                <tr>
+                    <td><strong>#{{ row.dataExportId }}</strong></td>
+                    <td>{{ row.exportType || '-' }}</td>
+                    <td><span class="badge badge--info">{{ row.fileFormat || '-' }}</span></td>
+                    <td><span [class]="statusBadge(row.status)">{{ row.status || 'N/A' }}</span></td>
+                    <td>{{ row.requestedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                        @if ((row.status ?? '').toLowerCase() === 'completed') {
+                        <a [href]="downloadUrl(row)" target="_blank" class="btn btn--primary btn--xs">
+                            <mat-icon>download</mat-icon> Descargar
+                        </a>
+                        } @else {
+                        <span class="text-muted">-</span>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredExports.length === 0) {
+        <div class="empty-state">
+            <mat-icon>cloud_off</mat-icon>
+            <p>No hay exportaciones para mostrar.</p>
+        </div>
+        }
+    </div>
+    }
 </section>

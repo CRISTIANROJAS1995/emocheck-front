@@ -1,10 +1,10 @@
 export const environment = {
     production: false,
-    // API principal (server) para que el resto de módulos sigan funcionando
-    apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
-    apiBaseUrl: 'https://kratosconquer-001-site1.mtempurl.com',
+    // DEV: API local para pruebas (HTTP para evitar ERR_CERT_AUTHORITY_INVALID)
+    apiUrl: 'http://localhost:5230/api',
+    apiBaseUrl: 'http://localhost:5230',
 
-    // Override SOLO para análisis emocional (API local mientras se valida Azure)
+    // Análisis emocional: usa la misma API local
     emotionalAnalysisApiUrl: 'http://localhost:5230/api',
     apiTimeout: 30000,
     appName: 'EmoCheck',

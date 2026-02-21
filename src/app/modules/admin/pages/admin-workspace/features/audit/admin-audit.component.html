@@ -1,0 +1,176 @@
+<section class="admin-page-wrapper">
+    <!-- Header -->
+    <header class="admin-page-header">
+        <div class="admin-page-header__left">
+            <div class="admin-page-header__badge">AUDITORIA Y SEGURIDAD</div>
+            <h1>Auditoría del Sistema</h1>
+            <p>Registros de actividad y logs del sistema para trazabilidad completa.</p>
+        </div>
+        <a routerLink="/admin" class="btn btn--outline btn--sm">
+            <mat-icon>arrow_back</mat-icon> Volver
+        </a>
+    </header>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'audit'"
+            (click)="switchTab('audit')">
+            <mat-icon>history</mat-icon> Auditoría
+        </button>
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'system'"
+            (click)="switchTab('system')">
+            <mat-icon>bug_report</mat-icon> Logs del Sistema
+        </button>
+    </div>
+
+    <!-- ═══════════ AUDIT TAB ═══════════ -->
+    @if (activeTab === 'audit') {
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon"><mat-icon>history</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ auditTotal }}</span>
+                <span class="kpi-card__label">Total Registros</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--sky">
+            <div class="kpi-card__icon"><mat-icon>pages</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ auditPage }}/{{ totalAuditPages }}</span>
+                <span class="kpi-card__label">Página</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="auditSearch" (ngModelChange)="applyAuditFilter()"
+                placeholder="Buscar por tabla, acción, usuario..." class="admin-filters__search" />
+            <input type="date" [(ngModel)]="startDate" />
+            <input type="date" [(ngModel)]="endDate" />
+            <button class="btn btn--primary btn--sm" (click)="auditPage = 1; loadAudit()">
+                <mat-icon>filter_list</mat-icon> Filtrar
+            </button>
+        </div>
+        <span class="admin-filters__count">{{ filteredAuditLogs.length }} mostrados</span>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando auditoría...</span>
+    </div>
+    }
+
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Acción</th>
+                    <th>Tabla</th>
+                    <th>Usuario</th>
+                    <th>Registro</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (log of filteredAuditLogs; track log.auditLogID) {
+                <tr>
+                    <td><strong>#{{ log.auditLogID }}</strong></td>
+                    <td><span [class]="actionBadge(log.action)">{{ log.action || '-' }}</span></td>
+                    <td>{{ log.tableName || '-' }}</td>
+                    <td>{{ log.userName || log.userID || '-' }}</td>
+                    <td>{{ log.recordID || '-' }}</td>
+                    <td>{{ log.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredAuditLogs.length === 0) {
+        <div class="empty-state">
+            <mat-icon>history</mat-icon>
+            <p>No hay registros de auditoría.</p>
+        </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <button class="btn btn--outline btn--sm" [disabled]="auditPage <= 1" (click)="prevPage()">
+            <mat-icon>chevron_left</mat-icon> Anterior
+        </button>
+        <span class="pagination__info">Página {{ auditPage }} de {{ totalAuditPages }} ({{ auditTotal }}
+            registros)</span>
+        <button class="btn btn--outline btn--sm" [disabled]="auditPage >= totalAuditPages" (click)="nextPage()">
+            Siguiente <mat-icon>chevron_right</mat-icon>
+        </button>
+    </div>
+    }
+    }
+
+    <!-- ═══════════ SYSTEM TAB ═══════════ -->
+    @if (activeTab === 'system') {
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--rose">
+            <div class="kpi-card__icon"><mat-icon>bug_report</mat-icon></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ systemLogs.length }}</span>
+                <span class="kpi-card__label">Errores del Sistema</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="systemSearch" (ngModelChange)="applySystemFilter()"
+                placeholder="Buscar por mensaje, nivel, fuente..." class="admin-filters__search" />
+        </div>
+        <span class="admin-filters__count">{{ filteredSystemLogs.length }} logs</span>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando logs...</span>
+    </div>
+    }
+
+    @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nivel</th>
+                    <th>Fuente</th>
+                    <th>Mensaje</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (log of filteredSystemLogs; track log.systemLogID) {
+                <tr>
+                    <td><strong>#{{ log.systemLogID }}</strong></td>
+                    <td><span [class]="levelBadge(log.level)">{{ log.level || '-' }}</span></td>
+                    <td>{{ log.source || '-' }}</td>
+                    <td class="truncate-cell">{{ log.message || '-' }}</td>
+                    <td>{{ log.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        @if (filteredSystemLogs.length === 0) {
+        <div class="empty-state">
+            <mat-icon>bug_report</mat-icon>
+            <p>No hay logs del sistema.</p>
+        </div>
+        }
+    </div>
+    }
+    }
+</section>
