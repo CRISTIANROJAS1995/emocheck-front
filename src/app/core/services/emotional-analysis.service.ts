@@ -58,8 +58,7 @@ export class EmotionalAnalysisService {
     }
 
     /**
-     * Realiza un análisis completo con múltiples capturas
-     *
+     * Realiza un análisis completo con múltiples capturas.
      */
     performFullAnalysis(frames: string[]): Observable<EmotionalAnalysisResult> {
         const payload: EmotionalAnalysisApiRequest = {

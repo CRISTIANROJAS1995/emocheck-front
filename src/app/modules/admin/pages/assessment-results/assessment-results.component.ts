@@ -7,6 +7,7 @@ import { AssessmentModuleDefinition, getAssessmentModuleDefinition } from 'app/c
 import { AssessmentResult } from 'app/core/models/assessment.model';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
+import { environment } from 'environments/environment';
 
 @Component({
     selector: 'app-assessment-results',
@@ -62,6 +63,7 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
                 this.assessmentHydration
                     .hydrateModuleResultFromCompletedEvaluations(this.moduleId, safeEvaluationId)
                     .pipe(
+                        switchMap(() => this.assessmentHydration.hydrateRecommendationsIfMissing(this.moduleId)),
                         finalize(() => {
                             this.isHydrating = false;
                         })
@@ -134,32 +136,10 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         this.router.navigate(['/resources']);
     }
 
-    callEmergencyLine(): void {
-        // Universal default as per UI copy.
-        try {
-            window.open('tel:123', '_self');
-        } catch {
-            // ignore
-        }
-
-        // Also offer in-app support center.
-        const evaluationResultId = this.result?.evaluationResultId;
-        this.router.navigate(['/support'], {
-            queryParams: {
-                ...(evaluationResultId ? { evaluationResultId } : {}),
-                mode: 'emergency',
-            },
-        });
-    }
-
     openSupportChat(): void {
-        const evaluationResultId = this.result?.evaluationResultId;
-        this.router.navigate(['/support'], {
-            queryParams: {
-                ...(evaluationResultId ? { evaluationResultId } : {}),
-                mode: 'chat',
-            },
-        });
+        const number = environment.whatsappNumber;
+        const message = encodeURIComponent('¡Hola! Acabo de completar una evaluación en EmoCheck y me gustaría recibir orientación y acompañamiento.');
+        window.open(`https://wa.me/${number}?text=${message}`, '_blank');
     }
 
     downloadResults(): void {

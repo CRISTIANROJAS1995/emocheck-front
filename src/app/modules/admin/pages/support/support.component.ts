@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -12,19 +13,35 @@ import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-
 @Component({
     selector: 'app-support',
     standalone: true,
-    imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, BackgroundCirclesComponent],
+    imports: [CommonModule, FormsModule, RouterModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, BackgroundCirclesComponent],
     templateUrl: './support.component.html',
     styleUrls: ['./support.component.scss'],
 })
 export class SupportComponent implements OnInit {
     loading = true;
+    submitting = false;
     error: string | null = null;
+    successMessage: string | null = null;
 
     evaluationResultId: number | null = null;
     mode: 'emergency' | 'chat' | null = null;
 
     emergencyContacts: EmergencyContactDto[] = [];
     myRequests: SupportRequestDto[] = [];
+
+    // Formulario de nueva solicitud
+    showForm = false;
+    formSubject = '';
+    formDescription = '';
+    formPriority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' = 'MEDIUM';
+    formError: string | null = null;
+
+    readonly priorityOptions = [
+        { value: 'LOW', label: 'Baja' },
+        { value: 'MEDIUM', label: 'Media' },
+        { value: 'HIGH', label: 'Alta' },
+        { value: 'URGENT', label: 'Urgente' },
+    ];
 
     constructor(private readonly route: ActivatedRoute, private readonly support: SupportService) { }
 
@@ -40,11 +57,7 @@ export class SupportComponent implements OnInit {
             emergency: this.support.getEmergencyContacts().pipe(catchError(() => of([]))),
             my: this.support.getMyRequests().pipe(catchError(() => of([]))),
         })
-            .pipe(
-                finalize(() => {
-                    this.loading = false;
-                })
-            )
+            .pipe(finalize(() => { this.loading = false; }))
             .subscribe({
                 next: ({ emergency, my }) => {
                     this.emergencyContacts = emergency;
@@ -57,15 +70,62 @@ export class SupportComponent implements OnInit {
     }
 
     call123(): void {
-        try {
-            window.open('tel:123', '_self');
-        } catch {
-            // ignore
+        try { window.open('tel:123', '_self'); } catch { /* ignore */ }
+    }
+
+    openForm(): void {
+        this.showForm = true;
+        this.formSubject = '';
+        this.formDescription = '';
+        this.formPriority = 'MEDIUM';
+        this.formError = null;
+        this.successMessage = null;
+    }
+
+    closeForm(): void {
+        this.showForm = false;
+        this.formError = null;
+    }
+
+    submitForm(): void {
+        this.formError = null;
+
+        if (!this.formSubject.trim()) {
+            this.formError = 'El asunto es obligatorio.';
+            return;
         }
+        if (!this.formDescription.trim()) {
+            this.formError = 'La descripción es obligatoria.';
+            return;
+        }
+
+        this.submitting = true;
+        this.support
+            .createRequest({
+                requestType: 'PSYCHOLOGICAL',
+                priority: this.formPriority,
+                subject: this.formSubject.trim(),
+                description: this.formDescription.trim(),
+                evaluationID: this.evaluationResultId ?? undefined,
+            })
+            .pipe(finalize(() => (this.submitting = false)))
+            .subscribe({
+                next: () => {
+                    this.showForm = false;
+                    this.successMessage = 'Solicitud creada correctamente. Un profesional te contactará pronto.';
+                    this.reloadMyRequests();
+                },
+                error: (e) => {
+                    this.formError = e?.error?.message
+                        ?? e?.error?.title
+                        ?? e?.message
+                        ?? 'No fue posible crear la solicitud. Intenta de nuevo.';
+                },
+            });
     }
 
     createEmergencyRequest(): void {
-        this.loading = true;
+        this.submitting = true;
         this.support
             .createRequest({
                 requestType: 'PSYCHOLOGICAL',
@@ -74,46 +134,56 @@ export class SupportComponent implements OnInit {
                 description: 'El resultado indica alto riesgo. Requiero apoyo urgente.',
                 evaluationID: this.evaluationResultId ?? undefined,
             })
-            .pipe(finalize(() => (this.loading = false)))
+            .pipe(finalize(() => (this.submitting = false)))
             .subscribe({
                 next: () => {
+                    this.successMessage = 'Solicitud de emergencia creada. Un profesional te contactará pronto.';
                     this.reloadMyRequests();
-                    window.alert('Solicitud creada. Un profesional te contactará pronto.');
                 },
                 error: (e) => {
-                    this.error = e?.message || 'No fue posible crear la solicitud';
+                    this.error = e?.error?.message
+                        ?? e?.error?.title
+                        ?? e?.message
+                        ?? 'No fue posible crear la solicitud de emergencia';
                 },
             });
     }
 
-    createChatRequest(): void {
-        this.loading = true;
-        this.support
-            .createRequest({
-                requestType: 'PSYCHOLOGICAL',
-                priority: 'HIGH',
-                subject: 'Solicitud de apoyo psicológico',
-                description: 'Me gustaría recibir orientación y acompañamiento.',
-                evaluationID: this.evaluationResultId ?? undefined,
-            })
-            .pipe(finalize(() => (this.loading = false)))
-            .subscribe({
-                next: () => {
-                    this.reloadMyRequests();
-                    window.alert('Solicitud creada. Un profesional te contactará pronto.');
-                },
-                error: (e) => {
-                    this.error = e?.message || 'No fue posible crear la solicitud';
-                },
-            });
+    statusLabel(status: string): string {
+        switch ((status ?? '').toUpperCase()) {
+            case 'OPEN': return 'Abierta';
+            case 'IN_PROGRESS': return 'En proceso';
+            case 'RESOLVED': return 'Resuelta';
+            case 'CANCELLED': return 'Cancelada';
+            default: return status;
+        }
+    }
+
+    statusTone(status: string): string {
+        switch ((status ?? '').toUpperCase()) {
+            case 'OPEN': return 'open';
+            case 'IN_PROGRESS': return 'progress';
+            case 'RESOLVED': return 'resolved';
+            case 'CANCELLED': return 'cancelled';
+            default: return '';
+        }
+    }
+
+    priorityLabel(priority: string): string {
+        switch ((priority ?? '').toUpperCase()) {
+            case 'LOW': return 'Baja';
+            case 'MEDIUM': return 'Media';
+            case 'HIGH': return 'Alta';
+            case 'URGENT': return 'Urgente';
+            default: return priority;
+        }
     }
 
     private reloadMyRequests(): void {
         this.support
             .getMyRequests()
             .pipe(catchError(() => of([])))
-            .subscribe((items) => {
-                this.myRequests = items;
-            });
+            .subscribe((items) => { this.myRequests = items; });
     }
 }
+

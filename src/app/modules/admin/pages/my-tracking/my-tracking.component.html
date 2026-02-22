@@ -39,8 +39,7 @@
                 </p>
 
                 <p class="tracking-thanks__text tracking-thanks__text--muted">
-                    Si has tenido días difíciles, recuerda que dispones de herramientas y actividades para retomar la
-                    calma y
+                    Si has tenido días difíciles, recuerda que dispones de herramientas y actividades para retomar la calma y
                     <br />
                     <span class="tracking-thanks__text--nowrap">reconectarte contigo.</span>
                 </p>
@@ -95,14 +94,13 @@
                         </div>
                         <div class="tracking-state__score-main">
                             <span class="tracking-state__score-value">{{ stateCard.scoreOutOfTen }}</span>
-                            <mat-icon class="tracking-state__score-up"
-                                svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+                            <mat-icon class="tracking-state__score-up" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
                         </div>
                         <p class="tracking-state__desc">
                             {{ stateCard.description }}
                         </p>
 
-                        <button class="tracking-state__cta" mat-button>
+                        <button class="tracking-state__cta" mat-button (click)="goToEmotionalAnalysis()">
                             <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
                             ¿Cuéntanos cómo te sientes hoy?
                         </button>
@@ -113,12 +111,8 @@
             <div class="tracking-state__right">
                 <p class="tracking-state__chart-title">Seguimiento de tu estado de ánimo (Último mes)</p>
 
-                <apx-chart class="tracking-state__chart" [series]="moodTrackingChart.series"
-                    [chart]="moodTrackingChart.chart" [xaxis]="moodTrackingChart.xaxis"
-                    [yaxis]="moodTrackingChart.yaxis" [stroke]="moodTrackingChart.stroke"
-                    [grid]="moodTrackingChart.grid" [dataLabels]="moodTrackingChart.dataLabels"
-                    [markers]="moodTrackingChart.markers" [tooltip]="moodTrackingChart.tooltip"
-                    [colors]="moodTrackingChart.colors"></apx-chart>
+                <apx-chart class="tracking-state__chart" [series]="moodTrackingChart.series" [chart]="moodTrackingChart.chart" [xaxis]="moodTrackingChart.xaxis" [yaxis]="moodTrackingChart.yaxis" [stroke]="moodTrackingChart.stroke" [grid]="moodTrackingChart.grid" [dataLabels]="moodTrackingChart.dataLabels"
+                    [markers]="moodTrackingChart.markers" [tooltip]="moodTrackingChart.tooltip" [colors]="moodTrackingChart.colors"></apx-chart>
             </div>
         </section>
 
@@ -145,20 +139,16 @@
                         <div class="module-row__top">
                             <div class="module-row__name">{{ m.title }}</div>
                             <div class="module-row__right">
-                                @if (m.isCompleted && m.percent > 0) {
-                                @if (m.badgeLabel) {
+                                @if (m.isCompleted && m.percent > 0) { @if (m.badgeLabel) {
                                 <span class="module-row__badge" [ngClass]="'module-row__badge--' + m.badgeTone">{{
-                                    m.badgeLabel }}</span>
-                                }
+                                    m.badgeLabel }}</span> }
                                 <span class="module-row__pct" [ngClass]="'module-row__pct--' + m.tone">{{ m.percent
-                                    }}%</span>
-                                }
+                                    }}%</span> }
                             </div>
                         </div>
                         <div class="module-row__bar">
                             @if (m.isCompleted && m.percent > 0) {
-                            <div class="module-row__bar-fill" [ngClass]="'module-row__bar-fill--' + m.tone"
-                                [style.width.%]="m.percent"></div>
+                            <div class="module-row__bar-fill" [ngClass]="'module-row__bar-fill--' + m.tone" [style.width.%]="m.percent"></div>
                             }
                         </div>
 
@@ -172,24 +162,19 @@
         <!-- Small stats cards -->
         <section class="tracking-stats">
             <div class="stat-card stat-card--teal">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (42).svg" alt=""
-                        aria-hidden="true" /></div>
+                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (42).svg" alt="" aria-hidden="true" /></div>
                 <div class="stat-card__value">{{ stats.completedCount }}/4</div>
                 <div class="stat-card__label">
-                    Módulos completados<br />
-                    @if (stats.pendingCount === 0) {
-                    <span class="stat-card__label-all">¡Todos completos!</span>
-                    } @else {
+                    Módulos completados<br /> @if (stats.pendingCount === 0) {
+                    <span class="stat-card__label-all">¡Todos completos!</span> } @else {
                     <span class="stat-card__label-all">{{ stats.pendingCount }} {{ stats.pendingCount === 1 ?
-                        'pendiente' : 'pendientes' }}</span>
-                    }
+                        'pendiente' : 'pendientes' }}</span> }
                 </div>
                 <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:calendar"></mat-icon>
             </div>
 
             <div class="stat-card stat-card--blue">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (43).svg" alt=""
-                        aria-hidden="true" /></div>
+                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (43).svg" alt="" aria-hidden="true" /></div>
                 <div class="stat-card__value">{{ stats.averageWellbeingPercent }}%</div>
                 <div class="stat-card__label">Bienestar promedio<br /><span class="stat-card__label-accent">Tu
                         puntuación general</span></div>
@@ -197,18 +182,14 @@
             </div>
 
             <div class="stat-card stat-card--lime">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (44).svg" alt=""
-                        aria-hidden="true" /></div>
-                <div class="stat-card__value">Vs. Prom.</div>
-                <div class="stat-card__label">Comparación organizacional<br /><span class="stat-card__label-accent">Por
-                        encima del promedio</span></div>
-                <div class="stat-card__chip">+5%</div>
+                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (44).svg" alt="" aria-hidden="true" /></div>
+                <div class="stat-card__value">{{ vsPromedioLabel }}</div>
+                <div class="stat-card__label">Comparación organizacional<br /><span class="stat-card__label-accent">{{ vsPromedioSubtitle }}</span></div>
             </div>
 
             <div class="stat-card stat-card--purple">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (45).svg" alt=""
-                        aria-hidden="true" /></div>
-                <div class="stat-card__value">6 meses</div>
+                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (45).svg" alt="" aria-hidden="true" /></div>
+                <div class="stat-card__value">{{ memberSinceLabel }}</div>
                 <div class="stat-card__label">Tiempo en EmoCheck<br /><span class="stat-card__label-accent">Mejora
                         sostenida</span></div>
                 <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
@@ -222,12 +203,8 @@
 
             <div class="tracking-results__grid">
                 @for (card of moduleResults; track card.id) {
-                <div class="result-card" [ngClass]="'result-card--' + card.id"
-                    [class.result-card--disabled]="!card.isCompleted"
-                    [class.result-card--good]="card.isCompleted && card.toneClass === 'good'"
-                    [class.result-card--warn]="card.isCompleted && card.toneClass === 'warn'"
-                    [class.result-card--bad]="card.isCompleted && card.toneClass === 'bad'"
-                    (click)="openModuleResults(card.id)">
+                <div class="result-card" [ngClass]="'result-card--' + card.id" [class.result-card--disabled]="!card.isCompleted" [class.result-card--good]="card.isCompleted && card.toneClass === 'good'" [class.result-card--warn]="card.isCompleted && card.toneClass === 'warn'"
+                    [class.result-card--bad]="card.isCompleted && card.toneClass === 'bad'" (click)="openModuleResults(card.id)">
                     <div class="result-card__head">
                         <div class="result-card__icon">
                             <img class="result-card__icon-img" [src]="moduleIcon(card.id)" alt="" aria-hidden="true" />
@@ -241,13 +218,13 @@
                         @if (card.isCompleted) {
                         <div class="result-card__actions">
                             @if (card.toneClass !== 'disabled') {
-                            <div class="result-card__status-pill"
-                                [ngClass]="'result-card__status-pill--' + card.toneClass">
-                                <img class="result-card__status-pill-icon" [src]="riskPillIcon(card.toneClass)" alt=""
-                                    aria-hidden="true" />
+                            <div class="result-card__status-pill" [ngClass]="'result-card__status-pill--' + card.toneClass">
+                                <img class="result-card__status-pill-icon" [src]="riskPillIcon(card.toneClass)" alt="" aria-hidden="true" />
                             </div>
                             }
-                            <div class="result-card__eye"><mat-icon svgIcon="heroicons_outline:eye"></mat-icon></div>
+                            <div class="result-card__eye">
+                                <mat-icon svgIcon="heroicons_outline:eye"></mat-icon>
+                            </div>
                         </div>
                         }
                     </div>
@@ -276,7 +253,9 @@
             <div class="chart-card">
                 <div class="chart-card__title">Mi Evolución en el Tiempo</div>
                 <div class="chart-card__subtitle">Progreso de tus puntajes en los últimos 6 meses</div>
-                <div class="chart-card__placeholder"></div>
+                <apx-chart [series]="moodTrackingChart.series" [chart]="moodTrackingChart.chart" [colors]="moodTrackingChart.colors" [stroke]="moodTrackingChart.stroke" [dataLabels]="moodTrackingChart.dataLabels" [markers]="moodTrackingChart.markers" [grid]="moodTrackingChart.grid"
+                    [xaxis]="moodTrackingChart.xaxis" [yaxis]="moodTrackingChart.yaxis" [tooltip]="moodTrackingChart.tooltip">
+                </apx-chart>
                 <div class="chart-card__legend">
                     <span class="lg-item lg-item--teal">Clima Org.</span>
                     <span class="lg-item lg-item--lime">Fatiga Laboral</span>
@@ -288,12 +267,8 @@
             <div class="chart-card">
                 <div class="chart-card__title">Comparación con Promedio Organizacional</div>
                 <div class="chart-card__subtitle">Tu desempeño vs. promedio de la organización</div>
-                <apx-chart [series]="radarComparisonChart.series" [chart]="radarComparisonChart.chart"
-                    [xaxis]="radarComparisonChart.xaxis" [yaxis]="radarComparisonChart.yaxis"
-                    [stroke]="radarComparisonChart.stroke" [fill]="radarComparisonChart.fill"
-                    [markers]="radarComparisonChart.markers" [dataLabels]="radarComparisonChart.dataLabels"
-                    [tooltip]="radarComparisonChart.tooltip" [colors]="radarComparisonChart.colors"
-                    [legend]="radarComparisonChart.legend" [plotOptions]="radarComparisonChart.plotOptions"></apx-chart>
+                <apx-chart [series]="radarComparisonChart.series" [chart]="radarComparisonChart.chart" [xaxis]="radarComparisonChart.xaxis" [yaxis]="radarComparisonChart.yaxis" [stroke]="radarComparisonChart.stroke" [fill]="radarComparisonChart.fill" [markers]="radarComparisonChart.markers"
+                    [dataLabels]="radarComparisonChart.dataLabels" [tooltip]="radarComparisonChart.tooltip" [colors]="radarComparisonChart.colors" [legend]="radarComparisonChart.legend" [plotOptions]="radarComparisonChart.plotOptions"></apx-chart>
             </div>
         </section>
 
@@ -303,35 +278,43 @@
                 <span class="tracking-followups__title-icon" aria-hidden="true"></span>
                 <span>Seguimientos Psicosociales</span>
             </div>
-            <div class="tracking-followups__subtitle">Aquí encontrarás las fechas estimadas de tu próximo seguimiento
-                con un profesional</div>
+            <div class="tracking-followups__subtitle">Aquí encontrarás las fechas estimadas de tu próximo seguimiento con un profesional</div>
 
             <div class="tracking-followups__grid">
                 <div class="follow-card follow-card--purple">
-                    <div class="follow-card__icon"><img class="follow-card__icon-img" src="icons/Icon (50).svg" alt=""
-                            aria-hidden="true" /></div>
+                    <div class="follow-card__icon"><img class="follow-card__icon-img" src="icons/Icon (50).svg" alt="" aria-hidden="true" /></div>
                     <div class="follow-card__content">
                         <div class="follow-card__k">Último seguimiento</div>
-                        <div class="follow-card__v">15 de octubre, 2025</div>
+                        <div class="follow-card__v">
+                            {{ followUp.lastSessionDate ?? 'Sin sesiones previas' }}
+                        </div>
                     </div>
-                    <div class="follow-card__hint follow-card__hint--full follow-card__hint--lift">Tu última sesión con
-                        el profesional de salud mental fue hace
-                        <b>16 días</b>
+                    <div class="follow-card__hint follow-card__hint--full follow-card__hint--lift">
+                        <ng-container *ngIf="followUp.lastSessionDaysAgo !== null; else noLastSession">
+                            Tu última sesión con el profesional de salud mental fue hace
+                            <b>{{ followUp.lastSessionDaysAgo }} {{ followUp.lastSessionDaysAgo === 1 ? 'día' : 'días' }}</b>
+                        </ng-container>
+                        <ng-template #noLastSession>Aún no tienes sesiones registradas.</ng-template>
                     </div>
                 </div>
 
                 <div class="follow-card follow-card--orange">
-                    <div class="follow-card__icon"><img class="follow-card__icon-img" src="icons/Icon (52).svg" alt=""
-                            aria-hidden="true" /></div>
+                    <div class="follow-card__icon"><img class="follow-card__icon-img" src="icons/Icon (52).svg" alt="" aria-hidden="true" /></div>
                     <div class="follow-card__content">
                         <div class="follow-card__k">Próximo seguimiento</div>
-                        <div class="follow-card__v follow-card__v--orange">30 de noviembre, 2025</div>
+                        <div class="follow-card__v follow-card__v--orange">
+                            {{ followUp.nextSessionDate ?? 'Sin programar' }}
+                        </div>
                     </div>
 
-                    <div class="follow-card__hint follow-card__hint--full">Faltan <b>30 días</b> para tu próxima
-                        evaluación programada</div>
+                    <div class="follow-card__hint follow-card__hint--full">
+                        <ng-container *ngIf="followUp.daysUntilNext !== null; else noNext">
+                            Faltan <b>{{ followUp.daysUntilNext }} {{ followUp.daysUntilNext === 1 ? 'día' : 'días' }}</b> para tu próxima evaluación programada
+                        </ng-container>
+                        <ng-template #noNext>No tienes sesiones programadas próximamente.</ng-template>
+                    </div>
 
-                    <button class="follow-card__cta" mat-button>
+                    <button class="follow-card__cta" mat-button (click)="scheduleFollowUp()">
                         <span class="follow-card__cta-content">
                             <img class="follow-card__cta-icon" src="icons/Icon (52).svg" alt="" aria-hidden="true" />
                             <span>Agendar Cita</span>
@@ -348,8 +331,7 @@
             <div class="tracking-detail" [ngClass]="'tracking-detail--' + card.moduleId">
                 <div class="tracking-detail__head">
                     <div class="tracking-detail__title">
-                        <img class="tracking-detail__module-icon" [src]="moduleIcon(card.moduleId)" alt=""
-                            aria-hidden="true" />
+                        <img class="tracking-detail__module-icon" [src]="moduleIcon(card.moduleId)" alt="" aria-hidden="true" />
                         <span>{{ card.title }}</span>
                     </div>
                     <div class="tracking-detail__meta">Evaluación completada el {{ card.completedAtLabel }}</div>
@@ -393,9 +375,7 @@
                                 <div class="finding-row__bar-fill" [style.width.%]="f.value"></div>
                             </div>
                         </div>
-                        }
-
-                        @if ((card.findings ?? []).length === 0) {
+                        } @if ((card.findings ?? []).length === 0) {
                         <div class="tracking-empty">No hay hallazgos disponibles para este resultado.</div>
                         }
                     </div>
@@ -411,9 +391,7 @@
                             <span class="rec-item__dot"></span>
                             <span class="rec-item__text">{{ r }}</span>
                         </div>
-                        }
-
-                        @if ((card.recommendations ?? []).length === 0) {
+                        } @if ((card.recommendations ?? []).length === 0) {
                         <div class="tracking-empty">No hay recomendaciones disponibles para este resultado.</div>
                         }
                     </div>
@@ -439,15 +417,13 @@
                     <div class="personal-card" [ngClass]="'personal-card--' + p.moduleId">
                         <div class="personal-card__header">
                             <div class="personal-card__icon">
-                                <img class="personal-card__icon-img" [src]="moduleIcon(p.moduleId)" alt=""
-                                    aria-hidden="true" />
+                                <img class="personal-card__icon-img" [src]="moduleIcon(p.moduleId)" alt="" aria-hidden="true" />
                             </div>
                             <div class="personal-card__title">{{ p.title }}</div>
                         </div>
                         <div class="personal-card__body">
                             <div class="personal-card__text">{{ p.text }}</div>
-                            <button class="personal-card__btn" mat-button
-                                (click)="openPersonalizedAction(p.moduleId)">{{ p.buttonLabel }}</button>
+                            <button class="personal-card__btn" mat-button (click)="openPersonalizedAction(p.moduleId)">{{ p.buttonLabel }}</button>
                         </div>
                     </div>
                     }
@@ -456,19 +432,19 @@
         </section>
 
         <div class="tracking-personal__footer">
-            <button class="footer-btn footer-btn--teal" mat-button>
+            <button class="footer-btn footer-btn--teal" mat-button (click)="exportReport()">
                 <span class="footer-btn__content">
                     <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
                     <span class="footer-btn__text">Descargar Mi Reporte</span>
                 </span>
             </button>
-            <button class="footer-btn footer-btn--lime" mat-button>
+            <button class="footer-btn footer-btn--lime" mat-button (click)="scheduleFollowUp()">
                 <span class="footer-btn__content">
                     <mat-icon svgIcon="heroicons_outline:calendar"></mat-icon>
                     <span class="footer-btn__text">Agendar Seguimiento</span>
                 </span>
             </button>
-            <button class="footer-btn footer-btn--blue" mat-button>
+            <button class="footer-btn footer-btn--blue" mat-button (click)="contactSupport()">
                 <span class="footer-btn__content">
                     <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
                     <span class="footer-btn__text">Contactar Apoyo Profesional</span>

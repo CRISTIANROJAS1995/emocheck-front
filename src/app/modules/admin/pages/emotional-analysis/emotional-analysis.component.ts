@@ -301,8 +301,15 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                 },
                 error: (err) => {
                     console.error('Error al analizar emociones:', err);
-                    const msg = err?.error?.message || err?.error?.title || err?.message || 'No se pudo analizar el rostro.';
-                    this.analysisError = msg;
+                    // Extraer mensaje del backend (400, 422, etc.) o fallback genérico
+                    const backendMsg: string =
+                        err?.error?.Message ??
+                        err?.error?.message ??
+                        err?.error?.title ??
+                        err?.error?.detail ??
+                        err?.message ??
+                        '';
+                    this.analysisError = backendMsg.trim() || 'No se pudo analizar el rostro. Asegúrate de que tu cara esté visible y bien iluminada.';
                     this.isAnalyzing = false;
                     // No mostramos resultados si falló: se queda en la pantalla con el error.
                 },
@@ -320,6 +327,22 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         this._cameraService.stopCamera();
     }
 
+    /**
+     * Reinicia el análisis después de un error de backend.
+     */
+    retryAnalysis(): void {
+        this.analysisError = '';
+        this.capturedFrames = [];
+        this.analysisStarted = false;
+        this.progress = 0;
+        this.currentStep = 1;
+        this.steps.forEach((s, i) => {
+            s.status = i === 0 ? 'active' : 'pending';
+            s.percentage = 0;
+        });
+        this.startAnalysis();
+    }
+
     skipAnalysis(): void {
         this.cleanup();
         this._router.navigate(['/home']);
@@ -331,8 +354,8 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     }
 
     startGuidedPause(): void {
-        console.log('Iniciando pausa guiada...');
-        // Aquí se implementaría la lógica de la pausa guiada
+        this.cleanup();
+        this._router.navigate(['/resources']);
     }
 
     /**

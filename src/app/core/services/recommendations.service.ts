@@ -70,13 +70,9 @@ export class RecommendationsService {
     }
 
     getMyRecommendations(_filters?: { isRead?: boolean }): Observable<RecommendationDto[]> {
-        // Swagger: GET /api/recommendation/my-unviewed -> RecommendationDto[] (direct)
-        return this.http.get<unknown>(`${this.apiUrl}/recommendation/my-unviewed`).pipe(
-            map((res) => {
-                const items = this.unwrapArray<SwaggerRecommendationDto>(res);
-                return (items ?? []).map((r) => this.mapSwaggerToUi(r));
-            })
-        );
+        // V5 API: GET /api/recommendation/by-result/{id} is the user-facing endpoint.
+        // There is no "my recommendations" list endpoint — return empty to avoid 404.
+        return new Observable((obs) => { obs.next([]); obs.complete(); });
     }
 
     getByResult(evaluationResultId: number): Observable<RecommendationDto[]> {
@@ -90,7 +86,7 @@ export class RecommendationsService {
     }
 
     markRead(recommendationId: number): Observable<void> {
-        // Swagger: PUT /api/recommendation/{id}/mark-viewed -> 200 OK (no body schema)
-        return this.http.put<void>(`${this.apiUrl}/recommendation/${recommendationId}/mark-viewed`, null);
+        // V5 API does not expose a mark-viewed endpoint — no-op to avoid 404.
+        return new Observable((obs) => { obs.next(); obs.complete(); });
     }
 }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
 export interface MyEvaluationDto {
@@ -127,14 +127,16 @@ export class EvaluationsService {
 
     getMyCompletedEvaluationsWithResult(): Observable<CompletedEvaluationWithResultDto[]> {
         return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
-            map((res) => this.unwrapArray<CompletedEvaluationWithResultDto>(res) ?? [])
+            map((res) => this.unwrapArray<CompletedEvaluationWithResultDto>(res) ?? []),
+            catchError(() => of([] as CompletedEvaluationWithResultDto[]))
         );
     }
 
     getEvaluationResponsesCount(evaluationId: number): Observable<number> {
         if (!evaluationId || evaluationId <= 0) return of(0);
 
-        return this.http.get<unknown>(`${this.apiUrl}/evaluation/${evaluationId}/with-responses`).pipe(
+        // V5 API: GET /api/evaluation/{id}/details → includes responses array
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/${evaluationId}/details`).pipe(
             map((res) => {
                 const dto = this.unwrapObject<SwaggerEvaluationWithResponsesDto>(res);
                 const count = (dto?.responses ?? []).length;

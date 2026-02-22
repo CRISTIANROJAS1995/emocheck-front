@@ -28,8 +28,7 @@
         <section class="summary-card" [ngClass]="outcomeClass">
             <div class="summary-row">
                 <div class="score-ring" aria-hidden="true">
-                    <svg width="160" height="160" viewBox="0 0 160 160" class="ring" focusable="false" tabindex="-1"
-                        aria-hidden="true">
+                    <svg width="160" height="160" viewBox="0 0 160 160" class="ring" focusable="false" tabindex="-1" aria-hidden="true">
                         <circle cx="80" cy="80" r="68" class="ring-track"></circle>
                         <circle cx="80" cy="80" r="68" class="ring-progress" [attr.stroke-dasharray]="ringDasharray">
                         </circle>
@@ -97,8 +96,7 @@
 
             <p *ngIf="(r.dimensions ?? []).length === 0">
                 <ng-container *ngIf="isHydrating">Cargando desglose por dimensiones...</ng-container>
-                <ng-container *ngIf="!isHydrating && hydrationAttempted">No hay desglose por dimensiones disponible para
-                    este resultado.</ng-container>
+                <ng-container *ngIf="!isHydrating && hydrationAttempted">No hay desglose por dimensiones disponible para este resultado.</ng-container>
             </p>
         </section>
 
@@ -114,8 +112,8 @@
 
             <p *ngIf="(r.recommendations ?? []).length === 0">
                 <ng-container *ngIf="isHydrating">Cargando recomendaciones...</ng-container>
-                <ng-container *ngIf="!isHydrating && hydrationAttempted">No hay recomendaciones disponibles para este
-                    resultado.</ng-container>
+                <ng-container *ngIf="!isHydrating && hydrationAttempted">No hay recomendaciones disponibles para este resultado.
+                </ng-container>
             </p>
         </section>
 
@@ -164,10 +162,7 @@
                 Si sientes que necesitas apoyo urgente, no dudes en contactarnos. Estamos aquí para ayudarte.
             </div>
             <div class="help-actions">
-                <button class="help-btn help-btn--primary" type="button" (click)="callEmergencyLine()">Línea 123 -
-                    Emergencias</button>
-                <button class="help-btn help-btn--secondary" type="button" (click)="openSupportChat()">Chat de
-                    apoyo</button>
+                <button class="help-btn help-btn--primary" type="button" (click)="openSupportChat()">Chat de apoyo</button>
             </div>
         </section>
 

@@ -201,6 +201,8 @@ export class AssessmentHydrationService {
     /**
      * Ensures recommendations are pulled from the backend recommendation endpoint
      * for the currently stored module result (no mock/fallback data).
+     * Used as a last-resort pass after hydrateCurrentModuleResultIfMissing in case
+     * my-completed returned recommendations empty (should not happen post-backend fix).
      */
     hydrateRecommendationsIfMissing(moduleId: AssessmentModuleId): Observable<void> {
         const current = this.state.getResult(moduleId);
@@ -225,6 +227,59 @@ export class AssessmentHydrationService {
                 this.state.setResult({
                     ...latest,
                     recommendations: recs,
+                });
+            }),
+            map(() => void 0),
+            catchError(() => of(void 0))
+        );
+    }
+
+    /**
+     * Calls `GET /api/evaluation/{evaluationId}/result` to fetch the full result
+     * including dimensionScores and recommendations when my-completed doesn't include them.
+     * @deprecated Backend now returns dimensionScores and recommendations directly in
+     * my-completed. This method is kept as a safety net but should no longer be needed.
+     */
+    hydrateDimensionsFromEvaluationResult(moduleId: AssessmentModuleId): Observable<void> {
+        const current = this.state.getResult(moduleId);
+        const evaluationId = current?.evaluationId;
+
+        if (!current) return of(void 0);
+        if (!evaluationId || evaluationId <= 0) return of(void 0);
+
+        const needsDimensions = (current.dimensions ?? []).length === 0;
+        const needsRecs = (current.recommendations ?? []).length === 0;
+        if (!needsDimensions && !needsRecs) return of(void 0);
+
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/${evaluationId}/result`).pipe(
+            map((res) => {
+                const anyRes = this.normalizeResponse(res) as any;
+                // Unwrap envelope if needed
+                if (anyRes?.success === true) return anyRes.data as any;
+                return anyRes;
+            }),
+            tap((result: any) => {
+                if (!result) return;
+                const latest = this.state.getResult(moduleId);
+                if (!latest) return;
+
+                const evalResultId = Number(result?.evaluationResultID ?? result?.evaluationResultId ?? 0);
+                const dims = ((result?.dimensionScores ?? []) as any[]).map((d: any) => ({
+                    id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
+                    label: d?.dimensionName ?? '',
+                    percent: this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
+                }));
+                const recs = ((result?.recommendations ?? []) as any[])
+                    .map((r: any) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
+                    .filter(Boolean);
+
+                this.state.setResult({
+                    ...latest,
+                    evaluationResultId: latest.evaluationResultId ?? (evalResultId > 0 ? evalResultId : undefined),
+                    dimensions: (latest.dimensions ?? []).length ? latest.dimensions : dims,
+                    recommendations: (latest.recommendations ?? []).length ? latest.recommendations : recs,
+                    headline: latest.headline || String(result?.riskLevel ?? ''),
+                    message: latest.message || String(result?.interpretation ?? ''),
                 });
             }),
             map(() => void 0),

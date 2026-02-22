@@ -21,9 +21,12 @@ import {
     NgApexchartsModule,
 } from 'ng-apexcharts';
 import { UserService } from 'app/core/user/user.service';
+import { UsersService } from 'app/core/services/users.service';
 import { CompletedEvaluationWithResultDto, EvaluationsService, MyEvaluationDto } from 'app/core/services/evaluations.service';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 import { RecommendationsService } from 'app/core/services/recommendations.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'environments/environment';
 import { catchError, forkJoin, of, switchMap, tap } from 'rxjs';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 
@@ -99,6 +102,13 @@ interface PersonalizedCardVm {
     buttonLabel: string;
 }
 
+interface FollowUpVm {
+    lastSessionDate: string | null;
+    lastSessionDaysAgo: number | null;
+    nextSessionDate: string | null;
+    daysUntilNext: number | null;
+}
+
 @Component({
     selector: 'app-my-tracking',
     standalone: true,
@@ -120,6 +130,14 @@ export class MyTrackingComponent implements OnInit {
 
     loading = true;
     loadError: string | null = null;
+
+    // Tiempo en EmoCheck — calculado desde createdAt del perfil
+    memberSinceLabel = '—';
+
+    // Comparación vs. promedio — el endpoint /dashboard/indicators es solo Admin/Psic/HRManager
+    // Para empleados no hay dato disponible, mostramos '—'
+    vsPromedioLabel = '—';
+    vsPromedioSubtitle = 'Sin datos disponibles';
 
     // Filters (UI only for now)
     readonly timeRanges: Array<{ id: TimeRangeId; label: string }> = [
@@ -205,8 +223,8 @@ export class MyTrackingComponent implements OnInit {
             v.includes('green')
         )
             return 'good';
-        if (v.includes('leve') || v.includes('alerta') || v.includes('medio') || v.includes('medium') || v.includes('yellow')) return 'warn';
-        if (v.includes('alto') || v.includes('riesgo') || v.includes('high') || v.includes('red')) return 'bad';
+        if (v.includes('leve') || v === 'mild' || v.includes('mild') || v.includes('alerta') || v.includes('medio') || v.includes('moderate') || v.includes('medium') || v.includes('yellow')) return 'warn';
+        if (v === 'severe' || v.includes('severe') || v.includes('alto') || v.includes('riesgo') || v.includes('high') || v.includes('red')) return 'bad';
         return 'none';
     }
 
@@ -223,8 +241,12 @@ export class MyTrackingComponent implements OnInit {
             lc.includes('bienestar')
         )
             return 'Bienestar Adecuado';
-        if (lc.includes('yellow') || lc.includes('medium') || lc.includes('medio') || lc.includes('leve') || lc.includes('alerta')) return 'Alerta Leve';
-        if (lc.includes('red') || lc.includes('high') || lc.includes('alto') || lc.includes('riesgo')) return 'Riesgo Alto';
+        if (lc === 'mild' || lc.includes('mild'))
+            return 'Leve';
+        if (lc.includes('yellow') || lc.includes('medium') || lc.includes('medio') || lc.includes('moderate') || lc.includes('leve') || lc.includes('alerta'))
+            return 'Alerta Moderada';
+        if (lc === 'severe' || lc.includes('severe') || lc.includes('red') || lc.includes('high') || lc.includes('alto') || lc.includes('riesgo'))
+            return 'Riesgo Alto';
         return v;
     }
 
@@ -402,17 +424,38 @@ export class MyTrackingComponent implements OnInit {
     private completedEvaluations: CompletedEvaluationWithResultDto[] = [];
     private latestCompletedEvaluationsFromMyEvaluations = new Map<ModuleProgressId, MyEvaluationDto>();
 
+    followUp: FollowUpVm = {
+        lastSessionDate: null,
+        lastSessionDaysAgo: null,
+        nextSessionDate: null,
+        daysUntilNext: null,
+    };
+
     trackById = (_: number, item: { id: string }) => item.id;
 
     exportReport(): void {
-        console.log('Export report', this.selectedTimeRange);
+        window.print();
+    }
+
+    goToEmotionalAnalysis(): void {
+        this.router.navigate(['/emotional-analysis']);
+    }
+
+    scheduleFollowUp(): void {
+        this.router.navigate(['/support']);
+    }
+
+    contactSupport(): void {
+        this.router.navigate(['/support']);
     }
 
     constructor(
         private readonly userService: UserService,
+        private readonly usersService: UsersService,
         private readonly evaluationsService: EvaluationsService,
         private readonly recommendationsService: RecommendationsService,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly http: HttpClient
     ) { }
 
     openModuleResults(moduleId: ModuleProgressId): void {
@@ -432,6 +475,15 @@ export class MyTrackingComponent implements OnInit {
     ngOnInit(): void {
         this.userService.user$.subscribe((u) => {
             this.userFullName = u?.name || 'Usuario';
+        });
+
+        // Cargar "Tiempo en EmoCheck" desde el perfil del usuario
+        this.usersService.getMyProfile().pipe(
+            catchError(() => of(null))
+        ).subscribe((profile) => {
+            if (profile?.creationDate) {
+                this.memberSinceLabel = this.computeMemberSince(profile.creationDate);
+            }
         });
 
         this.loading = true;
@@ -460,6 +512,46 @@ export class MyTrackingComponent implements OnInit {
                     this.loading = false;
                 },
             });
+
+        this.loadFollowUps();
+    }
+
+    private loadFollowUps(): void {
+        this.http.get<unknown>(`${environment.apiUrl}/support/my-requests`).pipe(
+            catchError(() => of([]))
+        ).subscribe((res: unknown) => {
+            const arr: any[] = Array.isArray(res) ? res
+                : (res as any)?.success === true ? ((res as any).data ?? [])
+                : [];
+
+            const now = Date.now();
+
+            // Última sesión: la solicitud RESOLVED más reciente
+            const resolved = arr
+                .filter((r) => String(r?.status ?? '').toUpperCase() === 'RESOLVED' && r?.updatedAt)
+                .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+            // Próximo seguimiento: la solicitud IN_PROGRESS o OPEN más próxima con scheduledDate
+            const upcoming = arr
+                .filter((r) => {
+                    const s = String(r?.status ?? '').toUpperCase();
+                    return (s === 'OPEN' || s === 'IN_PROGRESS') && r?.scheduledDate;
+                })
+                .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime());
+
+            const last = resolved[0] ?? null;
+            const next = upcoming[0] ?? null;
+
+            const lastDate = last ? new Date(last.updatedAt) : null;
+            const nextDate = next ? new Date(next.scheduledDate) : null;
+
+            this.followUp = {
+                lastSessionDate: lastDate ? this.formatDateLong(lastDate.toISOString()) : null,
+                lastSessionDaysAgo: lastDate ? Math.round((now - lastDate.getTime()) / (1000 * 60 * 60 * 24)) : null,
+                nextSessionDate: nextDate ? this.formatDateLong(nextDate.toISOString()) : null,
+                daysUntilNext: nextDate ? Math.max(0, Math.round((nextDate.getTime() - now) / (1000 * 60 * 60 * 24))) : null,
+            };
+        });
     }
 
     private applyCompletedEvaluations(items: CompletedEvaluationWithResultDto[]): void {
@@ -995,5 +1087,18 @@ export class MyTrackingComponent implements OnInit {
         const d = new Date(iso);
         if (Number.isNaN(d.getTime())) return '';
         return new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit' }).format(d);
+    }
+
+    private computeMemberSince(iso: string): string {
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return '—';
+        const now = new Date();
+        const diffMs = now.getTime() - d.getTime();
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const months = Math.floor(days / 30);
+        const years = Math.floor(days / 365);
+        if (years >= 1) return `${years} ${years === 1 ? 'año' : 'años'}`;
+        if (months >= 1) return `${months} ${months === 1 ? 'mes' : 'meses'}`;
+        return `${days} ${days === 1 ? 'día' : 'días'}`;
     }
 }

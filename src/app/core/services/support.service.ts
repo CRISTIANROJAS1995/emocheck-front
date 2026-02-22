@@ -159,7 +159,18 @@ export class SupportService {
     }
 
     createRequest(payload: CreateSupportRequestDto): Observable<{ supportRequestId: number } & Record<string, unknown>> {
-        return this.http.post<unknown>(`${this.apiUrl}/support`, payload).pipe(
+        // Only include evaluationID in the body if it has a valid value
+        const body: Record<string, unknown> = {
+            requestType: payload.requestType,
+            subject: payload.subject,
+            description: payload.description,
+            priority: payload.priority,
+        };
+        if (payload.evaluationID != null && Number.isFinite(payload.evaluationID) && payload.evaluationID > 0) {
+            body['evaluationID'] = payload.evaluationID;
+        }
+
+        return this.http.post<unknown>(`${this.apiUrl}/support`, body).pipe(
             map((res) => {
                 const created = this.unwrapApiResponse<any>(res, 'No fue posible crear la solicitud') ?? {};
                 return {

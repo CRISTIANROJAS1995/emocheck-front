@@ -162,7 +162,7 @@ export class AssessmentService {
                 const moduleData = this.unwrapObject<SwaggerModuleFullDto>(res);
                 const resolvedId = this.getModuleId(moduleData);
                 if (!resolvedId) {
-                    throw new Error('No fue posible obtener el mÃ³dulo');
+                    throw new Error('No fue posible obtener el módulo');
                 }
 
                 // V5: questions live inside instruments; legacy: directly on module
@@ -188,7 +188,7 @@ export class AssessmentService {
                     ? of(true)
                     : throwError(() => ({
                         code: 'CONSENT_REQUIRED',
-                        message: 'Debes aceptar el consentimiento informado antes de iniciar la evaluaciÃ³n.',
+                        message: 'Debes aceptar el consentimiento informado antes de iniciar la evaluación.',
                     }))
             ),
             switchMap(() => this.getModuleDetail(moduleId)),
@@ -207,7 +207,7 @@ export class AssessmentService {
                                 map((res) => {
                                     const evaluation = this.unwrapObject<SwaggerEvaluationDto>(res);
                                     if (!evaluation?.evaluationID) {
-                                        throw new Error('No fue posible iniciar la evaluaciÃ³n');
+                                        throw new Error('No fue posible iniciar la evaluación');
                                     }
                                     return evaluation;
                                 })
@@ -238,7 +238,7 @@ export class AssessmentService {
                             ),
                             map((result: SwaggerEvaluationResultDto | null) => {
                                 if (!result?.evaluationResultID) {
-                                    throw new Error('No fue posible completar la evaluaciÃ³n');
+                                    throw new Error('No fue posible completar la evaluación');
                                 }
                                 return result;
                             })
@@ -286,7 +286,7 @@ export class AssessmentService {
                 const match = this.findBestModuleMatch(moduleId, modules);
                 const id = this.getModuleId(match);
                 if (!id) {
-                    throw new Error(`No se encontrÃ³ el mÃ³dulo backend para '${moduleId}'`);
+                    throw new Error(`No se encontró el módulo backend para '${moduleId}'`);
                 }
                 return id;
             })

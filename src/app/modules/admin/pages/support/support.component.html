@@ -21,10 +21,13 @@
 
         <div class="support-container">
             <div class="support-surface">
+
+                <!-- Loading -->
                 <div class="support-loading" *ngIf="loading">
                     <mat-progress-spinner diameter="28" mode="indeterminate"></mat-progress-spinner>
                 </div>
 
+                <!-- Error global -->
                 <div class="support-callout support-callout--danger" *ngIf="!loading && error">
                     <div class="support-callout__icon">
                         <mat-icon svgIcon="heroicons_outline:exclamation-triangle"></mat-icon>
@@ -35,7 +38,18 @@
                     </div>
                 </div>
 
-                <div class="support-grid">
+                <!-- Éxito -->
+                <div class="support-callout support-callout--success" *ngIf="successMessage">
+                    <div class="support-callout__icon">
+                        <mat-icon svgIcon="heroicons_outline:check-circle"></mat-icon>
+                    </div>
+                    <div class="support-callout__body">
+                        <div class="support-callout__text">{{ successMessage }}</div>
+                    </div>
+                </div>
+
+                <div class="support-grid" *ngIf="!loading">
+                    <!-- Emergencias -->
                     <section class="support-card support-card--emergency">
                         <div class="support-card__header">
                             <div class="support-card__title">
@@ -73,12 +87,14 @@
                         </ng-template>
 
                         <div class="support-card__actions">
-                            <button mat-button class="support-btn support-btn--danger" type="button" (click)="createEmergencyRequest()">
+                            <button mat-button class="support-btn support-btn--danger" type="button" [disabled]="submitting" (click)="createEmergencyRequest()">
+                                <mat-progress-spinner *ngIf="submitting" diameter="16" mode="indeterminate"></mat-progress-spinner>
                                 Solicitar ayuda inmediata
                             </button>
                         </div>
                     </section>
 
+                    <!-- Apoyo psicológico -->
                     <section class="support-card support-card--chat">
                         <div class="support-card__header">
                             <div class="support-card__title">
@@ -87,8 +103,8 @@
                                 </span>
                                 <span>Apoyo psicológico</span>
                             </div>
-                            <button mat-button class="support-card__cta" type="button" (click)="createChatRequest()">
-                                Crear solicitud
+                            <button mat-button class="support-card__cta" type="button" (click)="openForm()">
+                                Nueva solicitud
                             </button>
                         </div>
 
@@ -106,15 +122,16 @@
                             <div class="support-request" *ngFor="let r of myRequests">
                                 <div class="support-request__row">
                                     <div class="support-request__subject">{{ r.subject }}</div>
-                                    <div class="support-request__status">{{ r.status }}</div>
+                                    <div class="support-request__status support-request__status--{{ statusTone(r.status) }}">
+                                        {{ statusLabel(r.status) }}
+                                    </div>
                                 </div>
                                 <div class="support-request__meta">
-                                    {{ r.requestType }} • {{ r.priority }} • {{ r.requestedAt | date: 'medium' }}
+                                    {{ priorityLabel(r.priority) }} • {{ r.requestedAt | date: 'dd/MM/yyyy HH:mm' }}
                                 </div>
                                 <div class="support-request__meta" *ngIf="r.assignedToPsychologistName">
-                                    Asignado a: {{ r.assignedToPsychologistName }}
-                                    <span *ngIf="r.assignedToPsychologistPhone">({{ r.assignedToPsychologistPhone
-                                        }})</span>
+                                    Asignado a: <strong>{{ r.assignedToPsychologistName }}</strong>
+                                    <span *ngIf="r.assignedToPsychologistPhone"> ({{ r.assignedToPsychologistPhone }})</span>
                                 </div>
                             </div>
                         </div>
@@ -124,6 +141,53 @@
                 <div class="support-hint" *ngIf="evaluationResultId">
                     Resultado asociado: <strong>#{{ evaluationResultId }}</strong>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal formulario nueva solicitud -->
+    <div class="support-modal-overlay" *ngIf="showForm" (click)="closeForm()">
+        <div class="support-modal" (click)="$event.stopPropagation()">
+            <div class="support-modal__header">
+                <span class="support-modal__title">Nueva solicitud de apoyo</span>
+                <button class="support-modal__close" type="button" (click)="closeForm()" aria-label="Cerrar">
+                    <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
+                </button>
+            </div>
+
+            <div class="support-modal__body">
+                <!-- Error de formulario -->
+                <div class="support-form-error" *ngIf="formError">
+                    <mat-icon svgIcon="heroicons_outline:exclamation-circle"></mat-icon>
+                    <span>{{ formError }}</span>
+                </div>
+
+                <div class="support-form-group">
+                    <label class="support-form-label" for="formSubject">Asunto <span class="required">*</span></label>
+                    <input id="formSubject" class="support-form-input" type="text" [(ngModel)]="formSubject" placeholder="Ej: Necesito orientación sobre mi evaluación" maxlength="150" />
+                </div>
+
+                <div class="support-form-group">
+                    <label class="support-form-label" for="formDescription">Descripción <span class="required">*</span></label>
+                    <textarea id="formDescription" class="support-form-textarea" [(ngModel)]="formDescription" placeholder="Cuéntanos brevemente cómo te sientes o qué necesitas..." rows="4" maxlength="500"></textarea>
+                </div>
+
+                <div class="support-form-group">
+                    <label class="support-form-label" for="formPriority">Prioridad</label>
+                    <select id="formPriority" class="support-form-select" [(ngModel)]="formPriority">
+                        <option *ngFor="let p of priorityOptions" [value]="p.value">{{ p.label }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="support-modal__footer">
+                <button class="support-btn support-btn--ghost" type="button" (click)="closeForm()">
+                    Cancelar
+                </button>
+                <button class="support-btn support-btn--primary" type="button" [disabled]="submitting" (click)="submitForm()">
+                    <mat-progress-spinner *ngIf="submitting" diameter="16" mode="indeterminate"></mat-progress-spinner>
+                    <span>{{ submitting ? 'Enviando...' : 'Enviar solicitud' }}</span>
+                </button>
             </div>
         </div>
     </div>
