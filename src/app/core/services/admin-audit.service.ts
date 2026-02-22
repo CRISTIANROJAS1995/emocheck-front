@@ -50,76 +50,83 @@ export class AdminAuditService {
 
     constructor(private readonly http: HttpClient) { }
 
-    /** Get paginated audit logs */
+    /** Get paginated audit logs — GET /api/auditlog?pageNumber=1&pageSize=50 */
     getAuditLogs(query?: AuditLogQuery): Observable<PaginatedResult<AuditLogDto>> {
         return this.http
-            .get<unknown>(`${this.apiUrl}/audit`, { params: this.buildParams(query) })
+            .get<unknown>(`${this.apiUrl}/auditlog`, { params: this.buildParams(query) })
             .pipe(
                 map((res) => this.unwrapPaginated<AuditLogDto>(res)),
                 catchError(() => of({ items: [], totalCount: 0, pageNumber: 1, pageSize: 50 }))
             );
     }
 
-    /** Get audit logs by user */
-    getByUser(userId: number): Observable<AuditLogDto[]> {
+    /** Get audit logs by user — GET /api/auditlog/user/{userId} */
+    getByUser(userId: number, startDate?: string, endDate?: string): Observable<AuditLogDto[]> {
+        let params = new HttpParams();
+        if (startDate) params = params.set('startDate', startDate);
+        if (endDate) params = params.set('endDate', endDate);
         return this.http
-            .get<unknown>(`${this.apiUrl}/audit/user/${userId}`)
+            .get<unknown>(`${this.apiUrl}/auditlog/user/${userId}`, { params })
             .pipe(
                 map((res) => this.unwrapArray<AuditLogDto>(res)),
                 catchError(() => of([]))
             );
     }
 
-    /** Get audit logs by entity name (uses main listing as fallback) */
-    getByTable(tableName: string): Observable<AuditLogDto[]> {
+    /** Get audit logs by action — GET /api/auditlog/action/{action} */
+    getByAction(action: string): Observable<AuditLogDto[]> {
         return this.http
-            .get<unknown>(`${this.apiUrl}/audit/action/${tableName}`)
+            .get<unknown>(`${this.apiUrl}/auditlog/action/${action}`)
             .pipe(
                 map((res) => this.unwrapArray<AuditLogDto>(res)),
                 catchError(() => of([]))
             );
     }
 
-    /** Get audit logs by entity name and id */
-    getByEntity(entityName: string, entityId: number): Observable<AuditLogDto[]> {
+    /** Get audit logs by table name — GET /api/auditlog/table/{tableName}?recordId={id} */
+    getByTable(tableName: string, recordId?: number): Observable<AuditLogDto[]> {
+        let params = new HttpParams();
+        if (recordId !== undefined) params = params.set('recordId', String(recordId));
         return this.http
-            .get<unknown>(`${this.apiUrl}/audit/entity/${entityName}/${entityId}`)
+            .get<unknown>(`${this.apiUrl}/auditlog/table/${tableName}`, { params })
             .pipe(
                 map((res) => this.unwrapArray<AuditLogDto>(res)),
                 catchError(() => of([]))
             );
     }
 
-    /** Get audit logs by date range */
+    /** Get audit logs by date range — GET /api/auditlog/date-range */
     getByDateRange(startDate: string, endDate: string): Observable<AuditLogDto[]> {
         const params = new HttpParams()
             .set('startDate', startDate)
             .set('endDate', endDate);
         return this.http
-            .get<unknown>(`${this.apiUrl}/audit/daterange`, { params })
+            .get<unknown>(`${this.apiUrl}/auditlog/date-range`, { params })
             .pipe(
                 map((res) => this.unwrapArray<AuditLogDto>(res)),
                 catchError(() => of([]))
             );
     }
 
-    /** Get system log errors */
-    getSystemErrors(): Observable<SystemLogDto[]> {
+    /** Get system log errors — GET /api/systemlog/errors?since={date} */
+    getSystemErrors(since?: string): Observable<SystemLogDto[]> {
+        let params = new HttpParams();
+        if (since) params = params.set('since', since);
         return this.http
-            .get<unknown>(`${this.apiUrl}/systemlog/errors`)
+            .get<unknown>(`${this.apiUrl}/systemlog/errors`, { params })
             .pipe(
                 map((res) => this.unwrapArray<SystemLogDto>(res)),
                 catchError(() => of([]))
             );
     }
 
-    /** Get system logs (optionally filtered by date range client-side) */
+    /** Get system logs by date range — GET /api/systemlog/date-range */
     getSystemLogsByDateRange(startDate: string, endDate: string): Observable<SystemLogDto[]> {
         const params = new HttpParams()
             .set('startDate', startDate)
             .set('endDate', endDate);
         return this.http
-            .get<unknown>(`${this.apiUrl}/systemlog`, { params })
+            .get<unknown>(`${this.apiUrl}/systemlog/date-range`, { params })
             .pipe(
                 map((res) => this.unwrapArray<SystemLogDto>(res)),
                 catchError(() => of([]))

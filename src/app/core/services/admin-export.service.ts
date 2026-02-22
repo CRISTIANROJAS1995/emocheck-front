@@ -32,13 +32,13 @@ export class AdminExportService {
 
     requestExport(payload: ExportRequestDto): Observable<DataExportDto> {
         return this.http
-            .post<unknown>(`${this.apiUrl}/export/request`, payload)
+            .post<unknown>(`${this.apiUrl}/export`, payload)
             .pipe(map((res) => this.unwrapObject<DataExportDto>(res)));
     }
 
     myExports(): Observable<DataExportDto[]> {
         return this.http
-            .get<unknown>(`${this.apiUrl}/export/my`)
+            .get<unknown>(`${this.apiUrl}/export/my-exports`)
             .pipe(map((res) => this.unwrapArray<DataExportDto>(res)));
     }
 

@@ -15,28 +15,36 @@
     @if (stats) {
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>notifications</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>notifications</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ stats.totalAlerts ?? 0 }}</span>
                 <span class="kpi-card__label">Total Alertas</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--rose">
-            <div class="kpi-card__icon"><mat-icon>error</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>error</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ stats.criticalCount ?? 0 }}</span>
                 <span class="kpi-card__label">Críticas</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--amber">
-            <div class="kpi-card__icon"><mat-icon>schedule</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>schedule</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ stats.pendingCount ?? 0 }}</span>
                 <span class="kpi-card__label">Pendientes</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ stats.resolvedCount ?? 0 }}</span>
                 <span class="kpi-card__label">Resueltas</span>
@@ -51,15 +59,18 @@
             <mat-icon class="admin-filters__icon">filter_list</mat-icon>
             <select [(ngModel)]="statusFilter" (ngModelChange)="applyFilter()">
                 <option value="">Todos los estados</option>
-                <option value="Pending">Pendientes</option>
-                <option value="Attended">Atendidas</option>
+                <option value="OPEN">Abierta</option>
+                <option value="ACKNOWLEDGED">Reconocida</option>
+                <option value="IN_PROGRESS">En Proceso</option>
+                <option value="RESOLVED">Resuelta</option>
+                <option value="DISMISSED">Descartada</option>
             </select>
             <select [(ngModel)]="levelFilter" (ngModelChange)="applyFilter()">
                 <option value="">Todos los niveles</option>
-                <option value="Critical">Crítica</option>
-                <option value="High">Alta</option>
-                <option value="Medium">Media</option>
-                <option value="Low">Baja</option>
+                <option value="CRITICAL">Crítica</option>
+                <option value="HIGH">Alta</option>
+                <option value="MEDIUM">Media</option>
+                <option value="LOW">Baja</option>
             </select>
         </div>
         <span class="admin-filters__count">{{ filteredAlerts.length }} alertas</span>
@@ -92,19 +103,16 @@
                 @for (alert of filteredAlerts; track alert.alertId) {
                 <tr [class.row--selected]="selectedAlert?.alertId === alert.alertId" (click)="selectAlert(alert)">
                     <td><strong>#{{ alert.alertId }}</strong></td>
-                    <td><span [class]="severityBadgeClass(alert.alertLevel)">{{ alert.alertLevel || 'N/A' }}</span></td>
+                    <td><span [class]="severityBadgeClass(alert.alertLevel)">{{ severityLabel(alert.alertLevel) }}</span></td>
                     <td>{{ alert.alertType || '-' }}</td>
                     <td>{{ alert.userIdAnonymized || alert.userId || '-' }}</td>
                     <td>{{ alert.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-                    <td><span [class]="statusBadgeClass(alert.isAttended)">{{ alert.isAttended ? 'Atendida' :
-                            'Pendiente' }}</span></td>
+                    <td><span [class]="statusBadgeClass(alert.status)">{{ statusLabel(alert.status) }}</span></td>
                     <td class="actions-cell">
-                        @if (!alert.isAttended) {
-                        <button class="btn btn--primary btn--xs"
-                            (click)="acknowledgeAlert(alert); $event.stopPropagation()" [disabled]="saving">
+                        @if (alert.status === 'OPEN') {
+                        <button class="btn btn--primary btn--xs" (click)="acknowledgeAlert(alert); $event.stopPropagation()" [disabled]="saving">
                             <mat-icon>done</mat-icon> Reconocer
-                        </button>
-                        }
+                        </button> }
                         <button class="btn btn--outline btn--xs" (click)="selectAlert(alert); $event.stopPropagation()">
                             <mat-icon>visibility</mat-icon>
                         </button>
@@ -134,7 +142,7 @@
         <div class="detail-panel__grid">
             <div class="detail-panel__field">
                 <label>Nivel</label>
-                <span [class]="severityBadgeClass(current.alertLevel)">{{ current.alertLevel || 'N/A' }}</span>
+                <span [class]="severityBadgeClass(current.alertLevel)">{{ severityLabel(current.alertLevel) }}</span>
             </div>
             <div class="detail-panel__field">
                 <label>Tipo</label>
@@ -146,8 +154,7 @@
             </div>
             <div class="detail-panel__field">
                 <label>Estado</label>
-                <span [class]="statusBadgeClass(current.isAttended)">{{ current.isAttended ? 'Atendida' : 'Pendiente'
-                    }}</span>
+                <span [class]="statusBadgeClass(current.status)">{{ statusLabel(current.status) }}</span>
             </div>
             <div class="detail-panel__field">
                 <label>Fecha creación</label>
@@ -165,25 +172,10 @@
             }
         </div>
 
-        @if (!current.isAttended) {
+        @if (current.status === 'OPEN' || current.status === 'ACKNOWLEDGED' || current.status === 'IN_PROGRESS') {
         <div class="detail-panel__resolve">
-            <h4>Asignar psicólogo</h4>
-            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-                <select [(ngModel)]="assignToUserId"
-                    style="flex:1;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px">
-                    <option [ngValue]="null" disabled>-- Seleccionar psicólogo --</option>
-                    @for (p of psychologists; track p.userId) {
-                    <option [ngValue]="p.userId">{{ p.fullName }} ({{ p.email }})</option>
-                    }
-                </select>
-                <button class="btn btn--primary btn--sm" [disabled]="saving || !assignToUserId" (click)="assignAlert()">
-                    <mat-icon>person_add</mat-icon> Asignar
-                </button>
-            </div>
-
             <h4>Resolver alerta</h4>
-            <textarea rows="3" class="resolve-textarea" [(ngModel)]="resolution"
-                placeholder="Describe la resolución (opcional)..."></textarea>
+            <textarea rows="3" class="resolve-textarea" [(ngModel)]="resolution" placeholder="Describe la resolución (opcional)..."></textarea>
             <div class="detail-panel__actions">
                 <button class="btn btn--success" [disabled]="saving" (click)="resolveAlert()">
                     <mat-icon>check_circle</mat-icon> Resolver alerta

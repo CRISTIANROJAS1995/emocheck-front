@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
-import { AdminUserListItemDto, AdminUsersService } from 'app/core/services/admin-users.service';
+import { AdminUserListItemDto, AdminUsersService, AdminUpdateUserRequestDto } from 'app/core/services/admin-users.service';
 import {
     AdminOrganizationService,
     CompanyDto, SiteDto, AreaDto, JobTypeDto, RoleDto,
@@ -89,12 +89,9 @@ export class AdminPanelComponent implements OnInit {
         });
 
         this.editForm = this.fb.group({
-            fullName: ['', Validators.required],
-            documentNumber: [''],
-            email: ['', [Validators.required, Validators.email]],
+            firstName: ['', Validators.required],
+            lastName: ['', Validators.required],
             phone: [''],
-            companyID: [null],
-            siteID: [null],
             areaID: [null],
             jobTypeID: [null],
         });
@@ -269,13 +266,14 @@ export class AdminPanelComponent implements OnInit {
         this.editingUser = user;
         this.showEditForm = true;
         this.showCreateForm = false;
+        // Split fullName into firstName / lastName for the API
+        const nameParts = (user.fullName ?? '').trim().split(/\s+/);
+        const firstName = nameParts[0] ?? '';
+        const lastName = nameParts.slice(1).join(' ') ?? '';
         this.editForm.patchValue({
-            fullName: user.fullName,
-            documentNumber: user.documentNumber ?? '',
-            email: user.email,
+            firstName,
+            lastName,
             phone: user.phone ?? '',
-            companyID: user.companyID ?? null,
-            siteID: user.siteID ?? null,
             areaID: user.areaID ?? null,
             jobTypeID: user.jobTypeID ?? null,
         });
@@ -299,17 +297,16 @@ export class AdminPanelComponent implements OnInit {
             return Number.isFinite(n) ? n : null;
         };
 
+        const payload: AdminUpdateUserRequestDto = {
+            firstName: String(v.firstName || '').trim() || undefined,
+            lastName: String(v.lastName || '').trim() || undefined,
+            phone: String(v.phone || '').trim() || undefined,
+            areaID: toOptionalNum(v.areaID),
+            jobTypeID: toOptionalNum(v.jobTypeID),
+        };
+
         this.adminUsers
-            .updateUser(this.editingUser.userId, {
-                fullName: String(v.fullName || '').trim(),
-                documentNumber: String(v.documentNumber || '').trim() || undefined,
-                email: String(v.email || '').trim(),
-                phone: String(v.phone || '').trim() || undefined,
-                companyID: toOptionalNum(v.companyID),
-                siteID: toOptionalNum(v.siteID),
-                areaID: toOptionalNum(v.areaID),
-                jobTypeID: toOptionalNum(v.jobTypeID),
-            } as any)
+            .updateUser(this.editingUser.userId, payload)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
                 next: () => {
@@ -333,13 +330,7 @@ export class AdminPanelComponent implements OnInit {
         return cid ? this.areas.filter(a => a.companyID === Number(cid)) : this.areas;
     }
 
-    get filteredEditSites(): SiteDto[] {
-        const cid = this.editForm.get('companyID')?.value;
-        return cid ? this.sites.filter(s => s.companyID === Number(cid)) : this.sites;
-    }
-
     get filteredEditAreas(): AreaDto[] {
-        const cid = this.editForm.get('companyID')?.value;
-        return cid ? this.areas.filter(a => a.companyID === Number(cid)) : this.areas;
+        return this.areas;
     }
 }

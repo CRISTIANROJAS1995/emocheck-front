@@ -1,0 +1,2002 @@
+{
+    "info": {
+        "_postman_id": "emocheck-api-v5-2026",
+        "name": "EmoCheck API v5",
+        "description": "Colección completa de todos los endpoints de la API EmoCheck. Versión 5 - Actualizada el 21/02/2026.\n\nUsa la variable {{baseUrl}} y {{token}} del environment.\n\n**Roles disponibles:** SuperAdmin, Psychologist, HRManager, Employee",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [{
+            "key": "baseUrl",
+            "value": "https://localhost:7000",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [{
+            "name": "🔐 Auth",
+            "item": [{
+                    "name": "Login",
+                    "event": [{
+                        "listen": "test",
+                        "script": {
+                            "exec": [
+                                "var json = pm.response.json();",
+                                "if (json.token) { pm.collectionVariables.set('token', json.token); }",
+                                "if (json.accessToken) { pm.collectionVariables.set('token', json.accessToken); }"
+                            ],
+                            "type": "text/javascript"
+                        }
+                    }],
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"admin@emocheck.com\",\n  \"password\": \"Admin123!\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+                        "description": "Iniciar sesión. Guarda el token automáticamente en la variable {{token}}."
+                    }
+                },
+                {
+                    "name": "Refresh Token",
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/auth/refresh-token", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh-token"] }
+                    }
+                },
+                {
+                    "name": "Revoke Token",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/auth/revoke-token", "host": ["{{baseUrl}}"], "path": ["api", "auth", "revoke-token"] }
+                    }
+                },
+                {
+                    "name": "Revoke All Tokens (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/auth/revoke-all/1", "host": ["{{baseUrl}}"], "path": ["api", "auth", "revoke-all", "1"] },
+                        "description": "Revocar todos los tokens de un usuario. Reemplaza 1 con el userId."
+                    }
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"currentPassword\": \"Admin123!\",\n  \"newPassword\": \"NewPass456!\",\n  \"confirmNewPassword\": \"NewPass456!\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/auth/change-password", "host": ["{{baseUrl}}"], "path": ["api", "auth", "change-password"] }
+                    }
+                },
+                {
+                    "name": "Admin Reset Password (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"newPassword\": \"TempPass123!\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/auth/admin-reset-password/1", "host": ["{{baseUrl}}"], "path": ["api", "auth", "admin-reset-password", "1"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🔑 OTP",
+            "item": [{
+                    "name": "Generar OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@empresa.com\",\n  \"purpose\": \"PASSWORD_RESET\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/otp/generate", "host": ["{{baseUrl}}"], "path": ["api", "otp", "generate"] },
+                        "description": "Propósitos: PASSWORD_RESET, EMAIL_VERIFICATION, TWO_FACTOR"
+                    }
+                },
+                {
+                    "name": "Validar OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@empresa.com\",\n  \"otpCode\": \"123456\",\n  \"purpose\": \"PASSWORD_RESET\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/otp/validate", "host": ["{{baseUrl}}"], "path": ["api", "otp", "validate"] }
+                    }
+                },
+                {
+                    "name": "Reenviar OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@empresa.com\",\n  \"purpose\": \"PASSWORD_RESET\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/otp/resend", "host": ["{{baseUrl}}"], "path": ["api", "otp", "resend"] }
+                    }
+                },
+                {
+                    "name": "Reset Password con OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"usuario@empresa.com\",\n  \"otpCode\": \"123456\",\n  \"newPassword\": \"NuevaPass123!\",\n  \"confirmNewPassword\": \"NuevaPass123!\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/otp/reset-password", "host": ["{{baseUrl}}"], "path": ["api", "otp", "reset-password"] }
+                    }
+                },
+                {
+                    "name": "Historial OTP por Usuario (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/otp/history/1", "host": ["{{baseUrl}}"], "path": ["api", "otp", "history", "1"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "👤 Users",
+            "item": [{
+                    "name": "Obtener todos los usuarios",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] }
+                    }
+                },
+                {
+                    "name": "Obtener usuario por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "1"] }
+                    }
+                },
+                {
+                    "name": "Obtener usuario por Email (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/email/admin@emocheck.com", "host": ["{{baseUrl}}"], "path": ["api", "users", "email", "admin@emocheck.com"] }
+                    }
+                },
+                {
+                    "name": "Usuarios por Empresa",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/company/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "company", "1"] }
+                    }
+                },
+                {
+                    "name": "Usuarios por Sede",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/site/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "site", "1"] }
+                    }
+                },
+                {
+                    "name": "Usuarios por Área",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/area/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "area", "1"] }
+                    }
+                },
+                {
+                    "name": "Mi Perfil",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api", "users", "me"] }
+                    }
+                },
+                {
+                    "name": "Crear Usuario (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\",\n  \"email\": \"juan.perez@empresa.com\",\n  \"password\": \"Pass123!\",\n  \"companyID\": 1,\n  \"siteID\": 1,\n  \"areaID\": 1,\n  \"jobTypeID\": 1,\n  \"phone\": \"+57300000000\",\n  \"gender\": \"M\",\n  \"birthDate\": \"1990-01-15\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] }
+                    }
+                },
+                {
+                    "name": "Actualizar Usuario (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"firstName\": \"Juan Carlos\",\n  \"phone\": \"+57311000000\",\n  \"areaID\": 2\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "1"] }
+                    }
+                },
+                {
+                    "name": "Desactivar Usuario (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/1/deactivate", "host": ["{{baseUrl}}"], "path": ["api", "users", "1", "deactivate"] }
+                    }
+                },
+                {
+                    "name": "Activar Usuario (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/1/activate", "host": ["{{baseUrl}}"], "path": ["api", "users", "1", "activate"] }
+                    }
+                },
+                {
+                    "name": "Asignar Rol (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/1/roles/2", "host": ["{{baseUrl}}"], "path": ["api", "users", "1", "roles", "2"] },
+                        "description": "Asignar rol roleId=2 al usuario userId=1"
+                    }
+                },
+                {
+                    "name": "Quitar Rol (SuperAdmin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/users/1/roles/2", "host": ["{{baseUrl}}"], "path": ["api", "users", "1", "roles", "2"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🗂️ Catalog",
+            "description": "Catálogos geográficos y de configuración. Gestión de países, departamentos, ciudades, tipos de cargo y roles del sistema.",
+            "item": [{
+                    "name": "Countries",
+                    "item": [{
+                            "name": "Obtener todos los países",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/countries", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "countries"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener países activos",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/countries/active", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "countries", "active"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener país por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/countries/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "countries", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear País (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Colombia\",\n  \"iSOCode\": \"COL\",\n  \"phoneCode\": \"+57\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/countries", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "countries"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar País (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Colombia\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/countries/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "countries", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar País (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/countries/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "countries", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "States (Departamentos)",
+                    "item": [{
+                            "name": "Obtener todos los departamentos",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/states", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "states"] }
+                            }
+                        },
+                        {
+                            "name": "Departamentos por País",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/states/by-country/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "states", "by-country", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener departamento por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/states/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "states", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Departamento (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"countryID\": 1,\n  \"name\": \"Cundinamarca\",\n  \"code\": \"CUN\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/states", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "states"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Departamento (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Cundinamarca\",\n  \"code\": \"CUN\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/states/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "states", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Departamento (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/states/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "states", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Cities",
+                    "item": [{
+                            "name": "Obtener todas las ciudades",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/cities", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "cities"] }
+                            }
+                        },
+                        {
+                            "name": "Ciudades por Departamento",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/cities/by-state/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "cities", "by-state", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener ciudad por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/cities/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "cities", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Ciudad (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"stateID\": 1,\n  \"name\": \"Bogotá D.C.\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/cities", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "cities"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Ciudad (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Bogotá D.C.\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/cities/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "cities", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Ciudad (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/cities/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "cities", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Job Types",
+                    "item": [{
+                            "name": "Obtener todos los tipos de cargo",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/job-types", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "job-types"] }
+                            }
+                        },
+                        {
+                            "name": "Tipos de cargo activos",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/job-types/active", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "job-types", "active"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener tipo de cargo por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/job-types/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "job-types", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Tipo de Cargo (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Analista de Datos\",\n  \"description\": \"Profesional encargado del análisis y visualización de datos\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/job-types", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "job-types"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Tipo de Cargo (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Analista Senior\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/job-types/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "job-types", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Tipo de Cargo (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/job-types/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "job-types", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Roles",
+                    "item": [{
+                            "name": "Obtener todos los roles (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/roles", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "roles"] }
+                            }
+                        },
+                        {
+                            "name": "Roles activos",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/roles/active", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "roles", "active"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener rol por ID (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/roles/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "roles", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Rol (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Auditor\",\n  \"description\": \"Rol de auditoría con acceso de solo lectura a reportes\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/roles", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "roles"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Rol (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"description\": \"Rol de auditoría actualizado\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/catalog/roles/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "roles", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Rol (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/catalog/roles/1", "host": ["{{baseUrl}}"], "path": ["api", "catalog", "roles", "1"] }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "🏢 Company",
+            "description": "Gestión de empresas, sedes (Sites) y áreas organizacionales.",
+            "item": [{
+                    "name": "Companies",
+                    "item": [{
+                            "name": "Obtener todas las empresas (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company", "host": ["{{baseUrl}}"], "path": ["api", "company"] }
+                            }
+                        },
+                        {
+                            "name": "Empresas activas",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/active", "host": ["{{baseUrl}}"], "path": ["api", "company", "active"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener empresa por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Empresa con Sedes y Áreas",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/1/detail", "host": ["{{baseUrl}}"], "path": ["api", "company", "1", "detail"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Empresa (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"businessName\": \"Empresa ABC S.A.S\",\n  \"tradeName\": \"Empresa ABC\",\n  \"taxID\": \"900123456-1\",\n  \"industry\": \"Tecnología\",\n  \"email\": \"contacto@empresaabc.com\",\n  \"phone\": \"+57 1 3456789\",\n  \"address\": \"Cra 15 # 93-75, Oficina 502\",\n  \"cityID\": 1,\n  \"website\": \"https://empresaabc.com\",\n  \"employeeCount\": 150\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/company", "host": ["{{baseUrl}}"], "path": ["api", "company"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Empresa (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"phone\": \"+57 1 9876543\",\n  \"employeeCount\": 200,\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/company/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Empresa (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Sites (Sedes)",
+                    "item": [{
+                            "name": "Obtener todas las sedes (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/sites", "host": ["{{baseUrl}}"], "path": ["api", "company", "sites"] }
+                            }
+                        },
+                        {
+                            "name": "Sedes por Empresa",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/1/sites", "host": ["{{baseUrl}}"], "path": ["api", "company", "1", "sites"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener sede por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/sites/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "sites", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Sede (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"companyID\": 1,\n  \"name\": \"Sede Norte\",\n  \"address\": \"Cra 7 # 127-50\",\n  \"cityID\": 1,\n  \"phone\": \"+57 1 6543210\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/company/sites", "host": ["{{baseUrl}}"], "path": ["api", "company", "sites"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Sede (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Sede Norte - Principal\",\n  \"phone\": \"+57 1 1234567\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/company/sites/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "sites", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Sede (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/sites/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "sites", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Areas",
+                    "item": [{
+                            "name": "Obtener todas las áreas (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/areas", "host": ["{{baseUrl}}"], "path": ["api", "company", "areas"] }
+                            }
+                        },
+                        {
+                            "name": "Áreas por Empresa",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/1/areas", "host": ["{{baseUrl}}"], "path": ["api", "company", "1", "areas"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener área por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/areas/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "areas", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Área (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"companyID\": 1,\n  \"siteID\": 1,\n  \"name\": \"Recursos Humanos\",\n  \"managerName\": \"María López\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/company/areas", "host": ["{{baseUrl}}"], "path": ["api", "company", "areas"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Área (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"managerName\": \"Carlos García\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/company/areas/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "areas", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Área (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/company/areas/1", "host": ["{{baseUrl}}"], "path": ["api", "company", "areas", "1"] }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "🧩 Assessment (Módulos e Instrumentos)",
+            "item": [{
+                    "name": "Modules",
+                    "item": [{
+                            "name": "Obtener todos los módulos",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules"] }
+                            }
+                        },
+                        {
+                            "name": "Módulos activos",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules/active", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules", "active"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener módulo por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules/1", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Módulo con Instrumentos",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules/1/instruments", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules", "1", "instruments"] }
+                            }
+                        },
+                        {
+                            "name": "Módulo con Jerarquía Completa",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules/1/full", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules", "1", "full"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Módulo (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"code\": \"MENTAL_HEALTH\",\n  \"name\": \"Salud Mental\",\n  \"description\": \"Módulo de evaluación de salud mental general\",\n  \"minScore\": 0,\n  \"maxScore\": 100,\n  \"iconName\": \"brain\",\n  \"colorHex\": \"#4A90D9\",\n  \"displayOrder\": 1,\n  \"estimatedMinutes\": 10\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Módulo (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"name\": \"Salud Mental y Bienestar\",\n  \"colorHex\": \"#5BA3F5\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules/1", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Eliminar Módulo (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/modules/1", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "modules", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Instruments",
+                    "item": [{
+                            "name": "Instrumentos por Módulo",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/instruments/by-module/1", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "instruments", "by-module", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener instrumento por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/instruments/1", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "instruments", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Instrumento con Preguntas",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/instruments/1/questions", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "instruments", "1", "questions"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Instrumento (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"moduleID\": 1,\n  \"code\": \"GAD7\",\n  \"name\": \"GAD-7 Ansiedad Generalizada\",\n  \"description\": \"Escala de evaluación de ansiedad generalizada de 7 ítems\",\n  \"scientificBasis\": \"Spitzer et al., 2006\",\n  \"scaleMin\": 0,\n  \"scaleMax\": 3,\n  \"itemCount\": 7,\n  \"maxScore\": 21,\n  \"minScore\": 0,\n  \"weightInModule\": 50.00,\n  \"displayOrder\": 1\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/instruments", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "instruments"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Instrumento (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"weightInModule\": 60.00,\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/instruments/1", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "instruments", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Eliminar Instrumento (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessmentmodule/instruments/1", "host": ["{{baseUrl}}"], "path": ["api", "assessmentmodule", "instruments", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Questions",
+                    "item": [{
+                            "name": "Preguntas por Instrumento",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/questions/by-instrument/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "questions", "by-instrument", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener pregunta por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/questions/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "questions", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Pregunta con Opciones",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/questions/1/options", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "questions", "1", "options"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Pregunta (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"instrumentID\": 1,\n  \"questionText\": \"¿Con qué frecuencia se ha sentido nervioso, ansioso o al límite?\",\n  \"questionNumber\": 1,\n  \"originalItemNumber\": 1,\n  \"isReversed\": false,\n  \"dimensionCode\": \"ANXIETY\",\n  \"isRequired\": true,\n  \"helpText\": \"Piense en los últimos 14 días\"\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessment/questions", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "questions"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Pregunta (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"questionText\": \"¿Con qué frecuencia se ha sentido nervioso o ansioso?\",\n  \"isActive\": true\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessment/questions/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "questions", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Desactivar Pregunta (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/questions/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "questions", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Question Options",
+                    "item": [{
+                            "name": "Opciones por Pregunta",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/options/by-question/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "options", "by-question", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener opción por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/options/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "options", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Opción (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"questionID\": 1,\n  \"optionText\": \"Nunca\",\n  \"numericValue\": 0,\n  \"displayOrder\": 1\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessment/options", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "options"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Opción (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"optionText\": \"Para nada\",\n  \"numericValue\": 0\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessment/options/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "options", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Eliminar Opción (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/options/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "options", "1"] }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Score Ranges",
+                    "item": [{
+                            "name": "Rangos por Instrumento",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/score-ranges/by-instrument/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "score-ranges", "by-instrument", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Obtener rango por ID",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "GET",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/score-ranges/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "score-ranges", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Crear Rango (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "POST",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"instrumentID\": 1,\n  \"rangeLevel\": \"LOW\",\n  \"label\": \"Ansiedad mínima\",\n  \"colorHex\": \"#4CAF50\",\n  \"minScore\": 0,\n  \"maxScore\": 4,\n  \"description\": \"Sin síntomas significativos de ansiedad\",\n  \"displayOrder\": 1\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessment/score-ranges", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "score-ranges"] }
+                            }
+                        },
+                        {
+                            "name": "Actualizar Rango (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "PUT",
+                                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"label\": \"Ansiedad leve\",\n  \"colorHex\": \"#8BC34A\",\n  \"maxScore\": 5\n}"
+                                },
+                                "url": { "raw": "{{baseUrl}}/api/assessment/score-ranges/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "score-ranges", "1"] }
+                            }
+                        },
+                        {
+                            "name": "Eliminar Rango (SuperAdmin)",
+                            "request": {
+                                "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": { "raw": "{{baseUrl}}/api/assessment/score-ranges/1", "host": ["{{baseUrl}}"], "path": ["api", "assessment", "score-ranges", "1"] }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "📋 Evaluation",
+            "item": [{
+                    "name": "Iniciar Evaluación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"moduleID\": 1,\n  \"isAnonymous\": false,\n  \"period\": \"2026-02\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/start", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "start"] }
+                    }
+                },
+                {
+                    "name": "Enviar Respuesta Individual",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"evaluationID\": 1,\n  \"questionID\": 1,\n  \"selectedValue\": 2\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/respond", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "respond"] }
+                    }
+                },
+                {
+                    "name": "Enviar Múltiples Respuestas",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"evaluationID\": 1,\n  \"responses\": [\n    { \"questionID\": 1, \"selectedValue\": 2 },\n    { \"questionID\": 2, \"selectedValue\": 1 },\n    { \"questionID\": 3, \"selectedValue\": 3 }\n  ]\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/respond-multiple", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "respond-multiple"] }
+                    }
+                },
+                {
+                    "name": "Completar Evaluación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/1/complete", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "1", "complete"] }
+                    }
+                },
+                {
+                    "name": "Obtener Evaluación por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/1", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "1"] }
+                    }
+                },
+                {
+                    "name": "Evaluación con Respuestas Detalladas",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/1/details", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "1", "details"] }
+                    }
+                },
+                {
+                    "name": "Mis Evaluaciones",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/my-evaluations", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "my-evaluations"] }
+                    }
+                },
+                {
+                    "name": "Mis Evaluaciones Completadas",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/my-completed", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "my-completed"] }
+                    }
+                },
+                {
+                    "name": "Evaluación en Progreso por Módulo",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/in-progress/1", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "in-progress", "1"] }
+                    }
+                },
+                {
+                    "name": "Evaluaciones por Usuario (Admin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/user/1", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "user", "1"] }
+                    }
+                },
+                {
+                    "name": "Obtener Resultado por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/results/1", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "results", "1"] }
+                    }
+                },
+                {
+                    "name": "Resultado por ID de Evaluación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/1/result", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "1", "result"] }
+                    }
+                },
+                {
+                    "name": "Mis Resultados",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/results/my-results", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "results", "my-results"] }
+                    }
+                },
+                {
+                    "name": "Resultados por Usuario (Admin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/evaluation/results/user/1", "host": ["{{baseUrl}}"], "path": ["api", "evaluation", "results", "user", "1"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🚨 Alerts",
+            "item": [{
+                    "name": "Obtener todas las alertas",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert", "host": ["{{baseUrl}}"], "path": ["api", "alert"] }
+                    }
+                },
+                {
+                    "name": "Obtener alerta por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert/1", "host": ["{{baseUrl}}"], "path": ["api", "alert", "1"] }
+                    }
+                },
+                {
+                    "name": "Alertas por Estado",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert/status/OPEN", "host": ["{{baseUrl}}"], "path": ["api", "alert", "status", "OPEN"] },
+                        "description": "Estados: OPEN, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, DISMISSED"
+                    }
+                },
+                {
+                    "name": "Alertas por Empresa",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert/company/1", "host": ["{{baseUrl}}"], "path": ["api", "alert", "company", "1"] }
+                    }
+                },
+                {
+                    "name": "Alertas por Área",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert/area/1", "host": ["{{baseUrl}}"], "path": ["api", "alert", "area", "1"] }
+                    }
+                },
+                {
+                    "name": "Alertas por Severidad",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert/severity/HIGH", "host": ["{{baseUrl}}"], "path": ["api", "alert", "severity", "HIGH"] },
+                        "description": "Severidades: LOW, MEDIUM, HIGH, CRITICAL"
+                    }
+                },
+                {
+                    "name": "Estadísticas de Alertas",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert/statistics", "host": ["{{baseUrl}}"], "path": ["api", "alert", "statistics"] }
+                    }
+                },
+                {
+                    "name": "Crear Alerta (Admin/Psicólogo)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"evaluationID\": 1,\n  \"userID\": 1,\n  \"severity\": \"HIGH\",\n  \"alertType\": \"RISK\",\n  \"description\": \"Puntuación de alto riesgo en módulo de ansiedad\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/alert", "host": ["{{baseUrl}}"], "path": ["api", "alert"] }
+                    }
+                },
+                {
+                    "name": "Acusar Recibo de Alerta",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/alert/1/acknowledge", "host": ["{{baseUrl}}"], "path": ["api", "alert", "1", "acknowledge"] }
+                    }
+                },
+                {
+                    "name": "Resolver Alerta",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PATCH",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"resolutionNotes\": \"Se realizó seguimiento y se vinculó al programa de bienestar\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/alert/1/resolve", "host": ["{{baseUrl}}"], "path": ["api", "alert", "1", "resolve"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🩺 Case Tracking",
+            "item": [{
+                    "name": "Obtener caso por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/1", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "1"] }
+                    }
+                },
+                {
+                    "name": "Caso por Alerta",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/alert/1", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "alert", "1"] }
+                    }
+                },
+                {
+                    "name": "Caso por Número",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/number/CASE-2026-0001", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "number", "CASE-2026-0001"] }
+                    }
+                },
+                {
+                    "name": "Casos por Usuario",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/user/1", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "user", "1"] }
+                    }
+                },
+                {
+                    "name": "Casos por Psicólogo",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/psychologist/1", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "psychologist", "1"] }
+                    }
+                },
+                {
+                    "name": "Mis Casos (Psicólogo)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/my-cases", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "my-cases"] }
+                    }
+                },
+                {
+                    "name": "Casos por Estado",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/status/OPEN", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "status", "OPEN"] },
+                        "description": "Estados: OPEN, IN_PROGRESS, CLOSED, ESCALATED"
+                    }
+                },
+                {
+                    "name": "Crear Caso",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"alertID\": 1,\n  \"userID\": 1,\n  \"assignedToUserID\": 2,\n  \"priority\": \"HIGH\",\n  \"description\": \"Caso derivado de alerta de riesgo moderado en ansiedad\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/casetracking", "host": ["{{baseUrl}}"], "path": ["api", "casetracking"] }
+                    }
+                },
+                {
+                    "name": "Actualizar Caso",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"assignedToUserID\": 3\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/1", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "1"] }
+                    }
+                },
+                {
+                    "name": "Cerrar Caso",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PATCH",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"closeReason\": \"Intervención exitosa. Usuario incorporado al programa de bienestar\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/1/close", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "1", "close"] }
+                    }
+                },
+                {
+                    "name": "Agregar Seguimiento",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"notes\": \"Primera sesión de seguimiento realizada. Estado general mejorado.\",\n  \"followUpType\": \"SESSION\",\n  \"scheduledDate\": \"2026-03-01T10:00:00\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/casetracking/1/follow-ups", "host": ["{{baseUrl}}"], "path": ["api", "casetracking", "1", "follow-ups"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "💡 Recommendations",
+            "item": [{
+                    "name": "Por Resultado de Evaluación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/recommendation/by-result/1", "host": ["{{baseUrl}}"], "path": ["api", "recommendation", "by-result", "1"] }
+                    }
+                },
+                {
+                    "name": "Recomendaciones Activas por Usuario",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/recommendation/active/1", "host": ["{{baseUrl}}"], "path": ["api", "recommendation", "active", "1"] }
+                    }
+                },
+                {
+                    "name": "Crear Recomendación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"evaluationResultID\": 1,\n  \"recommendationTypeID\": 1,\n  \"instrumentID\": 1,\n  \"title\": \"Técnicas de respiración para reducir ansiedad\",\n  \"description\": \"Practicar técnicas de respiración diafragmática 10 min al día\",\n  \"priority\": \"HIGH\",\n  \"resourceUrl\": \"https://recursos.emocheck.com/respiracion\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/recommendation", "host": ["{{baseUrl}}"], "path": ["api", "recommendation"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "📚 Resources (Bienestar)",
+            "item": [{
+                    "name": "Categorías de Recursos",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/resource/categories", "host": ["{{baseUrl}}"], "path": ["api", "resource", "categories"] }
+                    }
+                },
+                {
+                    "name": "Categoría por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/resource/categories/1", "host": ["{{baseUrl}}"], "path": ["api", "resource", "categories", "1"] }
+                    }
+                },
+                {
+                    "name": "Todos los Recursos",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/resource", "host": ["{{baseUrl}}"], "path": ["api", "resource"] }
+                    }
+                },
+                {
+                    "name": "Recursos por Categoría",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/resource/by-category/1", "host": ["{{baseUrl}}"], "path": ["api", "resource", "by-category", "1"] }
+                    }
+                },
+                {
+                    "name": "Recursos Recomendados para Mí",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/resource/recommended", "host": ["{{baseUrl}}"], "path": ["api", "resource", "recommended"] }
+                    }
+                },
+                {
+                    "name": "Recurso por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/resource/1", "host": ["{{baseUrl}}"], "path": ["api", "resource", "1"] }
+                    }
+                },
+                {
+                    "name": "Crear Recurso (Admin/Psicólogo)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"resourceCategoryID\": 1,\n  \"title\": \"Meditación guiada para el estrés laboral\",\n  \"description\": \"Audio de 15 minutos de meditación mindfulness\",\n  \"contentType\": \"AUDIO\",\n  \"contentUrl\": \"https://cdn.emocheck.com/meditations/stress-01.mp3\",\n  \"moduleID\": 1,\n  \"targetRiskLevel\": \"HIGH\",\n  \"durationMinutes\": 15,\n  \"tags\": \"meditacion,estres,mindfulness\",\n  \"displayOrder\": 1\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/resource", "host": ["{{baseUrl}}"], "path": ["api", "resource"] }
+                    }
+                },
+                {
+                    "name": "Actualizar Recurso (Admin/Psicólogo)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "PUT",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Meditación guiada anti-estrés\",\n  \"durationMinutes\": 20\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/resource/1", "host": ["{{baseUrl}}"], "path": ["api", "resource", "1"] }
+                    }
+                },
+                {
+                    "name": "Eliminar Recurso (Admin/Psicólogo)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/resource/1", "host": ["{{baseUrl}}"], "path": ["api", "resource", "1"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🆘 Support",
+            "item": [{
+                    "name": "Mis Solicitudes",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/support/my-requests", "host": ["{{baseUrl}}"], "path": ["api", "support", "my-requests"] }
+                    }
+                },
+                {
+                    "name": "Solicitud por ID",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/support/1", "host": ["{{baseUrl}}"], "path": ["api", "support", "1"] }
+                    }
+                },
+                {
+                    "name": "Solicitudes por Usuario (Admin)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/support/user/1", "host": ["{{baseUrl}}"], "path": ["api", "support", "user", "1"] }
+                    }
+                },
+                {
+                    "name": "Solicitudes por Estado",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/support/status/OPEN", "host": ["{{baseUrl}}"], "path": ["api", "support", "status", "OPEN"] },
+                        "description": "Estados: OPEN, IN_PROGRESS, RESOLVED, CANCELLED"
+                    }
+                },
+                {
+                    "name": "Mis Solicitudes Asignadas (Psicólogo)",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/support/my-assigned", "host": ["{{baseUrl}}"], "path": ["api", "support", "my-assigned"] }
+                    }
+                },
+                {
+                    "name": "Crear Solicitud de Soporte",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"requestType\": \"PSYCHOLOGICAL\",\n  \"subject\": \"Necesito apoyo emocional\",\n  \"description\": \"He estado experimentando altos niveles de estrés laboral\",\n  \"priority\": \"MEDIUM\",\n  \"evaluationID\": 1\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/support", "host": ["{{baseUrl}}"], "path": ["api", "support"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "✅ Consent",
+            "item": [{
+                    "name": "Obtener Último Consentimiento",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/consent/latest", "host": ["{{baseUrl}}"], "path": ["api", "consent", "latest"] }
+                    }
+                },
+                {
+                    "name": "Verificar Consentimiento",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/consent/check", "host": ["{{baseUrl}}"], "path": ["api", "consent", "check"] }
+                    }
+                },
+                {
+                    "name": "Aceptar Consentimiento",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"version\": \"1.0\",\n  \"accepted\": true,\n  \"consentText\": \"Acepto los términos del consentimiento informado para participar en el programa EmoCheck\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/consent/accept", "host": ["{{baseUrl}}"], "path": ["api", "consent", "accept"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "📊 Dashboard",
+            "item": [{
+                    "name": "Indicadores Principales",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/dashboard/indicators?CompanyID=1&StartDate=2026-01-01&EndDate=2026-02-21",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "dashboard", "indicators"],
+                            "query": [
+                                { "key": "CompanyID", "value": "1", "description": "ID de empresa (opcional)" },
+                                { "key": "SiteID", "value": "", "description": "ID de sede (opcional)", "disabled": true },
+                                { "key": "AreaID", "value": "", "description": "ID de área (opcional)", "disabled": true },
+                                { "key": "ModuleID", "value": "", "description": "ID de módulo (opcional)", "disabled": true },
+                                { "key": "StartDate", "value": "2026-01-01" },
+                                { "key": "EndDate", "value": "2026-02-21" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Tendencias Temporales",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/dashboard/trends?periodType=monthly",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "dashboard", "trends"],
+                            "query": [
+                                { "key": "periodType", "value": "monthly", "description": "monthly | weekly | quarterly" },
+                                { "key": "CompanyID", "value": "", "disabled": true }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Distribución de Riesgo",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/dashboard/risk-distribution?CompanyID=1", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "risk-distribution"], "query": [{ "key": "CompanyID", "value": "1" }] }
+                    }
+                },
+                {
+                    "name": "Estadísticas por Módulo",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/dashboard/module-statistics", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "module-statistics"] }
+                    }
+                },
+                {
+                    "name": "Comparativa por Área",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/dashboard/area-comparison?CompanyID=1", "host": ["{{baseUrl}}"], "path": ["api", "dashboard", "area-comparison"], "query": [{ "key": "CompanyID", "value": "1" }] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "📤 Export",
+            "item": [{
+                    "name": "Solicitar Exportación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "POST",
+                        "header": [{ "key": "Content-Type", "value": "application/json" }],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"exportType\": \"EVALUATIONS\",\n  \"format\": \"XLSX\",\n  \"filters\": \"{\\\"companyId\\\": 1, \\\"startDate\\\": \\\"2026-01-01\\\"}\"\n}"
+                        },
+                        "url": { "raw": "{{baseUrl}}/api/export", "host": ["{{baseUrl}}"], "path": ["api", "export"] },
+                        "description": "ExportType: EVALUATIONS, ALERTS, USERS, RESULTS, CASE_TRACKING. Format: XLSX, CSV"
+                    }
+                },
+                {
+                    "name": "Mis Exportaciones",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/export/my-exports", "host": ["{{baseUrl}}"], "path": ["api", "export", "my-exports"] }
+                    }
+                },
+                {
+                    "name": "Estado de Exportación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/export/1", "host": ["{{baseUrl}}"], "path": ["api", "export", "1"] }
+                    }
+                },
+                {
+                    "name": "Descargar Exportación",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/export/1/download", "host": ["{{baseUrl}}"], "path": ["api", "export", "1", "download"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🔍 Audit Log (SuperAdmin)",
+            "item": [{
+                    "name": "Logs por Usuario",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auditlog/user/1?startDate=2026-01-01&endDate=2026-02-21",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "auditlog", "user", "1"],
+                            "query": [
+                                { "key": "startDate", "value": "2026-01-01" },
+                                { "key": "endDate", "value": "2026-02-21" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logs por Tabla",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auditlog/table/Users?recordId=1",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "auditlog", "table", "Users"],
+                            "query": [{ "key": "recordId", "value": "1", "description": "Opcional" }]
+                        }
+                    }
+                },
+                {
+                    "name": "Logs por Acción",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": { "raw": "{{baseUrl}}/api/auditlog/action/UPDATE", "host": ["{{baseUrl}}"], "path": ["api", "auditlog", "action", "UPDATE"] },
+                        "description": "Acciones: INSERT, UPDATE, DELETE"
+                    }
+                },
+                {
+                    "name": "Logs por Rango de Fechas",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auditlog/date-range?startDate=2026-01-01&endDate=2026-02-21",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "auditlog", "date-range"],
+                            "query": [
+                                { "key": "startDate", "value": "2026-01-01" },
+                                { "key": "endDate", "value": "2026-02-21" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Todos los Logs Paginados",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/auditlog?pageNumber=1&pageSize=50",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "auditlog"],
+                            "query": [
+                                { "key": "pageNumber", "value": "1" },
+                                { "key": "pageSize", "value": "50" }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "🖥️ System Log (SuperAdmin)",
+            "item": [{
+                    "name": "Logs por Rango de Fechas",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/systemlog/date-range?startDate=2026-02-01&endDate=2026-02-21",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "systemlog", "date-range"],
+                            "query": [
+                                { "key": "startDate", "value": "2026-02-01" },
+                                { "key": "endDate", "value": "2026-02-21" }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logs de Errores Recientes",
+                    "request": {
+                        "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/systemlog/errors?since=2026-02-20T00:00:00",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "systemlog", "errors"],
+                            "query": [{ "key": "since", "value": "2026-02-20T00:00:00", "description": "Opcional. Por defecto últimas 24h" }]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

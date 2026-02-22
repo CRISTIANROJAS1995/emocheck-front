@@ -57,15 +57,18 @@ export class AdminCasesComponent implements OnInit {
     form: CreateCaseTrackingDto = {
         alertId: 0,
         userId: undefined,
-        assignedToPsychologistId: 0,
-        priority: 'Medium',
-        initialAssessment: '',
-        interventionPlan: '',
+        assignedToUserID: 0,
+        priority: 'MEDIUM',
+        description: '',
     };
 
     // Edit form
     editStatus = '';
-    editNotes = '';
+    editAssignedToUserID: number | null = null;
+    editPriority = '';
+
+    // Close reason
+    closeReason = '';
 
     constructor(
         private readonly service: AdminCaseTrackingService,
@@ -140,8 +143,10 @@ export class AdminCasesComponent implements OnInit {
             return;
         }
         this.selectedCase = c;
-        this.editStatus = c.status || 'Open';
-        this.editNotes = c.progressNotes || '';
+        this.editStatus = c.status || 'OPEN';
+        this.editAssignedToUserID = c.assignedToPsychologistId ?? null;
+        this.editPriority = c.priority || 'MEDIUM';
+        this.closeReason = '';
         this.loadFollowUps(c.caseTrackingId);
     }
 
@@ -174,7 +179,11 @@ export class AdminCasesComponent implements OnInit {
     updateCase(): void {
         if (!this.selectedCase) return;
         this.saving = true;
-        this.service.update(this.selectedCase.caseTrackingId, { status: this.editStatus, progressNotes: this.editNotes })
+        this.service.update(this.selectedCase.caseTrackingId, {
+            status: this.editStatus,
+            assignedToUserID: this.editAssignedToUserID ?? undefined,
+            priority: this.editPriority || undefined,
+        })
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
                 next: () => { this.notify.success('Caso actualizado'); this.selectedCase = null; this.load(); },
@@ -185,7 +194,7 @@ export class AdminCasesComponent implements OnInit {
     closeCase(): void {
         if (!this.selectedCase) return;
         this.saving = true;
-        this.service.close(this.selectedCase.caseTrackingId)
+        this.service.close(this.selectedCase.caseTrackingId, this.closeReason.trim() || undefined)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
                 next: () => { this.notify.success('Caso cerrado'); this.selectedCase = null; this.load(); },
@@ -194,7 +203,7 @@ export class AdminCasesComponent implements OnInit {
     }
 
     createCase(): void {
-        if (!this.form.alertId || !this.form.assignedToPsychologistId || !this.form.initialAssessment || !this.form.interventionPlan) {
+        if (!this.form.alertId || !this.form.assignedToUserID || !this.form.description) {
             this.notify.warning('Completa todos los campos obligatorios');
             return;
         }
@@ -204,7 +213,7 @@ export class AdminCasesComponent implements OnInit {
             .subscribe({
                 next: () => {
                     this.notify.success('Caso creado');
-                    this.form = { alertId: 0, userId: undefined, assignedToPsychologistId: 0, priority: 'Medium', initialAssessment: '', interventionPlan: '' };
+                    this.form = { alertId: 0, userId: undefined, assignedToUserID: 0, priority: 'MEDIUM', description: '' };
                     this.activeTab = 'list';
                     this.load();
                 },
@@ -212,27 +221,47 @@ export class AdminCasesComponent implements OnInit {
             });
     }
 
-    get openCount(): number { return this.cases.filter(c => c.status === 'Open').length; }
-    get inProgressCount(): number { return this.cases.filter(c => c.status === 'InProgress').length; }
-    get closedCount(): number { return this.cases.filter(c => c.status === 'Closed' || c.status === 'Resolved').length; }
+    get openCount(): number { return this.cases.filter(c => (c.status ?? '').toUpperCase() === 'OPEN').length; }
+    get inProgressCount(): number { return this.cases.filter(c => (c.status ?? '').toUpperCase() === 'IN_PROGRESS').length; }
+    get closedCount(): number { return this.cases.filter(c => ['CLOSED', 'ESCALATED'].includes((c.status ?? '').toUpperCase())).length; }
 
     priorityBadge(p: string | undefined): string {
-        switch ((p ?? '').toLowerCase()) {
-            case 'critical': return 'badge badge--danger';
-            case 'high': return 'badge badge--warning';
-            case 'medium': return 'badge badge--info';
-            case 'low': return 'badge badge--success';
-            default: return 'badge badge--neutral';
+        switch ((p ?? '').toUpperCase()) {
+            case 'CRITICAL': return 'badge badge--danger';
+            case 'HIGH':     return 'badge badge--warning';
+            case 'MEDIUM':   return 'badge badge--info';
+            case 'LOW':      return 'badge badge--success';
+            default:         return 'badge badge--neutral';
         }
     }
 
     statusBadge(s: string | undefined): string {
-        switch ((s ?? '').toLowerCase()) {
-            case 'open': return 'badge badge--warning';
-            case 'inprogress': return 'badge badge--info';
-            case 'resolved': return 'badge badge--success';
-            case 'closed': return 'badge badge--neutral';
-            default: return 'badge badge--neutral';
+        switch ((s ?? '').toUpperCase()) {
+            case 'OPEN':        return 'badge badge--warning';
+            case 'IN_PROGRESS': return 'badge badge--info';
+            case 'ESCALATED':   return 'badge badge--danger';
+            case 'CLOSED':      return 'badge badge--neutral';
+            default:            return 'badge badge--neutral';
+        }
+    }
+
+    statusLabel(s: string | undefined): string {
+        switch ((s ?? '').toUpperCase()) {
+            case 'OPEN':        return 'Abierto';
+            case 'IN_PROGRESS': return 'En Proceso';
+            case 'ESCALATED':   return 'Escalado';
+            case 'CLOSED':      return 'Cerrado';
+            default:            return s ?? '-';
+        }
+    }
+
+    priorityLabel(p: string | undefined): string {
+        switch ((p ?? '').toUpperCase()) {
+            case 'CRITICAL': return 'Crítica';
+            case 'HIGH':     return 'Alta';
+            case 'MEDIUM':   return 'Media';
+            case 'LOW':      return 'Baja';
+            default:         return p ?? '-';
         }
     }
 }

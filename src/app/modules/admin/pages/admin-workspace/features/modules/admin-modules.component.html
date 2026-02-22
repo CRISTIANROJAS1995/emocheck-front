@@ -15,8 +15,7 @@
             @if (viewMode === 'detail') {
             <button class="btn btn--outline btn--sm" (click)="backToList()">
                 <mat-icon>arrow_back</mat-icon> Volver a Módulos
-            </button>
-            }
+            </button> }
             <a routerLink="/admin" class="btn btn--outline btn--sm">
                 <mat-icon>arrow_back</mat-icon> Admin
             </a>
@@ -27,21 +26,27 @@
     @if (viewMode === 'list') {
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>view_module</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>view_module</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ modules.length }}</span>
                 <span class="kpi-card__label">Total Módulos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ activeCount }}</span>
                 <span class="kpi-card__label">Activos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--amber">
-            <div class="kpi-card__icon"><mat-icon>cancel</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>cancel</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ modules.length - activeCount }}</span>
                 <span class="kpi-card__label">Inactivos</span>
@@ -54,22 +59,28 @@
     @if (viewMode === 'detail' && selectedModule) {
     <div class="kpi-row">
         <div class="kpi-card kpi-card--sky">
-            <div class="kpi-card__icon"><mat-icon>quiz</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>quiz</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ totalQuestions }}</span>
                 <span class="kpi-card__label">Preguntas</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>speed</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>speed</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ selectedModule.module?.maxScore ?? 0 }}</span>
                 <span class="kpi-card__label">Puntaje Máximo</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>{{ selectedModule.module?.isActive ? 'check_circle' : 'cancel'
-                    }}</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>{{ selectedModule.module?.isActive ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ selectedModule.module?.isActive ? 'Sí' : 'No' }}</span>
                 <span class="kpi-card__label">Activo</span>
@@ -81,15 +92,16 @@
     <!-- ═══════════ CREATE MODULE FORM ═══════════ -->
     @if (viewMode === 'list' && showCreateModule) {
     <div class="editor-panel">
-        <h3><mat-icon>add_circle</mat-icon> Crear Nuevo Módulo</h3>
+        <h3>
+            <mat-icon>add_circle</mat-icon> Crear Nuevo Módulo</h3>
         <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Código único *</span>
+                <input [(ngModel)]="moduleForm.code" placeholder="Ej: MENTAL_HEALTH" />
+            </label>
             <label class="editor-panel__field">
                 <span>Nombre *</span>
                 <input [(ngModel)]="moduleForm.name" placeholder="Nombre del módulo" />
-            </label>
-            <label class="editor-panel__field">
-                <span>Tipo de Instrumento</span>
-                <input [(ngModel)]="moduleForm.instrumentType" placeholder="Ej: Likert, Cuestionario..." />
             </label>
             <label class="editor-panel__field editor-panel__field--full">
                 <span>Descripción</span>
@@ -97,16 +109,28 @@
                     rows="2"></textarea>
             </label>
             <label class="editor-panel__field">
+                <span>Puntaje Mínimo</span>
+                <input type="number" [(ngModel)]="moduleForm.minScore" placeholder="0" />
+            </label>
+            <label class="editor-panel__field">
                 <span>Puntaje Máximo</span>
                 <input type="number" [(ngModel)]="moduleForm.maxScore" placeholder="100" />
             </label>
             <label class="editor-panel__field">
-                <span>Tiempo Estimado (min) *</span>
+                <span>Tiempo Estimado (min)</span>
                 <input type="number" [(ngModel)]="moduleForm.estimatedMinutes" placeholder="10" min="1" />
             </label>
             <label class="editor-panel__field">
                 <span>Orden de Visualización</span>
-                <input type="number" [(ngModel)]="moduleForm.orderIndex" placeholder="0" />
+                <input type="number" [(ngModel)]="moduleForm.displayOrder" placeholder="0" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Ícono</span>
+                <input [(ngModel)]="moduleForm.iconName" placeholder="Ej: psychology" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Color (hex)</span>
+                <input [(ngModel)]="moduleForm.colorHex" placeholder="#4F46E5" />
             </label>
         </div>
         <div class="editor-panel__actions">
@@ -124,8 +148,7 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="search" placeholder="Buscar módulo por nombre..."
-                class="admin-filters__search" />
+            <input type="text" [(ngModel)]="search" placeholder="Buscar módulo por nombre..." class="admin-filters__search" />
         </div>
         <div style="display:flex;align-items:center;gap:8px">
             <span class="admin-filters__count">{{ filteredModules.length }} módulos</span>
@@ -141,16 +164,14 @@
         <mat-spinner diameter="40"></mat-spinner>
         <span>Cargando módulos...</span>
     </div>
-    }
-
-    @if (!loading) {
+    } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
             <thead>
                 <tr>
                     <th (click)="toggleSort('moduleID')" [class]="sortClass('moduleID')">ID</th>
                     <th (click)="toggleSort('name')" [class]="sortClass('name')">Nombre</th>
-                    <th>Tipo</th>
+                    <th>Código</th>
                     <th>Descripción</th>
                     <th>Puntaje Máx</th>
                     <th>Estado</th>
@@ -162,7 +183,7 @@
                 <tr>
                     <td><strong>#{{ mod.moduleID }}</strong></td>
                     <td>{{ mod.name || '-' }}</td>
-                    <td><span class="badge badge--info">{{ mod.instrumentType || '-' }}</span></td>
+                    <td><span class="badge badge--info">{{ mod.code || '-' }}</span></td>
                     <td class="truncate-cell">{{ mod.description || '-' }}</td>
                     <td>{{ mod.maxScore ?? 0 }}</td>
                     <td>
@@ -174,8 +195,7 @@
                         <button class="btn btn--primary btn--xs" (click)="openDetail(mod)" title="Ver completo">
                             <mat-icon>visibility</mat-icon>
                         </button>
-                        <button class="btn btn--danger btn--xs" (click)="deleteModule(mod)" [disabled]="saving"
-                            title="Eliminar">
+                        <button class="btn btn--danger btn--xs" (click)="deleteModule(mod)" [disabled]="saving" title="Eliminar">
                             <mat-icon>delete</mat-icon>
                         </button>
                     </td>
@@ -190,19 +210,15 @@
         </div>
         }
     </div>
-    }
-    }
+    } }
 
     <!-- ═══════════ DETAIL VIEW ═══════════ -->
-    @if (viewMode === 'detail') {
-    @if (detailLoading) {
+    @if (viewMode === 'detail') { @if (detailLoading) {
     <div class="loading-state">
         <mat-spinner diameter="40"></mat-spinner>
         <span>Cargando módulo completo...</span>
     </div>
-    }
-
-    @if (!detailLoading && selectedModule) {
+    } @if (!detailLoading && selectedModule) {
 
     <!-- Module info card (read mode) -->
     @if (editingModuleId === null) {
@@ -213,20 +229,23 @@
                 <button class="btn btn--primary btn--xs" (click)="startEditModule()" title="Editar módulo">
                     <mat-icon>edit</mat-icon> Editar
                 </button>
-                <button class="btn btn--danger btn--xs" (click)="deleteModule(selectedModule!.module)"
-                    [disabled]="saving" title="Eliminar módulo">
+                <button class="btn btn--danger btn--xs" (click)="deleteModule(selectedModule!.module)" [disabled]="saving" title="Eliminar módulo">
                     <mat-icon>delete</mat-icon> Eliminar
                 </button>
             </div>
         </div>
         <div class="detail-panel__grid">
             <div class="detail-panel__field">
+                <label>Código</label>
+                <span>{{ selectedModule.module?.code || 'No especificado' }}</span>
+            </div>
+            <div class="detail-panel__field">
                 <label>Nombre</label>
                 <span>{{ selectedModule.module?.name }}</span>
             </div>
             <div class="detail-panel__field">
-                <label>Tipo de Instrumento</label>
-                <span>{{ selectedModule.module?.instrumentType || 'No especificado' }}</span>
+                <label>Puntaje Mínimo</label>
+                <span>{{ selectedModule.module?.minScore ?? 0 }}</span>
             </div>
             <div class="detail-panel__field">
                 <label>Puntaje Máximo</label>
@@ -238,7 +257,15 @@
             </div>
             <div class="detail-panel__field">
                 <label>Orden</label>
-                <span>{{ selectedModule.module?.orderIndex ?? 0 }}</span>
+                <span>{{ selectedModule.module?.displayOrder ?? 0 }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Ícono</label>
+                <span>{{ selectedModule.module?.iconName || '-' }}</span>
+            </div>
+            <div class="detail-panel__field">
+                <label>Color</label>
+                <span>{{ selectedModule.module?.colorHex || '-' }}</span>
             </div>
             <div class="detail-panel__field detail-panel__field--full">
                 <label>Descripción</label>
@@ -251,19 +278,24 @@
     <!-- Module info card (edit mode) -->
     @if (editingModuleId !== null) {
     <div class="editor-panel">
-        <h3><mat-icon>edit</mat-icon> Editar Módulo #{{ editingModuleId }}</h3>
+        <h3>
+            <mat-icon>edit</mat-icon> Editar Módulo #{{ editingModuleId }}</h3>
         <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Código único *</span>
+                <input [(ngModel)]="editModuleForm.code" placeholder="Ej: MENTAL_HEALTH" />
+            </label>
             <label class="editor-panel__field">
                 <span>Nombre *</span>
                 <input [(ngModel)]="editModuleForm.name" placeholder="Nombre del módulo" />
             </label>
-            <label class="editor-panel__field">
-                <span>Tipo de Instrumento</span>
-                <input [(ngModel)]="editModuleForm.instrumentType" placeholder="Ej: Likert, Cuestionario..." />
-            </label>
             <label class="editor-panel__field editor-panel__field--full">
                 <span>Descripción</span>
                 <textarea [(ngModel)]="editModuleForm.description" placeholder="Descripción..." rows="2"></textarea>
+            </label>
+            <label class="editor-panel__field">
+                <span>Puntaje Mínimo</span>
+                <input type="number" [(ngModel)]="editModuleForm.minScore" />
             </label>
             <label class="editor-panel__field">
                 <span>Puntaje Máximo</span>
@@ -275,7 +307,15 @@
             </label>
             <label class="editor-panel__field">
                 <span>Orden</span>
-                <input type="number" [(ngModel)]="editModuleForm.orderIndex" />
+                <input type="number" [(ngModel)]="editModuleForm.displayOrder" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Ícono</span>
+                <input [(ngModel)]="editModuleForm.iconName" placeholder="Ej: psychology" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Color (hex)</span>
+                <input [(ngModel)]="editModuleForm.colorHex" placeholder="#4F46E5" />
             </label>
         </div>
         <div class="editor-panel__actions">
@@ -287,42 +327,75 @@
     </div>
     }
 
-    <!-- Questions Section (read-only from backend) -->
-    @if (selectedModule.questions.length > 0) {
-    <div class="detail-panel" style="margin-top:16px">
-        <div class="detail-panel__header">
-            <h3><mat-icon>quiz</mat-icon> Preguntas ({{ selectedModule.questions.length }})</h3>
+    <!-- Instruments Section -->
+    <div class="instruments-section">
+        <div class="instruments-section__header">
+            <h3>
+                <mat-icon>library_books</mat-icon>
+                Instrumentos ({{ selectedModule.instruments?.length ?? 0 }})
+            </h3>
         </div>
-        <table class="admin-table admin-table--nested">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Pregunta</th>
-                    <th>Tipo Respuesta</th>
-                    <th>Requerida</th>
-                    <th>Opciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (q of selectedModule.questions; track q.questionID; let i = $index) {
-                <tr>
-                    <td>{{ q.orderIndex ?? (i + 1) }}</td>
-                    <td>{{ q.questionText || '-' }}</td>
-                    <td><span class="badge badge--info">{{ q.responseType || 'N/A' }}</span></td>
-                    <td>{{ q.isRequired ? 'Sí' : 'No' }}</td>
-                    <td>{{ q.options?.length ?? 0 }}</td>
-                </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-    } @else {
-    <div class="empty-state" style="margin-top:16px">
-        <mat-icon>quiz</mat-icon>
-        <p>Este módulo no tiene preguntas configuradas.</p>
-    </div>
-    }
 
-    }
-    }
+        @if (!selectedModule.instruments || selectedModule.instruments.length === 0) {
+        <div class="empty-state">
+            <mat-icon>library_books</mat-icon>
+            <p>Este módulo no tiene instrumentos configurados.</p>
+        </div>
+        } @for (inst of selectedModule.instruments; track inst.instrumentID) {
+        <div class="instrument-card" [class.instrument-card--open]="isInstrumentExpanded(inst.instrumentID)">
+
+            <!-- Instrument header (clickable accordion) -->
+            <div class="instrument-card__header" (click)="toggleInstrument(inst.instrumentID)">
+                <div class="instrument-card__title">
+                    <mat-icon>assignment</mat-icon>
+                    <strong>{{ inst.name }}</strong>
+                    <span class="badge badge--info">{{ inst.code }}</span>
+                    <span style="color:#64748b;font-size:12px;font-weight:400">
+                        {{ inst.itemCount ?? 0 }} ítems &nbsp;·&nbsp; max {{ inst.maxScore ?? 0 }} pts
+                    </span>
+                </div>
+                <mat-icon>{{ isInstrumentExpanded(inst.instrumentID) ? 'expand_less' : 'expand_more' }}</mat-icon>
+            </div>
+
+            <!-- Instrument body (questions) -->
+            @if (isInstrumentExpanded(inst.instrumentID)) {
+            <div class="instrument-card__body">
+                @if (inst.description) {
+                <p class="instrument-card__desc">{{ inst.description }}</p>
+                } @if (questionsForInstrument(inst.instrumentID).length > 0) {
+                <table class="admin-table admin-table--nested">
+                    <thead>
+                        <tr>
+                            <th style="width:42px">#</th>
+                            <th>Pregunta</th>
+                            <th style="width:110px">Dimensión</th>
+                            <th style="width:80px">Invertida</th>
+                            <th style="width:70px">Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (q of questionsForInstrument(inst.instrumentID); track q.questionID; let i = $index) {
+                        <tr>
+                            <td><strong>{{ q.questionNumber ?? (i + 1) }}</strong></td>
+                            <td>{{ q.questionText || '-' }}</td>
+                            <td>
+                                <span class="badge badge--info">{{ q.dimensionCode || 'N/A' }}</span>
+                            </td>
+                            <td>{{ q.isReversed ? 'Sí' : 'No' }}</td>
+                            <td>{{ q.options?.length ?? 0 }}</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                } @else {
+                <p class="no-questions">No hay preguntas registradas para este instrumento.</p>
+                }
+            </div>
+            }
+
+        </div>
+        }
+    </div>
+
+    } }
 </section>

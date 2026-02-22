@@ -26,22 +26,30 @@ export class AdminAuditComponent implements OnInit {
     auditLogs: AuditLogDto[] = [];
     filteredAuditLogs: AuditLogDto[] = [];
     auditSearch = '';
+    auditActionFilter = '';
     auditPage = 1;
     auditPageSize = 50;
     auditTotal = 0;
+    expandedAuditId: number | null = null;
+
+    // KPI counters computed from loaded page
+    get auditInserts(): number { return this.auditLogs.filter(l => this.isAction(l.action, ['insert', 'create'])).length; }
+    get auditUpdates(): number { return this.auditLogs.filter(l => this.isAction(l.action, ['update', 'modify'])).length; }
+    get auditDeletes(): number { return this.auditLogs.filter(l => this.isAction(l.action, ['delete'])).length; }
 
     // System logs
     systemLogs: SystemLogDto[] = [];
     filteredSystemLogs: SystemLogDto[] = [];
     systemSearch = '';
+    systemLevelFilter = '';
+    expandedSystemId: number | null = null;
 
-    // Date filters
+    get systemErrors(): number { return this.systemLogs.filter(l => this.isLevel(l.level, ['error', 'fatal'])).length; }
+    get systemWarnings(): number { return this.systemLogs.filter(l => this.isLevel(l.level, ['warning', 'warn'])).length; }
+
+    // Shared date filters
     startDate = '';
     endDate = '';
-
-    // Sort
-    sortField = 'auditLogID';
-    sortAsc = false;
 
     constructor(private readonly service: AdminAuditService, private readonly notify: AlertService) { }
 
@@ -56,6 +64,7 @@ export class AdminAuditComponent implements OnInit {
     // ── Audit Logs ───────────────────────────
     loadAudit(): void {
         this.loading = true;
+        this.expandedAuditId = null;
         this.service.getAuditLogs({
             pageNumber: this.auditPage,
             pageSize: this.auditPageSize,
@@ -74,14 +83,31 @@ export class AdminAuditComponent implements OnInit {
 
     applyAuditFilter(): void {
         const q = this.auditSearch.trim().toLowerCase();
+        const action = this.auditActionFilter.toLowerCase();
         let filtered = this.auditLogs;
         if (q) {
             filtered = filtered.filter(l =>
-                `${l.tableName ?? ''} ${l.action ?? ''} ${l.userName ?? ''} ${l.userID ?? ''}`
+                `${l.tableName ?? ''} ${l.action ?? ''} ${l.userName ?? ''} ${l.userID ?? ''} ${l.recordID ?? ''} ${l.ipAddress ?? ''}`
                     .toLowerCase().includes(q)
             );
         }
+        if (action) {
+            filtered = filtered.filter(l => (l.action ?? '').toLowerCase() === action);
+        }
         this.filteredAuditLogs = filtered;
+    }
+
+    toggleAuditRow(id: number): void {
+        this.expandedAuditId = this.expandedAuditId === id ? null : id;
+    }
+
+    hasDetail(log: AuditLogDto): boolean {
+        return !!(log.oldValues || log.newValues || log.ipAddress || log.userAgent);
+    }
+
+    formatJson(raw: string | null | undefined): string {
+        if (!raw) return '';
+        try { return JSON.stringify(JSON.parse(raw), null, 2); } catch { return raw; }
     }
 
     nextPage(): void {
@@ -105,6 +131,7 @@ export class AdminAuditComponent implements OnInit {
     // ── System Logs ──────────────────────────
     loadSystem(): void {
         this.loading = true;
+        this.expandedSystemId = null;
         this.service.getSystemErrors()
             .pipe(finalize(() => (this.loading = false)))
             .subscribe({
@@ -118,13 +145,30 @@ export class AdminAuditComponent implements OnInit {
 
     applySystemFilter(): void {
         const q = this.systemSearch.trim().toLowerCase();
+        const lvl = this.systemLevelFilter.toLowerCase();
         let filtered = this.systemLogs;
         if (q) {
             filtered = filtered.filter(l =>
-                `${l.message ?? ''} ${l.level ?? ''} ${l.source ?? ''}`.toLowerCase().includes(q)
+                `${l.message ?? ''} ${l.level ?? ''} ${l.source ?? ''} ${l.stackTrace ?? ''}`.toLowerCase().includes(q)
             );
         }
+        if (lvl) {
+            filtered = filtered.filter(l => (l.level ?? '').toLowerCase() === lvl);
+        }
         this.filteredSystemLogs = filtered;
+    }
+
+    toggleSystemRow(id: number): void {
+        this.expandedSystemId = this.expandedSystemId === id ? null : id;
+    }
+
+    // ── Helpers ──────────────────────────────
+    private isAction(action: string | null | undefined, values: string[]): boolean {
+        return values.includes((action ?? '').toLowerCase());
+    }
+
+    private isLevel(level: string | null | undefined, values: string[]): boolean {
+        return values.includes((level ?? '').toLowerCase());
     }
 
     actionBadge(action: string | undefined): string {
@@ -132,6 +176,7 @@ export class AdminAuditComponent implements OnInit {
             case 'insert': case 'create': return 'badge badge--success';
             case 'update': case 'modify': return 'badge badge--info';
             case 'delete': return 'badge badge--danger';
+            case 'login': case 'logout': return 'badge badge--purple';
             default: return 'badge badge--neutral';
         }
     }
@@ -141,6 +186,7 @@ export class AdminAuditComponent implements OnInit {
             case 'error': case 'fatal': return 'badge badge--danger';
             case 'warning': case 'warn': return 'badge badge--warning';
             case 'info': case 'information': return 'badge badge--info';
+            case 'debug': case 'trace': return 'badge badge--neutral';
             default: return 'badge badge--neutral';
         }
     }

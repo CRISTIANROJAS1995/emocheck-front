@@ -6,8 +6,8 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 export interface AdminCaseQuery {
-    status?: 'Open' | 'InProgress' | 'Resolved' | 'Closed' | string;
-    priority?: 'Low' | 'Medium' | 'High' | 'Critical' | string;
+    status?: 'OPEN' | 'IN_PROGRESS' | 'CLOSED' | 'ESCALATED' | string;
+    priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | string;
     psychologistId?: number;
 }
 
@@ -43,23 +43,22 @@ export interface FollowUpDto {
 
 export interface CreateFollowUpDto {
     notes: string;
-    followUpDate?: string;
+    followUpType?: 'SESSION' | 'CALL' | 'EMAIL' | string;
+    scheduledDate?: string;
 }
 
 export interface CreateCaseTrackingDto {
     alertId: number;
     userId?: number;
-    assignedToPsychologistId: number;
-    priority: 'Low' | 'Medium' | 'High' | 'Critical' | string;
-    initialAssessment: string;
-    interventionPlan: string;
-    nextFollowUpDate?: string;
+    assignedToUserID: number;
+    priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | string;
+    description: string;
 }
 
 export interface UpdateCaseTrackingDto {
     status?: string;
-    progressNotes?: string;
-    nextFollowUpDate?: string;
+    assignedToUserID?: number;
+    priority?: string;
 }
 
 type BackendCaseTrackingDto = {
@@ -144,8 +143,10 @@ export class AdminCaseTrackingService {
 
     // ── Cases CRUD ─────────────────────────────
     list(query?: AdminCaseQuery): Observable<CaseTrackingDto[]> {
+        // Use /status/OPEN as default — API has no "list all" endpoint
+        const status = (query?.status ?? 'OPEN').toUpperCase();
         return this.http
-            .get<unknown>(`${this.apiUrl}/casetracking`)
+            .get<unknown>(`${this.apiUrl}/casetracking/status/${status}`)
             .pipe(
                 map((res) => this.unwrapArray<BackendCaseTrackingDto>(res).map((x) => this.mapCase(x))),
                 map((rows) => this.applyClientFilters(rows, query)),
@@ -159,20 +160,23 @@ export class AdminCaseTrackingService {
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
     }
 
-    /** Get cases by status — uses client-side filtering (backend status endpoint is not available) */
+    /** Get cases by status — GET /casetracking/status/{status} */
     listByStatus(status: string): Observable<CaseTrackingDto[]> {
-        return this.list({ status });
+        return this.http
+            .get<unknown>(`${this.apiUrl}/casetracking/status/${status.toUpperCase()}`)
+            .pipe(
+                map((res) => this.unwrapArray<BackendCaseTrackingDto>(res).map((x) => this.mapCase(x))),
+                catchError(() => of([])),
+            );
     }
 
     create(payload: CreateCaseTrackingDto): Observable<CaseTrackingDto> {
         const backendPayload = {
             alertID: payload.alertId,
-            userID: typeof payload.userId === 'number' ? payload.userId : 0,
-            assignedToPsychologistID: payload.assignedToPsychologistId,
+            userID: typeof payload.userId === 'number' ? payload.userId : undefined,
+            assignedToUserID: payload.assignedToUserID,
             priority: payload.priority,
-            initialAssessment: payload.initialAssessment,
-            interventionPlan: payload.interventionPlan,
-            nextFollowUpDate: payload.nextFollowUpDate,
+            description: payload.description,
         };
         return this.http
             .post<unknown>(`${this.apiUrl}/casetracking`, backendPayload)
@@ -185,9 +189,11 @@ export class AdminCaseTrackingService {
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
     }
 
-    close(caseId: number): Observable<CaseTrackingDto> {
+    /** Close a case — PATCH /casetracking/{id}/close */
+    close(caseId: number, closeReason?: string): Observable<CaseTrackingDto> {
+        const body = { closeReason: closeReason ?? 'Caso cerrado' };
         return this.http
-            .post<unknown>(`${this.apiUrl}/casetracking/${caseId}/close`, {})
+            .patch<unknown>(`${this.apiUrl}/casetracking/${caseId}/close`, body)
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
     }
 
@@ -202,8 +208,13 @@ export class AdminCaseTrackingService {
     }
 
     createFollowUp(caseId: number, payload: CreateFollowUpDto): Observable<FollowUpDto | null> {
+        const body = {
+            notes: payload.notes,
+            followUpType: payload.followUpType ?? 'SESSION',
+            scheduledDate: payload.scheduledDate,
+        };
         return this.http
-            .post<unknown>(`${this.apiUrl}/casetracking/${caseId}/follow-ups`, payload)
+            .post<unknown>(`${this.apiUrl}/casetracking/${caseId}/follow-ups`, body)
             .pipe(
                 map((res) => this.mapFollowUp(this.unwrapObject<BackendFollowUpDto>(res))),
                 catchError(() => of(null)),

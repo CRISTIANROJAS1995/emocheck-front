@@ -7,8 +7,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
 import {
     AdminAssessmentModuleDto,
+    AdminInstrumentDto,
     AdminQuestionDto,
     AdminModulesService,
+    CreateModulePayload,
     ModuleFullDto,
 } from 'app/core/services/admin-modules.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
@@ -39,11 +41,31 @@ export class AdminModulesComponent implements OnInit {
 
     // ── Create Module ──
     showCreateModule = false;
-    moduleForm: Partial<AdminAssessmentModuleDto> = this.emptyModule();
+    moduleForm: CreateModulePayload = this.emptyModule();
 
     // ── Edit Module ──
     editingModuleId: number | null = null;
-    editModuleForm: Partial<AdminAssessmentModuleDto> = {};
+    editModuleForm: Partial<CreateModulePayload> = {};
+
+    // ── Instrument accordion ──
+    expandedInstrumentIds = new Set<number>();
+
+    toggleInstrument(id: number): void {
+        if (this.expandedInstrumentIds.has(id)) {
+            this.expandedInstrumentIds.delete(id);
+        } else {
+            this.expandedInstrumentIds.add(id);
+        }
+    }
+
+    isInstrumentExpanded(id: number): boolean {
+        return this.expandedInstrumentIds.has(id);
+    }
+
+    /** Devuelve las preguntas que pertenecen a un instrumento dado */
+    questionsForInstrument(instrumentId: number): AdminQuestionDto[] {
+        return (this.selectedModule?.questions ?? []).filter(q => q.instrumentID === instrumentId);
+    }
 
     constructor(private readonly service: AdminModulesService, private readonly notify: AlertService) { }
 
@@ -64,7 +86,7 @@ export class AdminModulesComponent implements OnInit {
         let filtered = this.modules;
         if (q) {
             filtered = filtered.filter((m) =>
-                `${m.name ?? ''} ${m.description ?? ''} ${m.instrumentType ?? ''}`.toLowerCase().includes(q)
+                `${m.name ?? ''} ${m.description ?? ''} ${m.code ?? ''}`.toLowerCase().includes(q)
             );
         }
         return [...filtered].sort((a, b) => {
@@ -117,6 +139,10 @@ export class AdminModulesComponent implements OnInit {
             this.notify.error('El nombre del módulo es requerido');
             return;
         }
+        if (!this.moduleForm.code?.trim()) {
+            this.notify.error('El código del módulo es requerido');
+            return;
+        }
         this.saving = true;
         this.service.createModule(this.moduleForm)
             .pipe(finalize(() => (this.saving = false)))
@@ -136,13 +162,15 @@ export class AdminModulesComponent implements OnInit {
         if (!m) return;
         this.editingModuleId = m.moduleID;
         this.editModuleForm = {
-            name: m.name,
-            description: m.description,
-            instrumentType: m.instrumentType,
-            maxScore: m.maxScore,
-            estimatedMinutes: m.estimatedMinutes,
-            orderIndex: m.orderIndex,
-            isActive: m.isActive,
+            code: m.code ?? '',
+            name: m.name ?? '',
+            description: m.description ?? '',
+            maxScore: m.maxScore ?? 100,
+            minScore: m.minScore ?? 0,
+            iconName: m.iconName ?? '',
+            colorHex: m.colorHex ?? '',
+            estimatedMinutes: m.estimatedMinutes ?? 10,
+            displayOrder: m.displayOrder ?? 0,
         };
     }
 
@@ -201,7 +229,7 @@ export class AdminModulesComponent implements OnInit {
             });
     }
 
-    private emptyModule(): Partial<AdminAssessmentModuleDto> {
-        return { name: '', description: '', instrumentType: '', maxScore: 100, estimatedMinutes: 10, isActive: true, orderIndex: 0 };
+    private emptyModule(): CreateModulePayload {
+        return { code: '', name: '', description: '', maxScore: 100, minScore: 0, estimatedMinutes: 10, displayOrder: 0 };
     }
 }

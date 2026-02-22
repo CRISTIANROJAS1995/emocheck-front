@@ -29,32 +29,29 @@ export interface EmergencyContactDto {
     availability?: string;
 }
 
-export type SupportRequestType = 'Consultation' | 'Therapy' | 'Emergency' | 'Information';
-export type SupportUrgencyLevel = 'Low' | 'Medium' | 'High' | 'Critical';
-export type PreferredContactMethod = 'Phone' | 'Email' | 'InPerson' | 'VideoCall';
+export type SupportRequestType = 'PSYCHOLOGICAL' | 'HR' | 'TECHNICAL' | string;
+export type SupportPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | string;
 
 export interface CreateSupportRequestDto {
-    evaluationResultId: number;
     requestType: SupportRequestType;
-    urgencyLevel: SupportUrgencyLevel;
     subject: string;
     description: string;
-    preferredContactMethod?: PreferredContactMethod;
-    preferredSchedule?: string;
+    priority: SupportPriority;
+    evaluationID?: number;
 }
 
 export interface SupportRequestDto {
     supportRequestId: number;
     requestType: SupportRequestType;
-    urgencyLevel: SupportUrgencyLevel;
-    status: 'Pending' | 'Assigned' | 'InProgress' | 'Completed' | 'Cancelled' | string;
+    priority: SupportPriority;
+    status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CANCELLED' | string;
     subject: string;
+    description?: string;
     requestedAt: string;
     assignedAt?: string | null;
     assignedToPsychologistName?: string | null;
     assignedToPsychologistPhone?: string | null;
-    firstContactAt?: string | null;
-    completedAt?: string | null;
+    resolvedAt?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -120,16 +117,16 @@ export class SupportService {
     private toSupportRequestDto(raw: any): SupportRequestDto {
         return {
             supportRequestId: Number(raw?.supportRequestID ?? raw?.supportRequestId ?? 0),
-            requestType: (raw?.requestType ?? 'Consultation') as SupportRequestType,
-            urgencyLevel: (raw?.urgencyLevel ?? 'Medium') as SupportUrgencyLevel,
-            status: String(raw?.status ?? 'Pending'),
+            requestType: (raw?.requestType ?? 'PSYCHOLOGICAL') as SupportRequestType,
+            priority: (raw?.priority ?? 'MEDIUM') as SupportPriority,
+            status: String(raw?.status ?? 'OPEN'),
             subject: String(raw?.subject ?? ''),
-            requestedAt: String(raw?.requestedAt ?? ''),
+            description: raw?.description ?? undefined,
+            requestedAt: String(raw?.requestedAt ?? raw?.createdAt ?? ''),
             assignedAt: raw?.assignedAt ?? null,
             assignedToPsychologistName: raw?.assignedToPsychologistName ?? raw?.psychologistName ?? null,
             assignedToPsychologistPhone: raw?.assignedToPsychologistPhone ?? null,
-            firstContactAt: raw?.firstContactAt ?? null,
-            completedAt: raw?.completedAt ?? null,
+            resolvedAt: raw?.resolvedAt ?? raw?.completedAt ?? null,
         };
     }
 
@@ -143,16 +140,26 @@ export class SupportService {
     }
 
     getEmergencyContacts(): Observable<EmergencyContactDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/support/professionals/emergency`).pipe(
-            map((res) => {
-                const list = this.unwrapApiResponse<any[]>(res, 'No fue posible obtener contactos de emergencia') ?? [];
-                return (list ?? []).map((item) => this.toEmergencyContactDto(item));
-            })
+        // No dedicated emergency endpoint — filter professionals by isEmergencyContact flag
+        return this.getProfessionals().pipe(
+            map((list) =>
+                list
+                    .filter((p) => p.isEmergencyContact)
+                    .map((p) => ({
+                        professionalSupportId: p.professionalSupportId,
+                        fullName: p.fullName,
+                        phone: p.phone,
+                        emergencyLine: undefined,
+                        email: p.email,
+                        isEmergencyContact: true,
+                        availability: undefined,
+                    } as EmergencyContactDto))
+            )
         );
     }
 
     createRequest(payload: CreateSupportRequestDto): Observable<{ supportRequestId: number } & Record<string, unknown>> {
-        return this.http.post<unknown>(`${this.apiUrl}/support/requests`, payload).pipe(
+        return this.http.post<unknown>(`${this.apiUrl}/support`, payload).pipe(
             map((res) => {
                 const created = this.unwrapApiResponse<any>(res, 'No fue posible crear la solicitud') ?? {};
                 return {
@@ -164,7 +171,7 @@ export class SupportService {
     }
 
     getMyRequests(): Observable<SupportRequestDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/support/requests/my`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/support/my-requests`).pipe(
             map((res) => {
                 const list = this.unwrapApiResponse<any[]>(res, 'No fue posible obtener solicitudes') ?? [];
                 return (list ?? []).map((item) => this.toSupportRequestDto(item));

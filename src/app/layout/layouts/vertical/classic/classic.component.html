@@ -2,8 +2,7 @@
 <fuse-loading-bar></fuse-loading-bar>
 
 <!-- Navigation -->
-<fuse-vertical-navigation class="bg-card print:hidden border-r" [mode]="'over'" [name]="'mainNavigation'"
-    [navigation]="navigation.default">
+<fuse-vertical-navigation class="bg-card print:hidden border-r" [mode]="'over'" [name]="'mainNavigation'" [navigation]="navigation.default">
     <!-- Navigation header hook -->
     <ng-container fuseVerticalNavigationContentHeader>
         <div class="flex items-center justify-between px-6 pt-8 pb-10">
@@ -39,25 +38,19 @@
                     <mat-icon svgIcon="heroicons_outline:bars-3"></mat-icon>
                 </button>
 
-                <div class="flex items-center">
+                <a routerLink="/admin" class="flex items-center">
                     <img class="h-8 w-auto" src="images/logo/texto-logo-emocheck.png" alt="EmoCheck" />
-                </div>
+                </a>
             </div>
 
             <!-- Right: actions -->
             <div class="ml-auto flex items-center gap-2">
-                <button mat-icon-button aria-label="Notificaciones">
-                    <mat-icon svgIcon="heroicons_outline:bell"
-                        style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
-                </button>
-                <button mat-icon-button aria-label="Ayuda">
-                    <mat-icon svgIcon="heroicons_outline:question-mark-circle"
-                        style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
-                </button>
-                <button mat-icon-button aria-label="Configuración">
-                    <mat-icon svgIcon="heroicons_outline:cog-6-tooth"
-                        style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
-                </button>
+                <a mat-icon-button routerLink="/support" aria-label="Ayuda">
+                    <mat-icon svgIcon="heroicons_outline:question-mark-circle" style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
+                </a>
+                <a mat-icon-button routerLink="/admin/config" aria-label="Configuración">
+                    <mat-icon svgIcon="heroicons_outline:cog-6-tooth" style="width: 12px; height: 10px; font-size: 12px;"></mat-icon>
+                </a>
                 <user></user>
             </div>
         </div>

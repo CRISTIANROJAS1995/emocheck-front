@@ -16,28 +16,36 @@
     <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>folder</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>folder</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ cases.length }}</span>
                 <span class="kpi-card__label">Total Casos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--amber">
-            <div class="kpi-card__icon"><mat-icon>folder_open</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>folder_open</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ openCount }}</span>
                 <span class="kpi-card__label">Abiertos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--sky">
-            <div class="kpi-card__icon"><mat-icon>pending</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>pending</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ inProgressCount }}</span>
                 <span class="kpi-card__label">En Progreso</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>task_alt</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>task_alt</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ closedCount }}</span>
                 <span class="kpi-card__label">Cerrados</span>
@@ -48,7 +56,8 @@
     <!-- Create Form -->
     @if (activeTab === 'create') {
     <div class="editor-panel">
-        <h3><mat-icon>add_circle</mat-icon> Crear Nuevo Caso</h3>
+        <h3>
+            <mat-icon>add_circle</mat-icon> Crear Nuevo Caso</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Alerta *</span>
@@ -62,7 +71,7 @@
             </label>
             <label class="editor-panel__field">
                 <span>Psicólogo asignado *</span>
-                <select [(ngModel)]="form.assignedToPsychologistId">
+                <select [(ngModel)]="form.assignedToUserID">
                     <option [ngValue]="0" disabled>-- Seleccionar psicólogo --</option>
                     @for (p of psychologists; track p.userId) {
                     <option [ngValue]="p.userId">{{ p.fullName }} ({{ p.email }})</option>
@@ -72,19 +81,15 @@
             <label class="editor-panel__field">
                 <span>Prioridad</span>
                 <select [(ngModel)]="form.priority">
-                    <option value="Low">Baja</option>
-                    <option value="Medium">Media</option>
-                    <option value="High">Alta</option>
-                    <option value="Critical">Crítica</option>
+                    <option value="LOW">Baja</option>
+                    <option value="MEDIUM">Media</option>
+                    <option value="HIGH">Alta</option>
+                    <option value="CRITICAL">Crítica</option>
                 </select>
             </label>
             <label class="editor-panel__field editor-panel__field--full">
-                <span>Valoración inicial *</span>
-                <textarea rows="3" [(ngModel)]="form.initialAssessment"></textarea>
-            </label>
-            <label class="editor-panel__field editor-panel__field--full">
-                <span>Plan de intervención *</span>
-                <textarea rows="3" [(ngModel)]="form.interventionPlan"></textarea>
+                <span>Descripción *</span>
+                <textarea rows="3" [(ngModel)]="form.description"></textarea>
             </label>
         </div>
         <div class="editor-panel__actions">
@@ -102,21 +107,20 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">filter_list</mat-icon>
-            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
-                placeholder="Buscar por caso, usuario..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()" placeholder="Buscar por caso, usuario..." class="admin-filters__search" />
             <select [(ngModel)]="statusFilter" (ngModelChange)="load()">
                 <option value="">Todos los estados</option>
-                <option value="Open">Abierto</option>
-                <option value="InProgress">En Progreso</option>
-                <option value="Resolved">Resuelto</option>
-                <option value="Closed">Cerrado</option>
+                <option value="OPEN">Abierto</option>
+                <option value="IN_PROGRESS">En Progreso</option>
+                <option value="ESCALATED">Escalado</option>
+                <option value="CLOSED">Cerrado</option>
             </select>
             <select [(ngModel)]="priorityFilter" (ngModelChange)="load()">
                 <option value="">Todas las prioridades</option>
-                <option value="Low">Baja</option>
-                <option value="Medium">Media</option>
-                <option value="High">Alta</option>
-                <option value="Critical">Crítica</option>
+                <option value="LOW">Baja</option>
+                <option value="MEDIUM">Media</option>
+                <option value="HIGH">Alta</option>
+                <option value="CRITICAL">Crítica</option>
             </select>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -157,26 +161,21 @@
                 <tr [class.row--selected]="selectedCase?.caseTrackingId === c.caseTrackingId" (click)="selectCase(c)">
                     <td><strong>#{{ c.caseTrackingId }}</strong></td>
                     <td>{{ c.caseNumber || '-' }}</td>
-                    <td><span [class]="statusBadge(c.status)">{{ c.status || 'N/A' }}</span></td>
-                    <td><span [class]="priorityBadge(c.priority)">{{ c.priority || 'N/A' }}</span></td>
+                    <td><span [class]="statusBadge(c.status)">{{ statusLabel(c.status) }}</span></td>
+                    <td><span [class]="priorityBadge(c.priority)">{{ priorityLabel(c.priority) }}</span></td>
                     <td>
                         @if (c.userInitials) {
-                        <span class="avatar-sm">{{ c.userInitials }}</span>
-                        }
-                        {{ c.userName || '-' }}
+                        <span class="avatar-sm">{{ c.userInitials }}</span> } {{ c.userName || '-' }}
                     </td>
                     <td>{{ c.assignedToPsychologistName || '-' }}</td>
                     <td>{{ c.openedAt | date:'dd/MM/yyyy' }}</td>
                     <td class="actions-cell">
                         <button class="btn btn--outline btn--xs" (click)="selectCase(c); $event.stopPropagation()">
                             <mat-icon>visibility</mat-icon>
-                        </button>
-                        @if (c.status !== 'Closed' && c.status !== 'Resolved') {
-                        <button class="btn btn--danger btn--xs"
-                            (click)="selectedCase = c; closeCase(); $event.stopPropagation()" [disabled]="saving">
+                        </button> @if (c.status !== 'CLOSED' && c.status !== 'ESCALATED') {
+                        <button class="btn btn--danger btn--xs" (click)="selectCase(c); $event.stopPropagation()" [disabled]="saving">
                             <mat-icon>lock</mat-icon>
-                        </button>
-                        }
+                        </button> }
                     </td>
                 </tr>
                 }
@@ -189,8 +188,7 @@
         </div>
         }
     </div>
-    }
-    }
+    } }
 
     <!-- Detail Panel -->
     @if (selectedCase; as current) {
@@ -204,11 +202,11 @@
         <div class="detail-panel__grid">
             <div class="detail-panel__field">
                 <label>Estado</label>
-                <span [class]="statusBadge(current.status)">{{ current.status }}</span>
+                <span [class]="statusBadge(current.status)">{{ statusLabel(current.status) }}</span>
             </div>
             <div class="detail-panel__field">
                 <label>Prioridad</label>
-                <span [class]="priorityBadge(current.priority)">{{ current.priority }}</span>
+                <span [class]="priorityBadge(current.priority)">{{ priorityLabel(current.priority) }}</span>
             </div>
             <div class="detail-panel__field">
                 <label>Usuario</label>
@@ -227,36 +225,47 @@
                 <span>{{ current.closedAt ? (current.closedAt | date:'dd/MM/yyyy HH:mm') : 'Abierto' }}</span>
             </div>
             <div class="detail-panel__field detail-panel__field--full">
-                <label>Valoración Inicial</label>
-                <span>{{ current.initialAssessment || '-' }}</span>
-            </div>
-            <div class="detail-panel__field detail-panel__field--full">
-                <label>Plan de Intervención</label>
-                <span>{{ current.interventionPlan || '-' }}</span>
+                <label>Descripción</label>
+                <span>{{ current.initialAssessment || current.progressNotes || '-' }}</span>
             </div>
         </div>
 
         <!-- Edit section -->
-        @if (current.status !== 'Closed' && current.status !== 'Resolved') {
+        @if (current.status !== 'CLOSED' && current.status !== 'ESCALATED') {
         <div class="edit-section">
             <h4>Actualizar caso</h4>
             <div class="edit-section__row">
                 <label class="editor-panel__field">
                     <span>Estado</span>
                     <select [(ngModel)]="editStatus">
-                        <option value="Open">Abierto</option>
-                        <option value="InProgress">En Progreso</option>
-                        <option value="Resolved">Resuelto</option>
+                        <option value="OPEN">Abierto</option>
+                        <option value="IN_PROGRESS">En Progreso</option>
+                        <option value="ESCALATED">Escalado</option>
                     </select>
                 </label>
                 <label class="editor-panel__field">
-                    <span>Notas de progreso</span>
-                    <textarea rows="2" [(ngModel)]="editNotes"></textarea>
+                    <span>Prioridad</span>
+                    <select [(ngModel)]="editPriority">
+                        <option value="LOW">Baja</option>
+                        <option value="MEDIUM">Media</option>
+                        <option value="HIGH">Alta</option>
+                        <option value="CRITICAL">Crítica</option>
+                    </select>
+                </label>
+            </div>
+            <div class="edit-section__row" style="margin-top:8px">
+                <label class="editor-panel__field editor-panel__field--full">
+                    <span>Razón de cierre</span>
+                    <textarea rows="2" [(ngModel)]="closeReason"
+                        placeholder="Describe la razón del cierre (opcional)..."></textarea>
                 </label>
             </div>
             <div class="edit-section__actions">
                 <button class="btn btn--primary btn--sm" [disabled]="saving" (click)="updateCase()">
                     <mat-icon>save</mat-icon> Guardar Cambios
+                </button>
+                <button class="btn btn--danger btn--sm" [disabled]="saving" (click)="closeCase()">
+                    <mat-icon>lock</mat-icon> Cerrar Caso
                 </button>
             </div>
         </div>
@@ -264,13 +273,13 @@
 
         <!-- Follow-ups Timeline -->
         <div class="follow-ups">
-            <h4><mat-icon>timeline</mat-icon> Seguimientos ({{ followUps.length }})</h4>
+            <h4>
+                <mat-icon>timeline</mat-icon> Seguimientos ({{ followUps.length }})</h4>
             @if (followUpLoading) {
             <div class="loading-state loading-state--sm">
                 <mat-spinner diameter="24"></mat-spinner>
             </div>
-            }
-            @for (fu of followUps; track fu.followUpId) {
+            } @for (fu of followUps; track fu.followUpId) {
             <div class="follow-up-item">
                 <div class="follow-up-item__dot"></div>
                 <div class="follow-up-item__content">
@@ -281,18 +290,15 @@
                     <p>{{ fu.notes }}</p>
                 </div>
             </div>
-            }
-            @if (!followUpLoading && followUps.length === 0) {
+            } @if (!followUpLoading && followUps.length === 0) {
             <p class="follow-ups-empty">No hay seguimientos registrados.</p>
             }
 
             <!-- Add follow-up -->
-            @if (current.status !== 'Closed' && current.status !== 'Resolved') {
+            @if (current.status !== 'CLOSED' && current.status !== 'ESCALATED') {
             <div class="follow-up-add">
-                <textarea rows="2" [(ngModel)]="newFollowUpNotes"
-                    placeholder="Agregar nota de seguimiento..."></textarea>
-                <button class="btn btn--primary btn--sm" [disabled]="saving || !newFollowUpNotes.trim()"
-                    (click)="addFollowUp()">
+                <textarea rows="2" [(ngModel)]="newFollowUpNotes" placeholder="Agregar nota de seguimiento..."></textarea>
+                <button class="btn btn--primary btn--sm" [disabled]="saving || !newFollowUpNotes.trim()" (click)="addFollowUp()">
                     <mat-icon>send</mat-icon> Agregar
                 </button>
             </div>

@@ -1,10 +1,11 @@
 <section class="admin-page-wrapper">
+
     <!-- Header -->
     <header class="admin-page-header">
         <div class="admin-page-header__left">
             <div class="admin-page-header__badge">AUDITORIA Y SEGURIDAD</div>
             <h1>Auditoría del Sistema</h1>
-            <p>Registros de actividad y logs del sistema para trazabilidad completa.</p>
+            <p>Trazabilidad completa de acciones de usuarios y errores del sistema.</p>
         </div>
         <a routerLink="/admin" class="btn btn--outline btn--sm">
             <mat-icon>arrow_back</mat-icon> Volver
@@ -13,28 +14,59 @@
 
     <!-- Tabs -->
     <div class="admin-tabs">
-        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'audit'"
-            (click)="switchTab('audit')">
-            <mat-icon>history</mat-icon> Auditoría
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'audit'" (click)="switchTab('audit')">
+            <mat-icon>manage_search</mat-icon> Auditoría de Acciones
         </button>
-        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'system'"
-            (click)="switchTab('system')">
-            <mat-icon>bug_report</mat-icon> Logs del Sistema
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'system'" (click)="switchTab('system')">
+            <mat-icon>terminal</mat-icon> Logs del Sistema
         </button>
     </div>
 
-    <!-- ═══════════ AUDIT TAB ═══════════ -->
+    <!-- ═══════════════════ AUDIT TAB ═══════════════════ -->
     @if (activeTab === 'audit') {
+
+    <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>history</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>list_alt</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ auditTotal }}</span>
                 <span class="kpi-card__label">Total Registros</span>
             </div>
         </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon">
+                <mat-icon>add_circle_outline</mat-icon>
+            </div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ auditInserts }}</span>
+                <span class="kpi-card__label">Creaciones (pág.)</span>
+            </div>
+        </div>
         <div class="kpi-card kpi-card--sky">
-            <div class="kpi-card__icon"><mat-icon>pages</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>edit_note</mat-icon>
+            </div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ auditUpdates }}</span>
+                <span class="kpi-card__label">Modificaciones (pág.)</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--rose">
+            <div class="kpi-card__icon">
+                <mat-icon>delete_outline</mat-icon>
+            </div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ auditDeletes }}</span>
+                <span class="kpi-card__label">Eliminaciones (pág.)</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--violet">
+            <div class="kpi-card__icon">
+                <mat-icon>pages</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ auditPage }}/{{ totalAuditPages }}</span>
                 <span class="kpi-card__label">Página</span>
@@ -46,10 +78,19 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="auditSearch" (ngModelChange)="applyAuditFilter()"
-                placeholder="Buscar por tabla, acción, usuario..." class="admin-filters__search" />
-            <input type="date" [(ngModel)]="startDate" />
-            <input type="date" [(ngModel)]="endDate" />
+            <input type="text" [(ngModel)]="auditSearch" (ngModelChange)="applyAuditFilter()" placeholder="Buscar tabla, usuario, IP, registro..." class="admin-filters__search" />
+            <select [(ngModel)]="auditActionFilter" (ngModelChange)="applyAuditFilter()">
+                <option value="">Todas las acciones</option>
+                <option value="insert">INSERT</option>
+                <option value="create">CREATE</option>
+                <option value="update">UPDATE</option>
+                <option value="modify">MODIFY</option>
+                <option value="delete">DELETE</option>
+                <option value="login">LOGIN</option>
+                <option value="logout">LOGOUT</option>
+            </select>
+            <input type="date" [(ngModel)]="startDate" title="Fecha inicio" />
+            <input type="date" [(ngModel)]="endDate" title="Fecha fin" />
             <button class="btn btn--primary btn--sm" (click)="auditPage = 1; loadAudit()">
                 <mat-icon>filter_list</mat-icon> Filtrar
             </button>
@@ -62,38 +103,103 @@
         <mat-spinner diameter="40"></mat-spinner>
         <span>Cargando auditoría...</span>
     </div>
-    }
-
-    @if (!loading) {
+    } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
             <thead>
                 <tr>
+                    <th style="width:32px"></th>
                     <th>ID</th>
                     <th>Acción</th>
-                    <th>Tabla</th>
+                    <th>Tabla / Entidad</th>
+                    <th>Reg. ID</th>
                     <th>Usuario</th>
-                    <th>Registro</th>
-                    <th>Fecha</th>
+                    <th>IP</th>
+                    <th>Fecha y Hora</th>
                 </tr>
             </thead>
             <tbody>
                 @for (log of filteredAuditLogs; track log.auditLogID) {
-                <tr>
+                <!-- Main row -->
+                <tr [class.row--selected]="expandedAuditId === log.auditLogID" (click)="hasDetail(log) ? toggleAuditRow(log.auditLogID) : null" [class.row--expandable]="hasDetail(log)">
+                    <td class="expand-toggle">
+                        @if (hasDetail(log)) {
+                        <mat-icon class="expand-icon" [class.expand-icon--open]="expandedAuditId === log.auditLogID">
+                            expand_more
+                        </mat-icon>
+                        }
+                    </td>
                     <td><strong>#{{ log.auditLogID }}</strong></td>
                     <td><span [class]="actionBadge(log.action)">{{ log.action || '-' }}</span></td>
-                    <td>{{ log.tableName || '-' }}</td>
-                    <td>{{ log.userName || log.userID || '-' }}</td>
-                    <td>{{ log.recordID || '-' }}</td>
-                    <td>{{ log.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                    <td>
+                        <div class="cell-table-name">
+                            <mat-icon class="cell-icon">table_chart</mat-icon>
+                            {{ log.tableName || '-' }}
+                        </div>
+                    </td>
+                    <td>
+                        @if (log.recordID) {
+                        <span class="record-id-badge">{{ log.recordID }}</span> } @else { <span class="text-muted">—</span> }
+                    </td>
+                    <td>
+                        <div class="cell-user">
+                            <div class="user-avatar">{{ (log.userName || '?')[0].toUpperCase() }}</div>
+                            <div class="user-info">
+                                <span class="user-name">{{ log.userName || 'Sistema' }}</span> @if (log.userID) {
+                                <span class="user-id">ID: {{ log.userID }}</span> }
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @if (log.ipAddress) {
+                        <code class="ip-code">{{ log.ipAddress }}</code> } @else { <span class="text-muted">—</span> }
+                    </td>
+                    <td class="date-cell">
+                        <div>{{ log.createdAt | date:'dd/MM/yyyy' }}</div>
+                        <div class="time-sub">{{ log.createdAt | date:'HH:mm:ss' }}</div>
+                    </td>
                 </tr>
-                }
+                <!-- Expanded detail row -->
+                @if (expandedAuditId === log.auditLogID) {
+                <tr class="detail-row">
+                    <td colspan="8">
+                        <div class="detail-panel">
+                            <!-- User Agent -->
+                            @if (log.userAgent) {
+                            <div class="detail-section">
+                                <div class="detail-section__label">
+                                    <mat-icon>devices</mat-icon> User Agent
+                                </div>
+                                <div class="detail-section__value detail-section__value--mono">{{ log.userAgent }}</div>
+                            </div>
+                            }
+                            <!-- Old Values / New Values side by side -->
+                            @if (log.oldValues || log.newValues) {
+                            <div class="detail-diff">
+                                <div class="detail-diff__col detail-diff__col--old">
+                                    <div class="detail-diff__header">
+                                        <mat-icon>undo</mat-icon> Valores Anteriores
+                                    </div>
+                                    <pre class="detail-pre">{{ formatJson(log.oldValues) || '—' }}</pre>
+                                </div>
+                                <div class="detail-diff__col detail-diff__col--new">
+                                    <div class="detail-diff__header">
+                                        <mat-icon>redo</mat-icon> Valores Nuevos
+                                    </div>
+                                    <pre class="detail-pre">{{ formatJson(log.newValues) || '—' }}</pre>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </td>
+                </tr>
+                } }
             </tbody>
         </table>
         @if (filteredAuditLogs.length === 0) {
         <div class="empty-state">
-            <mat-icon>history</mat-icon>
-            <p>No hay registros de auditoría.</p>
+            <mat-icon>manage_search</mat-icon>
+            <p>No hay registros de auditoría para los filtros actuales.</p>
         </div>
         }
     </div>
@@ -103,32 +209,66 @@
         <button class="btn btn--outline btn--sm" [disabled]="auditPage <= 1" (click)="prevPage()">
             <mat-icon>chevron_left</mat-icon> Anterior
         </button>
-        <span class="pagination__info">Página {{ auditPage }} de {{ totalAuditPages }} ({{ auditTotal }}
-            registros)</span>
+        <span class="pagination__info">Página {{ auditPage }} de {{ totalAuditPages }}
+            ({{ auditTotal }} registros totales)</span>
         <button class="btn btn--outline btn--sm" [disabled]="auditPage >= totalAuditPages" (click)="nextPage()">
             Siguiente <mat-icon>chevron_right</mat-icon>
         </button>
     </div>
-    }
-    }
+    } }
 
-    <!-- ═══════════ SYSTEM TAB ═══════════ -->
+    <!-- ═══════════════════ SYSTEM LOGS TAB ═══════════════════ -->
     @if (activeTab === 'system') {
+
+    <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--rose">
-            <div class="kpi-card__icon"><mat-icon>bug_report</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>error_outline</mat-icon>
+            </div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ systemErrors }}</span>
+                <span class="kpi-card__label">Errores / Fatales</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--amber">
+            <div class="kpi-card__icon">
+                <mat-icon>warning_amber</mat-icon>
+            </div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ systemWarnings }}</span>
+                <span class="kpi-card__label">Advertencias</span>
+            </div>
+        </div>
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon">
+                <mat-icon>terminal</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ systemLogs.length }}</span>
-                <span class="kpi-card__label">Errores del Sistema</span>
+                <span class="kpi-card__label">Total Cargados</span>
             </div>
         </div>
     </div>
 
+    <!-- Filters -->
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="systemSearch" (ngModelChange)="applySystemFilter()"
-                placeholder="Buscar por mensaje, nivel, fuente..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="systemSearch" (ngModelChange)="applySystemFilter()" placeholder="Buscar mensaje, nivel, fuente, stack trace..." class="admin-filters__search" />
+            <select [(ngModel)]="systemLevelFilter" (ngModelChange)="applySystemFilter()">
+                <option value="">Todos los niveles</option>
+                <option value="fatal">FATAL</option>
+                <option value="error">ERROR</option>
+                <option value="warning">WARNING</option>
+                <option value="warn">WARN</option>
+                <option value="info">INFO</option>
+                <option value="debug">DEBUG</option>
+                <option value="trace">TRACE</option>
+            </select>
+            <button class="btn btn--secondary btn--sm" (click)="loadSystem()">
+                <mat-icon>refresh</mat-icon> Recargar
+            </button>
         </div>
         <span class="admin-filters__count">{{ filteredSystemLogs.length }} logs</span>
     </div>
@@ -136,41 +276,80 @@
     @if (loading) {
     <div class="loading-state">
         <mat-spinner diameter="40"></mat-spinner>
-        <span>Cargando logs...</span>
+        <span>Cargando logs del sistema...</span>
     </div>
-    }
-
-    @if (!loading) {
+    } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
             <thead>
                 <tr>
+                    <th style="width:32px"></th>
                     <th>ID</th>
                     <th>Nivel</th>
-                    <th>Fuente</th>
+                    <th>Fuente / Módulo</th>
                     <th>Mensaje</th>
-                    <th>Fecha</th>
+                    <th>Fecha y Hora</th>
                 </tr>
             </thead>
             <tbody>
                 @for (log of filteredSystemLogs; track log.systemLogID) {
-                <tr>
+                <!-- Main row -->
+                <tr [class.row--selected]="expandedSystemId === log.systemLogID" (click)="toggleSystemRow(log.systemLogID)" class="row--expandable">
+                    <td class="expand-toggle">
+                        <mat-icon class="expand-icon" [class.expand-icon--open]="expandedSystemId === log.systemLogID">
+                            expand_more
+                        </mat-icon>
+                    </td>
                     <td><strong>#{{ log.systemLogID }}</strong></td>
                     <td><span [class]="levelBadge(log.level)">{{ log.level || '-' }}</span></td>
-                    <td>{{ log.source || '-' }}</td>
-                    <td class="truncate-cell">{{ log.message || '-' }}</td>
-                    <td>{{ log.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                    <td>
+                        @if (log.source) {
+                        <div class="cell-table-name">
+                            <mat-icon class="cell-icon">code</mat-icon>
+                            {{ log.source }}
+                        </div>
+                        } @else { <span class="text-muted">—</span> }
+                    </td>
+                    <td class="message-cell">{{ log.message || '-' }}</td>
+                    <td class="date-cell">
+                        <div>{{ log.createdAt | date:'dd/MM/yyyy' }}</div>
+                        <div class="time-sub">{{ log.createdAt | date:'HH:mm:ss' }}</div>
+                    </td>
                 </tr>
-                }
+                <!-- Expanded stack trace -->
+                @if (expandedSystemId === log.systemLogID) {
+                <tr class="detail-row">
+                    <td colspan="6">
+                        <div class="detail-panel">
+                            <!-- Full message -->
+                            <div class="detail-section">
+                                <div class="detail-section__label">
+                                    <mat-icon>chat_bubble_outline</mat-icon> Mensaje Completo
+                                </div>
+                                <div class="detail-section__value">{{ log.message || '—' }}</div>
+                            </div>
+                            <!-- Stack Trace -->
+                            @if (log.stackTrace) {
+                            <div class="detail-section">
+                                <div class="detail-section__label detail-section__label--danger">
+                                    <mat-icon>layers</mat-icon> Stack Trace
+                                </div>
+                                <pre class="detail-pre detail-pre--stacktrace">{{ log.stackTrace }}</pre>
+                            </div>
+                            }
+                        </div>
+                    </td>
+                </tr>
+                } }
             </tbody>
         </table>
         @if (filteredSystemLogs.length === 0) {
         <div class="empty-state">
-            <mat-icon>bug_report</mat-icon>
-            <p>No hay logs del sistema.</p>
+            <mat-icon>check_circle_outline</mat-icon>
+            <p>No hay logs del sistema para los filtros actuales.</p>
         </div>
         }
     </div>
-    }
-    }
+    } }
+
 </section>

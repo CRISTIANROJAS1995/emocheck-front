@@ -1,15 +1,12 @@
 /* Page */
+
 .profile-page {
     min-height: 100vh;
     position: relative;
     overflow: hidden;
     isolation: isolate;
     padding: 28px 32px 56px;
-
-    background:
-        radial-gradient(1200px 600px at 15% 0%, rgba(43, 127, 255, 0.06) 0%, rgba(43, 127, 255, 0) 55%),
-        radial-gradient(1000px 520px at 85% 10%, rgba(0, 187, 167, 0.07) 0%, rgba(0, 187, 167, 0) 52%),
-        linear-gradient(180deg, rgba(241, 245, 249, 0.72) 0%, rgba(241, 245, 249, 0.22) 100%);
+    background: radial-gradient(1200px 600px at 15% 0%, rgba(43, 127, 255, 0.06) 0%, rgba(43, 127, 255, 0) 55%), radial-gradient(1000px 520px at 85% 10%, rgba(0, 187, 167, 0.07) 0%, rgba(0, 187, 167, 0) 52%), linear-gradient(180deg, rgba(241, 245, 249, 0.72) 0%, rgba(241, 245, 249, 0.22) 100%);
 }
 
 :host ::ng-deep app-background-circles {
@@ -21,7 +18,9 @@
     pointer-events: none;
 }
 
+
 /* Match questionnaire circles placement (mental-health) */
+
 :host ::ng-deep app-background-circles .blur-circle {
     position: fixed;
     z-index: 0;
@@ -167,7 +166,6 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     border-radius: 8px !important;
 }
 
-
 .profile-loading {
     color: rgba(0, 0, 0, 0.6);
     padding: 8px 0 16px;
@@ -202,18 +200,6 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     gap: 12px;
     box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
     backdrop-filter: blur(10px);
-}
-
-.profile-card::after {
-    content: '';
-    position: absolute;
-    left: 12px;
-    right: 12px;
-    top: 12px;
-    height: 2px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, rgba(0, 187, 167, 0.45) 0%, rgba(2, 132, 199, 0.55) 55%, rgba(124, 58, 237, 0.40) 100%);
-    opacity: 0.85;
 }
 
 .profile-card--password {
@@ -292,7 +278,9 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     border-radius: 12px !important;
 }
 
+
 /* Avatar */
+
 .avatar-row {
     margin-top: 10px;
     display: grid;
@@ -371,11 +359,9 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     .profile-hero {
         width: 100%;
     }
-
     .profile-grid {
         grid-template-columns: 1fr;
     }
-
     .form-grid--password {
         grid-template-columns: 1fr;
     }

@@ -105,24 +105,44 @@ export class AdminAlertsService {
             );
     }
 
-    /** Get alerts by status — uses main list with client-side filtering (backend has no status endpoint) */
+    /** Get alerts by status — GET /alert/status/{status} */
     listByStatus(status: string): Observable<AdminAlertDto[]> {
-        return this.list({ status });
+        return this.http
+            .get<unknown>(`${this.apiUrl}/alert/status/${status}`)
+            .pipe(
+                map((res) => this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x))),
+                catchError(() => of([]))
+            );
     }
 
-    /** Get alerts by severity — uses main list with client-side filtering */
+    /** Get alerts by severity — GET /alert/severity/{severity} */
     listBySeverity(severity: string): Observable<AdminAlertDto[]> {
-        return this.list({ alertLevel: severity });
+        return this.http
+            .get<unknown>(`${this.apiUrl}/alert/severity/${severity}`)
+            .pipe(
+                map((res) => this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x))),
+                catchError(() => of([]))
+            );
     }
 
-    /** Get alerts by company — uses main list (backend has no company filter endpoint) */
-    listByCompany(_companyId: number): Observable<AdminAlertDto[]> {
-        return this.list();
+    /** Get alerts by company — GET /alert/company/{companyId} */
+    listByCompany(companyId: number): Observable<AdminAlertDto[]> {
+        return this.http
+            .get<unknown>(`${this.apiUrl}/alert/company/${companyId}`)
+            .pipe(
+                map((res) => this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x))),
+                catchError(() => of([]))
+            );
     }
 
-    /** Get alerts by area — uses main list (backend has no area filter endpoint) */
-    listByArea(_areaId: number): Observable<AdminAlertDto[]> {
-        return this.list();
+    /** Get alerts by area — GET /alert/area/{areaId} */
+    listByArea(areaId: number): Observable<AdminAlertDto[]> {
+        return this.http
+            .get<unknown>(`${this.apiUrl}/alert/area/${areaId}`)
+            .pipe(
+                map((res) => this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x))),
+                catchError(() => of([]))
+            );
     }
 
     /** Get alert statistics */
@@ -145,38 +165,30 @@ export class AdminAlertsService {
             .pipe(map((res) => this.mapAlert(this.unwrapObject<BackendAlertDto>(res))));
     }
 
-    /** Acknowledge an alert — uses PUT attend */
+    /** Acknowledge an alert — PATCH /alert/{id}/acknowledge (no body) */
     acknowledge(alertId: number): Observable<unknown> {
-        return this.attend(alertId, { actionTaken: 'Reconocida', notes: '' });
-    }
-
-    /** Assign an alert to a psychologist — PUT /alert/:id/assign */
-    assign(alertId: number, payload: { assignedToUserId: number }): Observable<unknown> {
-        const body = { assignedToUserID: payload.assignedToUserId };
         return this.http
-            .put<unknown>(`${this.apiUrl}/alert/${alertId}/assign`, body)
-            .pipe(
-                map((res) => this.mapAlert(this.unwrapObject<BackendAlertDto>(res))),
-                catchError(() => of(null as any))
-            );
+            .patch<unknown>(`${this.apiUrl}/alert/${alertId}/acknowledge`, {})
+            .pipe(catchError(() => of(null)));
     }
 
-    /** Resolve an alert — PUT /alert/:id/resolve */
+    /** Assign an alert to a psychologist — no dedicated endpoint, not supported by API */
+    assign(_alertId: number, _payload: { assignedToUserId: number }): Observable<unknown> {
+        return of(null);
+    }
+
+    /** Resolve an alert — PATCH /alert/{id}/resolve */
     resolve(alertId: number, payload: { resolution?: string }): Observable<unknown> {
-        const body = { actionTaken: payload.resolution ?? 'Resuelta', notes: '' };
+        const body = { resolutionNotes: payload.resolution ?? '' };
         return this.http
-            .put<unknown>(`${this.apiUrl}/alert/${alertId}/resolve`, body)
-            .pipe(
-                map((res) => this.mapAlert(this.unwrapObject<BackendAlertDto>(res))),
-                catchError(() => of(null as any))
-            );
+            .patch<unknown>(`${this.apiUrl}/alert/${alertId}/resolve`, body)
+            .pipe(catchError(() => of(null)));
     }
 
-    /** Attend (mark as attended) — the only real backend action endpoint */
-    attend(alertId: number, payload: AttendAlertDto): Observable<AdminAlertDto> {
-        const body = { alertID: alertId, actionTaken: payload.actionTaken, notes: payload.notes ?? '' };
+    /** Attend (mark as attended) — kept for backward compat, redirects to acknowledge */
+    attend(alertId: number, _payload: AttendAlertDto): Observable<AdminAlertDto> {
         return this.http
-            .put<unknown>(`${this.apiUrl}/alert/${alertId}/attend`, body)
+            .patch<unknown>(`${this.apiUrl}/alert/${alertId}/acknowledge`, {})
             .pipe(
                 map((res) => this.mapAlert(this.unwrapObject<BackendAlertDto>(res))),
                 catchError(() => of(null as any))

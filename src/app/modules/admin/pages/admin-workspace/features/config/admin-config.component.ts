@@ -220,7 +220,7 @@ export class AdminConfigComponent implements OnInit {
     // ── Edit ──
     startEditCompany(c: CompanyDto): void {
         this.editCompanyId = c.companyID;
-        this.editCompanyForm = { name: c.name, businessName: c.businessName ?? '', taxID: c.taxID ?? '', email: c.email ?? '', phone: c.phone ?? '', address: c.address ?? '', website: c.website ?? '', industry: c.industry ?? '' };
+        this.editCompanyForm = { name: c.name, tradeName: c.tradeName ?? c.name, businessName: c.businessName ?? '', taxID: c.taxID ?? '', email: c.email ?? '', phone: c.phone ?? '', address: c.address ?? '', website: c.website ?? '', industry: c.industry ?? '' };
         this.showEditForm = true;
         this.showForm = false;
     }
@@ -290,7 +290,7 @@ export class AdminConfigComponent implements OnInit {
     async toggleCompany(c: CompanyDto): Promise<void> {
         const ok = await this.alert.confirm(`¿${c.isActive ? 'Desactivar' : 'Activar'} "${c.name}"?`, 'Confirmar cambio');
         if (!ok) return;
-        this.orgService.toggleCompany(c.companyID).subscribe({
+        this.orgService.toggleCompany(c.companyID, c.isActive).subscribe({
             next: () => { this.alert.success(c.isActive ? 'Empresa desactivada' : 'Empresa activada'); this.loadTab(); },
             error: () => this.alert.error('Error al cambiar estado'),
         });
@@ -299,7 +299,7 @@ export class AdminConfigComponent implements OnInit {
     async toggleSite(s: SiteDto): Promise<void> {
         const ok = await this.alert.confirm(`¿${s.isActive ? 'Desactivar' : 'Activar'} "${s.name}"?`, 'Confirmar cambio');
         if (!ok) return;
-        this.orgService.toggleSite(s.siteID).subscribe({
+        this.orgService.toggleSite(s.siteID, s.isActive).subscribe({
             next: () => { this.alert.success(s.isActive ? 'Sede desactivada' : 'Sede activada'); this.loadTab(); },
             error: () => this.alert.error('Error al cambiar estado'),
         });
@@ -308,7 +308,7 @@ export class AdminConfigComponent implements OnInit {
     async toggleArea(a: AreaDto): Promise<void> {
         const ok = await this.alert.confirm(`¿${a.isActive ? 'Desactivar' : 'Activar'} "${a.name}"?`, 'Confirmar cambio');
         if (!ok) return;
-        this.orgService.toggleArea(a.areaID).subscribe({
+        this.orgService.toggleArea(a.areaID, a.isActive).subscribe({
             next: () => { this.alert.success(a.isActive ? 'Área desactivada' : 'Área activada'); this.loadTab(); },
             error: () => this.alert.error('Error al cambiar estado'),
         });
@@ -317,7 +317,7 @@ export class AdminConfigComponent implements OnInit {
     async toggleJobType(j: JobTypeDto): Promise<void> {
         const ok = await this.alert.confirm(`¿${j.isActive ? 'Desactivar' : 'Activar'} "${j.name}"?`, 'Confirmar cambio');
         if (!ok) return;
-        this.orgService.toggleJobType(j.jobTypeID).subscribe({
+        this.orgService.toggleJobType(j.jobTypeID, j.isActive).subscribe({
             next: () => { this.alert.success(j.isActive ? 'Cargo desactivado' : 'Cargo activado'); this.loadTab(); },
             error: () => this.alert.error('Error al cambiar estado'),
         });
@@ -325,7 +325,7 @@ export class AdminConfigComponent implements OnInit {
 
     // ── Empty form factories ──
     private emptyCompany(): CreateCompanyDto {
-        return { name: '', businessName: '', taxID: '', email: '', phone: '', address: '', website: '', industry: '' };
+        return { name: '', tradeName: '', businessName: '', taxID: '', email: '', phone: '', address: '', website: '', industry: '' };
     }
     private emptySite(): CreateSiteDto {
         return { companyID: 0, name: '', code: '', address: '', phone: '', email: '' };

@@ -73,8 +73,7 @@
                         </ng-template>
 
                         <div class="support-card__actions">
-                            <button mat-button class="support-btn support-btn--danger" type="button"
-                                (click)="createEmergencyRequest()">
+                            <button mat-button class="support-btn support-btn--danger" type="button" (click)="createEmergencyRequest()">
                                 Solicitar ayuda inmediata
                             </button>
                         </div>
@@ -110,7 +109,7 @@
                                     <div class="support-request__status">{{ r.status }}</div>
                                 </div>
                                 <div class="support-request__meta">
-                                    {{ r.requestType }} • {{ r.urgencyLevel }} • {{ r.requestedAt | date: 'medium' }}
+                                    {{ r.requestType }} • {{ r.priority }} • {{ r.requestedAt | date: 'medium' }}
                                 </div>
                                 <div class="support-request__meta" *ngIf="r.assignedToPsychologistName">
                                     Asignado a: {{ r.assignedToPsychologistName }}

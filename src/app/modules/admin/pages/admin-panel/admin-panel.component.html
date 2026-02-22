@@ -16,28 +16,36 @@
     <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>people</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>people</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ users.length }}</span>
                 <span class="kpi-card__label">Total Usuarios</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ activeCount }}</span>
                 <span class="kpi-card__label">Activos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--rose">
-            <div class="kpi-card__icon"><mat-icon>person_off</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>person_off</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ inactiveCount }}</span>
                 <span class="kpi-card__label">Inactivos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--amber">
-            <div class="kpi-card__icon"><mat-icon>filter_list</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>filter_list</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ filteredUsers.length }}</span>
                 <span class="kpi-card__label">Resultados</span>
@@ -48,7 +56,8 @@
     <!-- Create User Form -->
     @if (showCreateForm) {
     <div class="editor-panel">
-        <h3><mat-icon>person_add</mat-icon> Crear Nuevo Usuario</h3>
+        <h3>
+            <mat-icon>person_add</mat-icon> Crear Nuevo Usuario</h3>
         <form [formGroup]="createForm" (ngSubmit)="createUser()">
             <div class="editor-panel__grid">
                 <label class="editor-panel__field">
@@ -127,42 +136,21 @@
     <!-- Edit User Form -->
     @if (showEditForm && editingUser) {
     <div class="editor-panel">
-        <h3><mat-icon>edit</mat-icon> Editar Usuario #{{ editingUser.userId }}</h3>
+        <h3>
+            <mat-icon>edit</mat-icon> Editar Usuario #{{ editingUser.userId }} — {{ editingUser.email }}</h3>
         <form [formGroup]="editForm" (ngSubmit)="saveEditUser()">
             <div class="editor-panel__grid">
                 <label class="editor-panel__field">
-                    <span>Nombre completo *</span>
-                    <input formControlName="fullName" />
+                    <span>Nombre *</span>
+                    <input formControlName="firstName" placeholder="Juan" />
                 </label>
                 <label class="editor-panel__field">
-                    <span>Documento</span>
-                    <input formControlName="documentNumber" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Email *</span>
-                    <input type="email" formControlName="email" />
+                    <span>Apellido *</span>
+                    <input formControlName="lastName" placeholder="Pérez" />
                 </label>
                 <label class="editor-panel__field">
                     <span>Teléfono</span>
-                    <input formControlName="phone" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Empresa</span>
-                    <select formControlName="companyID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (c of companies; track c.companyID) {
-                        <option [ngValue]="c.companyID">{{ c.name }}</option>
-                        }
-                    </select>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Sede</span>
-                    <select formControlName="siteID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (s of filteredEditSites; track s.siteID) {
-                        <option [ngValue]="s.siteID">{{ s.name }}</option>
-                        }
-                    </select>
+                    <input formControlName="phone" placeholder="+57311000000" />
                 </label>
                 <label class="editor-panel__field">
                     <span>Área</span>
@@ -197,8 +185,7 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
-                placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()" placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
         </div>
         <div style="display:flex;align-items:center;gap:8px">
             <span class="admin-filters__count">{{ filteredUsers.length }} de {{ users.length }}</span>
@@ -251,11 +238,8 @@
                     <td>{{ u.areaName ?? '---' }}</td>
                     <td>
                         @for (role of (u.roles ?? []); track role) {
-                        <span class="badge badge--indigo" style="margin-right:4px;margin-bottom:2px">{{ role }}</span>
-                        }
-                        @if (!(u.roles ?? []).length) {
-                        <span class="badge badge--neutral">Sin rol</span>
-                        }
+                        <span class="badge badge--indigo" style="margin-right:4px;margin-bottom:2px">{{ role }}</span> } @if (!(u.roles ?? []).length) {
+                        <span class="badge badge--neutral">Sin rol</span> }
                     </td>
                     <td>
                         <span [class]="u.isActive ? 'badge badge--success' : 'badge badge--danger'">
@@ -263,16 +247,13 @@
                         </span>
                     </td>
                     <td class="actions-cell">
-                        <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()"
-                            title="Editar">
+                        <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()" title="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()"
-                            [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
+                        <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()" [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
                         </button>
-                        <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()"
-                            [disabled]="saving" title="Eliminar">
+                        <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()" [disabled]="saving" title="Eliminar">
                             <mat-icon>delete</mat-icon>
                         </button>
                     </td>

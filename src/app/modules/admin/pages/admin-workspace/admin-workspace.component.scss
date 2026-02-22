@@ -1,4 +1,5 @@
 /* Admin Hub - Centro de Control */
+
 :host {
     display: block;
     width: 100%;
@@ -10,7 +11,9 @@
     margin: 0 auto;
 }
 
+
 /* Hero Header */
+
 .admin-hub__header {
     display: flex;
     align-items: center;
@@ -61,11 +64,9 @@
     font-size: 13px;
     transition: all 0.15s;
     white-space: nowrap;
-
     &:hover {
         background: rgba(255, 255, 255, 0.25);
     }
-
     mat-icon {
         font-size: 18px;
         width: 18px;
@@ -73,7 +74,9 @@
     }
 }
 
+
 /* KPI Cards */
+
 .admin-hub__kpis {
     margin-top: 18px;
     display: grid;
@@ -91,12 +94,10 @@
     backdrop-filter: blur(8px);
     border: 1px solid rgba(0, 0, 0, 0.06);
     transition: transform 0.15s, box-shadow 0.15s;
-
     &:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     }
-
     &__icon {
         display: flex;
         align-items: center;
@@ -104,26 +105,22 @@
         width: 44px;
         height: 44px;
         border-radius: 12px;
-
         mat-icon {
             font-size: 22px;
             width: 22px;
             height: 22px;
         }
     }
-
     &__info {
         display: flex;
         flex-direction: column;
     }
-
     &__value {
         font-size: 24px;
         font-weight: 800;
         color: #1e293b;
         line-height: 1;
     }
-
     &__label {
         font-size: 11px;
         font-weight: 600;
@@ -132,29 +129,27 @@
         letter-spacing: 0.04em;
         margin-top: 4px;
     }
-
     &--indigo .kpi-card__icon {
         background: #eef2ff;
         color: #6366f1;
     }
-
     &--emerald .kpi-card__icon {
         background: #ecfdf5;
         color: #10b981;
     }
-
     &--amber .kpi-card__icon {
         background: #fffbeb;
         color: #f59e0b;
     }
-
     &--rose .kpi-card__icon {
         background: #fff1f2;
         color: #f43f5e;
     }
 }
 
+
 /* Feature Cards Grid */
+
 .admin-hub__grid {
     margin-top: 18px;
     display: grid;
@@ -174,19 +169,16 @@
     color: inherit;
     transition: all 0.2s ease;
     cursor: pointer;
-
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
     }
-
     &__top {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 14px;
     }
-
     &__icon-wrap {
         display: flex;
         align-items: center;
@@ -194,27 +186,23 @@
         width: 42px;
         height: 42px;
         border-radius: 12px;
-
         mat-icon {
             font-size: 22px;
             width: 22px;
             height: 22px;
         }
     }
-
     &__metric {
         font-size: 22px;
         font-weight: 800;
         color: #1e293b;
     }
-
     &__title {
         margin: 0;
         font-size: 16px;
         font-weight: 700;
         color: #1e293b;
     }
-
     &__desc {
         margin: 6px 0 0;
         font-size: 13px;
@@ -222,15 +210,18 @@
         line-height: 1.5;
         flex: 1;
     }
-
+    &__divider {
+        border: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.07);
+        margin: 14px 0 0;
+    }
     &__link {
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        margin-top: 14px;
+        margin-top: 10px;
         font-size: 13px;
         font-weight: 600;
-
         mat-icon {
             font-size: 16px;
             width: 16px;
@@ -238,118 +229,98 @@
             transition: transform 0.15s;
         }
     }
-
     &:hover &__link mat-icon {
         transform: translateX(3px);
     }
-
     &--rose {
         .feature-card__icon-wrap {
             background: #fff1f2;
             color: #f43f5e;
         }
-
         .feature-card__link {
             color: #f43f5e;
         }
-
         &:hover {
             border-color: rgba(244, 63, 94, 0.2);
         }
     }
-
     &--amber {
         .feature-card__icon-wrap {
             background: #fffbeb;
             color: #f59e0b;
         }
-
         .feature-card__link {
             color: #f59e0b;
         }
-
         &:hover {
             border-color: rgba(245, 158, 11, 0.2);
         }
     }
-
     &--indigo {
         .feature-card__icon-wrap {
             background: #eef2ff;
             color: #6366f1;
         }
-
         .feature-card__link {
             color: #6366f1;
         }
-
         &:hover {
             border-color: rgba(99, 102, 241, 0.2);
         }
     }
-
     &--emerald {
         .feature-card__icon-wrap {
             background: #ecfdf5;
             color: #10b981;
         }
-
         .feature-card__link {
             color: #10b981;
         }
-
         &:hover {
             border-color: rgba(16, 185, 129, 0.2);
         }
     }
-
     &--sky {
         .feature-card__icon-wrap {
             background: #f0f9ff;
             color: #0ea5e9;
         }
-
         .feature-card__link {
             color: #0ea5e9;
         }
-
         &:hover {
             border-color: rgba(14, 165, 233, 0.2);
         }
     }
-
     &--violet {
         .feature-card__icon-wrap {
             background: #f5f3ff;
             color: #8b5cf6;
         }
-
         .feature-card__link {
             color: #8b5cf6;
         }
-
         &:hover {
             border-color: rgba(139, 92, 246, 0.2);
         }
     }
-
     &--teal {
         .feature-card__icon-wrap {
             background: #f0fdfa;
             color: #14b8a6;
         }
-
         .feature-card__link {
             color: #14b8a6;
         }
-
         &:hover {
             border-color: rgba(20, 184, 166, 0.2);
         }
     }
 }
 
+
 /* Loading */
+
 .admin-hub__loading {
     display: flex;
     flex-direction: column;
@@ -360,16 +331,16 @@
     font-size: 14px;
 }
 
+
 /* Responsive */
+
 @media (max-width: 900px) {
     .admin-hub__header {
         flex-direction: column;
     }
-
     .admin-hub__kpis {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .admin-hub__grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -379,7 +350,6 @@
     .admin-hub__kpis {
         grid-template-columns: 1fr;
     }
-
     .admin-hub__grid {
         grid-template-columns: 1fr;
     }

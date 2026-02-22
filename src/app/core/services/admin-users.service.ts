@@ -58,6 +58,15 @@ export interface AdminCreateUserResponseDto {
     roles?: string[];
 }
 
+/** Only fields accepted by PUT /api/users/{id} */
+export interface AdminUpdateUserRequestDto {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    areaID?: number | null;
+    jobTypeID?: number | null;
+}
+
 /** Shape returned by the deployed backend (flat fields, no nested objects) */
 interface BackendUserDto {
     userID: number;
@@ -165,7 +174,7 @@ export class AdminUsersService {
             );
     }
 
-    updateUser(userId: number, payload: Partial<BackendUserDto>): Observable<AdminUserListItemDto> {
+    updateUser(userId: number, payload: AdminUpdateUserRequestDto): Observable<AdminUserListItemDto> {
         return this.http
             .put<unknown>(`${this.apiUrl}/users/${userId}`, payload)
             .pipe(map((res) => this.mapUser(this.unwrapObject<BackendUserDto>(res))));
@@ -177,15 +186,17 @@ export class AdminUsersService {
             .pipe(map(() => null));
     }
 
-    /** Activate user — uses updateUser with isActive flag */
+    /** Activate user — PATCH /users/{id}/activate */
     activateUser(userId: number): Observable<unknown> {
-        return this.updateUser(userId, { isActive: true } as any)
+        return this.http
+            .patch<unknown>(`${this.apiUrl}/users/${userId}/activate`, {})
             .pipe(catchError(() => of(null)));
     }
 
-    /** Deactivate user — uses updateUser with isActive flag */
+    /** Deactivate user — PATCH /users/{id}/deactivate */
     deactivateUser(userId: number): Observable<unknown> {
-        return this.updateUser(userId, { isActive: false } as any)
+        return this.http
+            .patch<unknown>(`${this.apiUrl}/users/${userId}/deactivate`, {})
             .pipe(catchError(() => of(null)));
     }
 

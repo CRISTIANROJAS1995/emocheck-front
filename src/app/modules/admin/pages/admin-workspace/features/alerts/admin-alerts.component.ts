@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
 import { AdminAlertDto, AdminAlertsService, AlertStatisticsDto } from 'app/core/services/admin-alerts.service';
-import { AdminUserListItemDto, AdminUsersService } from 'app/core/services/admin-users.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
@@ -22,8 +21,9 @@ export class AdminAlertsComponent implements OnInit {
     loading = false;
     saving = false;
 
-    // Filters
+    // Filters — status values match API: OPEN | ACKNOWLEDGED | IN_PROGRESS | RESOLVED | DISMISSED
     statusFilter = '';
+    // Severity values match API: LOW | MEDIUM | HIGH | CRITICAL
     levelFilter = '';
 
     alerts: AdminAlertDto[] = [];
@@ -34,34 +34,17 @@ export class AdminAlertsComponent implements OnInit {
     // Resolve form
     resolution = '';
 
-    // Assign form
-    psychologists: AdminUserListItemDto[] = [];
-    assignToUserId: number | null = null;
-
     // Sort
     sortField = 'createdAt';
     sortAsc = false;
 
     constructor(
         private readonly service: AdminAlertsService,
-        private readonly usersService: AdminUsersService,
         private readonly notify: AlertService,
     ) { }
 
     ngOnInit(): void {
         this.load();
-        this.loadPsychologists();
-    }
-
-    loadPsychologists(): void {
-        this.usersService.listUsers().pipe(catchError(() => of([]))).subscribe(users => {
-            this.psychologists = users.filter(u =>
-                (u.roles ?? []).some(r => r.toLowerCase().includes('psychologist') || r.toLowerCase().includes('psicólogo'))
-            );
-            if (this.psychologists.length === 0) {
-                this.psychologists = users;
-            }
-        });
     }
 
     load(): void {
@@ -80,14 +63,14 @@ export class AdminAlertsComponent implements OnInit {
     applyFilter(): void {
         let filtered = this.alerts;
         if (this.statusFilter) {
-            if (this.statusFilter === 'Pending') {
-                filtered = filtered.filter(a => !a.isAttended);
-            } else if (this.statusFilter === 'Attended') {
-                filtered = filtered.filter(a => a.isAttended);
-            }
+            filtered = filtered.filter(a =>
+                (a.status ?? '').toUpperCase() === this.statusFilter.toUpperCase()
+            );
         }
         if (this.levelFilter) {
-            filtered = filtered.filter(a => (a.alertLevel ?? '').toLowerCase() === this.levelFilter.toLowerCase());
+            filtered = filtered.filter(a =>
+                (a.alertLevel ?? '').toUpperCase() === this.levelFilter.toUpperCase()
+            );
         }
         // Sort
         filtered = [...filtered].sort((a, b) => {
@@ -147,35 +130,45 @@ export class AdminAlertsComponent implements OnInit {
             });
     }
 
-    assignAlert(): void {
-        if (!this.selectedAlert || !this.assignToUserId) {
-            this.notify.warning('Selecciona un psicólogo para asignar');
-            return;
-        }
-        this.saving = true;
-        this.service.assign(this.selectedAlert.alertId, { assignedToUserId: this.assignToUserId })
-            .pipe(finalize(() => (this.saving = false)))
-            .subscribe({
-                next: () => {
-                    this.notify.success('Alerta asignada exitosamente');
-                    this.assignToUserId = null;
-                    this.load();
-                },
-                error: (e) => this.notify.error(e?.message || 'Error al asignar alerta'),
-            });
-    }
-
     severityBadgeClass(level: string | undefined): string {
-        switch ((level ?? '').toLowerCase()) {
-            case 'critical': return 'badge badge--danger';
-            case 'high': return 'badge badge--warning';
-            case 'medium': return 'badge badge--info';
-            case 'low': return 'badge badge--success';
-            default: return 'badge badge--neutral';
+        switch ((level ?? '').toUpperCase()) {
+            case 'CRITICAL': return 'badge badge--danger';
+            case 'HIGH':     return 'badge badge--warning';
+            case 'MEDIUM':   return 'badge badge--info';
+            case 'LOW':      return 'badge badge--success';
+            default:         return 'badge badge--neutral';
         }
     }
 
-    statusBadgeClass(isAttended: boolean): string {
-        return isAttended ? 'badge badge--success' : 'badge badge--warning';
+    statusBadgeClass(status: string | undefined): string {
+        switch ((status ?? '').toUpperCase()) {
+            case 'OPEN':         return 'badge badge--danger';
+            case 'ACKNOWLEDGED': return 'badge badge--warning';
+            case 'IN_PROGRESS':  return 'badge badge--info';
+            case 'RESOLVED':     return 'badge badge--success';
+            case 'DISMISSED':    return 'badge badge--neutral';
+            default:             return 'badge badge--neutral';
+        }
+    }
+
+    statusLabel(status: string | undefined): string {
+        switch ((status ?? '').toUpperCase()) {
+            case 'OPEN':         return 'Abierta';
+            case 'ACKNOWLEDGED': return 'Reconocida';
+            case 'IN_PROGRESS':  return 'En Proceso';
+            case 'RESOLVED':     return 'Resuelta';
+            case 'DISMISSED':    return 'Descartada';
+            default:             return status ?? 'Desconocido';
+        }
+    }
+
+    severityLabel(level: string | undefined): string {
+        switch ((level ?? '').toUpperCase()) {
+            case 'CRITICAL': return 'Crítica';
+            case 'HIGH':     return 'Alta';
+            case 'MEDIUM':   return 'Media';
+            case 'LOW':      return 'Baja';
+            default:         return level ?? '-';
+        }
     }
 }

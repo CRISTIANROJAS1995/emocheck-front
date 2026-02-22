@@ -65,20 +65,14 @@ export class SupportComponent implements OnInit {
     }
 
     createEmergencyRequest(): void {
-        if (!this.evaluationResultId) {
-            window.alert('No se encontró el id del resultado para crear la solicitud.');
-            return;
-        }
-
         this.loading = true;
         this.support
             .createRequest({
-                evaluationResultId: this.evaluationResultId,
-                requestType: 'Emergency',
-                urgencyLevel: 'Critical',
+                requestType: 'PSYCHOLOGICAL',
+                priority: 'URGENT',
                 subject: 'Solicitud de ayuda inmediata',
                 description: 'El resultado indica alto riesgo. Requiero apoyo urgente.',
-                preferredContactMethod: 'Phone',
+                evaluationID: this.evaluationResultId ?? undefined,
             })
             .pipe(finalize(() => (this.loading = false)))
             .subscribe({
@@ -93,20 +87,14 @@ export class SupportComponent implements OnInit {
     }
 
     createChatRequest(): void {
-        if (!this.evaluationResultId) {
-            window.alert('No se encontró el id del resultado para crear la solicitud.');
-            return;
-        }
-
         this.loading = true;
         this.support
             .createRequest({
-                evaluationResultId: this.evaluationResultId,
-                requestType: 'Consultation',
-                urgencyLevel: 'High',
+                requestType: 'PSYCHOLOGICAL',
+                priority: 'HIGH',
                 subject: 'Solicitud de apoyo psicológico',
                 description: 'Me gustaría recibir orientación y acompañamiento.',
-                preferredContactMethod: 'VideoCall',
+                evaluationID: this.evaluationResultId ?? undefined,
             })
             .pipe(finalize(() => (this.loading = false)))
             .subscribe({
