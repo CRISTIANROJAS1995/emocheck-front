@@ -46,7 +46,7 @@ interface EmotionalAnalysisApiResponse {
     providedIn: 'root'
 })
 export class EmotionalAnalysisService {
-    private readonly apiUrl = (environment as any).emotionalAnalysisApiUrl || environment.apiUrl;
+    private readonly apiUrl = environment.apiUrl;
 
     constructor(private readonly http: HttpClient) { }
 

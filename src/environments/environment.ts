@@ -1,11 +1,7 @@
 export const environment = {
     production: false,
     // DEV: API local para pruebas (HTTP para evitar ERR_CERT_AUTHORITY_INVALID)
-    apiUrl: 'http://localhost:5230/api',
-    apiBaseUrl: 'http://localhost:5230',
-
-    // Análisis emocional: usa la misma API local
-    emotionalAnalysisApiUrl: 'http://localhost:5230/api',
+    apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
     apiTimeout: 30000,
     appName: 'EmoCheck',
     version: '1.0.0',
@@ -20,6 +16,4 @@ export const environment = {
     refreshTokenStorageKey: 'emocheck_refreshToken',
     userStorageKey: 'emocheck_user',
     tokenExpirationWarning: 300000, // 5 minutos en ms
-
-
 };

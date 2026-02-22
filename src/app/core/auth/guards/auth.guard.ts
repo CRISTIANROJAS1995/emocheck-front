@@ -1,21 +1,21 @@
 import { inject } from '@angular/core';
 import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
-import { AuthService } from 'app/core/services/auth.service'; // 🔧 USAR NUESTRO AUTHSERVICE
-import { of, switchMap } from 'rxjs';
+import { AuthService } from 'app/core/services/auth.service';
 
 export const AuthGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
     const router: Router = inject(Router);
     const authService: AuthService = inject(AuthService);
 
-    // Check the authentication status usando nuestro servicio
-    return authService.isAuthenticated$.pipe(
-        switchMap((authenticated) => {
-            if (!authenticated) {
-                const redirectURL = state.url === '/sign-out' ? '' : `redirectURL=${state.url}`;
-                const urlTree = router.parseUrl(`sign-in?${redirectURL}`);
-                return of(urlTree);
-            }
-            return of(true);
-        })
-    );
+    // Verificación síncrona directa: si hay token en localStorage la sesión es válida.
+    // La rehidratación del usuario ocurre en background (initializeAuth).
+    // Si el token está expirado/inválido, el error de la API llamará a logout() y
+    // redirigirá a /sign-in automáticamente.
+    const hasToken = !!authService.getToken();
+
+    if (!hasToken) {
+        const redirectURL = state.url === '/sign-out' ? '' : `redirectURL=${state.url}`;
+        return router.parseUrl(`sign-in?${redirectURL}`);
+    }
+
+    return true;
 };

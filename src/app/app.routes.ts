@@ -7,8 +7,8 @@ import { LayoutComponent } from 'app/layout/layout.component';
 
 export const appRoutes: Route[] = [
 
-    // Redirect empty path to '/example'
-    { path: '', pathMatch: 'full', redirectTo: 'welcome' },
+    // Redirect empty path → signed-in-redirect (decide según sesión y rol)
+    { path: '', pathMatch: 'full', redirectTo: 'signed-in-redirect' },
 
     { path: 'signed-in-redirect', canActivate: [AuthGuard], loadChildren: () => import('app/modules/auth/signed-in-redirect/signed-in-redirect.routes') },
 

@@ -15,7 +15,11 @@ export class AuthService {
     }
     private currentUserSubject = new BehaviorSubject<User | null>(null);
     public currentUser$ = this.currentUserSubject.asObservable();
-    private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+    // Inicializar con true si ya hay token en localStorage para que el AuthGuard
+    // no redirija a /sign-in mientras la rehidratación HTTP está en curso.
+    private isAuthenticatedSubject = new BehaviorSubject<boolean>(
+        !!localStorage.getItem(environment.tokenStorageKey)
+    );
     public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
     private lastAuthErrorSubject = new BehaviorSubject<string | null>(null);
     public lastAuthError$ = this.lastAuthErrorSubject.asObservable();
@@ -159,15 +163,32 @@ export class AuthService {
             return;
         }
 
-        // Hay token: marcamos sesión como activa y rehidratamos usuario desde la API.
-        // (No construimos usuario desde JWT: la fuente de verdad es `/users/current`.)
+        // Hay token → la sesión es válida hasta que el backend diga lo contrario.
+        // Rehidratamos el usuario en background SIN forzar logout si falla,
+        // porque puede ser un error de red temporal o de la API.
+        // El interceptor se encarga de llamar logout() si recibe un 401 real.
         this.isAuthenticatedSubject.next(true);
         this.ensureCurrentUserLoaded().subscribe({
-            error: () => {
-                // Si el token es inválido/expirado, limpiamos sesión.
-                this.logout();
+            error: (err) => {
+                // Solo limpiar sesión si el backend confirma que el token es inválido (401)
+                // No hacerlo en errores de red (0), timeout, o errores del servidor (500).
+                const status = err?.status ?? err?.error?.status ?? 0;
+                if (status === 401) {
+                    this.clearSession();
+                }
+                // Para cualquier otro error simplemente ignorar —
+                // el usuario seguirá autenticado y el interceptor reintentará.
             },
         });
+    }
+
+    /** Limpia la sesión localmente sin redirigir al router */
+    private clearSession(): void {
+        localStorage.removeItem(environment.tokenStorageKey);
+        localStorage.removeItem(environment.refreshTokenStorageKey);
+        localStorage.removeItem(environment.userStorageKey);
+        this.currentUserSubject.next(null);
+        this.isAuthenticatedSubject.next(false);
     }
 
     /** Método signIn para compatibilidad con el componente de login */
@@ -262,11 +283,7 @@ export class AuthService {
 
     /** Cerrar sesión */
     logout(): void {
-        localStorage.removeItem(environment.tokenStorageKey);
-        localStorage.removeItem(environment.refreshTokenStorageKey);
-        localStorage.removeItem(environment.userStorageKey);
-        this.currentUserSubject.next(null);
-        this.isAuthenticatedSubject.next(false);
+        this.clearSession();
         this.router.navigate(['/sign-in']);
     }
 

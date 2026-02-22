@@ -1,5 +1,4 @@
 import { BooleanInput } from '@angular/cdk/coercion';
-import { NgClass } from '@angular/common';
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -14,10 +13,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router } from '@angular/router';
-import { UserService } from 'app/core/user/user.service';
-import { User } from 'app/core/user/user.types';
-import { AuthService } from 'app/core/services/auth.service'; // 🔧 NUESTRO AUTHSERVICE
 import { User as MotionIQUser } from 'app/core/models/auth.model'; // 🔧 NUESTRO MODELO USER
+import { AuthService } from 'app/core/services/auth.service'; // 🔧 NUESTRO AUTHSERVICE
+import { UserService } from 'app/core/user/user.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -30,7 +28,6 @@ import { Subject, takeUntil } from 'rxjs';
         MatButtonModule,
         MatMenuModule,
         MatIconModule,
-        NgClass,
         MatDividerModule,
     ],
 })
