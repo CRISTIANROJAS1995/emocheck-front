@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse } from 'app/core/models/auth.model';
 import { environment } from '../../../environments/environment';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 export type ResourceType = 'Video' | 'Article' | 'Audio' | 'Exercise' | 'PDF' | string;
 export type TargetAudience = 'Green' | 'Yellow' | 'Red' | 'All' | string;
@@ -168,7 +168,7 @@ export class ResourcesService {
     }
 
     getCategories(): Observable<ResourceCategoryDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/resources/categories`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/resource/categories`).pipe(
             map((res) => {
                 const items = this.unwrapApiResponse<SwaggerResourceCategoryDto[]>(res, 'No fue posible obtener categorías') ?? [];
                 return (items ?? []).map((c) => this.toCategoryDto(c));
@@ -186,8 +186,8 @@ export class ResourcesService {
             filters?.categoryId != null && !filters?.resourceType && !filters?.targetAudience && filters?.isFeatured == null;
 
         const url = onlyCategoryFilter
-            ? `${this.apiUrl}/resources/category/${filters!.categoryId}`
-            : `${this.apiUrl}/resources`;
+            ? `${this.apiUrl}/resource/by-category/${filters!.categoryId}`
+            : `${this.apiUrl}/resource`;
 
         const params: Record<string, string> = {};
         if (!onlyCategoryFilter) {
@@ -206,95 +206,40 @@ export class ResourcesService {
     }
 
     getFeatured(): Observable<WellnessResourceDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/resources/featured`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/resource`).pipe(
             map((res) => {
                 const items = this.unwrapApiResponse<SwaggerWellnessResourceDto[]>(res, 'No fue posible obtener recursos destacados') ?? [];
-                return (items ?? []).map((r) => this.toResourceDto(r));
+                return (items ?? []).filter((r) => r.isFeatured).map((r) => this.toResourceDto(r));
             })
         );
     }
 
     getRecommended(): Observable<RecommendedResourcesDto> {
-        // Swagger-aligned strategy:
-        // 1) Find latest completed evaluation
-        // 2) Pull recommendations by evaluationResultId
-        // 3) Enrich with resources list (URL/title matching)
-        // 4) Fallback to audience-based filtering when recommendations are empty
-        return this.http
-            .get<unknown>(`${this.apiUrl}/evaluation/my-completed`)
-            .pipe(
-                map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
-                catchError(() => of([])),
-                switchMap((completed) => {
-                    const latest = (completed ?? [])
-                        .filter((e) => !!e?.completedAt)
-                        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0];
-
-                    const risk = ((latest?.result?.riskLevel ?? 'All') as TargetAudience) || 'All';
-                    const evaluationResultId = Number(
-                        latest?.result?.evaluationResultID ?? latest?.result?.evaluationResultId ?? 0
-                    );
-
-                    if (!Number.isFinite(evaluationResultId) || evaluationResultId <= 0) {
-                        return this.getRecommendedFallback(risk);
-                    }
-
-                    return forkJoin({
-                        recommendations: this.http
-                            .get<unknown>(`${this.apiUrl}/recommendation/by-result/${evaluationResultId}`)
-                            .pipe(
-                                map((res) => this.unwrapArray<SwaggerRecommendationDto>(res)),
-                                catchError(() => of([]))
-                            ),
-                        resources: this.getResources().pipe(catchError(() => of([]))),
-                    }).pipe(
-                        map(({ recommendations, resources }) => {
-                            const normalizedResources = resources ?? [];
-
-                            const mapped = (recommendations ?? [])
-                                .map((r) => {
-                                    const recUrl = String(r?.resourceUrl ?? '').trim();
-                                    const recTitle = String(r?.title ?? '').trim();
-                                    const recText = String(r?.recommendationText ?? '').trim();
-
-                                    const linked = normalizedResources.find((item) => {
-                                        const byUrl = !!recUrl && String(item?.contentUrl ?? '').trim() === recUrl;
-                                        const byTitle = !!recTitle && String(item?.title ?? '').trim().toLowerCase() === recTitle.toLowerCase();
-                                        return byUrl || byTitle;
-                                    });
-
-                                    return {
-                                        wellnessResourceId: (linked?.wellnessResourceId ?? Number(r?.recommendationID ?? 0)) || 0,
-                                        title: linked?.title ?? (recTitle || 'Recomendación'),
-                                        description: linked?.description ?? (recText || undefined),
-                                        resourceType: linked?.resourceType ?? 'Recommendation',
-                                        contentUrl: linked?.contentUrl ?? recUrl,
-                                        durationMinutes: linked?.durationMinutes,
-                                        targetAudience: linked?.targetAudience ?? risk,
-                                    };
-                                })
-                                .filter((x) => !!String(x.title ?? '').trim())
-                                .slice(0, 6);
-
-                            if (!mapped.length) {
-                                return null;
-                            }
-
-                            return {
-                                userRiskLevel: risk,
-                                recommendationReason: 'Basado en tu último resultado',
-                                resources: mapped,
-                            } as RecommendedResourcesDto;
-                        }),
-                        switchMap((fromRecommendations) =>
-                            fromRecommendations
-                                ? of(fromRecommendations)
-                                : this.getRecommendedFallback(risk)
-                        )
-                    );
-                }),
-                catchError(() => this.getRecommendedFallback('All'))
-            );
+        // Use the native V5 endpoint: GET /api/resource/recommended
+        return this.http.get<unknown>(`${this.apiUrl}/resource/recommended`).pipe(
+            map((res) => {
+                const data = this.unwrapApiResponse<any>(res, 'No fue posible obtener recomendaciones');
+                // API may return an array of resources or a wrapper object
+                if (Array.isArray(data)) {
+                    return {
+                        userRiskLevel: 'All' as TargetAudience,
+                        recommendationReason: 'Recomendaciones para ti',
+                        resources: (data as SwaggerWellnessResourceDto[]).slice(0, 6).map((r) => ({
+                            wellnessResourceId: r.wellnessResourceID,
+                            title: r.title ?? '',
+                            description: r.description ?? undefined,
+                            resourceType: r.resourceType ?? '',
+                            contentUrl: r.contentUrl ?? '',
+                            durationMinutes: r.durationMinutes ?? undefined,
+                            targetAudience: (r.targetAudience ?? 'All') as TargetAudience,
+                        })),
+                    } as RecommendedResourcesDto;
+                }
+                // Already a RecommendedResourcesDto shape
+                return data as RecommendedResourcesDto;
+            }),
+            catchError(() => this.getRecommendedFallback('All'))
+        );
     }
 
     private getRecommendedFallback(risk: TargetAudience): Observable<RecommendedResourcesDto> {
@@ -338,54 +283,20 @@ export class ResourcesService {
         return [];
     }
 
-    trackAccess(resourceId: number, payload: TrackAccessDto): Observable<string | null> {
-        // MD contract (preferred): POST /api/resources/{resourceId}/track-access
-        const mdBody = {
-            durationSeconds: payload?.durationSeconds ?? 0,
-            completedPercentage: payload?.completedPercentage ?? 0,
-            rating: payload?.rating ?? undefined,
-            feedback: payload?.feedback ?? undefined,
-        };
-
-        // Swagger contract (fallback): POST /api/resources/{resourceId}/access
-        const swaggerBody = {
-            wellnessResourceID: resourceId,
-            timeSpentSeconds: payload?.durationSeconds ?? 0,
-            wasCompleted: (payload?.completedPercentage ?? 0) >= 100,
-            userRating: payload?.rating ?? undefined,
-            feedback: payload?.feedback ?? undefined,
-        };
-
-        const tryUnwrapToString = (res: unknown): string | null => {
-            const unwrapped = this.unwrapApiResponse<any>(res, 'No fue posible registrar acceso');
-            if (unwrapped == null) return null;
-            if (typeof unwrapped === 'string') return unwrapped;
-            try {
-                return JSON.stringify(unwrapped);
-            } catch {
-                return null;
-            }
-        };
-
-        return this.http.post<unknown>(`${this.apiUrl}/resources/${resourceId}/track-access`, mdBody).pipe(
-            map((res) => tryUnwrapToString(res)),
-            catchError(() =>
-                this.http.post<unknown>(`${this.apiUrl}/resources/${resourceId}/access`, swaggerBody).pipe(
-                    map((res) => tryUnwrapToString(res))
-                )
-            )
-        );
+    trackAccess(_resourceId: number, _payload: TrackAccessDto): Observable<string | null> {
+        // V5 API does not expose a resource access tracking endpoint.
+        return of(null);
     }
 
     getProfessionals(): Observable<ProfessionalSupportDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/support/professionals`).pipe(
-            map((res) => this.unwrapApiResponse<ProfessionalSupportDto[]>(res, 'No fue posible obtener profesionales') ?? [])
-        );
+        // V5 API does not expose a professionals directory endpoint.
+        // Return empty array to avoid 404 errors on the resources page.
+        return of([]);
     }
 
     getEmergencyProfessionals(): Observable<ProfessionalSupportDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/support/professionals/emergency`).pipe(
-            map((res) => this.unwrapApiResponse<ProfessionalSupportDto[]>(res, 'No fue posible obtener contactos de emergencia') ?? [])
-        );
+        // V5 API does not expose an emergency professionals endpoint.
+        // Return empty array to avoid 404 errors on the resources page.
+        return of([]);
     }
 }

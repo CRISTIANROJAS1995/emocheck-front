@@ -29,7 +29,7 @@
                     <mat-icon svgIcon="heroicons_outline:exclamation-triangle"></mat-icon>
                 </div>
                 <div class="resources-callout__body">
-                    <div class="resources-callout__title">No pudimos cargar el mÃ³dulo</div>
+                    <div class="resources-callout__title">No pudimos cargar el módulo</div>
                     <div class="resources-callout__text">{{ error }}</div>
                 </div>
                 <button class="resources-callout__cta" mat-button type="button" (click)="loadInitial()">
@@ -42,10 +42,10 @@
                 <div class="resources-warnings__item" *ngFor="let w of warnings">{{ w }}</div>
             </div>
 
-            <!-- Acceso rÃ¡pido -->
+            <!-- Acceso rápido -->
             <section class="resources-section">
                 <div class="resources-section__title">Acceso permanente</div>
-                <div class="resources-section__subtitle">Atajos rÃ¡pidos para tu bienestar</div>
+                <div class="resources-section__subtitle">Atajos rápidos para tu bienestar</div>
 
                 <div class="quick-grid">
                     <button class="quick-card quick-card--purple" type="button" (click)="openQuickAccess('emotional-calibration')">
@@ -53,7 +53,7 @@
                             <div class="quick-card__glyph">
                                 <mat-icon svgIcon="heroicons_outline:sparkles"></mat-icon>
                             </div>
-                            <div class="quick-card__title">CalibraciÃ³n emocional</div>
+                            <div class="quick-card__title">Calibración emocional</div>
                         </div>
                         <div class="quick-card__desc">Analiza tu estado emocional cuando lo necesites</div>
                         <span class="quick-card__cta">Abrir</span>
@@ -66,7 +66,7 @@
                             </div>
                             <div class="quick-card__title">Mindfulness</div>
                         </div>
-                        <div class="quick-card__desc">Ejercicios de respiraciÃ³n y atenciÃ³n plena</div>
+                        <div class="quick-card__desc">Ejercicios de respiración y atención plena</div>
                         <span class="quick-card__cta">Explorar</span>
                     </button>
 
@@ -77,7 +77,7 @@
                             </div>
                             <div class="quick-card__title">Neuropausas</div>
                         </div>
-                        <div class="quick-card__desc">Pausas activas para recargar energÃ­a mental</div>
+                        <div class="quick-card__desc">Pausas activas para recargar energía mental</div>
                         <span class="quick-card__cta">Explorar</span>
                     </button>
 
@@ -94,10 +94,10 @@
                 </div>
             </section>
 
-            <!-- CategorÃ­as -->
+            <!-- Categorías -->
             <section class="resources-section">
-                <div class="resources-section__title">CategorÃ­as</div>
-                <div class="resources-section__subtitle">Explora por temÃ¡tica</div>
+                <div class="resources-section__title">Categorías</div>
+                <div class="resources-section__subtitle">Explora por temática</div>
 
                 <div class="resources-categories">
                     <button mat-button class="resources-chip" type="button" [class.is-active]="selectedCategoryId === null" (click)="selectCategory(null)">
@@ -111,7 +111,7 @@
                 </div>
 
                 <div class="resources-empty" *ngIf="!loading && !error && !(categories?.length)">
-                    No hay categorÃ­as disponibles por ahora.
+                    No hay categorías disponibles por ahora.
                 </div>
             </section>
 
@@ -137,7 +137,7 @@
                         <div class="resource-card__meta">
                             <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
                             <span class="resource-badge">{{ r.resourceType }}</span>
-                            <span class="resource-dot" *ngIf="r.durationMinutes">â€¢</span>
+                            <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
                         </div>
                         <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
@@ -148,7 +148,7 @@
             <!-- Destacados -->
             <section class="resources-section">
                 <div class="resources-section__title">Destacados</div>
-                <div class="resources-section__subtitle">SelecciÃ³n curada para empezar hoy</div>
+                <div class="resources-section__subtitle">Selección curada para empezar hoy</div>
 
                 <div class="resources-empty" *ngIf="!loading && !error && !(featured?.length)">
                     No hay recursos destacados por ahora.
@@ -163,7 +163,7 @@
                         <div class="resource-card__meta">
                             <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
                             <span class="resource-badge">{{ r.resourceType }}</span>
-                            <span class="resource-dot" *ngIf="r.durationMinutes">â€¢</span>
+                            <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
                         </div>
                         <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
@@ -175,7 +175,7 @@
             <section class="resources-section">
                 <div class="resources-section__title">Todos los recursos</div>
                 <div class="resources-section__subtitle" *ngIf="selectedCategoryId !== null">
-                    Filtrando por categorÃ­a
+                    Filtrando por categoría
                 </div>
 
                 <div class="resources-empty" *ngIf="!loading && !error && !resources?.length">
@@ -190,10 +190,10 @@
                         </div>
                         <div class="resource-card__meta">
                             <span class="resource-category" *ngIf="r.categoryName">{{ r.categoryName }}</span>
-                            <span class="resource-dot" *ngIf="r.categoryName">â€¢</span>
+                            <span class="resource-dot" *ngIf="r.categoryName">•</span>
                             <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
                             <span class="resource-badge">{{ r.resourceType }}</span>
-                            <span class="resource-dot" *ngIf="r.durationMinutes">â€¢</span>
+                            <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
                         </div>
                         <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
@@ -205,7 +205,7 @@
             <section class="resources-section">
                 <div class="resources-section__title">Apoyo profesional</div>
                 <div class="resources-section__subtitle">
-                    Si necesitas hablar con alguien, aquÃ­ tienes opciones de contacto
+                    Si necesitas hablar con alguien, aquí tienes opciones de contacto
                 </div>
 
                 <div class="resources-empty" *ngIf="!loading && !error && !(professionals?.length || emergencyContacts?.length)">
