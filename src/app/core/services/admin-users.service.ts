@@ -40,8 +40,12 @@ export interface AdminUserListItemDto {
 }
 
 export interface AdminCreateUserRequestDto {
-    fullName: string;
+    firstName: string;
+    lastName: string;
+    documentType: string;
     documentNumber: string;
+    phone: string;
+    gender: string;
     email: string;
     password: string;
     companyID?: number | null;

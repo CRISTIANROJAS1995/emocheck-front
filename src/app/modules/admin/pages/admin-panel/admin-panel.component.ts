@@ -77,10 +77,14 @@ export class AdminPanelComponent implements OnInit {
 
     ngOnInit(): void {
         this.createForm = this.fb.group({
-            fullName: ['', Validators.required],
+            firstName: ['', Validators.required],
+            lastName: ['', Validators.required],
+            documentType: ['CC', Validators.required],
             documentNumber: ['', Validators.required],
+            phone: ['', Validators.required],
+            gender: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
-            password: ['', Validators.required],
+            password: ['', [Validators.required, Validators.minLength(8)]],
             companyID: [null],
             siteID: [null],
             areaID: [null],
@@ -131,7 +135,7 @@ export class AdminPanelComponent implements OnInit {
                 error: (e) => {
                     this.users = [];
                     this.filteredUsers = [];
-                    this.alert.error(e?.message || 'No fue posible cargar usuarios');
+                    this.alert.error(this.extractErrorMessage(e, 'No fue posible cargar usuarios'));
                 },
             });
     }
@@ -188,7 +192,7 @@ export class AdminPanelComponent implements OnInit {
                 this.alert.success(user.isActive ? 'Usuario desactivado' : 'Usuario activado');
                 this.loadUsers();
             },
-            error: (e) => this.alert.error(e?.message || 'Error al cambiar estado'),
+            error: (e) => this.alert.error(this.extractErrorMessage(e, 'Error al cambiar estado')),
         });
     }
 
@@ -205,7 +209,7 @@ export class AdminPanelComponent implements OnInit {
                     this.alert.success('Usuario eliminado');
                     this.loadUsers();
                 },
-                error: (e) => this.alert.error(e?.message || 'No fue posible eliminar el usuario'),
+                error: (e) => this.alert.error(this.extractErrorMessage(e, 'No fue posible eliminar el usuario')),
             });
     }
 
@@ -230,25 +234,29 @@ export class AdminPanelComponent implements OnInit {
 
         this.adminUsers
             .createUser({
-                fullName: String(v.fullName || '').trim(),
+                firstName: String(v.firstName || '').trim(),
+                lastName: String(v.lastName || '').trim(),
+                documentType: String(v.documentType || '').trim(),
                 documentNumber: String(v.documentNumber || '').trim(),
+                phone: String(v.phone || '').trim(),
+                gender: String(v.gender || '').trim(),
                 email: String(v.email || '').trim(),
                 password: String(v.password || '').trim(),
                 companyID: toOptionalNum(v.companyID),
                 siteID: toOptionalNum(v.siteID),
                 areaID: toOptionalNum(v.areaID),
                 jobTypeID: Number(v.jobTypeID),
-                roleIDs: roleIDs.length ? roleIDs : [1],
+                roleIDs: roleIDs.length ? roleIDs : [6],
             })
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
                 next: () => {
                     this.alert.success('Usuario creado exitosamente');
-                    this.createForm.reset({ roleIDs: [1] });
+                    this.createForm.reset({ roleIDs: [6] });
                     this.showCreateForm = false;
                     this.loadUsers();
                 },
-                error: (e) => this.alert.error(e?.message || 'No fue posible crear el usuario'),
+                error: (e) => this.alert.error(this.extractErrorMessage(e, 'No fue posible crear el usuario')),
             });
     }
 
@@ -329,7 +337,7 @@ export class AdminPanelComponent implements OnInit {
                 }
                 this.alert.success(wasAssigned ? 'Rol removido' : 'Rol asignado');
             },
-            error: (e) => this.alert.error(e?.error?.message || e?.message || 'Error al modificar rol'),
+            error: (e) => this.alert.error(this.extractErrorMessage(e, 'Error al modificar rol')),
         });
     }
 
@@ -363,7 +371,7 @@ export class AdminPanelComponent implements OnInit {
                     this.cancelEdit();
                     this.loadUsers();
                 },
-                error: (e) => this.alert.error(e?.error?.message || e?.message || 'No fue posible actualizar el usuario'),
+                error: (e) => this.alert.error(this.extractErrorMessage(e, 'No fue posible actualizar el usuario')),
             });
     }
 
@@ -381,5 +389,38 @@ export class AdminPanelComponent implements OnInit {
 
     get filteredEditAreas(): AreaDto[] {
         return this.areas;
+    }
+
+    // ── Error helpers ──
+
+    /**
+     * Extrae el mensaje legible de un HttpErrorResponse.
+     * Maneja los dos formatos que retorna el backend:
+     *   1. { StatusCode, Message, Details }   → usa "Message"
+     *   2. { errors: { Field: [msg, ...] } }  → concatena todos los mensajes de campo
+     */
+    private extractErrorMessage(e: any, fallback = 'Ha ocurrido un error'): string {
+        const body = e?.error;
+        if (!body) return e?.message || fallback;
+
+        // Formato 1: { Message: "..." }
+        if (typeof body.Message === 'string' && body.Message.trim()) {
+            return body.Message.trim();
+        }
+
+        // Formato 2: { errors: { Field: ["msg1", ...] } }
+        if (body.errors && typeof body.errors === 'object') {
+            const messages: string[] = [];
+            for (const field of Object.keys(body.errors)) {
+                const fieldMsgs: string[] = Array.isArray(body.errors[field])
+                    ? body.errors[field]
+                    : [String(body.errors[field])];
+                messages.push(...fieldMsgs);
+            }
+            if (messages.length) return messages.join('\n');
+        }
+
+        // Formato genérico: message / title
+        return body.message || body.title || e?.message || fallback;
     }
 }

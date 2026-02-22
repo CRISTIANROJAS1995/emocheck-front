@@ -253,6 +253,7 @@
             <div class="chart-card">
                 <div class="chart-card__title">Mi Evolución en el Tiempo</div>
                 <div class="chart-card__subtitle">Progreso de tus puntajes en los últimos 6 meses</div>
+                @if (hasChartData) {
                 <apx-chart [series]="moodTrackingChart.series" [chart]="moodTrackingChart.chart" [colors]="moodTrackingChart.colors" [stroke]="moodTrackingChart.stroke" [dataLabels]="moodTrackingChart.dataLabels" [markers]="moodTrackingChart.markers" [grid]="moodTrackingChart.grid"
                     [xaxis]="moodTrackingChart.xaxis" [yaxis]="moodTrackingChart.yaxis" [tooltip]="moodTrackingChart.tooltip">
                 </apx-chart>
@@ -262,6 +263,11 @@
                     <span class="lg-item lg-item--orange">Riesgo Psico.</span>
                     <span class="lg-item lg-item--purple">Salud Mental</span>
                 </div>
+                } @else if (!loading) {
+                <div class="chart-empty">
+                    <span>Completa al menos una evaluación para ver tu evolución en el tiempo.</span>
+                </div>
+                }
             </div>
 
             <div class="chart-card">

@@ -131,6 +131,9 @@ export class MyTrackingComponent implements OnInit {
     loading = true;
     loadError: string | null = null;
 
+    /** True once applyCharts() has at least one real score to plot. */
+    hasChartData = false;
+
     // Tiempo en EmoCheck — calculado desde createdAt del perfil
     memberSinceLabel = '—';
 
@@ -672,9 +675,12 @@ export class MyTrackingComponent implements OnInit {
                 const dims = latest!.result?.dimensionScores ?? [];
                 const findings = (dims ?? []).map((d) => {
                     const tone = this.riskToneFor(d?.riskLevel);
+                    const pct = (d as any)?.percentageScore != null
+                        ? Math.round(Math.max(0, Math.min(100, Number((d as any).percentageScore))))
+                        : this.safePercent(d?.score ?? 0, d?.maxScore ?? 0);
                     return {
-                        label: d?.dimensionName ?? 'Dimensión',
-                        value: this.safePercent(d?.score ?? 0, d?.maxScore ?? 0),
+                        label: this.resolveDimensionLabel(moduleId, (d as any)?.instrumentCode, d?.dimensionName),
+                        value: pct,
                         badge: this.badgeLabelForRiskLevel(d?.riskLevel),
                         tone,
                     };
@@ -821,12 +827,13 @@ export class MyTrackingComponent implements OnInit {
 
         const fallbackDesc = 'No encuentras respuestas a lo que estás sintiendo, podemos conversarlo y hallar soluciones.';
         const interpretation = String(item?.result?.interpretation ?? '').trim();
+        const isEnglishFallback = interpretation.toLowerCase().startsWith('evaluation completed');
 
         this.stateCard = {
             badgeLabel: this.badgeForRisk(risk),
             headline: this.headlineForTone(tone),
             scoreOutOfTen: Number.isFinite(outOfTen) ? `${outOfTen.toFixed(1)}/10` : '—',
-            description: interpretation || fallbackDesc,
+            description: (!interpretation || isEnglishFallback) ? fallbackDesc : interpretation,
             tone,
         };
     }
@@ -892,6 +899,9 @@ export class MyTrackingComponent implements OnInit {
             .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())[0];
 
         const placeholderValue = within.length === 1 ? valueFor(within[0]) : lastKnown ? valueFor(lastKnown) : 0;
+
+        // Only render chart if we have at least one real data point with a non-zero score.
+        this.hasChartData = placeholderValue > 0 || within.length >= 2;
 
         const categories = shouldUseWeeklyPlaceholder
             ? ['S1', 'S2', 'S3', 'S4']
@@ -1075,6 +1085,32 @@ export class MyTrackingComponent implements OnInit {
         const max = Number(maxScore ?? 0);
         if (!max || Number.isNaN(s) || Number.isNaN(max)) return 0;
         return Math.round(Math.max(0, Math.min(100, (s / max) * 100)));
+    }
+
+    /**
+     * Resolves a human-friendly dimension label.
+     * Priority: instrumentCode match → backend dimensionName keyword match → dimensionName raw.
+     */
+    private resolveDimensionLabel(moduleId: ModuleProgressId, instrumentCode: string | undefined, dimensionName: string | undefined): string {
+        const labels = getAssessmentModuleDefinition(moduleId)?.dimensionLabels ?? [];
+
+        // 1. Exact match by instrumentCode (e.g. "GAD7" → "Ansiedad")
+        if (instrumentCode) {
+            const code = String(instrumentCode).toUpperCase().replace(/[-\s]/g, '');
+            const match = labels.find((l) => l.instrumentCode.toUpperCase().replace(/[-\s]/g, '') === code);
+            if (match?.label) return match.label;
+        }
+
+        // 2. Match instrumentCode contained in the backend dimensionName
+        //    e.g. "GAD-7 (Ansiedad Generalizada)" contains "GAD7"
+        if (dimensionName) {
+            const normalized = dimensionName.toUpperCase().replace(/[-\s]/g, '');
+            const match = labels.find((l) => normalized.includes(l.instrumentCode.toUpperCase().replace(/[-\s]/g, '')));
+            if (match?.label) return match.label;
+        }
+
+        // 3. Fallback to raw backend name
+        return dimensionName?.trim() || 'Dimensión';
     }
 
     private formatDateLong(iso: string): string {

@@ -95,9 +95,12 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
 
         if (shouldHydrate) {
             this.isHydrating = true;
+            // Use hydrateModuleResultFromCompletedEvaluations as primary path:
+            // it always re-fetches from my-completed regardless of stored evaluationId,
+            // fixing cases where stale localStorage state has no evaluationId or empty dims.
             this.subscriptions.add(
                 this.assessmentHydration
-                    .hydrateCurrentModuleResultIfMissing(this.moduleId)
+                    .hydrateModuleResultFromCompletedEvaluations(this.moduleId, this.result.evaluationId)
                     .pipe(
                         switchMap(() => this.assessmentHydration.hydrateRecommendationsIfMissing(this.moduleId)),
                         finalize(() => {
@@ -105,6 +108,9 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
                         })
                     )
                     .subscribe({
+                        next: () => {
+                            this.result = this.state.getResult(this.moduleId);
+                        },
                         error: () => {
                             this.isHydrating = false;
                         },
@@ -222,13 +228,41 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     }
 
     getBarTone(percent: number): 'good' | 'warn' | 'bad' {
+        const higherIsWorse = this.moduleDef?.higherIsWorse ?? false;
+        if (higherIsWorse) {
+            // For modules where higher score = worse (e.g., anxiety, depression)
+            if (percent >= 70) return 'bad';
+            if (percent >= 40) return 'warn';
+            return 'good';
+        }
+        // For modules where higher score = better (e.g., organizational climate)
         if (percent >= 70) return 'good';
         if (percent >= 50) return 'warn';
         return 'bad';
     }
 
-    getDimensionLabel(dimension: { id: string; label: string }, index: number): string {
-        const labelFromModule = this.moduleDef?.dimensionLabels?.[index]?.label;
-        return labelFromModule ?? dimension.label;
+    getDimensionLabel(dimension: { id: string; label: string; instrumentCode?: string }, index: number): string {
+        const labels = this.moduleDef?.dimensionLabels ?? [];
+
+        // 1. Match exacto por instrumentCode (e.g. "GAD7" → "Ansiedad")
+        if (dimension.instrumentCode) {
+            const code = dimension.instrumentCode.toUpperCase();
+            const byCode = labels.find((dl) => dl.instrumentCode.toUpperCase() === code);
+            if (byCode?.label) return byCode.label;
+        }
+
+        // 2. Match por instrumentCode contenido en el label del backend
+        //    e.g. "GAD-7 (Ansiedad Generalizada)" contiene "GAD7" o "GAD-7"
+        if (dimension.label?.trim()) {
+            const backendLabel = dimension.label.toUpperCase().replace(/[-\s]/g, '');
+            const byLabelCode = labels.find((dl) => {
+                const normalized = dl.instrumentCode.toUpperCase().replace(/[-\s]/g, '');
+                return backendLabel.includes(normalized);
+            });
+            if (byLabelCode?.label) return byLabelCode.label;
+        }
+
+        // 3. Fallback posicional
+        return labels[index]?.label ?? dimension.label?.trim() ?? '';
     }
 }

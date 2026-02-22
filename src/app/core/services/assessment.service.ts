@@ -387,12 +387,15 @@ export class AssessmentService {
             outcome,
             score,
             evaluatedAt: anyRes?.calculatedAt,
-            headline: String(anyRes?.riskLevel ?? ''),
-            message: anyRes?.interpretation || '',
+            headline: this.mapRiskLevelToSpanish((anyRes?.riskLevel ?? '') as RiskLevel),
+            message: this.buildInterpretationMessage(outcome, score),
             dimensions: ((anyRes?.dimensionScores ?? []) as any[]).map((d) => ({
                 id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
                 label: d?.dimensionName ?? '',
-                percent: this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
+                instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
+                percent: d?.percentageScore != null
+                    ? Math.round(Math.max(0, Math.min(100, Number(d.percentageScore))))
+                    : this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
             })),
             recommendations: ((anyRes?.recommendations ?? []) as any[])
                 .map((r) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
@@ -437,6 +440,26 @@ export class AssessmentService {
         if (value.includes('yellow') || value.includes('medium')) return 'mild';
         if (value.includes('red') || value.includes('high')) return 'high-risk';
         return 'mild';
+    }
+
+    private mapRiskLevelToSpanish(risk: RiskLevel | string): string {
+        const value = String(risk ?? '').toLowerCase();
+        if (value.includes('low')    || value.includes('green'))                          return 'Riesgo Bajo';
+        if (value.includes('medium') || value.includes('yellow') || value.includes('moderate')) return 'Riesgo Moderado';
+        if (value.includes('severe'))                                                     return 'Riesgo Severo';
+        if (value.includes('high')   || value.includes('red'))                           return 'Riesgo Alto';
+        return 'Resultado disponible';
+    }
+
+    private buildInterpretationMessage(outcome: AssessmentOutcome, score: number): string {
+        switch (outcome) {
+            case 'adequate':
+                return `Tu puntaje es ${score}/100. Los indicadores se encuentran dentro de rangos saludables. Continúa con tus hábitos de bienestar.`;
+            case 'mild':
+                return `Tu puntaje es ${score}/100. Se detectaron algunas señales que vale la pena atender. Te recomendamos revisar las sugerencias personalizadas.`;
+            case 'high-risk':
+                return `Tu puntaje es ${score}/100. Los resultados indican niveles elevados que requieren atención. Te recomendamos buscar orientación profesional.`;
+        }
     }
 
     private findBestModuleMatch(moduleId: AssessmentModuleId, modules: SwaggerAssessmentModuleDto[]): SwaggerAssessmentModuleDto | undefined {

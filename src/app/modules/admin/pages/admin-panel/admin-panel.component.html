@@ -61,19 +61,47 @@
         <form [formGroup]="createForm" (ngSubmit)="createUser()">
             <div class="editor-panel__grid">
                 <label class="editor-panel__field">
-                    <span>Nombre completo *</span>
-                    <input formControlName="fullName" placeholder="Juan Perez" />
+                    <span>Nombre *</span>
+                    <input formControlName="firstName" placeholder="Juan" />
                 </label>
                 <label class="editor-panel__field">
-                    <span>Documento *</span>
+                    <span>Apellido *</span>
+                    <input formControlName="lastName" placeholder="Pérez" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Tipo de Documento *</span>
+                    <select formControlName="documentType">
+                        <option value="CC">Cédula de Ciudadanía (CC)</option>
+                        <option value="CE">Cédula de Extranjería (CE)</option>
+                        <option value="PA">Pasaporte (PA)</option>
+                        <option value="TI">Tarjeta de Identidad (TI)</option>
+                        <option value="NIT">NIT</option>
+                    </select>
+                </label>
+                <label class="editor-panel__field">
+                    <span>Número de Documento *</span>
                     <input formControlName="documentNumber" placeholder="1234567890" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Teléfono *</span>
+                    <input formControlName="phone" placeholder="3001234567" />
+                </label>
+                <label class="editor-panel__field">
+                    <span>Género *</span>
+                    <select formControlName="gender">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                        <option value="O">Otro</option>
+                        <option value="NI">Prefiero no indicarlo</option>
+                    </select>
                 </label>
                 <label class="editor-panel__field">
                     <span>Email *</span>
                     <input type="email" formControlName="email" placeholder="correo@empresa.com" />
                 </label>
                 <label class="editor-panel__field">
-                    <span>Contrasena temporal *</span>
+                    <span>Contraseña temporal * (mín. 8 caracteres)</span>
                     <input type="password" formControlName="password" placeholder="TempPass123!" />
                 </label>
                 <label class="editor-panel__field">

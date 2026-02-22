@@ -21,7 +21,8 @@ export interface AssessmentModuleDefinition {
         questionCardBackground: string;
     };
 
-    dimensionLabels: Array<{ id: string; label: string }>;
+    /** instrumentCode must match the backend's instrumentCode field (e.g. GAD7, PHQ9). */
+    dimensionLabels: Array<{ id: string; instrumentCode: string; label: string }>;
 }
 
 export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
@@ -42,10 +43,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             questionCardBackground: '#EFF6FF',
         },
         dimensionLabels: [
-            { id: 'anxiety', label: 'Ansiedad (GAD-7)' },
-            { id: 'depression', label: 'Depresión (PHQ-9)' },
-            { id: 'insomnia', label: 'Insomnio (ISI)' },
-            { id: 'stress', label: 'Estrés Percibido' },
+            { id: 'anxiety',    instrumentCode: 'GAD7', label: 'Ansiedad' },
+            { id: 'depression', instrumentCode: 'PHQ9', label: 'Depresión' },
+            { id: 'insomnia',   instrumentCode: 'ISI',  label: 'Insomnio' },
+            { id: 'stress',     instrumentCode: 'PSS4', label: 'Estrés Percibido' },
         ],
     },
     {
@@ -65,10 +66,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             questionCardBackground: '#F7FCE8',
         },
         dimensionLabels: [
-            { id: 'energy', label: 'Energía Física' },
-            { id: 'focus', label: 'Energía Cognitiva' },
-            { id: 'emotional', label: 'Energía Emocional' },
-            { id: 'recovery', label: 'Motivación Laboral' },
+            { id: 'energy',    instrumentCode: 'FATIGUE_ENERGY',    label: 'Energía Física' },
+            { id: 'focus',     instrumentCode: 'FATIGUE_COGNITIVE',  label: 'Energía Cognitiva' },
+            { id: 'emotional', instrumentCode: 'FATIGUE_EMOTIONAL',  label: 'Energía Emocional' },
+            { id: 'recovery',  instrumentCode: 'FATIGUE_MOTIVATION', label: 'Motivación Laboral' },
         ],
     },
     {
@@ -88,10 +89,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             questionCardBackground: '#F0FDFA',
         },
         dimensionLabels: [
-            { id: 'leadership', label: 'Liderazgo y Dirección' },
-            { id: 'teamwork', label: 'Trabajo en Equipo' },
-            { id: 'communication', label: 'Comunicación Organizacional' },
-            { id: 'recognition', label: 'Reconocimiento' },
+            { id: 'leadership',    instrumentCode: 'CLIMATE_LEADERSHIP',     label: 'Liderazgo y Dirección' },
+            { id: 'teamwork',      instrumentCode: 'CLIMATE_TEAMWORK',        label: 'Trabajo en Equipo' },
+            { id: 'communication', instrumentCode: 'CLIMATE_COMMUNICATION',   label: 'Comunicación' },
+            { id: 'recognition',   instrumentCode: 'CLIMATE_RECOGNITION',     label: 'Reconocimiento' },
         ],
     },
     {
@@ -111,10 +112,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             questionCardBackground: '#FFF7ED',
         },
         dimensionLabels: [
-            { id: 'demands', label: 'Demandas del Trabajo' },
-            { id: 'control', label: 'Control sobre el Trabajo' },
-            { id: 'support', label: 'Apoyo Social y Liderazgo' },
-            { id: 'rewards', label: 'Recompensas' },
+            { id: 'demands',  instrumentCode: 'PSYCHO_DEMANDS',  label: 'Demandas del Trabajo' },
+            { id: 'control',  instrumentCode: 'PSYCHO_CONTROL',  label: 'Control sobre el Trabajo' },
+            { id: 'support',  instrumentCode: 'PSYCHO_SUPPORT',  label: 'Apoyo Social y Liderazgo' },
+            { id: 'rewards',  instrumentCode: 'PSYCHO_REWARDS',  label: 'Recompensas' },
         ],
     },
 ];

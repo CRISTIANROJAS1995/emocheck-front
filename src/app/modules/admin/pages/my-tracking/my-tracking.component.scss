@@ -20,7 +20,9 @@
     pointer-events: none;
 }
 
+
 /* Match the same decorative circles placement used by the questionnaire screens (e.g. mental-health) */
+
 :host ::ng-deep app-background-circles .blur-circle {
     position: fixed;
     z-index: 0;
@@ -52,7 +54,9 @@
     z-index: 1;
 }
 
+
 /* Header hero */
+
 .tracking-hero {
     width: 1170px;
     height: 129px;
@@ -141,7 +145,6 @@
     min-width: 0;
     box-sizing: border-box;
     overflow: hidden;
-
     /* Angular Material icons (MDC) default to 24px via CSS vars. Force 16px here (Figma). */
     --mat-icon-size: 16px;
     --mdc-icon-size: 16px;
@@ -189,8 +192,8 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
 }
 
 
-
 /* Make MDC ripple/focus layers follow the same radius */
+
 .tracking-hero__back .mat-mdc-button-persistent-ripple,
 .tracking-hero__back .mdc-button__ripple,
 .tracking-hero__back .mat-mdc-focus-indicator::before {
@@ -205,7 +208,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     }
 }
 
+
 /* Thank you */
+
 .tracking-thanks {
     margin-top: 18px;
     display: flex;
@@ -215,12 +220,10 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     flex-direction: row;
     align-items: center;
     gap: 16px;
-
     border-radius: 14px;
     border: 2px solid #E9D4FF;
     background: linear-gradient(135deg, #EFF6FF 0%, #FAF5FF 50%, #F0FDFA 100%);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10);
-
     margin-left: auto;
     margin-right: auto;
 }
@@ -232,7 +235,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-
     border-radius: 22369600px;
     background: linear-gradient(135deg, #C27AFF 0%, #F6339A 100%);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.10), 0 2px 4px -2px rgba(0, 0, 0, 0.10);
@@ -259,7 +261,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     flex-shrink: 0;
     align-self: stretch;
     display: block;
-
     background-color: #C27AFF;
     -webkit-mask: url('/icons/accion-inmediata.svg') no-repeat center / contain;
     mask: url('/icons/accion-inmediata.svg') no-repeat center / contain;
@@ -301,17 +302,14 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
         height: auto;
         padding-right: 24px;
     }
-
     .tracking-thanks__text,
     .tracking-thanks__content {
         width: auto;
         max-width: 100%;
     }
-
     .tracking-thanks__text--nowrap {
         white-space: normal;
     }
-
     .tracking-thanks__sparkles {
         margin-right: 0;
     }
@@ -328,7 +326,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #475569;
 }
 
+
 /* Filters */
+
 .tracking-filters {
     margin-top: 18px;
     border-radius: 14px;
@@ -442,7 +442,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     text-transform: none;
 }
 
+
 /* Make MDC ripple/focus layers follow the same radius */
+
 .tracking-filters__export .mat-mdc-button-persistent-ripple,
 .tracking-filters__export .mdc-button__ripple,
 .tracking-filters__export .mat-mdc-focus-indicator::before {
@@ -466,7 +468,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     display: block;
 }
 
+
 /* State card */
+
 .tracking-state {
     margin-top: 16px;
     border-radius: 14px;
@@ -601,11 +605,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     justify-content: center;
     align-items: flex-start;
     gap: 16px;
-
     border-radius: 8px !important;
     background: linear-gradient(90deg, #AD46FF 0%, #E60076 100%) !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.10), 0 2px 4px -2px rgba(0, 0, 0, 0.10);
-
     color: #FFFFFF !important;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
@@ -633,7 +635,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     display: block;
 }
 
+
 /* Make MDC ripple/focus layers follow the same radius */
+
 .tracking-state__cta .mat-mdc-button-persistent-ripple,
 .tracking-state__cta .mdc-button__ripple,
 .tracking-state__cta .mat-mdc-focus-indicator::before {
@@ -648,7 +652,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #64748B;
 }
 
+
 /* Modules progress */
+
 .tracking-modules {
     margin-top: 16px;
     border-radius: 14px;
@@ -864,7 +870,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     background: rgba(148, 163, 184, 0.45);
 }
 
+
 /* Stats cards */
+
 .tracking-stats {
     margin-top: 22px;
     display: grid;
@@ -1064,7 +1072,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #9810FA;
 }
 
+
 /* Results */
+
 .tracking-results {
     margin-top: 16px;
     border-radius: 14px;
@@ -1109,12 +1119,10 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     --module-surface: #FFFFFF;
     --module-surface-disabled: rgba(248, 250, 252, 0.85);
     --module-icon-bg: rgba(148, 163, 184, 0.14);
-
     --card-bg: var(--module-surface);
     --severity-color: #94A3B8;
     --severity-bg: rgba(148, 163, 184, 0.12);
     --severity-border: rgba(148, 163, 184, 0.22);
-
     border-radius: 14px;
     border: 1px solid var(--severity-border);
     background: var(--card-bg);
@@ -1135,7 +1143,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-
     border-radius: 14px;
     background: var(--module-icon-bg);
 }
@@ -1184,7 +1191,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-
     border-radius: 22369600px;
     box-sizing: border-box;
 }
@@ -1264,7 +1270,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     width: 64px;
     flex-shrink: 0;
     text-align: right;
-
     font-size: 24px;
     font-style: normal;
     font-weight: 700;
@@ -1332,7 +1337,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     opacity: 0.55;
 }
 
+
 /* Charts section */
+
 .tracking-charts {
     margin-top: 16px;
     display: grid;
@@ -1366,11 +1373,7 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     height: 210px;
     border: 1px dashed rgba(148, 163, 184, 0.40);
     border-radius: 10px;
-    background: repeating-linear-gradient(0deg,
-            rgba(148, 163, 184, 0.10),
-            rgba(148, 163, 184, 0.10) 12px,
-            rgba(255, 255, 255, 0.0) 12px,
-            rgba(255, 255, 255, 0.0) 24px);
+    background: repeating-linear-gradient(0deg, rgba(148, 163, 184, 0.10), rgba(148, 163, 184, 0.10) 12px, rgba(255, 255, 255, 0.0) 12px, rgba(255, 255, 255, 0.0) 24px);
 }
 
 .chart-card__legend {
@@ -1378,6 +1381,18 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     display: flex;
     gap: 14px;
     flex-wrap: wrap;
+}
+
+.chart-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    color: #94A3B8;
+    text-align: center;
+    padding: 16px;
 }
 
 .lg-item {
@@ -1414,7 +1429,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     background: #A855F7;
 }
 
+
 /* Follow-ups */
+
 .tracking-followups {
     margin-top: 16px;
     border-radius: 14px;
@@ -1483,7 +1500,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-
     border-radius: 22369600px;
 }
 
@@ -1589,7 +1605,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     align-self: stretch;
     width: 100%;
     grid-column: 1 / -1;
-
     border-radius: 8px !important;
     background: linear-gradient(90deg, #FF6900 0%, #E17100 100%);
     color: #FFFFFF !important;
@@ -1632,7 +1647,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     border-radius: 8px !important;
 }
 
+
 /* Detail */
+
 .tracking-detail-list {
     margin-top: 16px;
     display: grid;
@@ -1698,7 +1715,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #94A3B8;
 }
 
+
 /* Module theming (reuse the same palette as shared module cards) */
+
 .tracking-detail--mental-health {
     border-color: #BEDBFF;
     background: #EFF6FF;
@@ -1863,7 +1882,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     display: block;
 }
 
+
 /* Section icon color should follow module tone */
+
 .tracking-detail--mental-health .tracking-detail__section-title mat-icon {
     color: #3366CC;
 }
@@ -1931,7 +1952,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     border-radius: 9999px;
 }
 
+
 /* Findings tones (Green / Yellow / Red) */
+
 .finding-row--good .finding-row__badge {
     background: rgba(34, 197, 94, 0.14);
     color: #16A34A;
@@ -2012,7 +2035,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #475569;
 }
 
+
 /* Personalized */
+
 .tracking-personal {
     margin-top: 16px;
     border-radius: 14px;
@@ -2132,7 +2157,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     /* 40px icon + 12px header gap */
 }
 
+
 /* Per-module card theming */
+
 .personal-card--mental-health {}
 
 .personal-card--mental-health .personal-card__icon {
@@ -2210,13 +2237,11 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     min-width: 0;
     justify-self: start;
     text-transform: none;
-
     /* Remove default Material gray hover/focus layer */
     --mdc-text-button-hover-state-layer-color: transparent;
     --mdc-text-button-hover-state-layer-opacity: 0;
     --mdc-text-button-pressed-state-layer-color: transparent;
     --mdc-text-button-pressed-state-layer-opacity: 0;
-
     transition: background-color 120ms ease, border-color 120ms ease;
 }
 
@@ -2255,10 +2280,8 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     min-width: 0;
     box-sizing: border-box;
     overflow: hidden;
-
     border-radius: 8px !important;
     background: #FFF;
-
     color: #0A0A0A !important;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
@@ -2266,26 +2289,25 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     font-weight: 600;
     line-height: 20px;
     text-transform: none;
-
     /* Remove default Material gray hover/focus layer */
     --mdc-text-button-hover-state-layer-color: transparent;
     --mdc-text-button-hover-state-layer-opacity: 0;
     --mdc-text-button-pressed-state-layer-color: transparent;
     --mdc-text-button-pressed-state-layer-opacity: 0;
-
     transition: background-color 120ms ease, border-color 120ms ease;
 }
+
 
 /* Let our explicit content wrapper control layout.
     NOTE: .mdc-button__label is rendered by Angular Material, so we must pierce
     view-encapsulation to reliably style it. */
+
 :host ::ng-deep .footer-btn .mdc-button__label {
     display: flex !important;
     width: 100% !important;
     height: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
-
     /* Ensure wrapper is centered even if sizing is affected by MDC internals */
     justify-content: center;
     align-items: center;
@@ -2365,32 +2387,28 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #155DFC !important;
 }
 
+
 /* Responsive */
+
 @media (max-width: 1024px) {
     .tracking-state {
         grid-template-columns: 1fr;
     }
-
     .tracking-filters__grid {
         grid-template-columns: 1fr;
     }
-
     .tracking-stats {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .tracking-charts {
         grid-template-columns: 1fr;
     }
-
     .tracking-followups__grid {
         grid-template-columns: 1fr;
     }
-
     .tracking-personal__footer {
         grid-template-columns: 1fr;
     }
-
     .tracking-results__grid {
         grid-template-columns: 1fr;
     }
@@ -2400,16 +2418,13 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     .my-tracking-container {
         padding: 18px 16px 48px;
     }
-
     .tracking-hero {
         flex-direction: column;
         align-items: flex-start;
     }
-
     .tracking-thanks {
         grid-template-columns: 52px 1fr;
     }
-
     .tracking-thanks__sparkles {
         display: none;
     }

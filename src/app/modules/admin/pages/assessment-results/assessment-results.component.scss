@@ -50,26 +50,22 @@
     color: rgba(30, 41, 57, 0.7);
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-
     .icon-action__img {
         width: 16px;
         height: 16px;
         flex-shrink: 0;
         display: block;
     }
-
     &:hover {
         background: #E5E7EB;
         border-color: rgba(209, 213, 219, 0.9);
         color: rgba(30, 41, 57, 0.9);
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
     }
-
     &:focus-visible {
         outline: 2px solid rgba(30, 41, 57, 0.22);
         outline-offset: 2px;
     }
-
     &:active {
         transform: translateY(1px);
     }
@@ -86,13 +82,11 @@
     background: transparent;
     color: rgba(15, 23, 42, 0.70);
     cursor: pointer;
-
     svg {
         width: 20px;
         height: 20px;
         fill: currentColor;
     }
-
     &:hover {
         background: rgba(15, 23, 42, 0.06);
         color: rgba(15, 23, 42, 0.85);
@@ -294,17 +288,17 @@
     color: #008236;
 }
 
+
 /* Paleta por resultado (Adecuado usa los defaults verdes) */
+
 .summary-card.outcome-mild {
     .ring-score {
         color: #B0711B;
     }
-
     .outcome-pill {
         border-color: #FDE68A;
         background: #FFFBEB;
     }
-
     .outcome-text {
         color: #B0711B;
     }
@@ -314,12 +308,10 @@
     .ring-score {
         color: #C91F25;
     }
-
     .outcome-pill {
         border-color: rgba(201, 31, 37, 0.25);
         background: transparent;
     }
-
     .outcome-text {
         color: #C91F25;
     }
@@ -335,7 +327,6 @@
     border-radius: 16px;
     border: 2px solid #FFC9C9;
     background: #FEF2F2;
-
     /* Alineación de contenido con el texto del título (después del ícono) */
     --help-indent: 34px;
     /* 24px icon + 10px gap */
@@ -544,9 +535,8 @@
     font-weight: 400;
     line-height: 24px;
     color: #364153;
-    width: 143px;
-    height: 24px;
-    flex: 0 0 143px;
+    flex: 1 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -778,7 +768,9 @@
     max-width: 100%;
 }
 
+
 /* Overrides locales para el botón inferior (emo-button) */
+
 :host ::ng-deep emo-button.footer-main-btn .emo-button {
     display: inline-flex;
     width: fit-content;
@@ -846,17 +838,14 @@
     .results-header-inner {
         padding: 2px 20px 0.667px 20px;
     }
-
     .summary-card {
         grid-template-columns: 1fr;
         justify-items: center;
         text-align: center;
     }
-
     .actions {
         grid-template-columns: 1fr;
     }
-
     .card--recommendations {
         height: auto;
     }

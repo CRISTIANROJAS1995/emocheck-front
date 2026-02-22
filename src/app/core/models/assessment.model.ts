@@ -15,6 +15,8 @@ export interface AssessmentQuestion {
 export interface AssessmentDimensionBreakdown {
     id: string;
     label: string;
+    /** Instrument code from backend (e.g. GAD7, PHQ9, ISI, PSS4). Used for friendly label lookup. */
+    instrumentCode?: string;
     /** 0-100 */
     percent: number;
 }
