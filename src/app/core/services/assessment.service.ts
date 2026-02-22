@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
     AssessmentModuleId,
@@ -11,53 +11,67 @@ import { environment } from '../../../environments/environment';
 import {
     Observable,
     catchError,
-    concatMap,
-    from,
     map,
     of,
     shareReplay,
     switchMap,
     throwError,
-    toArray,
 } from 'rxjs';
 import { ConsentService } from './consent.service';
 
 type RiskLevel = 'Green' | 'Yellow' | 'Red' | 'Low' | 'Medium' | 'High';
 
+// â”€â”€ V5 DTOs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 interface SwaggerAssessmentModuleDto {
-    assessmentModuleID: number;
-    moduleName?: string | null;
+    moduleID: number;
+    code?: string | null;
+    name?: string | null;
     description?: string | null;
-    instrumentType?: string | null;
     isActive?: boolean;
+    // legacy fallback fields (some endpoints may still return old names)
+    assessmentModuleID?: number;
+    moduleName?: string | null;
+    instrumentType?: string | null;
 }
 
-interface SwaggerAssessmentModuleWithQuestionsDto {
-    assessmentModuleID: number;
-    moduleName?: string | null;
-    description?: string | null;
-    instrumentType?: string | null;
-    isActive?: boolean;
-    questions?: SwaggerQuestionDto[] | null;
+interface SwaggerQuestionOptionDto {
+    optionID?: number;
+    questionOptionID?: number;  // legacy
+    optionText?: string | null;
+    numericValue?: number;      // V5
+    optionValue?: number;       // legacy fallback
+    displayOrder?: number;      // V5
+    orderIndex?: number;        // legacy fallback
 }
 
 interface SwaggerQuestionDto {
     questionID: number;
     questionText?: string | null;
-    orderIndex: number;
+    questionNumber?: number;    // V5
+    orderIndex?: number;        // legacy fallback
     options?: SwaggerQuestionOptionDto[] | null;
 }
 
-interface SwaggerQuestionOptionDto {
-    questionOptionID: number;
-    optionText?: string | null;
-    optionValue: number;
-    orderIndex: number;
+interface SwaggerInstrumentDto {
+    instrumentID?: number;
+    questions?: SwaggerQuestionDto[] | null;
+}
+
+interface SwaggerModuleFullDto {
+    moduleID?: number;
+    assessmentModuleID?: number;  // legacy fallback
+    name?: string | null;
+    moduleName?: string | null;   // legacy fallback
+    instruments?: SwaggerInstrumentDto[] | null;
+    // legacy: some backends return questions directly on module
+    questions?: SwaggerQuestionDto[] | null;
 }
 
 interface SwaggerEvaluationDto {
     evaluationID: number;
-    assessmentModuleID: number;
+    moduleID?: number;              // V5
+    assessmentModuleID?: number;    // legacy fallback
     assessmentModuleName?: string | null;
     startedAt: string;
     completedAt?: string | null;
@@ -104,7 +118,7 @@ export class AssessmentService {
     private readonly apiUrl = environment.apiUrl;
 
     private readonly modules$ = this.http
-        .get<unknown>(`${this.apiUrl}/assessmentmodule/active`)
+        .get<unknown>(`${this.apiUrl}/assessmentmodule/modules/active`)
         .pipe(
             map((res) => {
                 const modules = this.unwrapArray<SwaggerAssessmentModuleDto>(res);
@@ -130,7 +144,7 @@ export class AssessmentService {
                 const result: AssessmentModuleId[] = [];
                 for (const def of ASSESSMENT_MODULES) {
                     const match = this.findBestModuleMatch(def.id, modules);
-                    if (match?.assessmentModuleID) {
+                    if (this.getModuleId(match)) {
                         result.push(def.id);
                     }
                 }
@@ -141,26 +155,26 @@ export class AssessmentService {
 
     getQuestions(moduleId: AssessmentModuleId): Observable<AssessmentQuestion[]> {
         return this.resolveApiModuleId(moduleId).pipe(
-            switchMap((apiModuleId) => this.http.get<unknown>(`${this.apiUrl}/assessmentmodule/${apiModuleId}/with-questions`)),
+            switchMap((apiModuleId) =>
+                this.http.get<unknown>(`${this.apiUrl}/assessmentmodule/modules/${apiModuleId}/full`)
+            ),
             map((res) => {
-                const moduleWithQuestions = this.unwrapObject<SwaggerAssessmentModuleWithQuestionsDto>(res);
-                if (!moduleWithQuestions?.assessmentModuleID) {
-                    throw new Error('No fue posible obtener el módulo');
+                const moduleData = this.unwrapObject<SwaggerModuleFullDto>(res);
+                const resolvedId = this.getModuleId(moduleData);
+                if (!resolvedId) {
+                    throw new Error('No fue posible obtener el mÃ³dulo');
                 }
 
-                const questions = (moduleWithQuestions.questions ?? []).slice().sort((a, b) => a.orderIndex - b.orderIndex);
-                this.moduleDetailCache.set(moduleId, {
-                    apiModuleId: moduleWithQuestions.assessmentModuleID,
-                    questions,
-                });
+                // V5: questions live inside instruments; legacy: directly on module
+                const questions = this.extractQuestions(moduleData);
+                const apiModuleId = resolvedId;
+
+                this.moduleDetailCache.set(moduleId, { apiModuleId, questions });
 
                 return questions.map((q) => ({
                     id: q.questionID,
                     text: q.questionText ?? '',
-                    options: (q.options ?? [])
-                        .slice()
-                        .sort((a, b) => a.orderIndex - b.orderIndex)
-                        .map((o) => o.optionText ?? ''),
+                    options: this.sortOptions(q.options ?? []).map((o) => o.optionText ?? ''),
                 }));
             })
         );
@@ -174,7 +188,7 @@ export class AssessmentService {
                     ? of(true)
                     : throwError(() => ({
                         code: 'CONSENT_REQUIRED',
-                        message: 'Debes aceptar el consentimiento informado antes de iniciar la evaluación.',
+                        message: 'Debes aceptar el consentimiento informado antes de iniciar la evaluaciÃ³n.',
                     }))
             ),
             switchMap(() => this.getModuleDetail(moduleId)),
@@ -187,13 +201,13 @@ export class AssessmentService {
 
                         return this.http
                             .post<unknown>(`${this.apiUrl}/evaluation/start`, {
-                                assessmentModuleID: detail.apiModuleId,
+                                moduleID: detail.apiModuleId,
                             })
                             .pipe(
                                 map((res) => {
                                     const evaluation = this.unwrapObject<SwaggerEvaluationDto>(res);
                                     if (!evaluation?.evaluationID) {
-                                        throw new Error('No fue posible iniciar la evaluación');
+                                        throw new Error('No fue posible iniciar la evaluaciÃ³n');
                                     }
                                     return evaluation;
                                 })
@@ -224,7 +238,7 @@ export class AssessmentService {
                             ),
                             map((result: SwaggerEvaluationResultDto | null) => {
                                 if (!result?.evaluationResultID) {
-                                    throw new Error('No fue posible completar la evaluación');
+                                    throw new Error('No fue posible completar la evaluaciÃ³n');
                                 }
                                 return result;
                             })
@@ -233,6 +247,12 @@ export class AssessmentService {
                     map((completed: SwaggerEvaluationResultDto) => this.mapToAssessmentResult(moduleId, completed))
                 )
             )
+        );
+    }
+
+    getMyCompletedEvaluationsWithResult(): Observable<SwaggerEvaluationWithResultDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
+            map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res) ?? [])
         );
     }
 
@@ -250,7 +270,7 @@ export class AssessmentService {
 
     private loadCompletedResultForEvaluation(evaluationId: number): Observable<SwaggerEvaluationResultDto | null> {
         if (!evaluationId) return of(null);
-        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed-evaluations`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
             map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
             map((items) => {
                 const match = (items ?? []).find((i: any) => Number((i as any)?.evaluationID ?? (i as any)?.evaluationId ?? 0) === evaluationId);
@@ -264,10 +284,11 @@ export class AssessmentService {
         return this.modules$.pipe(
             map((modules) => {
                 const match = this.findBestModuleMatch(moduleId, modules);
-                if (!match) {
-                    throw new Error(`No se encontró el módulo backend para '${moduleId}'`);
+                const id = this.getModuleId(match);
+                if (!id) {
+                    throw new Error(`No se encontrÃ³ el mÃ³dulo backend para '${moduleId}'`);
                 }
-                return match.assessmentModuleID;
+                return id;
             })
         );
     }
@@ -288,43 +309,64 @@ export class AssessmentService {
     }
 
     private submitAllResponses(evaluationId: number, questions: SwaggerQuestionDto[], answers: number[]): Observable<unknown> {
-        const items = questions.map((q, index) => {
-            const options = (q.options ?? []).slice().sort((a, b) => a.orderIndex - b.orderIndex);
+        const responses = questions.map((q, index) => {
+            const options = this.sortOptions(q.options ?? []);
             const rawAnswer = answers[index];
             const asNumber = Number(rawAnswer);
 
-            // `EmoQuestionnaireComponent` emits the selected option index (0-based).
-            // Prefer index mapping to avoid ambiguity with backend optionValue ranges.
+            // answers are 0-based option indices from the questionnaire component
             let optionIndex = Number.isFinite(asNumber) ? asNumber : 0;
 
-            // If the provided value is outside the option index range, attempt to
-            // interpret it as the backend optionValue.
             if (optionIndex < 0 || optionIndex > options.length - 1) {
-                const byValue = options.findIndex((o) => Number(o?.optionValue) === asNumber);
+                // try matching by numericValue (legacy optionValue fallback)
+                const byValue = options.findIndex((o) => Number(o?.numericValue ?? o?.optionValue) === asNumber);
                 optionIndex = byValue >= 0 ? byValue : 0;
             }
 
             optionIndex = Math.max(0, Math.min(options.length - 1, optionIndex));
-
             const selected = options[optionIndex] ?? options[0];
+            const selectedValue = Number(selected?.numericValue ?? selected?.optionValue ?? optionIndex);
 
-            const optionId = selected?.questionOptionID;
-            const optionValue = selected?.optionValue ?? optionIndex;
-
-            return {
-                evaluationID: evaluationId,
-                questionID: q.questionID,
-                questionOptionID: typeof optionId === 'number' ? optionId : null,
-                responseValue: String(optionValue),
-            };
+            return { questionID: q.questionID, selectedValue };
         });
 
-        return from(items).pipe(
-            concatMap((payload) =>
-                this.http.post<unknown>(`${this.apiUrl}/evaluation/submit-response`, payload)
-            ),
-            toArray()
+        // V5 API: use respond-multiple for a single atomic call
+        return this.http.post<unknown>(`${this.apiUrl}/evaluation/respond-multiple`, {
+            evaluationID: evaluationId,
+            responses,
+        });
+    }
+
+    /** Extract questions from V5 (instruments â†’ questions) or legacy (direct questions). */
+    private extractQuestions(moduleData: SwaggerModuleFullDto): SwaggerQuestionDto[] {
+        if (moduleData?.instruments?.length) {
+            const all: SwaggerQuestionDto[] = [];
+            for (const instrument of moduleData.instruments) {
+                for (const q of instrument.questions ?? []) {
+                    all.push(q);
+                }
+            }
+            return all.slice().sort((a, b) =>
+                (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0)
+            );
+        }
+        return (moduleData?.questions ?? []).slice().sort((a, b) =>
+            (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0)
         );
+    }
+
+    /** Sort options by displayOrder (V5) or orderIndex (legacy). */
+    private sortOptions(options: SwaggerQuestionOptionDto[]): SwaggerQuestionOptionDto[] {
+        return options.slice().sort((a, b) =>
+            (a.displayOrder ?? a.orderIndex ?? 0) - (b.displayOrder ?? b.orderIndex ?? 0)
+        );
+    }
+
+    /** Get numeric module ID from either V5 (moduleID) or legacy (assessmentModuleID) DTO. */
+    private getModuleId(module: SwaggerAssessmentModuleDto | SwaggerModuleFullDto | undefined | null): number {
+        if (!module) return 0;
+        const anyM = module as any;
+        return Number(anyM?.moduleID ?? anyM?.assessmentModuleID ?? 0);
     }
 
     private mapToAssessmentResult(
@@ -400,9 +442,12 @@ export class AssessmentService {
     private findBestModuleMatch(moduleId: AssessmentModuleId, modules: SwaggerAssessmentModuleDto[]): SwaggerAssessmentModuleDto | undefined {
         const moduleDef = getAssessmentModuleDefinition(moduleId);
         const candidates = modules.filter((m) => m.isActive !== false);
+
+        // Helper accessors for V5 (name/code) and legacy (moduleName/instrumentType)
+        const byCode = (needle: string) => candidates.find((m) => (m.code ?? '').toLowerCase().includes(needle));
+        const byName = (needle: string) => candidates.find((m) => (m.name ?? m.moduleName ?? '').toLowerCase().includes(needle));
+        const byExactName = (needle: string) => candidates.find((m) => (m.name ?? m.moduleName ?? '').toLowerCase() === needle);
         const byType = (needle: string) => candidates.find((m) => (m.instrumentType ?? '').toLowerCase().includes(needle));
-        const byName = (needle: string) => candidates.find((m) => (m.moduleName ?? '').toLowerCase().includes(needle));
-        const byExactName = (needle: string) => candidates.find((m) => (m.moduleName ?? '').toLowerCase() === needle);
 
         const defTitle = (moduleDef.title ?? '').toLowerCase();
         if (defTitle) {
@@ -412,13 +457,14 @@ export class AssessmentService {
 
         switch (moduleId) {
             case 'mental-health':
-                return byType('mental') ?? byName('salud') ?? byName('mental');
+                return byCode('mental') ?? byType('mental') ?? byName('salud') ?? byName('mental');
             case 'work-fatigue':
-                return byType('fatigue') ?? byName('fatiga');
+                return byCode('fatigue') ?? byCode('fatiga') ?? byType('fatigue') ?? byName('fatiga');
             case 'organizational-climate':
-                return byType('climate') ?? byName('clima');
+                return byCode('climate') ?? byCode('clima') ?? byType('climate') ?? byName('clima');
             case 'psychosocial-risk':
-                return byType('psychosocial') ?? byName('psicosocial');
+                return byCode('psychosocial') ?? byCode('psicosocial') ?? byType('psychosocial') ?? byName('psicosocial');
         }
     }
 }
+

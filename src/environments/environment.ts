@@ -16,4 +16,8 @@ export const environment = {
     refreshTokenStorageKey: 'emocheck_refreshToken',
     userStorageKey: 'emocheck_user',
     tokenExpirationWarning: 300000, // 5 minutos en ms
+
+    // 📞 Soporte WhatsApp (número en formato internacional sin + ni espacios)
+    whatsappNumber: '573244563035',
+    whatsappMessage: '¡Hola! Necesito ayuda con EmoCheck.',
 };

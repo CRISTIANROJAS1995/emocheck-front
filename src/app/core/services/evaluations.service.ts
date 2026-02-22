@@ -126,7 +126,7 @@ export class EvaluationsService {
     }
 
     getMyCompletedEvaluationsWithResult(): Observable<CompletedEvaluationWithResultDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed-evaluations`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
             map((res) => this.unwrapArray<CompletedEvaluationWithResultDto>(res) ?? [])
         );
     }

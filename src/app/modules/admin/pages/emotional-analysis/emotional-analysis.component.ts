@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { take } from 'rxjs';
 import { CameraService } from 'app/core/services/camera.service';
 import { EmotionalAnalysisService, EmotionalAnalysisResult } from 'app/core/services/emotional-analysis.service';
+import { AuthService } from 'app/core/services/auth.service';
 
 @Component({
     selector: 'app-emotional-analysis',
@@ -14,7 +16,7 @@ import { EmotionalAnalysisService, EmotionalAnalysisResult } from 'app/core/serv
 export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('videoElement', { static: false }) videoElement!: ElementRef<HTMLVideoElement>;
 
-    userName: string = 'María Gómez';
+    userName: string = '';
     currentStep: number = 1;
     totalSteps: number = 5;
     progress: number = 0;
@@ -103,10 +105,29 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     constructor(
         private _router: Router,
         private _cameraService: CameraService,
-        private _emotionalAnalysisService: EmotionalAnalysisService
+        private _emotionalAnalysisService: EmotionalAnalysisService,
+        private _authService: AuthService
     ) { }
 
     ngOnInit(): void {
+        // Cargar nombre real del usuario
+        const cached = this._authService.getCurrentUser();
+        if (cached?.name) {
+            this.userName = cached.name;
+        }
+
+        this._authService
+            .ensureCurrentUserLoaded()
+            .pipe(take(1))
+            .subscribe({
+                next: (user) => {
+                    if (user?.name) {
+                        this.userName = user.name;
+                    }
+                },
+                error: () => { /* Mantener nombre en caché o vacío */ },
+            });
+
         // Verificar soporte de cámara
         if (!this._cameraService.isCameraSupported()) {
             this.cameraError = 'Tu navegador no soporta acceso a la cámara';

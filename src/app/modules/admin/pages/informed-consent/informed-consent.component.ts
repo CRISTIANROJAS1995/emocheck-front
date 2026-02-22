@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BackgroundCirclesInvertedComponent } from 'app/shared/components/ui/background-circles-inverted/background-circles-inverted.component';
 import { AuthService } from 'app/core/services/auth.service';
 import { ConsentService } from 'app/core/services/consent.service';
+import { UsersService } from 'app/core/services/users.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
 import { catchError, of, switchMap, take } from 'rxjs';
 
@@ -15,44 +16,51 @@ import { catchError, of, switchMap, take } from 'rxjs';
     templateUrl: './informed-consent.component.html',
     styleUrls: ['./informed-consent.component.scss']
 })
-export class InformedConsentComponent {
+export class InformedConsentComponent implements OnInit {
     consentForm: FormGroup;
     userName: string = 'Usuario';
+    userDocumentNumber: string = '';
     showFullConsent: boolean = false;
-    private readonly consentText =
-        'CONSENTIMIENTO INFORMADO PARA EVALUACIÓN DE SALUD MENTAL Y BIENESTAR LABORAL. ' +
-        'Declaro que he sido informado/a sobre los objetivos, procedimientos, beneficios y riesgos de la evaluación de salud mental y factores psicosociales a través de la plataforma EmoCheck. ' +
-        'Entiendo que mi participación es voluntaria y que puedo retirarme en cualquier momento sin consecuencias negativas. ' +
-        'Autorizo el tratamiento de mis datos personales conforme a la Ley 1581 de 2012 y el Decreto 1377 de 2013, exclusivamente para fines de promoción de salud mental, prevención de riesgos psicosociales y mejora del clima organizacional. ' +
-        'Entiendo y acepto que los resultados son de orientación y acompañamiento profesional y no constituyen un diagnóstico clínico.';
 
     constructor(
         private _formBuilder: FormBuilder,
         private _router: Router,
         private readonly authService: AuthService,
         private readonly consentService: ConsentService,
+        private readonly usersService: UsersService,
         private readonly alert: AlertService
     ) {
         this.consentForm = this._formBuilder.group({
             acceptConsent: [false, Validators.requiredTrue]
         });
+    }
 
-        const user = this.authService.getCurrentUser();
-        this.userName = user?.name || 'Usuario';
+    ngOnInit(): void {
+        // Carga inmediata desde caché
+        const cached = this.authService.getCurrentUser();
+        if (cached?.name) {
+            this.userName = cached.name;
+        }
 
-        // On fast redirects after login, the user may not be loaded yet.
-        // Ensure we greet with the real backend user (/users/current).
-        this.authService
-            .ensureCurrentUserLoaded()
-            .pipe(take(1))
-            .subscribe({
-                next: (u) => {
-                    this.userName = u?.name || this.userName;
-                },
-                error: () => {
-                    // keep default
-                },
-            });
+        // Cargar perfil completo para obtener nombre + número de documento
+        this.usersService.getMyProfile().pipe(take(1)).subscribe({
+            next: (profile) => {
+                if (profile.fullName) {
+                    this.userName = profile.fullName;
+                }
+                this.userDocumentNumber = profile.documentNumber || '';
+            },
+            error: () => {
+                // Si falla getMyProfile, intentar con authService
+                this.authService
+                    .ensureCurrentUserLoaded()
+                    .pipe(take(1))
+                    .subscribe({
+                        next: (u) => { this.userName = u?.name || this.userName; },
+                        error: () => { /* mantener valor en caché */ },
+                    });
+            },
+        });
     }
 
     toggleFullConsent(event: Event): void {

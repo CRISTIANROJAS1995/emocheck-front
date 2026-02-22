@@ -8,6 +8,7 @@ import {
     OnInit,
     ViewEncapsulation,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterModule } from '@angular/router';
 import { User as MotionIQUser } from 'app/core/models/auth.model'; // 🔧 NUESTRO MODELO USER
 import { AuthService } from 'app/core/services/auth.service'; // 🔧 NUESTRO AUTHSERVICE
+import { UsersService } from 'app/core/services/users.service';
 import { UserService } from 'app/core/user/user.service';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -25,6 +27,7 @@ import { Subject, takeUntil } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush,
     exportAs: 'user',
     imports: [
+        CommonModule,
         MatButtonModule,
         MatMenuModule,
         MatIconModule,
@@ -39,6 +42,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
     @Input() showAvatar: boolean = true;
     user: MotionIQUser; // 🔧 USAR NUESTRO MODELO
+    jobTitle: string = '';
 
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
@@ -49,7 +53,8 @@ export class UserComponent implements OnInit, OnDestroy {
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
         private _userService: UserService,
-        private _authService: AuthService // 🔧 AGREGAR NUESTRO AUTHSERVICE
+        private _authService: AuthService, // 🔧 AGREGAR NUESTRO AUTHSERVICE
+        private _usersService: UsersService
     ) { }
 
     // -----------------------------------------------------------------------------------------------------
@@ -65,9 +70,18 @@ export class UserComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((user: MotionIQUser) => {
                 this.user = user;
-
-                // Mark for check
                 this._changeDetectorRef.markForCheck();
+            });
+
+        // Load job title from profile
+        this._usersService.getMyProfile()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe({
+                next: (profile) => {
+                    this.jobTitle = profile.jobTypeName ?? '';
+                    this._changeDetectorRef.markForCheck();
+                },
+                error: () => { /* silently ignore — subtitle stays empty */ }
             });
     }
 

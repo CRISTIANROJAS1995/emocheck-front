@@ -61,13 +61,13 @@ export class AssessmentHydrationService {
     ) { }
 
     /**
-     * Hydrates a single module result from `/evaluation/my-completed-evaluations`.
+     * Hydrates a single module result from `/evaluation/my-completed`.
      * Useful for deep-links (e.g. opening results from history) where there is no in-memory state.
      */
     hydrateModuleResultFromCompletedEvaluations(moduleId: AssessmentModuleId, evaluationId?: number): Observable<void> {
         const targetEvaluationId = Number(evaluationId ?? 0);
 
-        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed-evaluations`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
             map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
             map((items) => {
                 const all = items ?? [];
@@ -101,7 +101,7 @@ export class AssessmentHydrationService {
      * so Home cards reflect real outcomes even after reload/storage clear.
      */
     hydrateLatestCompletedResults(): Observable<void> {
-        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed-evaluations`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
             map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
             map((items) => this.pickLatestPerModule(items)),
             tap((latest) => {
@@ -154,7 +154,7 @@ export class AssessmentHydrationService {
 
     /**
      * Hydrates the current module result by matching its evaluationId against
-     * `/evaluation/my-completed-evaluations` (more reliable than module-name heuristics).
+     * `/evaluation/my-completed` (more reliable than module-name heuristics).
      */
     hydrateCurrentModuleResultIfMissing(moduleId: AssessmentModuleId): Observable<void> {
         const current = this.state.getResult(moduleId);
@@ -170,7 +170,7 @@ export class AssessmentHydrationService {
 
         if (!needsHydration) return of(void 0);
 
-        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed-evaluations`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
             map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
             map((items) =>
                 (items ?? []).find((i: any) => Number((i as any)?.evaluationID ?? (i as any)?.evaluationId ?? 0) === evaluationId) ?? null

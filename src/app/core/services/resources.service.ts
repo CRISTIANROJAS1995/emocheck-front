@@ -221,7 +221,7 @@ export class ResourcesService {
         // 3) Enrich with resources list (URL/title matching)
         // 4) Fallback to audience-based filtering when recommendations are empty
         return this.http
-            .get<unknown>(`${this.apiUrl}/evaluation/my-completed-evaluations`)
+            .get<unknown>(`${this.apiUrl}/evaluation/my-completed`)
             .pipe(
                 map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
                 catchError(() => of([])),

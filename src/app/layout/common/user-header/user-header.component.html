@@ -6,10 +6,7 @@
                 <!-- Avatar -->
                 <div class="h-16 w-16 flex-0 overflow-hidden rounded-full bg-gray-200">
                     <!-- 🔧 Avatar por defecto siempre visible -->
-                    <img [src]="(user?.avatar || 'images/avatars/male-01.jpg')" 
-                         class="h-full w-full object-cover"
-                         alt="Avatar Usuario" 
-                         onError="this.src='images/avatars/male-01.jpg'" />
+                    <img [src]="(user?.avatar || 'images/avatars/male-01.jpg')" class="h-full w-full object-cover" alt="Avatar Usuario" onError="this.src='images/avatars/male-01.jpg'" />
                 </div>
 
                 <!-- Info -->
@@ -24,19 +21,13 @@
                         <div class="flex">
                             <div class="font-semibold">Compañía:</div>
                             <div class="ml-1 truncate">
-                                {{ user?.company || 'Motion IQ Solutions' }}
-                            </div>
-                        </div>
-                        <div class="flex">
-                            <div class="font-semibold">Área:</div>
-                            <div class="ml-1 truncate">
-                                {{ user?.role || 'Administración' }}
+                                {{ user?.companyName || 'EmoCheck' }}
                             </div>
                         </div>
                         <div class="flex">
                             <div class="font-semibold">Email:</div>
                             <div class="ml-1 truncate">
-                                {{ user?.email || 'admin@motioniq.com' }}
+                                {{ user?.email || '' }}
                             </div>
                         </div>
                     </div>
@@ -44,8 +35,8 @@
                     <!-- Roles -->
                     <div class="mt-2 flex flex-wrap gap-2">
                         <div class="font-semibold">Rol:</div>
-                        <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                            {{ user?.role || 'Admin' }}
+                        <span *ngFor="let r of (user?.roles || [])" class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                            {{ r }}
                         </span>
                     </div>
                 </div>
