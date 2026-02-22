@@ -69,17 +69,24 @@ export class EmotionalAnalysisService {
         return this.http
             .post<EmotionalAnalysisApiResponse>(`${this.apiUrl}/evaluation/emotional-analysis`, payload)
             .pipe(
-                map((res) => ({
-                    attention: this.clampScore(res.attention),
-                    concentration: this.clampScore(res.concentration),
-                    balance: this.clampScore(res.balance),
-                    positivity: this.clampScore(res.positivity),
-                    calm: this.clampScore(res.calm),
-                    fatigueScore: typeof res.fatigueScore === 'number' ? res.fatigueScore : undefined,
-                    dominantEmotion: typeof res.dominantEmotion === 'string' ? res.dominantEmotion : undefined,
-                    alertCreated: typeof res.alertCreated === 'boolean' ? res.alertCreated : undefined,
-                    timestamp: res.timestamp ? new Date(res.timestamp) : new Date(),
-                }))
+                map((res) => {
+                    // Check if analysis was unavailable (backend returned isAvailable: false)
+                    const anyRes = res as any;
+                    if (anyRes.isAvailable === false) {
+                        throw new Error(anyRes.unavailableReason || 'El análisis emocional no está disponible en este momento.');
+                    }
+                    return {
+                        attention: this.clampScore(res.attention),
+                        concentration: this.clampScore(res.concentration),
+                        balance: this.clampScore(res.balance),
+                        positivity: this.clampScore(res.positivity),
+                        calm: this.clampScore(res.calm),
+                        fatigueScore: typeof res.fatigueScore === 'number' ? res.fatigueScore : undefined,
+                        dominantEmotion: typeof res.dominantEmotion === 'string' ? res.dominantEmotion : undefined,
+                        alertCreated: typeof res.alertCreated === 'boolean' ? res.alertCreated : undefined,
+                        timestamp: res.timestamp ? new Date(res.timestamp) : new Date(),
+                    };
+                })
             );
     }
 

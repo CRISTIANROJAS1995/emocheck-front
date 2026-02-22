@@ -245,7 +245,7 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                 const videoEl = this.videoElement?.nativeElement;
                 if (!videoEl || videoEl.readyState < 2 || !videoEl.videoWidth) return;
 
-                const frame = this._cameraService.captureFrame(videoEl, { maxWidth: 1024, quality: 0.8 });
+                const frame = this._cameraService.captureFrame(videoEl, { maxWidth: 640, quality: 0.65 });
                 if (!frame) return;
 
                 this.capturedFrames.push(frame);
