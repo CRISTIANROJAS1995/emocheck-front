@@ -35,7 +35,7 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     ];
 
     // Propiedades dinámicas para los resultados
-    resultType: 'alert' | 'emotional-load' = 'emotional-load';
+    resultType: 'alert' | 'emotional-load' | 'normal' = 'emotional-load';
 
     // Configuración dinámica según el tipo de resultado
     get resultConfig() {
@@ -64,6 +64,32 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                 buttonFontWeight: '600',
                 buttonLineHeight: '20px',
                 buttonPadding: '8.333px 152.882px 7.667px 152.882px'
+            };
+        } else if (this.resultType === 'normal') {
+            return {
+                iconGradient: 'linear-gradient(135deg, #34D399 0%, #10B981 100%)',
+                iconShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
+                title: '¡Excelente! Tu estado emocional es saludable',
+                titleSize: '20px',
+                titleLineHeight: '30px',
+                messageText: '¡Vas muy bien! 🌟 Tu bienestar emocional está en un gran nivel. Sigue así y mantén tus buenos hábitos.',
+                messageColor: '#364153',
+                messageSize: '14px',
+                messageLineHeight: '20px',
+                containerBorder: '#6EE7B7',
+                containerBorderWidth: '2px',
+                containerBackground: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 50%)',
+                containerPadding: '18px',
+                containerGap: '19.862px',
+                buttonGradient: 'linear-gradient(90deg, #34D399 0%, #10B981 100%)',
+                buttonShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
+                buttonText: 'Seguir con mis evaluaciones',
+                buttonIcon: 'icons/Icon.svg',
+                buttonEmoji: '🌟',
+                buttonFontSize: '14px',
+                buttonFontWeight: '600',
+                buttonLineHeight: '20px',
+                buttonPadding: '8.333px 20px 7.667px 20px'
             };
         } else {
             return {
@@ -281,7 +307,7 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                         result.alertCreated === true ||
                         (typeof result.fatigueScore === 'number' && result.fatigueScore >= fatigueThreshold) ||
                         state === 'critical';
-                    this.resultType = isRed ? 'alert' : 'emotional-load';
+                    this.resultType = isRed ? 'alert' : (state === 'normal' ? 'normal' : 'emotional-load');
 
                     // Actualizar porcentajes en los steps
                     this.steps[0].percentage = result.attention;
