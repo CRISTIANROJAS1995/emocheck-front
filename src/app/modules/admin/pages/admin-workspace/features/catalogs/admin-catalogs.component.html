@@ -1,0 +1,465 @@
+<div class="catalogs-page">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="page-header__info">
+            <h1 class="page-title">
+                <mat-icon svgIcon="heroicons_outline:tag"></mat-icon>
+                Catálogos del Sistema
+            </h1>
+            <p class="page-subtitle">Gestiona los datos de referencia: geografía, tipos de cargo y roles</p>
+        </div>
+        <a routerLink="/admin" class="btn-back">
+            <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon>
+            Volver
+        </a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="catalog-tabs">
+        <button class="catalog-tab" [class.active]="activeTab === 'countries'" (click)="setTab('countries')">
+      <mat-icon svgIcon="heroicons_outline:globe-alt"></mat-icon> Países
+      <span class="tab-badge">{{ countries.length }}</span>
+    </button>
+        <button class="catalog-tab" [class.active]="activeTab === 'states'" (click)="setTab('states')">
+      <mat-icon svgIcon="heroicons_outline:map"></mat-icon> Departamentos
+      <span class="tab-badge">{{ states.length }}</span>
+    </button>
+        <button class="catalog-tab" [class.active]="activeTab === 'cities'" (click)="setTab('cities')">
+      <mat-icon svgIcon="heroicons_outline:building-office-2"></mat-icon> Ciudades
+      <span class="tab-badge">{{ cities.length }}</span>
+    </button>
+        <button class="catalog-tab" [class.active]="activeTab === 'jobtypes'" (click)="setTab('jobtypes')">
+      <mat-icon svgIcon="heroicons_outline:briefcase"></mat-icon> Tipos de Cargo
+      <span class="tab-badge">{{ jobTypes.length }}</span>
+    </button>
+        <button class="catalog-tab" [class.active]="activeTab === 'roles'" (click)="setTab('roles')">
+      <mat-icon svgIcon="heroicons_outline:shield-check"></mat-icon> Roles
+      <span class="tab-badge">{{ roles.length }}</span>
+    </button>
+    </div>
+
+    @if (loading) {
+    <div class="loading-wrap">
+        <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+    </div>
+    } @else {
+
+    <!-- ══════════ COUNTRIES ══════════ -->
+    @if (activeTab === 'countries') {
+    <div class="tab-content">
+        <div class="toolbar">
+            <input class="search-input" [(ngModel)]="countrySearch" (ngModelChange)="applyFilters()" placeholder="Buscar país..." />
+            <button class="btn-primary" (click)="openCreateCountry()">
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon> Nuevo País
+          </button>
+        </div>
+
+        @if (showForm) {
+        <div class="inline-form">
+            <h3>Nuevo País</h3>
+            <div class="form-grid">
+                <label>Nombre *<input [(ngModel)]="countryForm.name" placeholder="Colombia" /></label>
+                <label>Código ISO *<input [(ngModel)]="countryForm.iSOCode" placeholder="COL" maxlength="3" /></label>
+                <label>Código Telefónico *<input [(ngModel)]="countryForm.phoneCode" placeholder="+57" maxlength="5" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="saveCountry()">
+                @if (saving) { <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner> }
+                Guardar
+              </button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        } @if (showEditForm && editCountryId) {
+        <div class="inline-form inline-form--edit">
+            <h3>Editar País</h3>
+            <div class="form-grid">
+                <label>Nombre *<input [(ngModel)]="editCountryForm.name" /></label>
+                <label>Código ISO *<input [(ngModel)]="editCountryForm.iSOCode" maxlength="3" /></label>
+                <label>Código Telefónico *<input [(ngModel)]="editCountryForm.phoneCode" maxlength="5" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="updateCountry()">
+                @if (saving) { <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner> }
+                Actualizar
+              </button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>ISO</th>
+                    <th>Tel.</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (c of filteredCountries; track c.countryID) {
+                <tr>
+                    <td class="td-id">{{ c.countryID }}</td>
+                    <td class="td-name">{{ c.name }}</td>
+                    <td><span class="badge badge--gray">{{ c.iSOCode }}</span></td>
+                    <td>{{ c.phoneCode }}</td>
+                    <td>
+                        <span class="badge" [class.badge--green]="c.isActive" [class.badge--red]="!c.isActive">
+                    {{ c.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                    </td>
+                    <td class="td-actions">
+                        <button class="icon-btn" title="Editar" (click)="startEditCountry(c)">
+                    <mat-icon svgIcon="heroicons_mini:pencil"></mat-icon>
+                  </button>
+                        <button class="icon-btn icon-btn--danger" title="Desactivar" (click)="deleteCountry(c)">
+                    <mat-icon svgIcon="heroicons_mini:trash"></mat-icon>
+                  </button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="6" class="td-empty">No hay países registrados.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+
+    <!-- ══════════ STATES ══════════ -->
+    @if (activeTab === 'states') {
+    <div class="tab-content">
+        <div class="toolbar">
+            <input class="search-input" [(ngModel)]="stateSearch" (ngModelChange)="applyFilters()" placeholder="Buscar departamento..." />
+            <select class="filter-select" [ngModel]="stateCountryFilter" (change)="stateCountryFilter = +$any($event.target).value; applyFilters()">
+            <option value="0">Todos los países</option>
+            @for (c of countries; track c.countryID) {
+              <option [value]="c.countryID">{{ c.name }}</option>
+            }
+          </select>
+            <button class="btn-primary" (click)="openCreateState()">
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon> Nuevo Dpto.
+          </button>
+        </div>
+
+        @if (showForm) {
+        <div class="inline-form">
+            <h3>Nuevo Departamento / Estado</h3>
+            <div class="form-grid">
+                <label>País *
+                <select [ngModel]="stateForm.countryID" (change)="stateForm.countryID = +$any($event.target).value">
+                  <option value="0">Seleccionar...</option>
+                  @for (c of countries; track c.countryID) {
+                    <option [value]="c.countryID">{{ c.name }}</option>
+                  }
+                </select>
+              </label>
+                <label>Nombre *<input [(ngModel)]="stateForm.name" placeholder="Cundinamarca" /></label>
+                <label>Código<input [(ngModel)]="stateForm.code" placeholder="CUN" maxlength="10" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="saveState()">Guardar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        } @if (showEditForm && editStateId) {
+        <div class="inline-form inline-form--edit">
+            <h3>Editar Departamento</h3>
+            <div class="form-grid">
+                <label>País *
+                <select [ngModel]="editStateForm.countryID" (change)="editStateForm.countryID = +$any($event.target).value">
+                  @for (c of countries; track c.countryID) {
+                    <option [value]="c.countryID">{{ c.name }}</option>
+                  }
+                </select>
+              </label>
+                <label>Nombre *<input [(ngModel)]="editStateForm.name" /></label>
+                <label>Código<input [(ngModel)]="editStateForm.code" maxlength="10" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="updateState()">Actualizar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Código</th>
+                    <th>País</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (s of filteredStates; track s.stateID) {
+                <tr>
+                    <td class="td-id">{{ s.stateID }}</td>
+                    <td class="td-name">{{ s.name }}</td>
+                    <td><span class="badge badge--gray">{{ s.code || '-' }}</span></td>
+                    <td>{{ s.countryName || '-' }}</td>
+                    <td>
+                        <span class="badge" [class.badge--green]="s.isActive" [class.badge--red]="!s.isActive">
+                    {{ s.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                    </td>
+                    <td class="td-actions">
+                        <button class="icon-btn" (click)="startEditState(s)"><mat-icon svgIcon="heroicons_mini:pencil"></mat-icon></button>
+                        <button class="icon-btn icon-btn--danger" (click)="deleteState(s)"><mat-icon svgIcon="heroicons_mini:trash"></mat-icon></button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="6" class="td-empty">No hay departamentos registrados.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+
+    <!-- ══════════ CITIES ══════════ -->
+    @if (activeTab === 'cities') {
+    <div class="tab-content">
+        <div class="toolbar">
+            <input class="search-input" [(ngModel)]="citySearch" (ngModelChange)="applyFilters()" placeholder="Buscar ciudad..." />
+            <select class="filter-select" [ngModel]="cityStateFilter" (change)="cityStateFilter = +$any($event.target).value; applyFilters()">
+            <option value="0">Todos los departamentos</option>
+            @for (s of states; track s.stateID) {
+              <option [value]="s.stateID">{{ s.name }}</option>
+            }
+          </select>
+            <button class="btn-primary" (click)="openCreateCity()">
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon> Nueva Ciudad
+          </button>
+        </div>
+
+        @if (showForm) {
+        <div class="inline-form">
+            <h3>Nueva Ciudad</h3>
+            <div class="form-grid">
+                <label>Departamento *
+                <select [ngModel]="cityForm.stateID" (change)="cityForm.stateID = +$any($event.target).value">
+                  <option value="0">Seleccionar...</option>
+                  @for (s of states; track s.stateID) {
+                    <option [value]="s.stateID">{{ s.name }}</option>
+                  }
+                </select>
+              </label>
+                <label>Nombre *<input [(ngModel)]="cityForm.name" placeholder="Bogotá D.C." /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="saveCity()">Guardar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        } @if (showEditForm && editCityId) {
+        <div class="inline-form inline-form--edit">
+            <h3>Editar Ciudad</h3>
+            <div class="form-grid">
+                <label>Departamento *
+                <select [ngModel]="editCityForm.stateID" (change)="editCityForm.stateID = +$any($event.target).value">
+                  @for (s of states; track s.stateID) {
+                    <option [value]="s.stateID">{{ s.name }}</option>
+                  }
+                </select>
+              </label>
+                <label>Nombre *<input [(ngModel)]="editCityForm.name" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="updateCity()">Actualizar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Departamento</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (c of filteredCities; track c.cityID) {
+                <tr>
+                    <td class="td-id">{{ c.cityID }}</td>
+                    <td class="td-name">{{ c.name }}</td>
+                    <td>{{ c.stateName || '-' }}</td>
+                    <td>
+                        <span class="badge" [class.badge--green]="c.isActive" [class.badge--red]="!c.isActive">
+                    {{ c.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                    </td>
+                    <td class="td-actions">
+                        <button class="icon-btn" (click)="startEditCity(c)"><mat-icon svgIcon="heroicons_mini:pencil"></mat-icon></button>
+                        <button class="icon-btn icon-btn--danger" (click)="deleteCity(c)"><mat-icon svgIcon="heroicons_mini:trash"></mat-icon></button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="5" class="td-empty">No hay ciudades registradas.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+
+    <!-- ══════════ JOB TYPES ══════════ -->
+    @if (activeTab === 'jobtypes') {
+    <div class="tab-content">
+        <div class="toolbar">
+            <input class="search-input" [(ngModel)]="jobTypeSearch" (ngModelChange)="applyFilters()" placeholder="Buscar cargo..." />
+            <button class="btn-primary" (click)="openCreateJobType()">
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon> Nuevo Cargo
+          </button>
+        </div>
+
+        @if (showForm) {
+        <div class="inline-form">
+            <h3>Nuevo Tipo de Cargo</h3>
+            <div class="form-grid form-grid--wide">
+                <label>Nombre *<input [(ngModel)]="jobTypeForm.name" placeholder="Analista de Datos" /></label>
+                <label>Descripción<input [(ngModel)]="jobTypeForm.description" placeholder="Descripción del cargo..." /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="saveJobType()">Guardar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        } @if (showEditForm && editJobTypeId) {
+        <div class="inline-form inline-form--edit">
+            <h3>Editar Tipo de Cargo</h3>
+            <div class="form-grid form-grid--wide">
+                <label>Nombre *<input [(ngModel)]="editJobTypeForm.name" /></label>
+                <label>Descripción<input [(ngModel)]="editJobTypeForm.description" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="updateJobType()">Actualizar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (j of filteredJobTypes; track j.jobTypeID) {
+                <tr>
+                    <td class="td-id">{{ j.jobTypeID }}</td>
+                    <td class="td-name">{{ j.name }}</td>
+                    <td class="td-desc">{{ j.description || '-' }}</td>
+                    <td>
+                        <span class="badge" [class.badge--green]="j.isActive" [class.badge--red]="!j.isActive">
+                    {{ j.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                    </td>
+                    <td class="td-actions">
+                        <button class="icon-btn" (click)="startEditJobType(j)"><mat-icon svgIcon="heroicons_mini:pencil"></mat-icon></button>
+                        <button class="icon-btn icon-btn--danger" (click)="deleteJobType(j)"><mat-icon svgIcon="heroicons_mini:trash"></mat-icon></button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="5" class="td-empty">No hay tipos de cargo registrados.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+
+    <!-- ══════════ ROLES ══════════ -->
+    @if (activeTab === 'roles') {
+    <div class="tab-content">
+        <div class="toolbar">
+            <input class="search-input" [(ngModel)]="roleSearch" (ngModelChange)="applyFilters()" placeholder="Buscar rol..." />
+            <button class="btn-primary" (click)="openCreateRole()">
+            <mat-icon svgIcon="heroicons_outline:plus"></mat-icon> Nuevo Rol
+          </button>
+        </div>
+
+        @if (showForm) {
+        <div class="inline-form">
+            <h3>Nuevo Rol del Sistema</h3>
+            <div class="form-grid form-grid--wide">
+                <label>Nombre *<input [(ngModel)]="roleForm.name" placeholder="Auditor" /></label>
+                <label>Descripción *<input [(ngModel)]="roleForm.description" placeholder="Rol de auditoría con acceso de lectura" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="saveRole()">Guardar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        } @if (showEditForm && editRoleId) {
+        <div class="inline-form inline-form--edit">
+            <h3>Editar Rol</h3>
+            <div class="form-grid form-grid--wide">
+                <label>Nombre *<input [(ngModel)]="editRoleForm.name" /></label>
+                <label>Descripción *<input [(ngModel)]="editRoleForm.description" /></label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" [disabled]="saving" (click)="updateRole()">Actualizar</button>
+                <button class="btn-ghost" (click)="cancelForm()">Cancelar</button>
+            </div>
+        </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (r of filteredRoles; track r.roleID) {
+                <tr>
+                    <td class="td-id">{{ r.roleID }}</td>
+                    <td class="td-name">
+                        <span class="role-badge">{{ r.name }}</span>
+                    </td>
+                    <td class="td-desc">{{ r.description || '-' }}</td>
+                    <td>
+                        <span class="badge" [class.badge--green]="r.isActive" [class.badge--red]="!r.isActive">
+                    {{ r.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                    </td>
+                    <td class="td-actions">
+                        <button class="icon-btn" (click)="startEditRole(r)"><mat-icon svgIcon="heroicons_mini:pencil"></mat-icon></button>
+                        <button class="icon-btn icon-btn--danger" (click)="deleteRole(r)"><mat-icon svgIcon="heroicons_mini:trash"></mat-icon></button>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="5" class="td-empty">No hay roles registrados.</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    } }
+</div>

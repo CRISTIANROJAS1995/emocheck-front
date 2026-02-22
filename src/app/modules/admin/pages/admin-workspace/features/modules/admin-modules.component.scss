@@ -1,5 +1,4 @@
 @use '../../admin-shared' as *;
-
 :host {
     display: block;
     width: 100%;
@@ -15,14 +14,12 @@
 // Instruments
 .instruments-section {
     margin-top: 20px;
-
     &__header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 14px;
     }
-
     h3 {
         font-size: 18px;
         font-weight: 700;
@@ -30,7 +27,6 @@
         align-items: center;
         gap: 8px;
         margin: 0;
-
         mat-icon {
             font-size: 22px;
             width: 22px;
@@ -47,43 +43,35 @@
     margin-bottom: 10px;
     overflow: hidden;
     transition: box-shadow .2s;
-
     &--open {
         box-shadow: 0 2px 12px rgba(99, 102, 241, .12);
         border-color: rgba(99, 102, 241, .2);
     }
-
     &__header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 14px 18px;
         cursor: pointer;
-
         &:hover {
             background: rgba(0, 0, 0, .02);
         }
     }
-
     &__title {
         display: flex;
         align-items: center;
         gap: 10px;
-
         mat-icon {
             color: #6366f1;
         }
-
         strong {
             font-size: 15px;
         }
     }
-
     &__body {
         padding: 0 18px 18px;
         border-top: 1px solid rgba(0, 0, 0, .06);
     }
-
     &__desc {
         font-size: 13px;
         color: #64748b;
@@ -94,11 +82,9 @@
 .admin-table--nested {
     margin-top: 8px;
     font-size: 13px;
-
     th {
         font-size: 12px;
     }
-
     td,
     th {
         padding: 8px 12px;
@@ -109,4 +95,218 @@
     font-size: 13px;
     color: #94a3b8;
     padding: 8px 0;
+}
+
+// Instrument card actions
+.instrument-card {
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+}
+
+// Tabs
+.detail-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(0, 0, 0, .08);
+    padding-bottom: 0;
+}
+
+.detail-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all .2s;
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+    &:hover {
+        color: #4f46e5;
+        background: rgba(99, 102, 241, .04);
+    }
+    &--active {
+        color: #4f46e5;
+        border-bottom-color: #4f46e5;
+        font-weight: 600;
+    }
+}
+
+// Sub-sections inside instrument body
+.sub-section {
+    border: 1px solid rgba(0, 0, 0, .07);
+    border-radius: 8px;
+    margin-top: 14px;
+    overflow: hidden;
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        background: rgba(0, 0, 0, .02);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+            }
+        }
+        &:hover {
+            background: rgba(0, 0, 0, .04);
+        }
+    }
+}
+
+// Compact editor panels inside instrument body
+.editor-panel--compact {
+    border-radius: 8px;
+    padding: 14px;
+    margin: 8px 0;
+    background: rgba(248, 250, 252, .8);
+}
+
+// Question rows
+.question-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(0, 0, 0, .05);
+    font-size: 13px;
+    transition: background .15s;
+    &:hover {
+        background: rgba(99, 102, 241, .03);
+    }
+    &__main {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        cursor: pointer;
+    }
+    &__num {
+        min-width: 28px;
+        height: 28px;
+        background: #e0e7ff;
+        color: #4f46e5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+    &__text {
+        flex: 1;
+        color: #334155;
+    }
+    &__expand {
+        margin-left: auto;
+    }
+    &__actions {
+        display: flex;
+        gap: 4px;
+        margin-left: 10px;
+        flex-shrink: 0;
+    }
+}
+
+// Options panel
+.options-panel {
+    padding: 10px 14px;
+    background: #f8fafc;
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 8px;
+        span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            mat-icon {
+                font-size: 14px;
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
+}
+
+.options-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.option-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid rgba(99, 102, 241, .2);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 12px;
+    &__value {
+        background: #e0e7ff;
+        color: #4f46e5;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+    &__text {
+        color: #334155;
+    }
+    .btn {
+        padding: 0;
+        min-width: unset;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+    }
+}
+
+// Color swatch
+.color-swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
 }

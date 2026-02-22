@@ -4,8 +4,9 @@ import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HttpClient } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { AdminAlertsService, AlertStatisticsDto } from '../../../../core/services/admin-alerts.service';
 import { AdminCaseTrackingService } from '../../../../core/services/admin-case-tracking.service';
 import { AdminExportService } from '../../../../core/services/admin-export.service';
@@ -13,6 +14,8 @@ import { AdminModulesService } from '../../../../core/services/admin-modules.ser
 import { AdminUsersService } from '../../../../core/services/admin-users.service';
 import { DashboardService, DashboardIndicatorsDto } from '../../../../core/services/dashboard.service';
 import { AdminOrganizationService } from '../../../../core/services/admin-organization.service';
+import { AdminCatalogService } from '../../../../core/services/admin-catalog.service';
+import { environment } from '../../../../../environments/environment';
 
 interface AdminCard {
     title: string;
@@ -92,6 +95,38 @@ export class AdminWorkspaceComponent implements OnInit {
             metric: '-',
             color: 'teal',
         },
+        {
+            title: 'Recursos de Bienestar',
+            description: 'Gestiona videos, artículos y recursos para los usuarios.',
+            icon: 'heroicons_outline:academic-cap',
+            route: '/admin/resources',
+            metric: '-',
+            color: 'sky',
+        },
+        {
+            title: 'Catálogos',
+            description: 'Países, departamentos, ciudades, tipos de cargo y roles del sistema.',
+            icon: 'heroicons_outline:tag',
+            route: '/admin/catalogs',
+            metric: '-',
+            color: 'orange',
+        },
+        {
+            title: 'Recomendaciones',
+            description: 'Crea y gestiona recomendaciones personalizadas por resultado de evaluación.',
+            icon: 'heroicons_outline:light-bulb',
+            route: '/admin/recommendations',
+            metric: '-',
+            color: 'yellow',
+        },
+        {
+            title: 'Evaluaciones',
+            description: 'Consulta historial de evaluaciones y resultados por usuario.',
+            icon: 'heroicons_outline:clipboard-document-list',
+            route: '/admin/evaluations',
+            metric: '-',
+            color: 'purple',
+        },
     ];
 
     constructor(
@@ -102,6 +137,8 @@ export class AdminWorkspaceComponent implements OnInit {
         private readonly usersService: AdminUsersService,
         private readonly dashboardService: DashboardService,
         private readonly orgService: AdminOrganizationService,
+        private readonly catalogService: AdminCatalogService,
+        private readonly http: HttpClient,
     ) { }
 
     ngOnInit(): void {
@@ -113,7 +150,20 @@ export class AdminWorkspaceComponent implements OnInit {
             modules: this.modulesService.listActive().pipe(catchError(() => of([]))),
             users: this.usersService.listUsers().pipe(catchError(() => of([]))),
             companies: this.orgService.getCompanies().pipe(catchError(() => of([]))),
-        }).subscribe(({ indicators, alertStats, cases, exports, modules, users, companies }) => {
+            resources: this.http.get<unknown>(`${environment.apiUrl}/resource`).pipe(
+                map((r: any) => Array.isArray(r) ? r : (r?.data ?? [])),
+                catchError(() => of([]))
+            ),
+            countries: this.catalogService.getCountries().pipe(catchError(() => of([]))),
+            recommendations: this.http.get<unknown>(`${environment.apiUrl}/recommendation/active/0`).pipe(
+                map((r: any) => Array.isArray(r) ? r : (r?.data ?? [])),
+                catchError(() => of([]))
+            ),
+            evaluations: this.http.get<unknown>(`${environment.apiUrl}/evaluation/my-evaluations`).pipe(
+                map((r: any) => Array.isArray(r) ? r : (r?.data ?? [])),
+                catchError(() => of([]))
+            ),
+        }).subscribe(({ indicators, alertStats, cases, exports, modules, users, companies, resources, countries, recommendations, evaluations }) => {
             this.indicators = indicators as DashboardIndicatorsDto;
             this.alertStats = alertStats as AlertStatisticsDto;
 
@@ -125,6 +175,10 @@ export class AdminWorkspaceComponent implements OnInit {
                 if (card.route.endsWith('/reports')) return { ...card, metric: String(exports.length) };
                 if (card.route.endsWith('/audit')) return { ...card, metric: '∞' };
                 if (card.route.endsWith('/config')) return { ...card, metric: String(companies.length) };
+                if (card.route.endsWith('/resources')) return { ...card, metric: String((resources as any[]).length) };
+                if (card.route.endsWith('/catalogs')) return { ...card, metric: String((countries as any[]).length) };
+                if (card.route.endsWith('/recommendations')) return { ...card, metric: String((recommendations as any[]).length) };
+                if (card.route.endsWith('/evaluations')) return { ...card, metric: String((evaluations as any[]).length) };
                 return card;
             });
             this.loading = false;

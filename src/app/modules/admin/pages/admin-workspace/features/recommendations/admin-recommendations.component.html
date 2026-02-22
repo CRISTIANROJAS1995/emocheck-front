@@ -1,0 +1,184 @@
+<div class="recs-page">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="page-header__info">
+            <h1 class="page-title">
+                <mat-icon svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                Recomendaciones
+            </h1>
+            <p class="page-subtitle">Crea y gestiona recomendaciones personalizadas para usuarios según sus resultados</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" (click)="openCreate()">
+        <mat-icon svgIcon="heroicons_outline:plus"></mat-icon> Nueva Recomendación
+      </button>
+            <a routerLink="/admin" class="btn-back">
+                <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon> Volver
+            </a>
+        </div>
+    </div>
+
+    @if (loading) {
+    <div class="loading-wrap">
+        <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+    </div>
+    } @else {
+
+    <!-- Create Form -->
+    @if (showCreateForm) {
+    <div class="inline-form">
+        <h3>
+            <mat-icon svgIcon="heroicons_outline:light-bulb"></mat-icon>
+            Nueva Recomendación
+        </h3>
+        <div class="form-grid">
+            <label class="form-field">
+            ID Resultado de Evaluación *
+            <input type="number" [(ngModel)]="form.evaluationResultID" placeholder="ID del resultado..." />
+            <span class="field-hint">Obtén el ID del resultado en la sección Evaluaciones</span>
+          </label>
+            <label class="form-field">
+            Tipo de Recomendación *
+            <select [(ngModel)]="form.recommendationTypeID">
+              @for (t of recTypes; track t.id) {
+                <option [value]="t.id">{{ t.name }}</option>
+              }
+            </select>
+          </label>
+            <label class="form-field">
+            Prioridad
+            <select [(ngModel)]="form.priority">
+              @for (p of priorities; track p) {
+                <option [value]="p">{{ p }}</option>
+              }
+            </select>
+          </label>
+            <label class="form-field form-field--full">
+            Título *
+            <input [(ngModel)]="form.title" placeholder="Técnicas de respiración diafragmática..." />
+          </label>
+            <label class="form-field form-field--full">
+            Descripción
+            <textarea [(ngModel)]="form.description" rows="3" placeholder="Descripción detallada de la recomendación..."></textarea>
+          </label>
+            <label class="form-field form-field--full">
+            URL de Recurso
+            <input [(ngModel)]="form.resourceUrl" placeholder="https://recursos.emocheck.com/..." type="url" />
+          </label>
+        </div>
+        <div class="form-actions">
+            <button class="btn-primary" [disabled]="saving" (click)="saveRecommendation()">
+            @if (saving) { <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner> }
+            Guardar Recomendación
+          </button>
+            <button class="btn-ghost" (click)="showCreateForm = false">Cancelar</button>
+        </div>
+    </div>
+    }
+
+    <!-- User Selector Panel -->
+    <div class="user-panel">
+        <div class="user-panel__header">
+            <mat-icon svgIcon="heroicons_outline:user-circle"></mat-icon>
+            <span>Consultar por usuario</span>
+        </div>
+        <div class="user-panel__body">
+            <select class="filter-select" [(ngModel)]="selectedUserId">
+          <option [value]="0">Seleccionar usuario...</option>
+          @for (u of users; track u.userId) {
+            <option [value]="u.userId">{{ u.fullName }} — {{ u.email }}</option>
+          }
+        </select>
+            <button class="btn-primary" [disabled]="!selectedUserId" (click)="loadRecommendationsForUser()">
+          <mat-icon svgIcon="heroicons_outline:magnifying-glass"></mat-icon> Ver Recomendaciones
+        </button>
+            <button class="btn-secondary" [disabled]="!selectedUserId" (click)="loadActiveRecommendationsForUser(selectedUserId)">
+          <mat-icon svgIcon="heroicons_outline:star"></mat-icon> Ver Activas
+        </button>
+        </div>
+    </div>
+
+    <!-- Results Panel -->
+    @if (selectedUserId && lookupResults.length > 0) {
+    <div class="results-panel">
+        <h4>
+            <mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon>
+            Resultados de evaluaciones
+            <span class="badge badge--blue">{{ lookupResults.length }}</span>
+        </h4>
+        <div class="results-grid">
+            @for (r of lookupResults; track (r.evaluationResultID ?? r.resultID)) {
+            <div class="result-card" (click)="loadRecommendationsByResult((r.evaluationResultID ?? r.resultID)!)">
+                <div class="result-card__module">{{ r.moduleName || 'Módulo' }}</div>
+                <div class="result-card__score">Puntaje: <strong>{{ r.totalScore ?? '-' }}</strong></div>
+                <div class="result-card__risk">
+                    <span class="badge" [class]="'badge--risk-' + (r.riskLevel?.toLowerCase() || 'none')">
+                  {{ r.riskLevel || 'Sin clasificar' }}
+                </span>
+                </div>
+                <div class="result-card__date">{{ r.completedAt | date:'dd/MM/yyyy' }}</div>
+                <div class="result-card__action">Ver recomendaciones →</div>
+            </div>
+            }
+        </div>
+    </div>
+    }
+
+    <!-- Recommendations List -->
+    @if (selectedUserId) {
+    <div class="recs-section">
+        <div class="recs-section__header">
+            <h3>
+                <mat-icon svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                Recomendaciones
+                <span class="badge badge--blue">{{ userRecommendations.length }}</span>
+            </h3>
+        </div>
+
+        @if (loadingUserRecs) {
+        <div class="loading-inline">
+            <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
+            <span>Cargando recomendaciones...</span>
+        </div>
+        } @else if (userRecommendations.length === 0) {
+        <div class="empty-state">
+            <mat-icon svgIcon="heroicons_outline:light-bulb"></mat-icon>
+            <p>No hay recomendaciones para este usuario en este resultado.</p>
+            <p class="empty-sub">Puedes crear una con el botón "Nueva Recomendación".</p>
+        </div>
+        } @else {
+        <div class="recs-list">
+            @for (rec of userRecommendations; track rec.recommendationID) {
+            <div class="rec-card">
+                <div class="rec-card__header">
+                    <span class="rec-card__title">{{ rec.title }}</span>
+                    <span class="badge" [class]="priorityColor(rec.priority)">{{ rec.priority }}</span> @if (rec.isViewed) {
+                    <span class="badge badge--gray">Visto</span> }
+                </div>
+                @if (rec.description) {
+                <p class="rec-card__desc">{{ rec.description }}</p>
+                } @if (rec.resourceUrl) {
+                <a [href]="rec.resourceUrl" target="_blank" class="rec-card__link">
+                    <mat-icon svgIcon="heroicons_mini:arrow-top-right-on-square"></mat-icon>
+                    Ver recurso
+                </a>
+                }
+                <div class="rec-card__meta">
+                    @if (rec.instrumentName) { <span>📊 {{ rec.instrumentName }}</span> } @if (rec.createdAt) { <span>📅 {{ rec.createdAt | date:'dd/MM/yyyy' }}</span> }
+                    <span>🔑 ID: {{ rec.recommendationID }}</span>
+                </div>
+            </div>
+            }
+        </div>
+        }
+    </div>
+    } @else {
+    <!-- Welcome state -->
+    <div class="welcome-state">
+        <mat-icon svgIcon="heroicons_outline:light-bulb"></mat-icon>
+        <h3>Gestión de Recomendaciones</h3>
+        <p>Selecciona un usuario para ver o crear recomendaciones personalizadas según sus resultados de evaluación.</p>
+    </div>
+    } }
+</div>

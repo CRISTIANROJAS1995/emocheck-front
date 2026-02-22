@@ -126,6 +126,38 @@ export class NavigationService {
                         link: '/admin/config',
                         classes: baseItemClasses,
                     },
+                    {
+                        id: 'admin-resources',
+                        title: 'Recursos',
+                        type: 'basic',
+                        icon: 'heroicons_outline:academic-cap',
+                        link: '/admin/resources',
+                        classes: baseItemClasses,
+                    },
+                    {
+                        id: 'admin-catalogs',
+                        title: 'Catálogos',
+                        type: 'basic',
+                        icon: 'heroicons_outline:tag',
+                        link: '/admin/catalogs',
+                        classes: baseItemClasses,
+                    },
+                    {
+                        id: 'admin-recommendations',
+                        title: 'Recomendaciones',
+                        type: 'basic',
+                        icon: 'heroicons_outline:light-bulb',
+                        link: '/admin/recommendations',
+                        classes: baseItemClasses,
+                    },
+                    {
+                        id: 'admin-evaluations',
+                        title: 'Evaluaciones',
+                        type: 'basic',
+                        icon: 'heroicons_outline:clipboard-document-check',
+                        link: '/admin/evaluations',
+                        classes: baseItemClasses,
+                    },
                 ],
             });
         } else {

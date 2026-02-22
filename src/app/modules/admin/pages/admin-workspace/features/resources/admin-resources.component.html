@@ -1,0 +1,191 @@
+<section class="admin-page-wrapper">
+    <header class="admin-page-header">
+        <div class="admin-page-header__left">
+            <div class="admin-page-header__badge">RECURSOS DE BIENESTAR</div>
+            <h1>Recursos de Bienestar</h1>
+            <p>Gestiona videos, artículos, audios y recursos para los usuarios.</p>
+        </div>
+        <div class="admin-page-header__actions">
+            <a routerLink="/admin" class="btn btn--outline btn--sm">
+                <mat-icon>arrow_back</mat-icon> Admin</a>
+        </div>
+    </header>
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+        <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-card__icon">
+                <mat-icon>folder</mat-icon>
+            </div>
+            <div class="kpi-card__body"><span class="kpi-card__value">{{ resources.length }}</span><span class="kpi-card__label">Total Recursos</span></div>
+        </div>
+        <div class="kpi-card kpi-card--sky">
+            <div class="kpi-card__icon">
+                <mat-icon>category</mat-icon>
+            </div>
+            <div class="kpi-card__body"><span class="kpi-card__value">{{ categories.length }}</span><span class="kpi-card__label">Categorías</span></div>
+        </div>
+        <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="kpi-card__body"><span class="kpi-card__value">{{ resources.length }}</span><span class="kpi-card__label">Activos</span></div>
+        </div>
+    </div>
+
+    <!-- Create Form -->
+    @if (showCreateForm) {
+    <div class="editor-panel">
+        <h3>
+            <mat-icon>add_circle</mat-icon> Nuevo Recurso</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field"><span>Título *</span><input [(ngModel)]="resourceForm.title" placeholder="Ej: Meditación guiada anti-estrés" /></label>
+            <label class="editor-panel__field">
+                <span>Categoría *</span>
+                <select [(ngModel)]="resourceForm.resourceCategoryID">
+                    <option [value]="0">— Seleccionar —</option>
+                    @for (c of categories; track c.resourceCategoryID) {
+                    <option [value]="c.resourceCategoryID">{{ c.categoryName ?? c.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field editor-panel__field--full"><span>Descripción</span><textarea [(ngModel)]="resourceForm.description" rows="2"></textarea></label>
+            <label class="editor-panel__field">
+                <span>Tipo de Contenido *</span>
+                <select [(ngModel)]="resourceForm.contentType">
+                    @for (ct of contentTypes; track ct) { <option [value]="ct">{{ ct }}</option> }
+                </select>
+            </label>
+            <label class="editor-panel__field editor-panel__field--full"><span>URL del Contenido *</span><input [(ngModel)]="resourceForm.contentUrl" placeholder="https://..." /></label>
+            <label class="editor-panel__field">
+                <span>Nivel de Riesgo</span>
+                <select [(ngModel)]="resourceForm.targetRiskLevel">
+                    <option value="">— Todos —</option>
+                    @for (rl of riskLevels; track rl) { <option [value]="rl">{{ rl }}</option> }
+                </select>
+            </label>
+            <label class="editor-panel__field"><span>Duración (min)</span><input type="number" [(ngModel)]="resourceForm.durationMinutes" /></label>
+            <label class="editor-panel__field"><span>Tags</span><input [(ngModel)]="resourceForm.tags" placeholder="meditacion,estres,mindfulness" /></label>
+            <label class="editor-panel__field"><span>Orden</span><input type="number" [(ngModel)]="resourceForm.displayOrder" /></label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showCreateForm = false">Cancelar</button>
+            <button class="btn btn--primary" (click)="createResource()" [disabled]="saving"><mat-icon>save</mat-icon> Crear Recurso</button>
+        </div>
+    </div>
+    }
+
+    <!-- Filters -->
+    <div class="admin-filters">
+        <div class="admin-filters__group">
+            <mat-icon class="admin-filters__icon">search</mat-icon>
+            <input type="text" [(ngModel)]="search" placeholder="Buscar por título, tags..." class="admin-filters__search" />
+        </div>
+        <div class="admin-filters__group">
+            <select [(ngModel)]="filterCategory" class="admin-filters__select">
+                <option [value]="0">Todas las categorías</option>
+                @for (c of categories; track c.resourceCategoryID) {
+                <option [value]="c.resourceCategoryID">{{ c.categoryName ?? c.name }}</option>
+                }
+            </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <span class="admin-filters__count">{{ filtered.length }} recursos</span>
+            <button class="btn btn--primary btn--sm" (click)="showCreateForm = !showCreateForm">
+                <mat-icon>{{ showCreateForm ? 'close' : 'add' }}</mat-icon>
+                {{ showCreateForm ? 'Cerrar' : 'Nuevo Recurso' }}
+            </button>
+        </div>
+    </div>
+
+    @if (loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner><span>Cargando recursos...</span></div>
+    } @if (!loading) {
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Categoría</th>
+                    <th>Tipo</th>
+                    <th>Nivel Riesgo</th>
+                    <th>Duración</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (r of filtered; track idOf(r)) {
+                <!-- Edit row -->
+                @if (editingId === idOf(r)) {
+                <tr>
+                    <td colspan="7">
+                        <div class="editor-panel" style="margin:8px">
+                            <h3>
+                                <mat-icon>edit</mat-icon> Editar Recurso #{{ editingId }}</h3>
+                            <div class="editor-panel__grid">
+                                <label class="editor-panel__field"><span>Título *</span><input [(ngModel)]="editForm.title" /></label>
+                                <label class="editor-panel__field">
+                                    <span>Categoría</span>
+                                    <select [(ngModel)]="editForm.resourceCategoryID">
+                                        @for (c of categories; track c.resourceCategoryID) {
+                                        <option [value]="c.resourceCategoryID">{{ c.categoryName ?? c.name }}</option>
+                                        }
+                                    </select>
+                                </label>
+                                <label class="editor-panel__field editor-panel__field--full"><span>Descripción</span><textarea [(ngModel)]="editForm.description" rows="2"></textarea></label>
+                                <label class="editor-panel__field">
+                                    <span>Tipo</span>
+                                    <select [(ngModel)]="editForm.contentType">
+                                        @for (ct of contentTypes; track ct) { <option [value]="ct">{{ ct }}</option> }
+                                    </select>
+                                </label>
+                                <label class="editor-panel__field editor-panel__field--full"><span>URL</span><input [(ngModel)]="editForm.contentUrl" /></label>
+                                <label class="editor-panel__field">
+                                    <span>Nivel Riesgo</span>
+                                    <select [(ngModel)]="editForm.targetRiskLevel">
+                                        <option value="">— Todos —</option>
+                                        @for (rl of riskLevels; track rl) { <option [value]="rl">{{ rl }}</option> }
+                                    </select>
+                                </label>
+                                <label class="editor-panel__field"><span>Duración (min)</span><input type="number" [(ngModel)]="editForm.durationMinutes" /></label>
+                                <label class="editor-panel__field"><span>Tags</span><input [(ngModel)]="editForm.tags" /></label>
+                            </div>
+                            <div class="editor-panel__actions">
+                                <button class="btn btn--ghost" (click)="cancelEdit()">Cancelar</button>
+                                <button class="btn btn--primary" (click)="saveEdit()" [disabled]="saving"><mat-icon>save</mat-icon> Guardar</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                }
+                <!-- Read row -->
+                @if (editingId !== idOf(r)) {
+                <tr>
+                    <td><strong>#{{ idOf(r) }}</strong></td>
+                    <td class="truncate-cell">{{ r.title }}</td>
+                    <td>{{ categoryName(r.resourceCategoryID) }}</td>
+                    <td><span class="badge badge--info">{{ r.contentType ?? r.resourceType ?? '-' }}</span></td>
+                    <td>
+                        @if (r.targetRiskLevel ?? r.targetAudience) {
+                        <span class="badge badge--amber">{{ r.targetRiskLevel ?? r.targetAudience }}</span> } @else { <span>-</span> }
+                    </td>
+                    <td>{{ r.durationMinutes ? r.durationMinutes + ' min' : '-' }}</td>
+                    <td class="actions-cell">
+                        <button class="btn btn--primary btn--xs" (click)="startEdit(r)" title="Editar"><mat-icon>edit</mat-icon></button>
+                        <button class="btn btn--danger btn--xs" (click)="deleteResource(r)" [disabled]="saving" title="Eliminar"><mat-icon>delete</mat-icon></button>
+                    </td>
+                </tr>
+                } }
+            </tbody>
+        </table>
+        @if (filtered.length === 0) {
+        <div class="empty-state">
+            <mat-icon>folder_open</mat-icon>
+            <p>No hay recursos para mostrar.</p>
+        </div>
+        }
+    </div>
+    }
+</section>

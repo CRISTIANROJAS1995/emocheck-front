@@ -1,0 +1,12 @@
+@use '../../admin-shared' as *;
+:host {
+    display: block;
+    width: 100%;
+}
+
+.truncate-cell {
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
