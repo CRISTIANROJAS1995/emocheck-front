@@ -296,6 +296,37 @@
         height: 18px;
         border-radius: 50%;
     }
+    &--editing {
+        border-radius: 10px;
+        border-color: #6366f1;
+        background: #f5f3ff;
+        padding: 4px 8px;
+        gap: 6px;
+        .btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+        }
+    }
+}
+
+.option-edit-input {
+    border: 1px solid #c7d2fe;
+    border-radius: 6px;
+    padding: 2px 6px;
+    font-size: 12px;
+    outline: none;
+    &:focus {
+        border-color: #6366f1;
+    }
+    &--num {
+        width: 52px;
+        text-align: center;
+    }
+    &--text {
+        flex: 1;
+        min-width: 100px;
+    }
 }
 
 // Color swatch
@@ -309,4 +340,57 @@
     font-weight: 600;
     color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+}
+
+// ── Quick-edit maxScore ────────────────────────────────────────────────────────
+.score-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all .15s;
+    &:hover {
+        background: #e0e7ff;
+        border-color: #6366f1;
+        color: #4338ca;
+    }
+    &--warn {
+        background: #fffbeb;
+        border-color: #fcd34d;
+        color: #d97706;
+        &:hover {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+    }
+}
+
+.quick-score-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.quick-score-input {
+    width: 72px;
+    padding: 4px 8px;
+    border: 1.5px solid #6366f1;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    outline: none;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .12);
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        opacity: 1;
+    }
 }

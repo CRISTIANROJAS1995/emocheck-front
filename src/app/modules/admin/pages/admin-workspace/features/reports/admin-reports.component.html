@@ -16,21 +16,27 @@
     <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>cloud_download</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>cloud_download</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ exports.length }}</span>
                 <span class="kpi-card__label">Total Exportaciones</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ completedCount }}</span>
                 <span class="kpi-card__label">Completadas</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--amber">
-            <div class="kpi-card__icon"><mat-icon>hourglass_empty</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>hourglass_empty</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ pendingCount }}</span>
                 <span class="kpi-card__label">En proceso</span>
@@ -41,42 +47,43 @@
     <!-- Create Form -->
     @if (showForm) {
     <div class="editor-panel">
-        <h3><mat-icon>cloud_upload</mat-icon> Solicitar Exportación</h3>
+        <h3>
+            <mat-icon>cloud_upload</mat-icon> Solicitar Exportación</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
-                <span>Tipo de exportación</span>
+                <span>Tipo de exportación *</span>
                 <select [(ngModel)]="request.exportType">
-                    <option value="Full">Completo</option>
-                    <option value="Partial">Parcial</option>
-                    <option value="EvaluationsOnly">Solo evaluaciones</option>
-                    <option value="PersonalDataOnly">Solo datos personales</option>
+                    @for (t of exportTypes; track t.value) {
+                    <option [value]="t.value">{{ t.label }}</option>
+                    }
                 </select>
             </label>
             <label class="editor-panel__field">
-                <span>Formato</span>
-                <select [(ngModel)]="request.fileFormat">
-                    <option value="CSV">CSV</option>
-                    <option value="JSON">JSON</option>
-                    <option value="PDF">PDF</option>
+                <span>Formato *</span>
+                <select [(ngModel)]="request.format">
+                    @for (f of exportFormats; track f.value) {
+                    <option [value]="f.value">{{ f.label }}</option>
+                    }
                 </select>
             </label>
             <label class="editor-panel__field">
-                <span>Desde</span>
-                <input type="date" [(ngModel)]="request.startDate" />
+                <span>Desde (opcional)</span>
+                <input type="date" [(ngModel)]="filterStartDate" />
             </label>
             <label class="editor-panel__field">
-                <span>Hasta</span>
-                <input type="date" [(ngModel)]="request.endDate" />
+                <span>Hasta (opcional)</span>
+                <input type="date" [(ngModel)]="filterEndDate" />
             </label>
-            <label class="editor-panel__field editor-panel__field--full">
-                <span>Motivo *</span>
-                <input [(ngModel)]="request.reason" placeholder="Describe el motivo de la exportación" />
+            <label class="editor-panel__field">
+                <span>ID Empresa (opcional)</span>
+                <input type="number" [(ngModel)]="filterCompanyId" placeholder="ej: 1" min="1" />
             </label>
         </div>
         <div class="editor-panel__actions">
             <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
             <button class="btn btn--primary" [disabled]="saving" (click)="create()">
-                <mat-icon>send</mat-icon> Solicitar
+                @if (saving) { <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner> }
+                <mat-icon>send</mat-icon> Solicitar Exportación
             </button>
         </div>
     </div>
@@ -86,8 +93,7 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
-                placeholder="Buscar por tipo, formato, estado..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()" placeholder="Buscar por tipo, formato, estado..." class="admin-filters__search" />
         </div>
         <div style="display:flex;align-items:center;gap:8px">
             <span class="admin-filters__count">{{ filteredExports.length }} exportaciones</span>
@@ -114,10 +120,11 @@
                 <tr>
                     <th (click)="toggleSort('dataExportId')" [class]="sortClass('dataExportId')">ID</th>
                     <th (click)="toggleSort('exportType')" [class]="sortClass('exportType')">Tipo</th>
-                    <th (click)="toggleSort('fileFormat')" [class]="sortClass('fileFormat')">Formato</th>
+                    <th>Formato</th>
                     <th (click)="toggleSort('status')" [class]="sortClass('status')">Estado</th>
                     <th>Solicitada</th>
-                    <th>Descarga</th>
+                    <th>Completada</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -125,16 +132,25 @@
                 <tr>
                     <td><strong>#{{ row.dataExportId }}</strong></td>
                     <td>{{ row.exportType || '-' }}</td>
-                    <td><span class="badge badge--info">{{ row.fileFormat || '-' }}</span></td>
-                    <td><span [class]="statusBadge(row.status)">{{ row.status || 'N/A' }}</span></td>
-                    <td>{{ row.requestedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td><span class="badge badge--info">{{ row.format || row.fileFormat || '-' }}</span></td>
                     <td>
-                        @if ((row.status ?? '').toLowerCase() === 'completed') {
+                        <span [class]="statusBadge(row.status)">
+                            @if (isPending(row)) {
+                            <mat-progress-spinner diameter="10" mode="indeterminate" style="display:inline-block;margin-right:4px"></mat-progress-spinner>
+                            }
+                            {{ statusLabel(row.status) }}
+                        </span>
+                    </td>
+                    <td>{{ row.requestedAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ row.completedAt ? (row.completedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                    <td class="td-actions">
+                        @if (isPending(row)) {
+                        <button class="icon-btn" title="Verificar estado" (click)="refresh(row)">
+                            <mat-icon>refresh</mat-icon>
+                        </button> } @if (isReady(row)) {
                         <a [href]="downloadUrl(row)" target="_blank" class="btn btn--primary btn--xs">
                             <mat-icon>download</mat-icon> Descargar
                         </a>
-                        } @else {
-                        <span class="text-muted">-</span>
                         }
                     </td>
                 </tr>
@@ -145,6 +161,9 @@
         <div class="empty-state">
             <mat-icon>cloud_off</mat-icon>
             <p>No hay exportaciones para mostrar.</p>
+            <button class="btn btn--primary btn--sm" (click)="showForm = true">
+                <mat-icon>add</mat-icon> Solicitar primera exportación
+            </button>
         </div>
         }
     </div>

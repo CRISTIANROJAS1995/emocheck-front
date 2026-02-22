@@ -12,7 +12,7 @@
                 <p class="profile-hero__subtitle">Actualiza tu información personal</p>
             </div>
 
-            <a class="profile-hero__back" mat-button [routerLink]="['/home']">
+            <a class="profile-hero__back" mat-button [routerLink]="[backRoute]">
                 <span class="profile-hero__back-content">
                     <mat-icon class="profile-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
                     <span class="profile-hero__back-text">Volver</span>
@@ -35,8 +35,7 @@
                     </div>
 
                     <div class="avatar-actions">
-                        <input #photoInput class="sr-only" type="file" accept="image/*"
-                            (change)="onPhotoSelected($event)" />
+                        <input #photoInput class="sr-only" type="file" accept="image/*" (change)="onPhotoSelected($event)" />
                         <button class="avatar-btn" mat-button type="button" (click)="triggerPhotoInput(photoInput)">
                             <mat-icon svgIcon="heroicons_outline:camera"></mat-icon>
                             <span>{{ photoPreviewUrl ? 'Actualizar foto' : 'Cargar foto' }}</span>
@@ -80,8 +79,7 @@
             </div>
         </form>
 
-        <form class="profile-card profile-card--password" [formGroup]="passwordForm" (ngSubmit)="changePassword()"
-            *ngIf="!loading">
+        <form class="profile-card profile-card--password" [formGroup]="passwordForm" (ngSubmit)="changePassword()" *ngIf="!loading">
             <div class="card-title">Cambiar contraseña</div>
             <div class="card-subtitle">Usa una contraseña segura y fácil de recordar</div>
 

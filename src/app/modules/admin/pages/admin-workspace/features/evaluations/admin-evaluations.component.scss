@@ -597,6 +597,92 @@ $gray-900: #111827;
     }
 }
 
+// ── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+    .evals-page {
+        padding: 1rem;
+    }
+    .page-header {
+        flex-direction: column;
+        gap: .75rem;
+        align-items: flex-start;
+    }
+    .btn-back {
+        align-self: flex-start;
+    }
+    // Stack layout vertically on mobile
+    .evals-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    // Sidebar becomes a horizontal scroll list on mobile
+    .user-sidebar {
+        max-height: 260px;
+    }
+    // User bar wraps
+    .user-bar {
+        flex-wrap: wrap;
+        gap: .625rem;
+        padding: .75rem 1rem;
+        &__counts {
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+    }
+    .view-tabs {
+        width: 100%;
+        .view-tab {
+            flex: 1;
+            text-align: center;
+        }
+    }
+    // Evaluations table — horizontal scroll
+    .content-section {
+        overflow-x: auto;
+    }
+    .data-table {
+        min-width: 560px;
+    }
+    // Instruments table on result detail
+    .instruments-table {
+        font-size: .8125rem;
+        th,
+        td {
+            padding: .5rem .75rem;
+        }
+    }
+    // KPI results grid — 1 column
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+    // Detail panel header wraps
+    .detail-panel__header {
+        flex-wrap: wrap;
+        gap: .5rem;
+        h4 {
+            font-size: .875rem;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .evals-page {
+        padding: .75rem;
+    }
+    .page-title {
+        font-size: 1.25rem;
+    }
+    .user-bar {
+        &__name {
+            font-size: .875rem;
+        }
+    }
+    .results-grid {
+        padding: .75rem;
+        gap: .625rem;
+    }
+}
+
 // ── Buttons ───────────────────────────────────────────────────────────────────
 .btn-sm {
     display: inline-flex;

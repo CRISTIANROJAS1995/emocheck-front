@@ -262,6 +262,11 @@ export class AdminPanelComponent implements OnInit {
 
     // ── Edit User ──
 
+    /** IDs de roles que el usuario tiene actualmente en el formulario de edición */
+    editRoleIDs: Set<number> = new Set();
+    /** Flag para mostrar spinner mientras se cambia un rol individualmente */
+    savingRole = false;
+
     startEditUser(user: AdminUserListItemDto): void {
         this.editingUser = user;
         this.showEditForm = true;
@@ -277,11 +282,55 @@ export class AdminPanelComponent implements OnInit {
             areaID: user.areaID ?? null,
             jobTypeID: user.jobTypeID ?? null,
         });
+        // Inicializar roles actuales del usuario
+        this.editRoleIDs = new Set(
+            (user.roles ?? [])
+                .map(roleName => this.roleOptions.find(r => r.name.toLowerCase() === roleName.toLowerCase())?.id)
+                .filter((id): id is number => id !== undefined)
+        );
     }
 
     cancelEdit(): void {
         this.showEditForm = false;
         this.editingUser = null;
+        this.editRoleIDs = new Set();
+    }
+
+    hasEditRole(roleId: number): boolean {
+        return this.editRoleIDs.has(roleId);
+    }
+
+    toggleEditRole(roleId: number): void {
+        if (!this.editingUser) return;
+        const userId = this.editingUser.userId;
+        const wasAssigned = this.editRoleIDs.has(roleId);
+        this.savingRole = true;
+
+        const obs = wasAssigned
+            ? this.adminUsers.removeRole(userId, roleId)
+            : this.adminUsers.assignRole(userId, roleId);
+
+        obs.pipe(finalize(() => (this.savingRole = false))).subscribe({
+            next: () => {
+                if (wasAssigned) {
+                    this.editRoleIDs.delete(roleId);
+                } else {
+                    this.editRoleIDs.add(roleId);
+                }
+                // Actualizar el objeto en memoria para que el badge de la tabla refleje el cambio
+                if (this.editingUser) {
+                    const roleName = this.roleOptions.find(r => r.id === roleId)?.name ?? '';
+                    const currentRoles = [...(this.editingUser.roles ?? [])];
+                    if (wasAssigned) {
+                        this.editingUser.roles = currentRoles.filter(r => r.toLowerCase() !== roleName.toLowerCase());
+                    } else {
+                        this.editingUser.roles = [...currentRoles, roleName];
+                    }
+                }
+                this.alert.success(wasAssigned ? 'Rol removido' : 'Rol asignado');
+            },
+            error: (e) => this.alert.error(e?.error?.message || e?.message || 'Error al modificar rol'),
+        });
     }
 
     saveEditUser(): void {

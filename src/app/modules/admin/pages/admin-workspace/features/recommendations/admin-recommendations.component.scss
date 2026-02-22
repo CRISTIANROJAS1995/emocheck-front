@@ -518,3 +518,48 @@ $gray-900: #111827;
         color: $gray-700;
     }
 }
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+    .recs-page {
+        padding: 1rem;
+    }
+    .page-header {
+        flex-direction: column;
+        gap: .75rem;
+        align-items: flex-start;
+    }
+    .header-actions {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    .btn-back {
+        align-self: flex-start;
+    }
+    .inline-form {
+        padding: 1rem;
+    }
+    // Scrollable tables
+    .tab-content,
+    .content-section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .data-table {
+        min-width: 520px;
+    }
+    // Cards grid — 1 column
+    .cards-grid,
+    .rec-cards {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .recs-page {
+        padding: .75rem;
+    }
+    .page-title {
+        font-size: 1.25rem;
+    }
+}

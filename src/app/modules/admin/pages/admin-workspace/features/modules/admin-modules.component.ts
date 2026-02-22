@@ -62,6 +62,37 @@ export class AdminModulesComponent implements OnInit {
     editingInstrumentId: number | null = null;
     editInstrumentForm: Partial<CreateInstrumentPayload> = {};
 
+    // Quick-edit maxScore inline on instrument card
+    quickEditMaxScoreId: number | null = null;
+    quickEditMaxScoreValue: number = 0;
+
+    openQuickEditMaxScore(inst: AdminInstrumentDto, event: Event): void {
+        event.stopPropagation();
+        this.quickEditMaxScoreId = inst.instrumentID;
+        this.quickEditMaxScoreValue = inst.maxScore ?? 0;
+    }
+
+    saveQuickMaxScore(inst: AdminInstrumentDto, event: Event): void {
+        event.stopPropagation();
+        if (this.quickEditMaxScoreValue < 0) { this.notify.error('El puntaje máximo no puede ser negativo'); return; }
+        this.saving = true;
+        this.service.updateInstrument(inst.instrumentID, { maxScore: this.quickEditMaxScoreValue })
+            .pipe(finalize(() => (this.saving = false)))
+            .subscribe({
+                next: (updated) => {
+                    Object.assign(inst, updated);
+                    this.quickEditMaxScoreId = null;
+                    this.notify.success('Puntaje máximo actualizado');
+                },
+                error: (e) => this.notify.error(e?.error?.message || 'Error al actualizar'),
+            });
+    }
+
+    cancelQuickMaxScore(event: Event): void {
+        event.stopPropagation();
+        this.quickEditMaxScoreId = null;
+    }
+
     //  Question CRUD (modal-like inline) 
     showCreateQuestion: number | null = null;   // instrumentID
     questionForm: Partial<CreateQuestionPayload> = {};
@@ -71,6 +102,8 @@ export class AdminModulesComponent implements OnInit {
     //  Option CRUD 
     showCreateOption: number | null = null;     // questionID
     optionForm: Partial<CreateOptionPayload> = {};
+    editingOptionId: number | null = null;
+    editOptionForm: { optionText: string; numericValue: number } = { optionText: '', numericValue: 0 };
     expandedQuestionIds = new Set<number>();
     questionOptions: Record<number, AdminOptionDto[]> = {};
     loadingOptions = new Set<number>();
@@ -219,7 +252,18 @@ export class AdminModulesComponent implements OnInit {
 
     startEditInstrument(inst: AdminInstrumentDto): void {
         this.editingInstrumentId = inst.instrumentID;
-        this.editInstrumentForm = { code: inst.code ?? '', name: inst.name ?? '', description: inst.description ?? '', scientificBasis: inst.scientificBasis ?? '', scaleMin: inst.scaleMin ?? 0, scaleMax: inst.scaleMax ?? 3, itemCount: inst.itemCount ?? 0, maxScore: inst.maxScore ?? 0, minScore: inst.minScore ?? 0, weightInModule: inst.weightInModule ?? 100, displayOrder: inst.displayOrder ?? 0 };
+        this.editInstrumentForm = {
+            name: inst.name ?? '',
+            description: inst.description ?? '',
+            scientificBasis: inst.scientificBasis ?? '',
+            scaleMin: inst.scaleMin ?? 0,
+            scaleMax: inst.scaleMax ?? 3,
+            itemCount: inst.itemCount ?? 0,
+            minScore: inst.minScore ?? 0,
+            maxScore: inst.maxScore ?? 0,
+            weightInModule: inst.weightInModule ?? 100,
+            displayOrder: inst.displayOrder ?? 0,
+        };
     }
 
     cancelEditInstrument(): void { this.editingInstrumentId = null; this.editInstrumentForm = {}; }
@@ -230,7 +274,14 @@ export class AdminModulesComponent implements OnInit {
         this.service.updateInstrument(this.editingInstrumentId, this.editInstrumentForm)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
-                next: () => { this.notify.success('Instrumento actualizado'); this.editingInstrumentId = null; this.refreshDetail(); },
+                next: (updated) => {
+                    this.notify.success('Instrumento actualizado');
+                    this.editingInstrumentId = null;
+                    // Sync local object to avoid flicker, then refresh full data
+                    const local = this.selectedModule?.instruments.find(i => i.instrumentID === updated.instrumentID);
+                    if (local) Object.assign(local, updated);
+                    this.refreshDetail();
+                },
                 error: (e) => this.notify.error(e?.error?.message || 'Error al actualizar instrumento'),
             });
     }
@@ -358,6 +409,33 @@ export class AdminModulesComponent implements OnInit {
                     if (opt.questionID) { delete this.questionOptions[opt.questionID]; this.loadOptions(opt.questionID); }
                 },
                 error: (e) => this.notify.error(e?.error?.message || 'Error al eliminar opción'),
+            });
+    }
+
+    startEditOption(opt: AdminOptionDto): void {
+        this.editingOptionId = opt.optionID;
+        this.editOptionForm = { optionText: opt.optionText ?? '', numericValue: opt.numericValue ?? 0 };
+    }
+
+    cancelEditOption(): void {
+        this.editingOptionId = null;
+    }
+
+    saveEditOption(opt: AdminOptionDto): void {
+        if (!this.editOptionForm.optionText?.trim()) { this.notify.error('El texto de la opción es requerido'); return; }
+        this.saving = true;
+        this.service.updateOption(opt.optionID, { optionText: this.editOptionForm.optionText, numericValue: this.editOptionForm.numericValue })
+            .pipe(finalize(() => (this.saving = false)))
+            .subscribe({
+                next: (updated) => {
+                    this.notify.success('Opción actualizada');
+                    this.editingOptionId = null;
+                    if (opt.questionID && this.questionOptions[opt.questionID]) {
+                        const idx = this.questionOptions[opt.questionID].findIndex(o => o.optionID === opt.optionID);
+                        if (idx !== -1) this.questionOptions[opt.questionID][idx] = updated;
+                    }
+                },
+                error: (e) => this.notify.error(e?.error?.message || 'Error al actualizar opción'),
             });
     }
 

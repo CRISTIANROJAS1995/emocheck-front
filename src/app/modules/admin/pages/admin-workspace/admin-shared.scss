@@ -11,7 +11,6 @@ $primary-50: #eef2ff;
 $primary-100: #e0e7ff;
 $primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
 $primary-gradient-2: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-
 $emerald: #10b981;
 $emerald-50: #ecfdf5;
 $emerald-100: #d1fae5;
@@ -27,24 +26,23 @@ $sky-100: #e0f2fe;
 $violet: #8b5cf6;
 $violet-50: #f5f3ff;
 $violet-100: #ede9fe;
-
 $glass-bg: rgba(255, 255, 255, 0.92);
 $glass-border: rgba(0, 0, 0, 0.05);
 $glass-blur: blur(16px);
-
 $shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
-$shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06),
+0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06),
+0 2px 4px -2px rgba(0, 0, 0, 0.04);
+$shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.08),
+0 4px 6px -4px rgba(0, 0, 0, 0.04);
 $shadow-xl: 0 20px 40px -5px rgba(0, 0, 0, 0.1);
 $shadow-hero: 0 8px 30px rgba(99, 102, 241, 0.3);
-
 $radius-xs: 6px;
 $radius-sm: 10px;
 $radius-md: 14px;
 $radius-lg: 18px;
 $radius-xl: 22px;
-
 $text-primary: #0f172a;
 $text-secondary: #475569;
 $text-muted: #94a3b8;
@@ -53,19 +51,15 @@ $border-default: #e2e8f0;
 $border-light: #f1f5f9;
 $border-focus: $primary;
 $focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.15);
-
 $transition-fast: 0.15s cubic-bezier(.4, 0, .2, 1);
 $transition-normal: 0.25s cubic-bezier(.4, 0, .2, 1);
 $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
-
-
 // ═══════════════════════════════════════════════════════════════
 //  PAGE WRAPPER
 // ═══════════════════════════════════════════════════════════════
 .admin-page-wrapper {
     padding: 0;
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  HERO HEADER
@@ -82,7 +76,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.10);
     position: relative;
     overflow: hidden;
-
     &::before,
     &::after {
         content: '';
@@ -91,7 +84,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         pointer-events: none;
         z-index: 0;
     }
-
     &::before {
         width: 280px;
         height: 280px;
@@ -99,7 +91,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         top: -100px;
         right: -60px;
     }
-
     &::after {
         width: 160px;
         height: 160px;
@@ -107,11 +98,9 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         bottom: -60px;
         left: 40px;
     }
-
     &__left {
         position: relative;
         z-index: 1;
-
         h1 {
             margin: 0;
             font-size: 28px;
@@ -120,7 +109,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
             line-height: 1.2;
             letter-spacing: -0.02em;
         }
-
         p {
             margin: 8px 0 0;
             font-size: 14px;
@@ -129,7 +117,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
             line-height: 1.6;
         }
     }
-
     &__badge {
         display: inline-block;
         font-size: 10px;
@@ -142,7 +129,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         margin-bottom: 10px;
         backdrop-filter: blur(4px);
     }
-
     &__actions {
         display: flex;
         align-items: center;
@@ -159,22 +145,18 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
     border-color: rgba(255, 255, 255, 0.28);
     color: white;
     box-shadow: none;
-
     mat-icon {
         color: white !important;
     }
-
     &:hover {
         background: rgba(255, 255, 255, 0.28);
         border-color: rgba(255, 255, 255, 0.45);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
     }
-
     &:active {
         background: rgba(255, 255, 255, 0.35);
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  KPI CARDS
@@ -198,7 +180,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
     transition: transform $transition-fast, box-shadow $transition-fast;
     position: relative;
     overflow: hidden;
-
     &::after {
         content: '';
         position: absolute;
@@ -208,12 +189,10 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         width: 4px;
         border-radius: 0 4px 4px 0;
     }
-
     &:hover {
         transform: translateY(-3px);
         box-shadow: $shadow-lg;
     }
-
     &__icon {
         display: flex;
         align-items: center;
@@ -223,24 +202,20 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         border-radius: $radius-sm;
         flex-shrink: 0;
         transition: transform $transition-fast;
-
         mat-icon {
             font-size: 24px;
             width: 24px;
             height: 24px;
         }
     }
-
     &:hover &__icon {
         transform: scale(1.08);
     }
-
     &__body,
     &__info {
         display: flex;
         flex-direction: column;
     }
-
     &__value {
         font-size: 32px;
         font-weight: 800;
@@ -248,7 +223,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         line-height: 1;
         letter-spacing: -0.03em;
     }
-
     &__label {
         font-size: 11px;
         font-weight: 700;
@@ -257,92 +231,73 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         color: $text-muted;
         margin-top: 5px;
     }
-
     &--indigo {
         &::after {
             background: $primary;
         }
-
         .kpi-card__icon {
             background: linear-gradient(135deg, $primary-50, $primary-100);
-
             mat-icon {
                 color: $primary;
             }
         }
     }
-
     &--emerald {
         &::after {
             background: $emerald;
         }
-
         .kpi-card__icon {
             background: linear-gradient(135deg, $emerald-50, $emerald-100);
-
             mat-icon {
                 color: $emerald;
             }
         }
     }
-
     &--amber {
         &::after {
             background: $amber;
         }
-
         .kpi-card__icon {
             background: linear-gradient(135deg, $amber-50, $amber-100);
-
             mat-icon {
                 color: $amber;
             }
         }
     }
-
     &--rose {
         &::after {
             background: $rose;
         }
-
         .kpi-card__icon {
             background: linear-gradient(135deg, $rose-50, $rose-100);
-
             mat-icon {
                 color: $rose;
             }
         }
     }
-
     &--sky {
         &::after {
             background: $sky;
         }
-
         .kpi-card__icon {
             background: linear-gradient(135deg, $sky-50, $sky-100);
-
             mat-icon {
                 color: $sky;
             }
         }
     }
-
     &--violet {
         &::after {
             background: $violet;
         }
-
         .kpi-card__icon {
             background: linear-gradient(135deg, $violet-50, $violet-100);
-
             mat-icon {
                 color: $violet;
             }
         }
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  FILTERS BAR
@@ -359,13 +314,11 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
     background: white;
     border: 1px solid $glass-border;
     box-shadow: $shadow-xs;
-
     &__group {
         display: flex;
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
-
         select,
         input[type="text"],
         input[type="date"],
@@ -378,20 +331,17 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
             color: $text-primary;
             font-weight: 500;
             transition: border-color $transition-fast, box-shadow $transition-fast, background $transition-fast;
-
             &:focus {
                 outline: none;
                 border-color: $border-focus;
                 box-shadow: $focus-ring;
                 background: white;
             }
-
             &::placeholder {
                 color: $text-muted;
                 font-weight: 400;
             }
         }
-
         select {
             cursor: pointer;
             appearance: none;
@@ -401,14 +351,12 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
             padding-right: 34px;
         }
     }
-
     &__icon {
         color: $text-muted;
         font-size: 20px;
         width: 20px;
         height: 20px;
     }
-
     &__search {
         padding: 10px 14px;
         border-radius: $radius-sm;
@@ -419,20 +367,17 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         min-width: 300px;
         font-weight: 500;
         transition: border-color $transition-fast, box-shadow $transition-fast, background $transition-fast;
-
         &:focus {
             outline: none;
             border-color: $border-focus;
             box-shadow: $focus-ring;
             background: white;
         }
-
         &::placeholder {
             color: $text-muted;
             font-weight: 400;
         }
     }
-
     &__count {
         font-size: 12px;
         color: $text-secondary;
@@ -443,7 +388,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
         border-radius: 20px;
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  DATA TABLE - PREMIUM
@@ -456,7 +400,6 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
     box-shadow: $shadow-md;
     overflow: hidden;
     position: relative;
-
     // Decorative top line
     &::before {
         content: '';
@@ -475,14 +418,12 @@ table.admin-table {
     border-collapse: separate;
     border-spacing: 0;
     font-size: 13px;
-
     // ── Header ──
     thead {
         position: sticky;
         top: 0;
         z-index: 2;
     }
-
     th {
         padding: 14px 20px;
         text-align: left;
@@ -498,20 +439,16 @@ table.admin-table {
         user-select: none;
         transition: color $transition-fast, background $transition-fast;
         position: relative;
-
         &:first-child {
             padding-left: 24px;
         }
-
         &:last-child {
             padding-right: 24px;
         }
-
         &:hover {
             color: $primary;
             background: #f1f5f9;
         }
-
         &::after {
             display: inline-block;
             margin-left: 6px;
@@ -520,29 +457,24 @@ table.admin-table {
             opacity: 0;
             transition: opacity $transition-fast;
         }
-
         &.sorted-asc,
         &.sorted-desc {
             color: $primary;
             font-weight: 800;
             background: $primary-50;
-
             &::after {
                 opacity: 1;
             }
         }
-
         &.sorted-asc::after {
             content: '\25B2';
             color: $primary;
         }
-
         &.sorted-desc::after {
             content: '\25BC';
             color: $primary;
         }
     }
-
     // ── Body ──
     td {
         padding: 16px 20px;
@@ -551,15 +483,12 @@ table.admin-table {
         vertical-align: middle;
         font-weight: 500;
         line-height: 1.4;
-
         &:first-child {
             padding-left: 24px;
         }
-
         &:last-child {
             padding-right: 24px;
         }
-
         strong {
             color: $text-secondary;
             font-weight: 700;
@@ -567,67 +496,53 @@ table.admin-table {
             font-variant-numeric: tabular-nums;
         }
     }
-
     tbody tr:last-child td {
         border-bottom: none;
     }
-
     // ── Alternating rows ──
     tbody tr:nth-child(even) {
         background: rgba(248, 250, 252, 0.6);
     }
-
     // ── Row interactivity ──
     tbody tr {
         transition: background $transition-fast, box-shadow $transition-fast;
         cursor: pointer;
-
         &:hover {
             background: rgba(99, 102, 241, 0.04);
-
             td:first-child {
                 box-shadow: inset 3px 0 0 rgba(99, 102, 241, 0.4);
             }
         }
-
         &.row--selected {
             background: rgba(99, 102, 241, 0.07);
-
             td:first-child {
                 box-shadow: inset 3px 0 0 $primary;
             }
         }
     }
-
     // ── Nested tables ──
     &--nested {
         margin-top: 14px;
         border: 1px solid $border-default;
         border-radius: $radius-sm;
         overflow: hidden;
-
         &::before {
             display: none;
         }
-
         th {
             background: $border-light;
             padding: 10px 14px;
             font-size: 10px;
             border-bottom-width: 1px;
         }
-
         td {
             padding: 10px 14px;
             font-size: 12px;
         }
-
         tbody tr {
             cursor: default;
-
             &:hover {
                 background: rgba(99, 102, 241, 0.02);
-
                 td:first-child {
                     box-shadow: none;
                 }
@@ -649,91 +564,75 @@ table.admin-table {
     gap: 6px;
     align-items: center;
     white-space: nowrap;
-
     // Override: all table action buttons use light pastel style
     .btn {
         border-radius: 8px;
         box-shadow: none;
         transition: all $transition-fast;
     }
-
     .btn--primary {
         background: $primary-50;
         color: $primary;
         border-color: $primary-100;
         box-shadow: none;
-
         mat-icon {
             color: $primary;
         }
-
         &:hover {
             background: $primary-100;
             border-color: $primary-light;
             filter: none;
         }
     }
-
     .btn--danger {
         background: $rose-50;
         color: #e11d48;
         border-color: $rose-100;
         box-shadow: none;
-
         mat-icon {
             color: #e11d48;
         }
-
         &:hover {
             background: $rose-100;
             border-color: $rose;
             filter: none;
         }
     }
-
     .btn--success {
         background: $emerald-50;
         color: #059669;
         border-color: $emerald-100;
         box-shadow: none;
-
         mat-icon {
             color: #059669;
         }
-
         &:hover {
             background: $emerald-100;
             border-color: $emerald;
             filter: none;
         }
     }
-
     .btn--outline {
         background: $sky-50;
         color: #0284c7;
         border-color: $sky-100;
         box-shadow: none;
-
         mat-icon {
             color: #0284c7;
         }
-
         &:hover {
             background: $sky-100;
             border-color: $sky;
         }
     }
-
     .btn--warning {
         background: $amber-50;
         color: #d97706;
         border-color: $amber-100;
         box-shadow: none;
-
         mat-icon {
             color: #d97706;
         }
-
         &:hover {
             background: $amber-100;
             border-color: $amber;
@@ -748,7 +647,6 @@ table.admin-table {
         font-size: 13px;
         line-height: 1.3;
     }
-
     &__email {
         font-size: 11px;
         color: $text-muted;
@@ -756,7 +654,6 @@ table.admin-table {
         line-height: 1.3;
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  BADGES
@@ -772,50 +669,42 @@ table.admin-table {
     white-space: nowrap;
     letter-spacing: 0.01em;
     line-height: 1.4;
-
     &--success {
         background: linear-gradient(135deg, $emerald-50, $emerald-100);
         color: #047857;
         border: 1px solid rgba(16, 185, 129, 0.18);
     }
-
     &--warning {
         background: linear-gradient(135deg, $amber-50, $amber-100);
         color: #b45309;
         border: 1px solid rgba(245, 158, 11, 0.18);
     }
-
     &--danger {
         background: linear-gradient(135deg, $rose-50, $rose-100);
         color: #be123c;
         border: 1px solid rgba(239, 68, 68, 0.18);
     }
-
     &--info {
         background: linear-gradient(135deg, $sky-50, $sky-100);
         color: #0369a1;
         border: 1px solid rgba(14, 165, 233, 0.18);
     }
-
     &--neutral {
         background: linear-gradient(135deg, #f8fafc, $border-light);
         color: $text-secondary;
         border: 1px solid rgba(0, 0, 0, 0.06);
     }
-
     &--indigo {
         background: linear-gradient(135deg, $primary-50, $primary-100);
         color: #3730a3;
         border: 1px solid rgba(99, 102, 241, 0.18);
     }
-
     &--purple {
         background: linear-gradient(135deg, $violet-50, $violet-100);
         color: #5b21b6;
         border: 1px solid rgba(124, 58, 237, 0.18);
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  BUTTONS
@@ -836,136 +725,112 @@ table.admin-table {
     text-decoration: none;
     white-space: nowrap;
     line-height: 1;
-
     mat-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
     }
-
     &:hover {
         background: #f8fafc;
         border-color: #cbd5e1;
         box-shadow: $shadow-xs;
     }
-
     &:active {
         transform: scale(0.97);
     }
-
     &:disabled {
         opacity: 0.5;
         cursor: default;
         pointer-events: none;
     }
-
     &--primary {
         background: $primary-50;
         color: $primary;
         border-color: $primary-100;
         box-shadow: none;
-
         mat-icon {
             color: $primary;
         }
-
         &:hover {
             background: $primary-100;
             border-color: $primary-light;
             box-shadow: $shadow-xs;
         }
-
         &:active {
             background: #d0d5f7;
         }
     }
-
     &--outline {
         background: transparent;
         color: $primary;
         border-color: rgba(99, 102, 241, 0.3);
-
         &:hover {
             background: rgba(99, 102, 241, 0.05);
             border-color: rgba(99, 102, 241, 0.5);
         }
     }
-
     &--ghost {
         background: transparent;
         color: $text-secondary;
         border-color: transparent;
-
         &:hover {
             background: $border-light;
         }
     }
-
     &--success {
         background: $emerald-50;
         color: #059669;
         border-color: #d1fae5;
         box-shadow: none;
-
         &:hover {
             background: $emerald-100;
             border-color: $emerald;
         }
     }
-
     &--danger {
         background: $rose-50;
         color: #e11d48;
         border-color: #ffe4e6;
         box-shadow: none;
-
         &:hover {
             background: $rose-100;
             border-color: $rose;
         }
     }
-
     &--warning {
         background: $amber-50;
         color: #d97706;
         border-color: #fef3c7;
         box-shadow: none;
-
         &:hover {
             background: $amber-100;
             border-color: $amber;
         }
     }
-
     &--info {
         background: $sky-50;
         color: #0284c7;
         border-color: #e0f2fe;
         box-shadow: none;
-
         &:hover {
             background: $sky-100;
             border-color: $sky;
         }
     }
-
     &--sm {
         padding: 8px 16px;
         font-size: 12px;
-
         mat-icon {
             font-size: 16px;
             width: 16px;
             height: 16px;
         }
     }
-
     &--xs {
         padding: 6px 10px;
         font-size: 11px;
         gap: 4px;
         border-radius: 8px;
-
         mat-icon {
             font-size: 14px;
             width: 14px;
@@ -973,7 +838,6 @@ table.admin-table {
         }
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  EMPTY & LOADING STATES
@@ -985,7 +849,6 @@ table.admin-table {
     justify-content: center;
     padding: 64px 24px;
     text-align: center;
-
     mat-icon {
         font-size: 64px;
         width: 64px;
@@ -993,7 +856,6 @@ table.admin-table {
         color: $border-default;
         margin-bottom: 18px;
     }
-
     p {
         font-size: 14px;
         color: $text-muted;
@@ -1013,13 +875,11 @@ table.admin-table {
     color: $text-secondary;
     font-size: 14px;
     font-weight: 500;
-
     &--sm {
         padding: 28px;
         gap: 10px;
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  EDITOR / FORM PANEL
@@ -1033,7 +893,6 @@ table.admin-table {
     box-shadow: $shadow-sm;
     position: relative;
     overflow: hidden;
-
     // Accent left bar
     &::before {
         content: '';
@@ -1044,7 +903,6 @@ table.admin-table {
         width: 4px;
         background: $primary-gradient;
     }
-
     >h3 {
         display: flex;
         align-items: center;
@@ -1055,7 +913,6 @@ table.admin-table {
         margin: 0 0 22px;
         padding-bottom: 16px;
         border-bottom: 1px solid $border-light;
-
         mat-icon {
             color: $primary;
             font-size: 22px;
@@ -1063,18 +920,15 @@ table.admin-table {
             height: 22px;
         }
     }
-
     &__grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 18px;
     }
-
     &__field {
         display: flex;
         flex-direction: column;
         gap: 7px;
-
         >span:first-child,
         >label:first-child {
             font-size: 11px;
@@ -1083,7 +937,6 @@ table.admin-table {
             letter-spacing: 0.06em;
             color: $text-secondary;
         }
-
         input,
         select,
         textarea {
@@ -1095,20 +948,17 @@ table.admin-table {
             color: $text-primary;
             font-weight: 500;
             transition: border-color $transition-fast, box-shadow $transition-fast, background $transition-fast;
-
             &:focus {
                 outline: none;
                 border-color: $border-focus;
                 box-shadow: $focus-ring;
                 background: white;
             }
-
             &::placeholder {
                 color: $text-muted;
                 font-weight: 400;
             }
         }
-
         select {
             cursor: pointer;
             appearance: none;
@@ -1117,17 +967,14 @@ table.admin-table {
             background-position: right 12px center;
             padding-right: 34px;
         }
-
         textarea {
             resize: vertical;
             min-height: 80px;
         }
-
         &--full {
             grid-column: 1 / -1;
         }
     }
-
     &__actions {
         margin-top: 22px;
         display: flex;
@@ -1137,7 +984,6 @@ table.admin-table {
         border-top: 1px solid $border-light;
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  DETAIL PANEL - PREMIUM
@@ -1150,7 +996,6 @@ table.admin-table {
     box-shadow: $shadow-md;
     overflow: hidden;
     position: relative;
-
     // Decorative top bar
     &::before {
         content: '';
@@ -1161,14 +1006,12 @@ table.admin-table {
         height: 3px;
         background: linear-gradient(90deg, $violet, $primary, $sky);
     }
-
     &__header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 22px 28px 18px;
         border-bottom: 1px solid $border-light;
-
         h3 {
             margin: 0;
             font-size: 18px;
@@ -1179,14 +1022,12 @@ table.admin-table {
             gap: 10px;
         }
     }
-
     &__grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 14px;
         padding: 22px 28px;
     }
-
     &__field {
         display: flex;
         flex-direction: column;
@@ -1196,12 +1037,10 @@ table.admin-table {
         background: #f8fafc;
         border: 1px solid $border-light;
         transition: border-color $transition-fast, box-shadow $transition-fast;
-
         &:hover {
             border-color: rgba(99, 102, 241, 0.15);
             box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
         }
-
         label {
             font-size: 10px;
             font-weight: 700;
@@ -1209,24 +1048,20 @@ table.admin-table {
             letter-spacing: 0.08em;
             color: $text-muted;
         }
-
         span {
             font-size: 14px;
             color: $text-primary;
             font-weight: 600;
             line-height: 1.4;
         }
-
         &--full {
             grid-column: 1 / -1;
         }
     }
-
     &__resolve {
         margin: 0 28px;
         padding: 22px 0;
         border-top: 2px dashed rgba(99, 102, 241, 0.12);
-
         h4 {
             font-size: 15px;
             font-weight: 800;
@@ -1234,7 +1069,6 @@ table.admin-table {
             margin: 0 0 14px;
         }
     }
-
     &__actions {
         padding: 0 28px 22px;
         display: flex;
@@ -1255,14 +1089,12 @@ table.admin-table {
     resize: vertical;
     min-height: 80px;
     transition: border-color $transition-fast, box-shadow $transition-fast;
-
     &:focus {
         outline: none;
         border-color: $border-focus;
         box-shadow: $focus-ring;
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  PAGINATION
@@ -1278,7 +1110,6 @@ table.admin-table {
     background: white;
     border: 1px solid $glass-border;
     box-shadow: $shadow-xs;
-
     &__info {
         font-size: 13px;
         color: $text-secondary;
@@ -1286,7 +1117,6 @@ table.admin-table {
         white-space: nowrap;
     }
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  TABS
@@ -1300,7 +1130,6 @@ table.admin-table {
     background: $border-light;
     width: fit-content;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
-
     &__tab {
         display: inline-flex;
         align-items: center;
@@ -1314,17 +1143,14 @@ table.admin-table {
         color: $text-secondary;
         cursor: pointer;
         transition: all $transition-fast;
-
         mat-icon {
             font-size: 18px;
             width: 18px;
             height: 18px;
         }
-
         &:hover {
             color: $text-primary;
         }
-
         &--active {
             background: white;
             color: $primary;
@@ -1334,13 +1160,11 @@ table.admin-table {
     }
 }
 
-
 // ═══════════════════════════════════════════════════════════════
 //  INSTRUMENTS (Modules page)
 // ═══════════════════════════════════════════════════════════════
 .instruments-section {
     margin-top: 24px;
-
     >h3 {
         display: flex;
         align-items: center;
@@ -1349,7 +1173,6 @@ table.admin-table {
         font-weight: 800;
         color: $text-primary;
         margin: 0 0 16px;
-
         mat-icon {
             color: $primary;
         }
@@ -1363,12 +1186,10 @@ table.admin-table {
     margin-bottom: 12px;
     overflow: hidden;
     transition: border-color $transition-normal, box-shadow $transition-normal;
-
     &--open {
         border-color: rgba(99, 102, 241, 0.2);
         box-shadow: $shadow-md;
     }
-
     &__header {
         display: flex;
         align-items: center;
@@ -1376,33 +1197,27 @@ table.admin-table {
         padding: 16px 22px;
         cursor: pointer;
         transition: background $transition-fast;
-
         &:hover {
             background: rgba(99, 102, 241, 0.02);
         }
     }
-
     &__title {
         display: flex;
         align-items: center;
         gap: 10px;
         font-size: 14px;
         color: $text-primary;
-
         mat-icon {
             color: $primary;
         }
-
         strong {
             font-weight: 700;
         }
     }
-
     &__body {
         padding: 0 22px 22px;
         border-top: 1px solid $border-light;
     }
-
     &__desc {
         font-size: 13px;
         color: $text-secondary;
@@ -1417,7 +1232,6 @@ table.admin-table {
     padding: 14px 0;
     font-weight: 500;
 }
-
 
 // ═══════════════════════════════════════════════════════════════
 //  AVATAR
@@ -1438,7 +1252,6 @@ table.admin-table {
     flex-shrink: 0;
 }
 
-
 // ═══════════════════════════════════════════════════════════════
 //  UTILITIES
 // ═══════════════════════════════════════════════════════════════
@@ -1448,7 +1261,6 @@ table.admin-table {
     font-weight: 500;
 }
 
-
 // ═══════════════════════════════════════════════════════════════
 //  RESPONSIVE
 // ═══════════════════════════════════════════════════════════════
@@ -1456,47 +1268,118 @@ table.admin-table {
     .admin-page-wrapper {
         padding: 18px 16px 40px;
     }
-
     .admin-page-header {
         flex-direction: column;
         gap: 16px;
         padding: 24px 22px;
-
+        &__left h1 {
+            font-size: 22px;
+        }
         &__actions {
             align-self: flex-start;
+            flex-wrap: wrap;
         }
     }
-
     .kpi-row {
         grid-template-columns: repeat(2, 1fr);
     }
-
     .admin-filters {
         flex-direction: column;
         align-items: stretch;
-
+        &__group {
+            flex-wrap: wrap;
+            gap: 8px;
+            select,
+            input[type="text"],
+            input[type="date"],
+            input[type="number"] {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
         &__search {
             min-width: unset;
+            width: 100%;
         }
     }
-
     .editor-panel__grid,
     .detail-panel__grid {
         grid-template-columns: 1fr;
     }
-
     .admin-tabs {
         width: 100%;
-
+        overflow-x: auto;
         &__tab {
             flex: 1;
             justify-content: center;
+            padding: 10px 12px;
+            font-size: 12px;
         }
+    }
+    // Make all tables scroll horizontally on mobile
+    .admin-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    table.admin-table {
+        min-width: 600px;
+        th,
+        td {
+            padding: 12px 14px;
+            &:first-child {
+                padding-left: 14px;
+            }
+            &:last-child {
+                padding-right: 14px;
+            }
+        }
+    }
+    .editor-panel {
+        padding: 20px 18px;
+    }
+    .detail-panel {
+        &__header {
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 18px 18px 14px;
+        }
+        &__grid {
+            padding: 16px 18px;
+        }
+        &__resolve,
+        &__actions {
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+    }
+    .pagination {
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
     }
 }
 
 @media (max-width: 480px) {
     .kpi-row {
         grid-template-columns: 1fr;
+    }
+    .kpi-card {
+        padding: 16px 18px;
+        &__value {
+            font-size: 24px;
+        }
+    }
+    .admin-page-header {
+        padding: 20px 16px;
+        &__left h1 {
+            font-size: 18px;
+        }
+        &__left p {
+            font-size: 13px;
+        }
+    }
+    .btn {
+        padding: 8px 14px;
+        font-size: 12px;
     }
 }

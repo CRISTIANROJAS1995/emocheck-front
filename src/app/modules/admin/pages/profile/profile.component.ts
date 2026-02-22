@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { UsersService, UserProfileDto } from 'app/core/services/users.service';
+import { AuthService } from 'app/core/services/auth.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 
 @Component({
@@ -39,7 +40,29 @@ export class ProfileComponent implements OnInit {
         { validators: [ProfileComponent.passwordsMatchValidator] }
     );
 
-    constructor(private readonly fb: FormBuilder, private readonly users: UsersService) { }
+    constructor(
+        private readonly fb: FormBuilder,
+        private readonly users: UsersService,
+        private readonly auth: AuthService,
+    ) { }
+
+    get backRoute(): string {
+        // Primary: use in-memory user (available after rehydration)
+        let roles = this.auth.getCurrentUser()?.roles ?? [];
+
+        // Fallback: read from localStorage cache so the button works
+        // immediately on page load before the async rehydration completes
+        if (!roles.length) {
+            try {
+                const stored = localStorage.getItem('emocheck_user');
+                if (stored) {
+                    roles = JSON.parse(stored)?.roles ?? [];
+                }
+            } catch { /* ignore */ }
+        }
+
+        return roles.includes('SystemAdmin') ? '/admin' : '/home';
+    }
 
     ngOnInit(): void {
         this.load();

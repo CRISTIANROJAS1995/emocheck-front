@@ -171,6 +171,24 @@
                     </select>
                 </label>
             </div>
+
+            <!-- Roles -->
+            <div class="editor-panel__roles">
+                <span class="editor-panel__roles-label">
+                    <mat-icon>shield</mat-icon> Roles asignados
+                    @if (savingRole) {
+                    <mat-progress-spinner diameter="14" mode="indeterminate" style="display:inline-block;margin-left:6px"></mat-progress-spinner>
+                    }
+                </span>
+                <div class="editor-panel__roles-grid">
+                    @for (role of roleOptions; track role.id) {
+                    <button type="button" class="role-toggle" [class.role-toggle--active]="hasEditRole(role.id)" [disabled]="savingRole" (click)="toggleEditRole(role.id)">
+                        <mat-icon>{{ hasEditRole(role.id) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                        {{ role.name }}
+                    </button> }
+                </div>
+            </div>
+
             <div class="editor-panel__actions">
                 <button type="button" class="btn btn--ghost" (click)="cancelEdit()">Cancelar</button>
                 <button type="submit" class="btn btn--primary" [disabled]="saving">

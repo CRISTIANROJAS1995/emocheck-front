@@ -8,9 +8,16 @@ $gray-200: #e5e7eb;
 $gray-600: #4b5563;
 $gray-700: #374151;
 $gray-900: #111827;
+:host {
+    display: block;
+    width: 100%;
+}
+
 .catalogs-page {
     padding: 2rem;
     max-width: 1200px;
+    width: 100%;
+    box-sizing: border-box;
     margin: 0 auto;
 }
 
@@ -396,5 +403,107 @@ $gray-900: #111827;
         background: #fee2e2;
         color: $danger;
         border-color: $danger;
+    }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+    .catalogs-page {
+        padding: 1rem;
+    }
+    .page-header {
+        flex-direction: column;
+        gap: .625rem;
+        align-items: flex-start;
+    }
+    .btn-back {
+        align-self: flex-start;
+    }
+    // Tabs: scroll horizontally, no wrap
+    .catalog-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: .25rem;
+        // hide scrollbar but keep scrollability
+        scrollbar-width: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+    .catalog-tab {
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-size: .8125rem;
+        padding: .5rem .75rem;
+        mat-icon {
+            display: none;
+        } // hide icons on mobile to save space
+    }
+    // Toolbar: search full width, button full width below
+    .toolbar {
+        flex-direction: column;
+        gap: .5rem;
+        align-items: stretch;
+        >* {
+            width: 100%;
+            flex: none;
+        }
+        .btn-primary {
+            justify-content: center;
+        }
+    }
+    .search-input,
+    .filter-select {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+        &--wide {
+            grid-template-columns: 1fr;
+        }
+    }
+    .inline-form {
+        padding: 1rem;
+    }
+    // Table: scroll container, compact columns
+    .tab-content {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .data-table {
+        min-width: 400px;
+        th,
+        td {
+            padding: .625rem .75rem;
+        }
+        // hide less important columns on very small screens
+        .td-desc {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .catalogs-page {
+        padding: .75rem;
+    }
+    .page-title {
+        font-size: 1.125rem;
+        mat-icon {
+            width: 22px;
+            height: 22px;
+        }
+    }
+    .page-subtitle {
+        font-size: .8125rem;
+    }
+    .data-table {
+        min-width: 320px;
+        .td-id {
+            display: none;
+        } // hide ID column on very small screens
     }
 }
