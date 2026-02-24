@@ -1,7 +1,8 @@
 export const environment = {
     production: false,
-    // DEV: API local para pruebas (HTTP para evitar ERR_CERT_AUTHORITY_INVALID)
-    apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
+    // DEV: API local para pruebas
+    // apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
+    apiUrl: 'http://localhost:5230/api',
     apiTimeout: 30000,
     appName: 'EmoCheck',
     version: '1.0.0',
@@ -16,6 +17,12 @@ export const environment = {
     refreshTokenStorageKey: 'emocheck_refreshToken',
     userStorageKey: 'emocheck_user',
     tokenExpirationWarning: 300000, // 5 minutos en ms
+
+    // 🎭 Face++ Emotion Recognition API
+    // Regístrate gratis en https://www.faceplusplus.com/ para obtener tus claves
+    facePlusPlusApiKey: 'mC3lFIbRo-c-stik5BMTIW6PxzO_1dQl',      // <-- Pega tu API Key aquí
+    facePlusPlusApiSecret: 'mA2kjEWBomyByvRQWt6vVUEsgU84V1r0',   // <-- Pega tu API Secret aquí
+    facePlusPlusApiUrl: '/facepp/v3/detect',
 
     // 📞 Soporte WhatsApp (número en formato internacional sin + ni espacios)
     whatsappNumber: '573244563035',

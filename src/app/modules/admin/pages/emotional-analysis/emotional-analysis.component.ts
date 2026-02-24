@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { take } from 'rxjs';
 import { CameraService } from 'app/core/services/camera.service';
 import { EmotionalAnalysisService, EmotionalAnalysisResult } from 'app/core/services/emotional-analysis.service';
+import { FaceEmotionDetectorService, FaceExpressionResult } from 'app/core/services/face-emotion-detector.service';
 import { AuthService } from 'app/core/services/auth.service';
 
 @Component({
@@ -23,7 +24,6 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     isAnalyzing: boolean = true;
     showResults: boolean = false;
     cameraError: string = '';
-    capturedFrames: string[] = [];
     analysisError: string = '';
 
     steps = [
@@ -123,15 +123,18 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     analysisResult: EmotionalAnalysisResult | null = null;
 
     private captureInterval: any;
-    private readonly captureEveryMs = 2000;
-    private readonly maxCapturedFrames = 8;
-    private readonly framesToSend = 3;
+    private readonly detectEveryMs = 2500;  // Face++ API: 1 llamada cada 2.5s (free tier 1 QPS + latencia)
+    private readonly minDetections = 6;    // Mínimo 6 detecciones antes de enviar (~7 seg)
+    private readonly maxDetections = 10;   // Máximo 10 detecciones (~12 seg)
+    private detections: FaceExpressionResult[] = [];
     private analysisStarted = false;
+    modelLoadError: string = '';
 
     constructor(
         private _router: Router,
         private _cameraService: CameraService,
         private _emotionalAnalysisService: EmotionalAnalysisService,
+        private _faceDetector: FaceEmotionDetectorService,
         private _authService: AuthService
     ) { }
 
@@ -158,7 +161,16 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         if (!this._cameraService.isCameraSupported()) {
             this.cameraError = 'Tu navegador no soporta acceso a la cámara';
             this.isAnalyzing = false;
+            return;
         }
+
+        // Cargar modelos de face-api.js (descarga ~600KB la primera vez, luego está en cache)
+        this._faceDetector.loadModels().then(() => {
+            console.log('[EmotionalAnalysis] Face detection models loaded');
+        }).catch((err) => {
+            console.error('[EmotionalAnalysis] Failed to load face models:', err);
+            this.modelLoadError = 'No se pudieron cargar los modelos de análisis facial.';
+        });
     }
 
     ngAfterViewInit(): void {
@@ -219,11 +231,17 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     }
 
     /**
-     * Inicia el proceso de análisis
+     * Inicia el proceso de análisis usando face-api.js (detección LOCAL en el navegador)
      */
     startAnalysis(): void {
-        if (this.cameraError) {
+        if (this.cameraError || this.modelLoadError) {
             this.isAnalyzing = false;
+            return;
+        }
+
+        if (!this._faceDetector.isReady) {
+            // Models still loading, retry in 500ms
+            setTimeout(() => this.startAnalysis(), 500);
             return;
         }
 
@@ -233,41 +251,43 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         this.isAnalyzing = true;
         this.currentStep = 1;
         this.progress = 0;
-        this.capturedFrames = [];
+        this.detections = [];
+        this._faceDetector.resetCalibration(); // Auto-calibrar con la cara actual del usuario
         this.steps.forEach((s, i) => {
             s.status = i === 0 ? 'active' : 'pending';
             s.percentage = 0;
         });
 
-        // Capturar frames (solo si hay cámara y video listo)
-        if (this._cameraService.isCameraSupported() && this.videoElement) {
-            this.captureInterval = setInterval(() => {
-                const videoEl = this.videoElement?.nativeElement;
-                if (!videoEl || videoEl.readyState < 2 || !videoEl.videoWidth) return;
+        // Detectar expresiones faciales localmente cada 600ms
+        const videoEl = this.videoElement?.nativeElement;
+        if (!videoEl) return;
 
-                const frame = this._cameraService.captureFrame(videoEl, { maxWidth: 640, quality: 0.65 });
-                if (!frame) return;
+        this.captureInterval = setInterval(async () => {
+            if (!videoEl || videoEl.readyState < 2 || !videoEl.videoWidth) return;
 
-                this.capturedFrames.push(frame);
-                if (this.capturedFrames.length > this.maxCapturedFrames) {
-                    this.capturedFrames = this.capturedFrames.slice(-this.maxCapturedFrames);
-                }
+            const result = await this._faceDetector.detectExpression(videoEl);
+            if (!result) return;
 
-                // Progreso real: cuando ya tenemos suficientes frames, paramos y analizamos.
-                const needed = this.framesToSend;
-                const got = Math.min(this.capturedFrames.length, needed);
-                this.progress = Math.min(60, Math.round((got / needed) * 60));
-                this.currentStep = 1 + Math.min(2, got); // 2-3 pasos visuales mientras captura
+            if (result.faceDetected) {
+                this.detections.push(result);
+                console.log(`[Detection ${this.detections.length}] ${result.emotion} (${(result.confidence * 100).toFixed(1)}%)`);
+            }
 
-                if (this.capturedFrames.length >= needed) {
-                    this.finishAnalysis();
-                }
-            }, this.captureEveryMs);
-        }
+            // Progreso visual
+            const got = Math.min(this.detections.length, this.minDetections);
+            this.progress = Math.min(60, Math.round((got / this.minDetections) * 60));
+            this.currentStep = 1 + Math.min(2, got);
+
+            // Cuando tenemos suficientes detecciones, finalizar
+            if (this.detections.length >= this.maxDetections ||
+                (this.detections.length >= this.minDetections && this.detections.length > 0)) {
+                this.finishAnalysis();
+            }
+        }, this.detectEveryMs);
     }
 
     /**
-     * Finaliza el análisis y procesa resultados
+     * Finaliza el análisis: promedia las detecciones locales y envía al backend
      */
     async finishAnalysis(): Promise<void> {
         if (this.captureInterval) {
@@ -284,15 +304,106 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
             else s.status = 'pending';
         });
 
-        // Procesar análisis con los frames capturados
-        const frames = this.capturedFrames.slice(-this.framesToSend);
-        if (frames.length === 0) {
-            this.analysisError = 'No se pudieron capturar frames de cámara.';
+        // Promediar las detecciones de face-api.js
+        const validDetections = this.detections.filter(d => d.faceDetected);
+        if (validDetections.length === 0) {
+            this.analysisError = 'No se detectó un rostro. Asegúrate de que tu cara esté visible y bien iluminada.';
             this.isAnalyzing = false;
             return;
         }
 
-        this._emotionalAnalysisService.performFullAnalysis(frames)
+        // ================================================================
+        // SCORING: Agregar RAW SCORES de todas las detecciones.
+        // Face++ casi siempre dice "neutral" como dominante por frame,
+        // pero las emociones secundarias (sad:15%, fear:17%) son señal REAL.
+        // Promediamos los scores RAW de cada emoción y aplicamos un
+        // boost fuerte a las no-neutrales para detectarlas.
+        // ================================================================
+        const EMOTION_TO_BACKEND: Record<string, string> = {
+            happy: 'happiness', sad: 'sadness', angry: 'anger',
+            disgusted: 'contempt', fearful: 'fear', surprised: 'surprise',
+            neutral: 'neutral',
+        };
+
+        // 1. Sumar scores RAW de cada emoción en todas las detecciones
+        const sumScores: Record<string, number> = {};
+        const peakScores: Record<string, number> = {};
+        for (const d of validDetections) {
+            for (const [emo, score] of Object.entries(d.expressions)) {
+                sumScores[emo] = (sumScores[emo] || 0) + score;
+                peakScores[emo] = Math.max(peakScores[emo] || 0, score);
+            }
+        }
+
+        // 2. Promediar
+        const total = validDetections.length;
+        const avgScores: Record<string, number> = {};
+        for (const emo of Object.keys(sumScores)) {
+            avgScores[emo] = sumScores[emo] / total;
+        }
+
+        // 3. BOOST + SUPRESIÓN NEUTRAL
+        //
+        // Problema: Face++ da neutral:97.8% incluso cuando el usuario está
+        // tenso/enojado, pero SÍ da señales leves en angry/fearful/disgusted.
+        // Ej: fearful:1.4% + angry:0.04% = negativeSum:1.44%
+        //
+        // Estrategia:
+        //   a) Si negativeSum > 0.5%, suprimir neutral proporcionalmente
+        //   b) Boost 30x a emociones negativas intensas (angry, fearful, disgusted)
+        //   c) Boost 5x a sad, happy, surprised (funcionan bien sin ayuda extra)
+        //   d) Neutral sin boost (1x, pero reducido por supresión)
+        //
+        // Verificado que NO afecta los 3 que funcionan:
+        //   Happy:   negativeSum≈0.6% → suppression leve, pero happy(445%) sigue ganando
+        //   Neutral: negativeSum≈0.04% → sin suppression, neutral(99.6%) gana
+        //   Sad:     negativeSum≈0.05% → sin suppression, sad(87.5%) gana
+        //   Angry:   negativeSum≈1.44% → suppression 57%, neutral baja a 41.5%,
+        //            fearful(42%) gana → RED
+
+        const negativeIntense = (avgScores['angry'] || 0) + (avgScores['fearful'] || 0) + (avgScores['disgusted'] || 0);
+        let neutralMultiplier = 1.0;
+        if (negativeIntense > 0.005) { // > 0.5%
+            const suppressFactor = Math.min(0.85, negativeIntense * 40);
+            neutralMultiplier = 1 - suppressFactor;
+            console.log(`  [NeutralSuppression] negativeSum=${(negativeIntense * 100).toFixed(2)}%, suppress=${(suppressFactor * 100).toFixed(0)}%, neutralMult=${neutralMultiplier.toFixed(3)}`);
+        }
+
+        let dominantEmotion = 'neutral';
+        let maxScore = 0;
+        for (const [emo, avg] of Object.entries(avgScores)) {
+            let boost: number;
+            if (emo === 'neutral') {
+                boost = neutralMultiplier; // 1.0 normalmente, reducido si hay emociones negativas
+            } else if (emo === 'angry' || emo === 'fearful' || emo === 'disgusted') {
+                boost = 30; // Boost fuerte para emociones de tensión/enojo
+            } else {
+                boost = 5.0; // Boost normal para happy, sad, surprised
+            }
+            const score = avg * boost;
+            const peak = peakScores[emo] || 0;
+            console.log(`  [RawScore] ${emo}: avg=${(avg * 100).toFixed(1)}%, peak=${(peak * 100).toFixed(1)}%, boost=${boost.toFixed(1)}x, final=${(score * 100).toFixed(1)}%`);
+            if (score > maxScore) {
+                maxScore = score;
+                dominantEmotion = emo;
+            }
+        }
+
+        // 4. Mapear a nombre backend
+        dominantEmotion = EMOTION_TO_BACKEND[dominantEmotion] || dominantEmotion;
+
+        // 5. Confianza: usar el peak del score original (sin boost) para la emoción ganadora
+        //    Para neutral, usar avgScore. Para otras, usar peak (más representativo).
+        const rawKey = Object.entries(EMOTION_TO_BACKEND).find(([, v]) => v === dominantEmotion)?.[0] || dominantEmotion;
+        const avgConfidence = dominantEmotion === 'neutral'
+            ? (avgScores[rawKey] || 0.5)
+            : Math.max(avgScores[rawKey] || 0, (peakScores[rawKey] || 0) * 0.85);
+
+        console.log(`[EmotionalAnalysis] Dominant: ${dominantEmotion} (conf: ${(avgConfidence * 100).toFixed(1)}%, from ${validDetections.length} detections)`);
+        console.log('[EmotionalAnalysis] Avg scores:', avgScores);
+
+        // Enviar al backend para mapear a scores de bienestar
+        this._emotionalAnalysisService.classifyEmotion(dominantEmotion, avgConfidence)
             .subscribe({
                 next: (result) => {
                     this.analysisResult = result;
@@ -358,7 +469,7 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
      */
     retryAnalysis(): void {
         this.analysisError = '';
-        this.capturedFrames = [];
+        this.detections = [];
         this.analysisStarted = false;
         this.progress = 0;
         this.currentStep = 1;

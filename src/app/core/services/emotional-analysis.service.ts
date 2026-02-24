@@ -30,6 +30,13 @@ interface EmotionalAnalysisApiRequest {
     createAlertOnFatigue: boolean;
 }
 
+interface EmotionClassificationApiRequest {
+    evaluationID?: number;
+    emotion: string;
+    confidence: number;
+    createAlertOnFatigue: boolean;
+}
+
 interface EmotionalAnalysisApiResponse {
     attention: number;
     concentration: number;
@@ -58,7 +65,7 @@ export class EmotionalAnalysisService {
     }
 
     /**
-     * Realiza un análisis completo con múltiples capturas.
+     * Realiza un análisis completo con múltiples capturas (vía Azure OpenAI — legacy).
      */
     performFullAnalysis(frames: string[]): Observable<EmotionalAnalysisResult> {
         const payload: EmotionalAnalysisApiRequest = {
@@ -68,26 +75,41 @@ export class EmotionalAnalysisService {
 
         return this.http
             .post<EmotionalAnalysisApiResponse>(`${this.apiUrl}/evaluation/emotional-analysis`, payload)
-            .pipe(
-                map((res) => {
-                    // Check if analysis was unavailable (backend returned isAvailable: false)
-                    const anyRes = res as any;
-                    if (anyRes.isAvailable === false) {
-                        throw new Error(anyRes.unavailableReason || 'El análisis emocional no está disponible en este momento.');
-                    }
-                    return {
-                        attention: this.clampScore(res.attention),
-                        concentration: this.clampScore(res.concentration),
-                        balance: this.clampScore(res.balance),
-                        positivity: this.clampScore(res.positivity),
-                        calm: this.clampScore(res.calm),
-                        fatigueScore: typeof res.fatigueScore === 'number' ? res.fatigueScore : undefined,
-                        dominantEmotion: typeof res.dominantEmotion === 'string' ? res.dominantEmotion : undefined,
-                        alertCreated: typeof res.alertCreated === 'boolean' ? res.alertCreated : undefined,
-                        timestamp: res.timestamp ? new Date(res.timestamp) : new Date(),
-                    };
-                })
-            );
+            .pipe(map((res) => this.mapResponse(res)));
+    }
+
+    /**
+     * Envía la emoción detectada por face-api.js al backend para mapear a scores.
+     * NO envía imágenes — la detección se hizo en el navegador.
+     */
+    classifyEmotion(emotion: string, confidence: number): Observable<EmotionalAnalysisResult> {
+        const payload: EmotionClassificationApiRequest = {
+            emotion,
+            confidence,
+            createAlertOnFatigue: true,
+        };
+
+        return this.http
+            .post<EmotionalAnalysisApiResponse>(`${this.apiUrl}/evaluation/emotional-analysis/classify`, payload)
+            .pipe(map((res) => this.mapResponse(res)));
+    }
+
+    private mapResponse(res: EmotionalAnalysisApiResponse): EmotionalAnalysisResult {
+        const anyRes = res as any;
+        if (anyRes.isAvailable === false) {
+            throw new Error(anyRes.unavailableReason || 'El análisis emocional no está disponible en este momento.');
+        }
+        return {
+            attention: this.clampScore(res.attention),
+            concentration: this.clampScore(res.concentration),
+            balance: this.clampScore(res.balance),
+            positivity: this.clampScore(res.positivity),
+            calm: this.clampScore(res.calm),
+            fatigueScore: typeof res.fatigueScore === 'number' ? res.fatigueScore : undefined,
+            dominantEmotion: typeof res.dominantEmotion === 'string' ? res.dominantEmotion : undefined,
+            alertCreated: typeof res.alertCreated === 'boolean' ? res.alertCreated : undefined,
+            timestamp: res.timestamp ? new Date(res.timestamp) : new Date(),
+        };
     }
 
     /**
