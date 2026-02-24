@@ -327,7 +327,7 @@ $gray-900: #111827;
 // ── Detail Panel ──────────────────────────────────────────────────────────────
 .detail-panel {
     background: #eef2ff;
-    border: 1px solid lighten($primary, 25%);
+    border: 1px solid #c7d2fe;
     border-radius: .75rem;
     overflow: hidden;
     &__header {
@@ -336,7 +336,7 @@ $gray-900: #111827;
         justify-content: space-between;
         padding: .875rem 1.25rem;
         background: white;
-        border-bottom: 1px solid lighten($primary, 25%);
+        border-bottom: 1px solid #c7d2fe;
         h4 {
             margin: 0;
             font-size: .9375rem;
@@ -439,7 +439,7 @@ $gray-900: #111827;
     font-weight: 600;
     color: $gray-700;
     margin: 0;
-    border-top: 1px solid lighten($primary, 25%);
+    border-top: 1px solid #c7d2fe;
     padding-top: .875rem;
 }
 
@@ -459,7 +459,7 @@ $gray-900: #111827;
         background: rgba(255, 255, 255, .6);
     }
     td {
-        border-top: 1px solid lighten($primary, 30%);
+        border-top: 1px solid #d4d8fe;
     }
 }
 
@@ -569,6 +569,39 @@ $gray-900: #111827;
     font-size: .75rem;
     color: $gray-600;
     margin-bottom: .5rem;
+}
+
+.result-card__dims {
+    margin-bottom: .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+}
+
+.result-card__dim-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .7rem;
+    color: $gray-600;
+    padding: .15rem 0;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.dim-name {
+    font-weight: 500;
+    color: $gray-700;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dim-score {
+    font-weight: 600;
+    color: $primary;
+    margin-left: .5rem;
+    flex-shrink: 0;
 }
 
 .result-card__cta {

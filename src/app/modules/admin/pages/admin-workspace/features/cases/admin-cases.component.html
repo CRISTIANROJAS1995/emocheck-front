@@ -61,11 +61,20 @@
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Alerta *</span>
-                <select [(ngModel)]="form.alertId">
+                <select [(ngModel)]="form.alertId" (ngModelChange)="onAlertChange()">
                     <option [ngValue]="0" disabled>-- Seleccionar alerta --</option>
                     @for (a of alerts; track a.alertId) {
                     <option [ngValue]="a.alertId">#{{ a.alertId }} - {{ a.alertLevel ?? 'N/A' }} - {{ a.description ??
                         'Sin descripción' | slice:0:50 }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Usuario afectado *</span>
+                <select [(ngModel)]="form.userId">
+                    <option [ngValue]="undefined" disabled>-- Seleccionar usuario --</option>
+                    @for (u of allUsers; track u.userId) {
+                    <option [ngValue]="u.userId">{{ u.fullName }} ({{ u.email }})</option>
                     }
                 </select>
             </label>

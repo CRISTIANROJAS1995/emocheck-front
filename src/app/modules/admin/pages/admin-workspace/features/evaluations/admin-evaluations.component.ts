@@ -19,11 +19,20 @@ export interface EvaluationDto {
     userName?: string | null;
     moduleID?: number;
     moduleName?: string | null;
+    assessmentModuleName?: string | null;
     status?: string | null;
     isAnonymous?: boolean;
     period?: string | null;
     startedAt?: string | null;
     completedAt?: string | null;
+    result?: {
+        evaluationResultID?: number;
+        totalScore?: number;
+        scorePercentage?: number;
+        riskLevel?: string | null;
+        calculatedAt?: string | null;
+        dimensionScores?: { dimensionName?: string | null; score?: number; maxScore?: number; percentageScore?: number; riskLevel?: string | null }[];
+    } | null;
 }
 
 export interface EvaluationResultDto {
@@ -35,6 +44,7 @@ export interface EvaluationResultDto {
     moduleID?: number;
     moduleName?: string | null;
     totalScore?: number;
+    scorePercentage?: number;
     riskLevel?: string | null;
     completedAt?: string | null;
     instrumentResults?: InstrumentResultDto[];
@@ -137,27 +147,40 @@ export class AdminEvaluationsComponent implements OnInit {
         this.selectedResultId = null;
         this.selectedResult = null;
         this.loadEvaluations();
-        this.loadResults();
     }
 
     loadEvaluations(): void {
         if (!this.selectedUserId) return;
         this.loadingEvals = true;
+        this.loadingResults = true;
         this.http.get<unknown>(`${this.apiUrl}/evaluation/user/${this.selectedUserId}`).pipe(
             map(r => this.unwrap<EvaluationDto>(r)),
             catchError(() => of([])),
-            finalize(() => this.loadingEvals = false)
-        ).subscribe(evals => this.evaluations = evals);
+            finalize(() => { this.loadingEvals = false; this.loadingResults = false; })
+        ).subscribe(evals => {
+            this.evaluations = evals;
+            // Derive results from completed evaluations that have an embedded result
+            this.results = evals
+                .filter(e => e.result?.evaluationResultID)
+                .map(e => ({
+                    evaluationResultID: e.result!.evaluationResultID,
+                    evaluationID: e.evaluationID,
+                    moduleName: e.moduleName || e.assessmentModuleName || null,
+                    totalScore: e.result!.totalScore,
+                    scorePercentage: e.result!.scorePercentage,
+                    riskLevel: e.result!.riskLevel,
+                    completedAt: e.result!.calculatedAt || e.completedAt,
+                    instrumentResults: (e.result!.dimensionScores ?? []).map(d => ({
+                        instrumentName: d.dimensionName ?? '-',
+                        score: d.percentageScore ?? (d.maxScore ? Math.round((d.score! / d.maxScore) * 100) : d.score),
+                        riskLevel: d.riskLevel,
+                    })),
+                } as EvaluationResultDto));
+        });
     }
 
     loadResults(): void {
-        if (!this.selectedUserId) return;
-        this.loadingResults = true;
-        this.http.get<unknown>(`${this.apiUrl}/evaluation/results/user/${this.selectedUserId}`).pipe(
-            map(r => this.unwrap<EvaluationResultDto>(r)),
-            catchError(() => of([])),
-            finalize(() => this.loadingResults = false)
-        ).subscribe(results => this.results = results);
+        // Results are now derived from evaluations in loadEvaluations()
     }
 
     viewDetail(evaluationId: number): void {
@@ -197,8 +220,19 @@ export class AdminEvaluationsComponent implements OnInit {
     riskColor(level: string | null | undefined): string {
         const map: Record<string, string> = {
             LOW: 'badge--green', MODERATE: 'badge--yellow', HIGH: 'badge--orange', SEVERE: 'badge--red',
+            GREEN: 'badge--green', YELLOW: 'badge--yellow', RED: 'badge--red',
         };
         return map[(level ?? '').toUpperCase()] ?? 'badge--gray';
+    }
+
+    riskLabel(level: string | null | undefined): string {
+        const map: Record<string, string> = {
+            LOW: 'Bajo', GREEN: 'Bajo',
+            MODERATE: 'Moderado', MEDIUM: 'Moderado', YELLOW: 'Moderado',
+            HIGH: 'Alto', RED: 'Alto',
+            SEVERE: 'Severo',
+        };
+        return map[(level ?? '').toUpperCase()] ?? (level || 'N/A');
     }
 
     statusColor(status: string | null | undefined): string {

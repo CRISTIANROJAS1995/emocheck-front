@@ -222,12 +222,22 @@
                     <div class="result-card" (click)="viewResult(r)">
                         <div class="result-card__header">
                             <span class="result-card__module">{{ r.moduleName || 'Módulo' }}</span>
-                            <span class="badge" [class]="riskColor(r.riskLevel)">{{ r.riskLevel || 'N/A' }}</span>
+                            <span class="badge" [class]="riskColor(r.riskLevel)">{{ riskLabel(r.riskLevel) }}</span>
                         </div>
                         <div class="result-card__score">
-                            <span class="score-value">{{ r.totalScore ?? 0 }}</span>
-                            <span class="score-label">puntos</span>
+                            <span class="score-value">{{ r.scorePercentage ?? r.totalScore ?? 0 }}</span>
+                            <span class="score-label">/100</span>
                         </div>
+                        @if (r.instrumentResults && r.instrumentResults.length > 0) {
+                        <div class="result-card__dims">
+                            @for (d of r.instrumentResults; track d.instrumentID) {
+                            <div class="result-card__dim-row">
+                                <span class="dim-name">{{ d.instrumentName }}</span>
+                                <span class="dim-score">{{ d.score ?? '-' }}%</span>
+                            </div>
+                            }
+                        </div>
+                        }
                         <div class="result-card__date">{{ r.completedAt | date:'dd/MM/yyyy HH:mm' }}</div>
                         <div class="result-card__cta">Ver detalle →</div>
                     </div>

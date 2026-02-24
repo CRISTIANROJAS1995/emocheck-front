@@ -45,6 +45,7 @@ export class AdminCasesComponent implements OnInit {
     // Dropdown data
     alerts: AdminAlertDto[] = [];
     psychologists: AdminUserListItemDto[] = [];
+    allUsers: AdminUserListItemDto[] = [];
 
     // New follow-up form
     newFollowUpNotes = '';
@@ -88,6 +89,7 @@ export class AdminCasesComponent implements OnInit {
             users: this.usersService.listUsers().pipe(catchError(() => of([]))),
         }).subscribe(({ alerts, users }) => {
             this.alerts = alerts;
+            this.allUsers = users;
             this.psychologists = users.filter(u =>
                 (u.roles ?? []).some(r => r.toLowerCase().includes('psychologist') || r.toLowerCase().includes('psicólogo'))
             );
@@ -96,6 +98,16 @@ export class AdminCasesComponent implements OnInit {
                 this.psychologists = users;
             }
         });
+    }
+
+    /** Cuando se selecciona una alerta, pre-rellena el userId con el usuario de la alerta */
+    onAlertChange(): void {
+        const alertId = this.form.alertId;
+        if (!alertId) return;
+        const alert = this.alerts.find(a => a.alertId === alertId);
+        if (alert?.userId && typeof alert.userId === 'number') {
+            this.form.userId = alert.userId;
+        }
     }
 
     load(): void {
@@ -203,8 +215,8 @@ export class AdminCasesComponent implements OnInit {
     }
 
     createCase(): void {
-        if (!this.form.alertId || !this.form.assignedToUserID || !this.form.description) {
-            this.notify.warning('Completa todos los campos obligatorios');
+        if (!this.form.alertId || !this.form.userId || !this.form.assignedToUserID || !this.form.description) {
+            this.notify.warning('Completa todos los campos obligatorios (alerta, usuario afectado, psicólogo y descripción)');
             return;
         }
         this.saving = true;
@@ -217,7 +229,11 @@ export class AdminCasesComponent implements OnInit {
                     this.activeTab = 'list';
                     this.load();
                 },
-                error: (e) => this.notify.error(e?.message || 'Error al crear caso'),
+                error: (e) => {
+                    const body = e?.error;
+                    const msg = body?.Message || body?.message || body?.title || e?.message || 'Error al crear caso';
+                    this.notify.error(msg);
+                },
             });
     }
 
