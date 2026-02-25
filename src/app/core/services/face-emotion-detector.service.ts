@@ -361,7 +361,7 @@ export class FaceEmotionDetectorService {
 
         // Pose factor: penalizar rostros girados/inclinados
         const poseFactor = Math.max(0.2, 1 - Math.abs(yaw) / 45)
-                         * Math.max(0.3, 1 - Math.abs(pitch) / 35);
+            * Math.max(0.3, 1 - Math.abs(pitch) / 35);
 
         // Quality factor: score normalizado de Face++ (0-1)
         const qualityFactor = Math.max(0.3, fq / 100);
