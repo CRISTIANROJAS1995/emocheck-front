@@ -1,8 +1,8 @@
 {
-  "/facepp": {
-    "target": "https://api-us.faceplusplus.com",
-    "secure": true,
-    "changeOrigin": true,
-    "logLevel": "debug"
-  }
+    "/facepp": {
+        "target": "https://api-us.faceplusplus.com",
+        "secure": true,
+        "changeOrigin": true,
+        "logLevel": "debug"
+    }
 }
