@@ -2,6 +2,24 @@
 import { environment } from 'environments/environment';
 
 /**
+ * Metadatos de calidad del frame para ponderacion inteligente.
+ * Face++ provee datos de calidad facial, pose y blur que permiten
+ * dar mayor peso a frames de mejor calidad en la agregacion final.
+ */
+export interface FrameQuality {
+    /** Face quality score de Face++ (0-100, mayor = mejor) */
+    faceQuality: number;
+    /** Angulos de pose de la cabeza en grados */
+    headPose: { yaw: number; pitch: number; roll: number };
+    /** Nivel de motion blur (0-100, menor = mas nitido) */
+    motionBlur: number;
+    /** Nivel de gaussian blur (0-100, menor = mas nitido) */
+    gaussianBlur: number;
+    /** Peso combinado calculado para este frame (0-1, mayor = mas confiable) */
+    frameWeight: number;
+}
+
+/**
  * Resultado de deteccion de expresion facial.
  * Compatible con el componente emotional-analysis existente.
  */
@@ -14,10 +32,14 @@ export interface FaceExpressionResult {
     expressions: Record<string, number>;
     /** Si se detecto un rostro */
     faceDetected: boolean;
+    /** Metadatos de calidad del frame para ponderacion inteligente */
+    quality?: FrameQuality;
+    /** Timestamp de esta deteccion (ms epoch) para analisis temporal */
+    timestamp?: number;
 }
 
 /**
- * Mapeo de nombres internos (estilo face-api) -> nombres backend.
+ * Mapeo de nombres internos -> nombres backend.
  * Usamos los mismos keys internos para mantener compatibilidad con el componente.
  */
 const EMOTION_MAP: Record<string, string> = {
@@ -60,14 +82,15 @@ export class FaceEmotionDetectorService {
     private loading = false;
     private loadPromise: Promise<void> | null = null;
     private pendingRequest = false; // Throttle: evita requests simultaneos
+    private _dailyLimitExhausted = false; // Si Face++ devolvio FREE_CALL_COUNT_LIMIT
 
     // -- Canvas reutilizable para captura de frames --
     private canvas: HTMLCanvasElement | null = null;
     private ctx: CanvasRenderingContext2D | null = null;
 
-    // -- Resolucion de captura (menor = mas rapido, Face++ acepta min 48x48) --
-    private static readonly CAPTURE_WIDTH = 640;
-    private static readonly JPEG_QUALITY = 0.80;
+    // Resolucion mas alta para captar expresiones sutiles
+    private static readonly CAPTURE_WIDTH = 720;
+    private static readonly JPEG_QUALITY = 0.85;
 
     /**
      * Inicializa el servicio. Valida que las API keys esten configuradas.
@@ -96,13 +119,8 @@ export class FaceEmotionDetectorService {
             this.canvas = document.createElement('canvas');
             this.ctx = this.canvas.getContext('2d');
 
-            // Test rapido de conectividad (opcional, se puede quitar en produccion)
-            console.log('[FaceEmotionDetector] Face++ API configurada correctamente');
-            console.log('[FaceEmotionDetector] Endpoint: ' + this.apiUrl);
-
             this.modelsLoaded = true;
             this.loading = false;
-            console.log('[FaceEmotionDetector] Face++ system ready - sin modelos locales, deteccion en la nube');
         } catch (err) {
             this.loading = false;
             this.loadPromise = null;
@@ -119,13 +137,16 @@ export class FaceEmotionDetectorService {
         return this.loading;
     }
 
+    /** True si se agoto el limite diario de Face++ (1000 calls/dia free tier) */
+    get isDailyLimitExhausted(): boolean {
+        return this._dailyLimitExhausted;
+    }
+
     /**
      * No-op: Face++ no necesita calibracion (es red neuronal cloud).
      * Se mantiene para compatibilidad con el componente.
      */
-    resetCalibration(): void {
-        console.log('[FaceEmotionDetector] resetCalibration() - no calibration needed (Face++ cloud)');
-    }
+    resetCalibration(): void { }
 
     /**
      * Detecta expresion facial usando Face++ Detect API.
@@ -147,6 +168,11 @@ export class FaceEmotionDetectorService {
             return null;
         }
 
+        // Limite diario agotado: no hacer mas llamadas
+        if (this._dailyLimitExhausted) {
+            return null;
+        }
+
         // Throttle: evitar requests simultaneos (Face++ tarda ~300-500ms)
         if (this.pendingRequest) {
             return null;
@@ -162,14 +188,14 @@ export class FaceEmotionDetectorService {
             }
 
             // 2. Llamar Face++ API con retry (free tier: 1 QPS)
-            const data = await this.callFacePlusPlusWithRetry(base64Image, 3);
+            //    maxRetries=1 para minimizar consumo de llamadas
+            const data = await this.callFacePlusPlusWithRetry(base64Image, 1);
             if (!data) {
                 return null;
             }
 
             // 3. Verificar que se detecto un rostro
             if (!data.faces || data.faces.length === 0) {
-                console.log('[FaceEmotionDetector] No face detected by Face++');
                 return { emotion: 'neutral', confidence: 0, expressions: {}, faceDetected: false };
             }
 
@@ -185,17 +211,13 @@ export class FaceEmotionDetectorService {
                 disgusted: (emotions.disgust || 0) / 100,
             };
 
-            // Log para debugging
-            console.log('[Face++] ' +
-                'neutral:' + (scores.neutral * 100).toFixed(1) + '% ' +
-                'happy:' + (scores.happy * 100).toFixed(1) + '% ' +
-                'sad:' + (scores.sad * 100).toFixed(1) + '% ' +
-                'angry:' + (scores.angry * 100).toFixed(1) + '% ' +
-                'surprised:' + (scores.surprised * 100).toFixed(1) + '% ' +
-                'fearful:' + (scores.fearful * 100).toFixed(1) + '% ' +
-                'disgusted:' + (scores.disgusted * 100).toFixed(1) + '%');
+            // Calcular calidad del frame para ponderacion inteligente
+            const quality = this.calculateFrameQuality(data.faces[0]);
 
-            return this.buildResult(scores);
+            const result = this.buildResult(scores);
+            result.quality = quality;
+            result.timestamp = Date.now();
+            return result;
 
         } catch (err) {
             console.error('[FaceEmotionDetector] Detection error:', err);
@@ -216,7 +238,7 @@ export class FaceEmotionDetectorService {
             formData.append('api_key', this.apiKey);
             formData.append('api_secret', this.apiSecret);
             formData.append('image_base64', base64Image);
-            formData.append('return_attributes', 'emotion');
+            formData.append('return_attributes', 'emotion,headpose,facequality,blur');
 
             try {
                 const response = await fetch(this.apiUrl, {
@@ -232,26 +254,27 @@ export class FaceEmotionDetectorService {
                     return data;
                 }
 
-                // CONCURRENCY_LIMIT_EXCEEDED: retry con backoff
+                // CONCURRENCY_LIMIT_EXCEEDED: retry con backoff (max 1 retry para ahorrar calls)
                 if (data?.error_message === 'CONCURRENCY_LIMIT_EXCEEDED') {
-                    const waitMs = 1500 * (attempt + 1); // 1.5s, 3s, 4.5s
-                    console.warn('[Face++] Rate limited, retrying in ' + waitMs + 'ms (attempt ' + (attempt + 1) + '/' + maxRetries + ')');
+                    const waitMs = 2000 * (attempt + 1);
                     await new Promise(resolve => setTimeout(resolve, waitMs));
                     continue;
                 }
 
                 // AUTHENTICATION_ERROR: no tiene sentido reintentar
                 if (data?.error_message === 'AUTHENTICATION_ERROR') {
-                    console.error('[Face++] AUTHENTICATION_ERROR - verifica tus API keys en environment.ts');
                     return null;
                 }
 
-                // Otro error de API
-                console.error('[Face++] API error ' + response.status + ':', data?.error_message || 'unknown');
+                // FREE_CALL_COUNT_LIMIT: limite diario agotado, NO reintentar
+                if (data?.error_message === 'FREE_CALL_COUNT_LIMIT') {
+                    this._dailyLimitExhausted = true;
+                    return null;
+                }
+
                 return null;
 
             } catch (networkErr) {
-                console.error('[Face++] Network error (attempt ' + (attempt + 1) + '):', networkErr);
                 if (attempt < maxRetries) {
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     continue;
@@ -260,7 +283,6 @@ export class FaceEmotionDetectorService {
             }
         }
 
-        console.error('[Face++] Max retries exceeded');
         return null;
     }
 
@@ -277,8 +299,11 @@ export class FaceEmotionDetectorService {
         this.canvas.width = FaceEmotionDetectorService.CAPTURE_WIDTH;
         this.canvas.height = Math.round(video.videoHeight * scale);
 
-        // Dibujar frame en canvas
+        // Preprocesamiento: mejora leve de contraste y brillo
+        // para compensar webcams con poca luz y mejorar deteccion de expresiones sutiles
+        this.ctx.filter = 'contrast(1.15) brightness(1.05)';
         this.ctx.drawImage(video, 0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.filter = 'none';
 
         // Convertir a base64 JPEG (sin el prefijo data:image/jpeg;base64,)
         const dataUrl = this.canvas.toDataURL('image/jpeg', FaceEmotionDetectorService.JPEG_QUALITY);
@@ -304,14 +329,53 @@ export class FaceEmotionDetectorService {
 
         const backendEmotion = EMOTION_MAP[maxEmotion] || maxEmotion;
 
-        console.log('[FaceEmotionDetector] Result: ' + backendEmotion +
-            ' (' + (maxConf * 100).toFixed(1) + '%)');
 
         return {
             emotion: backendEmotion,
             confidence: maxConf,
             expressions: scores,
             faceDetected: true,
+        };
+    }
+
+    /**
+     * Calcula un peso de calidad para el frame basado en datos de Face++.
+     * Frames con mejor calidad facial, pose frontal y menos blur
+     * obtienen mayor peso en la agregacion final.
+     *
+     * Factores:
+     *   - headpose: rostros girados >30° o inclinados >25° reducen peso
+     *   - facequality: score directo de Face++ (0-100)
+     *   - blur: frames borrosos (motion o gaussian) reducen peso
+     */
+    private calculateFrameQuality(face: any): FrameQuality {
+        const hp = face.attributes?.headpose || {};
+        const fq = face.attributes?.facequality?.value ?? 50;
+        const blur = face.attributes?.blur || {};
+
+        const yaw = hp.yaw_angle || 0;
+        const pitch = hp.pitch_angle || 0;
+        const roll = hp.roll_angle || 0;
+        const motionBlur = blur.motionblur?.value || 0;
+        const gaussianBlur = blur.gaussianblur?.value || 0;
+
+        // Pose factor: penalizar rostros girados/inclinados
+        const poseFactor = Math.max(0.2, 1 - Math.abs(yaw) / 45)
+                         * Math.max(0.3, 1 - Math.abs(pitch) / 35);
+
+        // Quality factor: score normalizado de Face++ (0-1)
+        const qualityFactor = Math.max(0.3, fq / 100);
+
+        // Blur factor: frames borrosos = menor confianza
+        const maxBlur = Math.max(motionBlur, gaussianBlur);
+        const blurFactor = Math.max(0.2, 1 - maxBlur / 80);
+
+        return {
+            faceQuality: fq,
+            headPose: { yaw, pitch, roll },
+            motionBlur,
+            gaussianBlur,
+            frameWeight: Math.max(0.1, poseFactor * qualityFactor * blurFactor),
         };
     }
 

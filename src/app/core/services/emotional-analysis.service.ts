@@ -79,8 +79,8 @@ export class EmotionalAnalysisService {
     }
 
     /**
-     * Envía la emoción detectada por face-api.js al backend para mapear a scores.
-     * NO envía imágenes — la detección se hizo en el navegador.
+     * Envía la emoción detectada por Face++ al backend para mapear a scores.
+     * NO envía imágenes — la detección se hizo via Face++ API.
      */
     classifyEmotion(emotion: string, confidence: number): Observable<EmotionalAnalysisResult> {
         const payload: EmotionClassificationApiRequest = {
