@@ -20,8 +20,8 @@ export const environment = {
 
     // 🎭 Face++ Emotion Recognition API
     // Regístrate gratis en https://www.faceplusplus.com/ para obtener tus claves
-    facePlusPlusApiKey: '55ynZIJ3GFnbHY4JFWDfxiPfoEUWy_Js',      // <-- Pega tu API Key aquí
-    facePlusPlusApiSecret: 'e5bIygczFiW8PON4yMLaiA5tK-RC8J42',   // <-- Pega tu API Secret aquí
+    facePlusPlusApiKey: 'fQpCTQEhbqvNqQqahwQPLei9kH5SIEcs',      // <-- Pega tu API Key aquí
+    facePlusPlusApiSecret: 'xAAxS5CiLPAmqNZ4Al2iuN8TVuSPyJ26',   // <-- Pega tu API Secret aquí
     facePlusPlusApiUrl: '/facepp/v3/detect',
 
     // 📞 Soporte WhatsApp (número en formato internacional sin + ni espacios)

@@ -13,8 +13,8 @@
     tokenExpirationWarning: 300000,
 
     // Face++ Emotion Recognition API
-    facePlusPlusApiKey: 'mC3lFIbRo-c-stik5BMTIW6PxzO_1dQl',
-    facePlusPlusApiSecret: 'mA2kjEWBomyByvRQWt6vVUEsgU84V1r0',
+    facePlusPlusApiKey: 'fQpCTQEhbqvNqQqahwQPLei9kH5SIEcs',      // <-- Pega tu API Key aquí
+    facePlusPlusApiSecret: 'xAAxS5CiLPAmqNZ4Al2iuN8TVuSPyJ26',   // <-- Pega tu API Secret aquí
     facePlusPlusApiUrl: '/facepp/v3/detect',
 
     // Soporte WhatsApp (numero en formato internacional sin + ni espacios)

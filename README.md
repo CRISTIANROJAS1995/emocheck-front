@@ -117,6 +117,235 @@ El componente acumula entre 3 y 5 detecciones y aplica:
 | Carga emocional | 🟠 Naranja | "Parece que hay algo de carga emocional" |
 | En alerta | 🔴 Rojo | "Tu cuerpo está en alerta" |
 
+### Clasificación del estado emocional
+
+# 📊 Rangos del Sistema Emocional — EmoCheck
+
+> **Endpoint:** `POST /api/evaluation/emotional-analysis/classify`
+> **Fecha de documentación:** 27 de febrero de 2026
+
+---
+
+## 1. Métrica principal: Promedio de los 5 scores
+
+El backend devuelve 5 scores individuales (0–100). El **frontend** calcula el promedio para determinar el estado general:
+
+```
+promedio = (attention + concentration + balance + positivity + calm) / 5
+```
+
+---
+
+## 2. Semaforización — Clasificación por promedio
+
+| Rango promedio | Estado | Color | Hex | Mensaje al usuario |
+|---|---|---|---|---|
+| **≥ 70** | 🟢 **VERDE** — Bienestar saludable | Verde | `#4CAF50` | "¡Excelente! Continúa con tus hábitos saludables" |
+| **50 – 69** | 🟠 **NARANJA** — Carga emocional moderada | Naranja | `#FFC107` | "Algunos aspectos necesitan atención. Te recomendamos..." |
+| **< 50** | 🔴 **ROJO** — Estado emocional crítico | Rojo | `#F44336` | "Tu cuerpo está en alerta" |
+
+> ⚠️ **Regla especial de fatiga:** si `fatigueScore ≥ 0.75`, el estado se fuerza a 🔴 **ROJO** independientemente del promedio de scores, y se crea una alerta automática en BD.
+
+---
+
+## 3. Scores esperados por emoción
+
+Valores calculados con `confidence ≈ 0.99` (intensidad ~99, `t ≈ 0.99`).
+Los scores incluyen la micro-variación determinística: `variation = (intensity % 7) - 3`.
+
+| Emoción | Atención | Concentración | Equilibrio | Positividad | Calma | FatigueScore | **Promedio** | Estado |
+|---|---|---|---|---|---|---|---|---|
+| `happiness` | ~89 | ~84 | ~91 | ~95 | ~91 | ~0.03 | **~90** | 🟢 Verde |
+| `neutral` | ~69 | ~65 | ~69 | ~62 | ~69 | ~0.12 | **~67** | 🟠 Naranja |
+| `surprise` | ~87 | ~54 | ~51 | ~64 | ~35 | ~0.18 | **~58** | 🟠 Naranja |
+| `contempt` | ~58 | ~55 | ~28 | ~18 | ~32 | ~0.50 | **~38** | 🔴 Rojo |
+| `anger` | ~46 | ~41 | ~13 | ~9 | ~9 | ~0.72 | **~24** | 🔴 Rojo |
+| `fear` | ~55 | ~36 | ~16 | ~13 | ~11 | ~0.70 | **~26** | 🔴 Rojo |
+| `sadness` | ~26 | ~23 | ~19 | ~9 | ~26 | ~0.88 | **~21** | 🔴 Rojo |
+| `fatigue` | ~19 | ~16 | ~29 | ~23 | ~36 | ~0.95 | **~25** | 🔴 Rojo |
+
+> **Nota:** Los valores son aproximados. El score final varía ±3 puntos en Atención/Concentración y ±1 en Equilibrio por la micro-variación `(intensity % 7) - 3`.
+
+---
+
+## 4. Rangos por score individual
+
+Cada uno de los 5 scores se mueve dentro de estos límites según la emoción:
+
+### 🟢 Emociones positivas
+
+| Score | `happiness` mín | `happiness` máx |
+|---|---|---|
+| Atención | 72 | 90 |
+| Concentración | 68 | 85 |
+| Equilibrio | 75 | 92 |
+| Positividad | 80 | 96 |
+| Calma | 75 | 92 |
+| FatigueScore | 0.03 | 0.18 |
+
+### 🟠 Emociones neutras / mixtas
+
+| Score | `neutral` mín | `neutral` máx | `surprise` mín | `surprise` máx |
+|---|---|---|---|---|
+| Atención | 60 | 70 | 75 | 88 |
+| Concentración | 56 | 66 | 50 | 55 |
+| Equilibrio | 58 | 70 | 48 | 52 |
+| Positividad | 50 | 63 | 55 | 65 |
+| Calma | 60 | 70 | 35 | 38 |
+| FatigueScore | 0.12 | 0.25 | 0.18 | 0.20 |
+
+### 🔴 Emociones negativas
+
+| Score | `anger` | `sadness` | `fear` | `contempt` | `fatigue` |
+|---|---|---|---|---|---|
+| Atención | 45 – 62 | 25 – 50 | 55 – 68 | 58 – 65 | 18 – 42 |
+| Concentración | 40 – 58 | 22 – 45 | 35 – 48 | 55 – 62 | 15 – 38 |
+| Equilibrio | 12 – 40 | 18 – 42 | 15 – 35 | 28 – 40 | 28 – 42 |
+| Positividad | 8 – 35 | 8 – 35 | 12 – 30 | 18 – 32 | 22 – 38 |
+| Calma | 8 – 35 | 25 – 42 | 10 – 28 | 32 – 42 | 35 – 48 |
+| FatigueScore | 0.35 – 0.72 | 0.45 – 0.88 | 0.40 – 0.70 | 0.30 – 0.50 | 0.55 – 0.95 |
+
+---
+
+## 5. Alerta por fatiga — Condiciones, momento y persistencia en BD
+
+### 5.1 Condiciones para generar la alerta
+
+Se deben cumplir **las 3 condiciones simultáneamente**:
+
+```
+1. createAlertOnFatigue = true     ← enviado en el request body (default: true)
+          AND
+2. fatigueScore >= 0.75            ← backend calculó fatiga alta según la emoción
+          AND
+3. El usuario existe en BD         ← se consulta para obtener CompanyID y AreaID
+```
+
+> Si **cualquiera** de las 3 falla, **no se crea la alerta** y `alertCreated` devuelve `false`.
+
+---
+
+### 5.2 Momento exacto en el flujo
+
+```
+POST /api/evaluation/emotional-analysis/classify
+         │
+         ▼
+  1. Calcula intensity y t  (de confidence)
+         │
+         ▼
+  2. Mapea emoción → scores  (attention, concentration, balance, positivity, calm, fatigueScore)
+         │
+         ▼
+  3. Construye EmotionalAnalysisResponseDto
+         │
+         ▼
+  4. Evalúa las 3 condiciones
+         │
+         ├── NO se cumplen  ──► devuelve response  (alertCreated: false)
+         │
+         └── SÍ se cumplen
+                  │
+                  ▼
+           INSERT results.Alert   ◄─── se guarda en BD aquí
+           SaveChangesAsync()
+                  │
+                  ▼
+           devuelve response  (alertCreated: true)
+```
+
+---
+
+### 5.3 Umbral configurable
+
+| Configuración | Valor por defecto | Ubicación |
+|---|---|---|
+| `AzureCognitive:FatigueAlertThreshold` | `0.75` | `appsettings.json` |
+| Override por request | Campo `fatigueAlertThreshold` en el body | `EmotionClassificationRequestDto` |
+
+> El cliente puede enviar su propio umbral en cada request. Si no lo envía, se usa el del servidor (`0.75`).
+
+---
+
+### 5.4 Campos que se guardan en `results.Alert`
+
+| Campo BD | Valor guardado |
+|---|---|
+| `UserID` | ID del usuario autenticado (JWT) |
+| `EvaluationID` | El enviado en el request, o `0` si no se envió |
+| `CompanyID` | Obtenido del perfil del usuario en BD |
+| `AreaID` | Obtenido del perfil del usuario en BD |
+| `AlertType` | `"FATIGUE_DETECTED"` |
+| `Severity` | `"CRITICAL"` si `fatigueScore ≥ 0.90` · `"HIGH"` si está entre `0.75` y `0.89` |
+| `Status` | `"OPEN"` |
+| `Title` | `"Fatiga detectada - Análisis emocional"` |
+| `Description` | `"Se detectó un nivel de fatiga de X.XX (umbral: Y.YY) en el análisis emocional del usuario Nombre Apellido."` |
+| `CreatedAt` | Fecha/hora UTC del momento del análisis |
+
+---
+
+### 5.5 ¿Qué emociones disparan la alerta? (con confianza ~0.99)
+
+| Emoción | `fatigueScore` calculado | ¿Supera 0.75? | `Severity` |
+|---|---|---|---|
+| `fatigue` | ~0.95 | ✅ **Sí** | `CRITICAL` |
+| `sadness` | ~0.88 | ✅ **Sí** | `HIGH` |
+| `anger` | ~0.72 | ❌ No (justo debajo) | — |
+| `fear` | ~0.70 | ❌ No | — |
+| `contempt` | ~0.50 | ❌ No | — |
+| `surprise` | ~0.18 | ❌ No | — |
+| `neutral` | ~0.12 | ❌ No | — |
+| `happiness` | ~0.03 | ❌ No | — |
+
+> ⚠️ `anger` con confianza muy alta puede llegar a `0.72`, quedando **justo por debajo** del umbral `0.75`. Solo `sadness` y `fatigue` lo superan de forma consistente.
+
+---
+
+## 6. Ejemplo real — "Tu cuerpo está en alerta"
+
+```json
+// Request
+{
+  "emotion": "anger",
+  "confidence": 0.98,
+  "createAlertOnFatigue": true
+}
+
+// Response
+{
+  "attention":     46,
+  "concentration": 41,
+  "balance":       13,
+  "positivity":     9,
+  "calm":           9,
+  "fatigueScore":  0.71,
+  "dominantEmotion": "anger",
+  "alertCreated":  false,
+  "timestamp":     "2026-02-27T..."
+}
+
+// promedio = (46 + 41 + 13 + 9 + 9) / 5 = 23.6  →  🔴 ROJO
+```
+
+---
+
+## 7. Flujo de decisión del frontend
+
+```
+response recibido
+       │
+       ├── alertCreated === true  ──────────────────────► 🔴 ROJO (fatiga crítica)
+       │
+       ├── fatigueScore >= 0.75   ──────────────────────► 🔴 ROJO (fatiga alta)
+       │
+       ├── promedio < 50          ──────────────────────► 🔴 ROJO ("Tu cuerpo está en alerta")
+       │
+       ├── promedio 50–69         ──────────────────────► 🟠 NARANJA (carga moderada)
+       │
+       └── promedio >= 70         ──────────────────────► 🟢 VERDE (bienestar saludable)
+```
+---
+
 ### Límites del Free Tier
 - **1.000 llamadas/día** (~16 sesiones diarias, 5 calls por sesión)
 - **1 request/segundo** — con throttle automático y retry con backoff exponencial
