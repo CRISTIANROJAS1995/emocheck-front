@@ -28,7 +28,7 @@
 
                 <!-- Subtitle -->
                 <p class="text-montserrat-semibold mt-2 text-center text-[14px] leading-[20px] text-[#009689]">
-                    {{ cameraError ? 'Conecta una cámara e inténtalo de nuevo.' : 'Sigue las instrucciones en pantalla' }}
+                    {{ cameraError ? 'Cierra otras apps que usen la cámara e inténtalo de nuevo.' : 'Sigue las instrucciones en pantalla' }}
                 </p>
 
                 <!-- Progress -->
@@ -46,14 +46,24 @@
 
                 <!-- Camera Preview -->
                 <div class="mt-6 w-full flex justify-center">
-                    <div class="video-container relative w-full max-w-[560px] overflow-hidden rounded-[16px] border-4 border-[#00BBA7] flex items-center justify-center">
+                    <div class="video-container relative w-full max-w-[560px] overflow-hidden rounded-[16px] border-4 border-[#00BBA7] flex items-center justify-center" [style.min-height]="cameraError ? '220px' : '0'">
                         <video #videoElement autoplay playsinline class="video-flipped" [class.hidden]="cameraError"></video>
 
                         <!-- Overlay solo para errores de cámara (hardware/permisos) -->
-                        <div *ngIf="cameraError" class="absolute inset-0 flex items-center justify-center bg-slate-900/70">
-                            <p class="text-montserrat text-center text-white px-4">
+                        <div *ngIf="cameraError" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900 px-4">
+                            <svg class="h-10 w-10 text-[#00BBA7]" viewBox="0 0 24 24" fill="none" stroke="#00BBA7" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                                <line x1="3" y1="3" x2="21" y2="21" stroke="#00BBA7" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <p class="text-montserrat text-center text-sm text-white px-4">
                                 {{ cameraError }}
                             </p>
+                            <button type="button" (click)="retryCamera()" class="mt-1 flex items-center gap-2 rounded-[8px] bg-[#00BBA7] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#00a393]">
+                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                                Reintentar
+                            </button>
                         </div>
                     </div>
                 </div>

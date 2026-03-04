@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
 import { AdminAlertDto, AdminAlertsService, AlertStatisticsDto } from 'app/core/services/admin-alerts.service';
+import { AdminUsersService } from 'app/core/services/admin-users.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
@@ -34,12 +35,16 @@ export class AdminAlertsComponent implements OnInit {
     // Resolve form
     resolution = '';
 
+    // Acknowledge form
+    actionTaken = '';
+
     // Sort
     sortField = 'createdAt';
     sortAsc = false;
 
     constructor(
         private readonly service: AdminAlertsService,
+        private readonly usersService: AdminUsersService,
         private readonly notify: AlertService,
     ) { }
 
@@ -50,13 +55,64 @@ export class AdminAlertsComponent implements OnInit {
     load(): void {
         this.loading = true;
         forkJoin({
-            alerts: this.service.list().pipe(catchError(() => of([]))),
-            stats: this.service.getStatistics().pipe(catchError(() => of(null))),
+            alerts: this.service.list().pipe(catchError((err) => {
+                console.error('[AdminAlerts] GET /alert error:', err?.status, err?.error ?? err?.message);
+                return of([]);
+            })),
+            stats: this.service.getStatistics().pipe(catchError((err) => {
+                console.error('[AdminAlerts] GET /alert/statistics error:', err?.status, err?.error ?? err?.message);
+                return of(null);
+            })),
         }).pipe(finalize(() => (this.loading = false)))
             .subscribe(({ alerts, stats }) => {
-                this.alerts = alerts;
                 this.stats = stats as AlertStatisticsDto;
-                this.applyFilter();
+
+                // Collect unique userIds to enrich with user names
+                const uniqueUserIds = [...new Set(alerts.map(a => a.userId).filter((id): id is number => !!id))];
+
+                if (uniqueUserIds.length === 0) {
+                    this.alerts = alerts;
+                    this.applyFilter();
+                    return;
+                }
+
+                // Fetch user data for each unique userId in parallel
+                const userRequests = uniqueUserIds.map(id =>
+                    this.usersService.getUserById(id).pipe(catchError(() => of(null)))
+                );
+
+                forkJoin(userRequests).subscribe(users => {
+                    // Build a lookup map: userId → user data
+                    const userMap = new Map<number, { fullName: string; documentNumber?: string; email?: string; companyName?: string; areaName?: string }>();
+                    users.forEach((u, i) => {
+                        if (u) {
+                            userMap.set(uniqueUserIds[i], {
+                                fullName: u.fullName,
+                                documentNumber: u.documentNumber,
+                                email: u.email,
+                                companyName: u.companyName,
+                                areaName: u.areaName,
+                            });
+                        }
+                    });
+
+                    // Enrich each alert with user info
+                    this.alerts = alerts.map(a => {
+                        if (a.userId && userMap.has(a.userId)) {
+                            const u = userMap.get(a.userId)!;
+                            return {
+                                ...a,
+                                userName: u.fullName,
+                                userDocumentNumber: u.documentNumber,
+                                userEmail: u.email,
+                                userCompany: u.companyName,
+                                userArea: u.areaName,
+                            };
+                        }
+                        return a;
+                    });
+                    this.applyFilter();
+                });
             });
     }
 
@@ -100,15 +156,18 @@ export class AdminAlertsComponent implements OnInit {
     selectAlert(alert: AdminAlertDto): void {
         this.selectedAlert = this.selectedAlert?.alertId === alert.alertId ? null : alert;
         this.resolution = '';
+        this.actionTaken = '';
     }
 
-    acknowledgeAlert(alert: AdminAlertDto): void {
+    acknowledgeAlert(alert: AdminAlertDto, actionTaken?: string): void {
         this.saving = true;
-        this.service.acknowledge(alert.alertId)
+        this.service.acknowledge(alert.alertId, actionTaken)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
                 next: () => {
                     this.notify.success('Alerta reconocida');
+                    this.selectedAlert = null;
+                    this.actionTaken = '';
                     this.load();
                 },
                 error: (e) => this.notify.error(e?.message || 'Error al reconocer alerta'),
@@ -144,6 +203,7 @@ export class AdminAlertsComponent implements OnInit {
         switch ((status ?? '').toUpperCase()) {
             case 'OPEN':         return 'badge badge--danger';
             case 'ACKNOWLEDGED': return 'badge badge--warning';
+            case 'IN_REVIEW':    return 'badge badge--info';
             case 'IN_PROGRESS':  return 'badge badge--info';
             case 'RESOLVED':     return 'badge badge--success';
             case 'DISMISSED':    return 'badge badge--neutral';
@@ -155,6 +215,7 @@ export class AdminAlertsComponent implements OnInit {
         switch ((status ?? '').toUpperCase()) {
             case 'OPEN':         return 'Abierta';
             case 'ACKNOWLEDGED': return 'Reconocida';
+            case 'IN_REVIEW':    return 'En Revisión';
             case 'IN_PROGRESS':  return 'En Proceso';
             case 'RESOLVED':     return 'Resuelta';
             case 'DISMISSED':    return 'Descartada';

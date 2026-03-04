@@ -18,9 +18,16 @@ export interface AdminAlertDto {
     alertId: number;
     userId?: number;
     userIdAnonymized?: string;
+    // Enriched fields (populated from GET /users/{id} after loading)
+    userName?: string;           // fullName del usuario
+    userDocumentNumber?: string; // número de identificación
+    userEmail?: string;
+    userCompany?: string;
+    userArea?: string;
     evaluationResultId?: number;
     alertLevel?: string;
     alertType?: string;
+    title?: string;
     description?: string;
     status?: string;
     isAttended: boolean;
@@ -50,7 +57,9 @@ type BackendAlertDto = {
     userIdentifier?: string;
     evaluationResultID?: number;
     alertLevel?: string;
+    severity?: string;       // algunos endpoints retornan "severity" en lugar de "alertLevel"
     alertType?: string;
+    title?: string;
     description?: string;
     status?: string;
     isAttended?: boolean;
@@ -62,6 +71,15 @@ type BackendAlertDto = {
     notes?: string;
     createdAt?: string;
 };
+
+export interface CreateAlertPayload {
+    evaluationID?: number;
+    userID?: number;
+    severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    alertType: string;
+    title: string;
+    description: string;
+}
 
 export interface AttendAlertDto {
     actionTaken: string;
@@ -80,8 +98,9 @@ export class AdminAlertsService {
             userId: typeof row.userID === 'number' ? row.userID : undefined,
             userIdAnonymized: typeof row.userIdentifier === 'string' ? row.userIdentifier : undefined,
             evaluationResultId: typeof row.evaluationResultID === 'number' ? row.evaluationResultID : undefined,
-            alertLevel: row.alertLevel,
+            alertLevel: (row.alertLevel ?? row.severity ?? '').toUpperCase() || undefined,
             alertType: row.alertType,
+            title: row.title,
             description: row.description,
             status: row.status,
             isAttended: !!row.isAttended,
@@ -100,7 +119,12 @@ export class AdminAlertsService {
         return this.http
             .get<unknown>(`${this.apiUrl}/alert`)
             .pipe(
-                map((res) => this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x))),
+                map((res) => {
+                    console.log('[AdminAlertsService] GET /alert RAW:', res);
+                    const mapped = this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x));
+                    console.log('[AdminAlertsService] mapped alerts:', mapped);
+                    return mapped;
+                }),
                 map((rows) => this.applyClientFilters(rows, query))
             );
     }
@@ -165,10 +189,25 @@ export class AdminAlertsService {
             .pipe(map((res) => this.mapAlert(this.unwrapObject<BackendAlertDto>(res))));
     }
 
-    /** Acknowledge an alert — PATCH /alert/{id}/acknowledge (no body) */
-    acknowledge(alertId: number): Observable<unknown> {
+    /** Create a new alert — POST /alert */
+    create(payload: CreateAlertPayload): Observable<AdminAlertDto | null> {
         return this.http
-            .patch<unknown>(`${this.apiUrl}/alert/${alertId}/acknowledge`, {})
+            .post<unknown>(`${this.apiUrl}/alert`, payload)
+            .pipe(
+                map((res) => this.mapAlert(this.unwrapObject<BackendAlertDto>(res))),
+                catchError((err) => {
+                    console.error('[AdminAlertsService] POST /alert error:', err?.status, err?.error ?? err?.message);
+                    return of(null);
+                })
+            );
+    }
+
+    /** Acknowledge an alert — PATCH /alert/{id}/acknowledge */
+    acknowledge(alertId: number, actionTaken?: string): Observable<unknown> {
+        const body: Record<string, string> = {};
+        if (actionTaken?.trim()) body['actionTaken'] = actionTaken.trim();
+        return this.http
+            .patch<unknown>(`${this.apiUrl}/alert/${alertId}/acknowledge`, body)
             .pipe(catchError(() => of(null)));
     }
 

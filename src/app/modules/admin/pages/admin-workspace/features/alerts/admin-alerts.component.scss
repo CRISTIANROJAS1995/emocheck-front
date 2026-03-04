@@ -1,5 +1,4 @@
 @use '../../admin-shared' as *;
-
 :host {
     display: block;
     width: 100%;
@@ -13,7 +12,6 @@
     font-size: 14px;
     resize: vertical;
     min-height: 80px;
-
     &:focus {
         border-color: #6366f1;
         outline: none;
@@ -24,11 +22,35 @@
     margin-top: 20px;
     padding-top: 16px;
     border-top: 1px dashed rgba(0, 0, 0, .1);
-
     h4 {
         font-weight: 700;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+        }
     }
+}
+
+.detail-panel__acknowledge {
+    margin-bottom: 4px;
+}
+
+.detail-panel__hint {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+
+.detail-panel__divider {
+    border-top: 1px dashed rgba(0, 0, 0, .08);
+    margin: 16px 0;
 }
 
 .detail-panel__actions {
@@ -45,4 +67,59 @@
 
 .row--selected {
     background: rgba(99, 102, 241, .06) !important;
+}
+
+// User name + document in table cell
+.user-name {
+    font-weight: 600;
+    font-size: 13px;
+    display: block;
+    line-height: 1.2;
+    margin-bottom: 1px;
+}
+
+.user-doc {
+    font-size: 11px;
+    color: #64748b;
+    letter-spacing: .02em;
+    display: block;
+    line-height: 1.2;
+}
+
+// User info block inside detail panel
+.user-detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    background: rgba(99, 102, 241, .04);
+    border-left: 3px solid #6366f1;
+    border-radius: 0 8px 8px 0;
+    &__name {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e293b;
+        mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            color: #6366f1;
+        }
+    }
+    &__row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #475569;
+        mat-icon {
+            font-size: 15px;
+            width: 15px;
+            height: 15px;
+            color: #94a3b8;
+        }
+    }
 }

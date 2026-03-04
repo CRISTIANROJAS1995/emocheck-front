@@ -6,6 +6,7 @@ import { CameraService } from 'app/core/services/camera.service';
 import { EmotionalAnalysisService, EmotionalAnalysisResult } from 'app/core/services/emotional-analysis.service';
 import { FaceEmotionDetectorService, FaceExpressionResult } from 'app/core/services/face-emotion-detector.service';
 import { AuthService } from 'app/core/services/auth.service';
+import { AdminAlertsService } from 'app/core/services/admin-alerts.service';
 
 @Component({
     selector: 'app-emotional-analysis',
@@ -135,7 +136,8 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         private _cameraService: CameraService,
         private _emotionalAnalysisService: EmotionalAnalysisService,
         private _faceDetector: FaceEmotionDetectorService,
-        private _authService: AuthService
+        private _authService: AuthService,
+        private _alertsService: AdminAlertsService,
     ) { }
 
     ngOnInit(): void {
@@ -423,10 +425,6 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                 next: (result) => {
                     this.analysisResult = result;
 
-                    // Cambiar el tipo de resultado (naranja vs rojo) basado en datos reales.
-                    // 1) Si backend creó alerta, UI debe mostrar rojo.
-                    // 2) Si hay fatigueScore (0..1) y supera el umbral default del backend (0.75), UI debe mostrar rojo.
-                    // 3) Si no, usamos la regla de promedio (misma del servicio front).
                     const fatigueThreshold = 0.75;
                     const state = this._emotionalAnalysisService.evaluateEmotionalState(result);
                     const isRed =
@@ -434,6 +432,35 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                         (typeof result.fatigueScore === 'number' && result.fatigueScore >= fatigueThreshold) ||
                         state === 'critical';
                     this.resultType = isRed ? 'alert' : (state === 'normal' ? 'normal' : 'emotional-load');
+
+                    // Si el backend no creó la alerta pero el estado es crítico o de alerta,
+                    // la creamos manualmente desde el frontend.
+                    if (!result.alertCreated && (state === 'critical' || state === 'alert')) {
+                        const severity = state === 'critical' ? 'HIGH' : 'MEDIUM';
+                        const avg = Math.round(
+                            (result.attention + result.concentration + result.balance + result.positivity + result.calm) / 5
+                        );
+                        const currentUser = this._authService.getCurrentUser();
+                        console.log('[EmotionalAnalysis] Creando alerta manual. Usuario:', currentUser?.id, 'Roles:', currentUser?.roles, 'Estado:', state);
+                        this._alertsService.create({
+                            userID: currentUser?.id ? Number(currentUser.id) : undefined,
+                            severity,
+                            alertType: 'EMOTIONAL_ANALYSIS',
+                            title: state === 'critical'
+                                ? 'Estado emocional crítico detectado'
+                                : 'Estado emocional de alerta detectado',
+                            description: `Análisis emocional detectó estado ${state === 'critical' ? 'crítico' : 'de alerta'}. Emoción dominante: ${result.dominantEmotion ?? 'N/A'}. Promedio de bienestar: ${avg}%. Scores — Atención: ${result.attention}%, Concentración: ${result.concentration}%, Equilibrio: ${result.balance}%, Positividad: ${result.positivity}%, Calma: ${result.calm}%.`,
+                        }).subscribe({
+                            next: (alert) => {
+                                if (alert) {
+                                    console.log('[EmotionalAnalysis] ✅ Alerta creada en BD. ID:', alert.alertId);
+                                } else {
+                                    console.warn('[EmotionalAnalysis] ⚠️ POST /alert respondió null — posible 403 (rol insuficiente) o error de BD.');
+                                }
+                            },
+                            error: (e) => console.error('[EmotionalAnalysis] ❌ Error al crear alerta. Status:', e?.status, e?.error),
+                        });
+                    }
 
                     // Actualizar porcentajes en los steps
                     this.steps[0].percentage = result.attention;
@@ -490,6 +517,28 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
             s.percentage = 0;
         });
         this.startAnalysis();
+    }
+
+    /**
+     * Reintenta acceder a la cámara después de un error de hardware/permisos.
+     */
+    retryCamera(): void {
+        this.cameraError = '';
+        this.analysisError = '';
+        this.detections = [];
+        this.analysisStarted = false;
+        this.isAnalyzing = true;
+        this.progress = 0;
+        this.currentStep = 1;
+        this.steps.forEach((s, i) => {
+            s.status = i === 0 ? 'active' : 'pending';
+            s.percentage = 0;
+        });
+        // Liberar stream previo antes de reintentar
+        this._cameraService.stopCamera();
+        if (this.videoElement?.nativeElement) {
+            this.initializeCamera();
+        }
     }
 
     skipAnalysis(): void {

@@ -1124,6 +1124,7 @@ Roles: SuperAdmin, Psychologist, HRManager
   "userID": 1,
   "severity": "HIGH",
   "alertType": "RISK",
+  "title": "Estado emocional crítico detectado",
   "description": "Puntuación de alto riesgo detectada"
 }
 ```

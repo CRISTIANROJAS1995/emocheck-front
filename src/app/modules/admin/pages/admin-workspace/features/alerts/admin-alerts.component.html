@@ -61,6 +61,7 @@
                 <option value="">Todos los estados</option>
                 <option value="OPEN">Abierta</option>
                 <option value="ACKNOWLEDGED">Reconocida</option>
+                <option value="IN_REVIEW">En Revisión</option>
                 <option value="IN_PROGRESS">En Proceso</option>
                 <option value="RESOLVED">Resuelta</option>
                 <option value="DISMISSED">Descartada</option>
@@ -93,7 +94,7 @@
                     <th (click)="toggleSort('alertId')" [class]="sortClass('alertId')">ID</th>
                     <th (click)="toggleSort('alertLevel')" [class]="sortClass('alertLevel')">Nivel</th>
                     <th (click)="toggleSort('alertType')" [class]="sortClass('alertType')">Tipo</th>
-                    <th (click)="toggleSort('userIdAnonymized')" [class]="sortClass('userIdAnonymized')">Usuario</th>
+                    <th (click)="toggleSort('userName')" [class]="sortClass('userName')">Usuario</th>
                     <th (click)="toggleSort('createdAt')" [class]="sortClass('createdAt')">Fecha</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -105,12 +106,16 @@
                     <td><strong>#{{ alert.alertId }}</strong></td>
                     <td><span [class]="severityBadgeClass(alert.alertLevel)">{{ severityLabel(alert.alertLevel) }}</span></td>
                     <td>{{ alert.alertType || '-' }}</td>
-                    <td>{{ alert.userIdAnonymized || alert.userId || '-' }}</td>
+                    <td>
+                        @if (alert.userName) {
+                        <span class="user-name">{{ alert.userName }}</span> @if (alert.userDocumentNumber) {
+                        <span class="user-doc">{{ alert.userDocumentNumber }}</span> } } @else { {{ alert.userIdAnonymized || alert.userId || '-' }} }
+                    </td>
                     <td>{{ alert.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td><span [class]="statusBadgeClass(alert.status)">{{ statusLabel(alert.status) }}</span></td>
                     <td class="actions-cell">
                         @if (alert.status === 'OPEN') {
-                        <button class="btn btn--primary btn--xs" (click)="acknowledgeAlert(alert); $event.stopPropagation()" [disabled]="saving">
+                        <button class="btn btn--primary btn--xs" (click)="selectAlert(alert); $event.stopPropagation()">
                             <mat-icon>done</mat-icon> Reconocer
                         </button> }
                         <button class="btn btn--outline btn--xs" (click)="selectAlert(alert); $event.stopPropagation()">
@@ -148,9 +153,49 @@
                 <label>Tipo</label>
                 <span>{{ current.alertType || '-' }}</span>
             </div>
-            <div class="detail-panel__field">
-                <label>Usuario</label>
-                <span>{{ current.userIdAnonymized || current.userId }}</span>
+            @if (current.title) {
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Título</label>
+                <span>{{ current.title }}</span>
+            </div>
+            } @if (current.description) {
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Descripción</label>
+                <span>{{ current.description }}</span>
+            </div>
+            }
+            <!-- Usuario: nombre + doc + email + área + empresa -->
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Usuario</label> @if (current.userName) {
+                <div class="user-detail-block">
+                    <div class="user-detail-block__name">
+                        <mat-icon class="user-detail-block__icon">person</mat-icon>
+                        <strong>{{ current.userName }}</strong>
+                    </div>
+                    @if (current.userDocumentNumber) {
+                    <div class="user-detail-block__row">
+                        <mat-icon>badge</mat-icon>
+                        <span>ID: {{ current.userDocumentNumber }}</span>
+                    </div>
+                    } @if (current.userEmail) {
+                    <div class="user-detail-block__row">
+                        <mat-icon>email</mat-icon>
+                        <span>{{ current.userEmail }}</span>
+                    </div>
+                    } @if (current.userArea) {
+                    <div class="user-detail-block__row">
+                        <mat-icon>business_center</mat-icon>
+                        <span>{{ current.userArea }}</span>
+                    </div>
+                    } @if (current.userCompany) {
+                    <div class="user-detail-block__row">
+                        <mat-icon>domain</mat-icon>
+                        <span>{{ current.userCompany }}</span>
+                    </div>
+                    }
+                </div>
+                } @else {
+                <span>{{ current.userIdAnonymized || current.userId || '-' }}</span> }
             </div>
             <div class="detail-panel__field">
                 <label>Estado</label>
@@ -172,13 +217,33 @@
             }
         </div>
 
-        @if (current.status === 'OPEN' || current.status === 'ACKNOWLEDGED' || current.status === 'IN_PROGRESS') {
+        @if (current.status === 'OPEN' || current.status === 'ACKNOWLEDGED' || current.status === 'IN_REVIEW' || current.status === 'IN_PROGRESS') {
         <div class="detail-panel__resolve">
-            <h4>Resolver alerta</h4>
-            <textarea rows="3" class="resolve-textarea" [(ngModel)]="resolution" placeholder="Describe la resolución (opcional)..."></textarea>
+
+            <!-- Reconocer: solo cuando está OPEN -->
+            @if (current.status === 'OPEN') {
+            <div class="detail-panel__acknowledge">
+                <h4>
+                    <mat-icon>done_all</mat-icon> Reconocer alerta</h4>
+                <p class="detail-panel__hint">Indica qué acción vas a tomar antes de reconocer la alerta.</p>
+                <textarea rows="2" class="resolve-textarea" [(ngModel)]="actionTaken" placeholder="Ej: Llamaré al empleado, Agendaré cita con psicólogo..."></textarea>
+                <div class="detail-panel__actions">
+                    <button class="btn btn--primary" [disabled]="saving" (click)="acknowledgeAlert(current, actionTaken)">
+                        <mat-icon>done</mat-icon> Reconocer alerta
+                    </button>
+                </div>
+            </div>
+            <div class="detail-panel__divider"></div>
+            }
+
+            <!-- Resolver -->
+            <h4>
+                <mat-icon>check_circle</mat-icon> Resolver alerta</h4>
+            <p class="detail-panel__hint">Describe el resultado final de la intervención.</p>
+            <textarea rows="3" class="resolve-textarea" [(ngModel)]="resolution" placeholder="Ej: El empleado fue atendido por el psicólogo y se encuentra estable..."></textarea>
             <div class="detail-panel__actions">
                 <button class="btn btn--success" [disabled]="saving" (click)="resolveAlert()">
-                    <mat-icon>check_circle</mat-icon> Resolver alerta
+                    <mat-icon>check_circle</mat-icon> Marcar como resuelta
                 </button>
             </div>
         </div>
