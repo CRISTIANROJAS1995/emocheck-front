@@ -79,7 +79,22 @@ interface SwaggerInstrumentScoreRangeDto {
 
 interface SwaggerInstrumentDto {
     instrumentID?: number;
+    code?: string | null;        // e.g. "GAD7", "PHQ9"
+    name?: string | null;        // e.g. "Ansiedad Generalizada"
+    instrumentType?: string | null; // legacy
     questions?: SwaggerQuestionDto[] | null;
+}
+
+/** Descriptor de un instrumento dentro de un módulo, listo para mostrar al usuario. */
+export interface InstrumentDescriptor {
+    /** Índice posicional dentro del array `module.instruments` (usado para filtrar preguntas). */
+    index: number;
+    /** Código del instrumento, ej. "GAD7", "PHQ9", "ISI", "PSS4". */
+    code: string;
+    /** Etiqueta amigable, ej. "Ansiedad", "Depresión". */
+    label: string;
+    /** Número de preguntas del instrumento. */
+    questionCount: number;
 }
 
 interface SwaggerModuleFullDto {
@@ -175,6 +190,7 @@ export class AssessmentService {
         );
 
     private readonly moduleDetailCache = new Map<AssessmentModuleId, { apiModuleId: number; questions: SwaggerQuestionDto[] }>();
+    private readonly moduleRawCache    = new Map<AssessmentModuleId, { apiModuleId: number; moduleData: SwaggerModuleFullDto }>();
 
     constructor(
         private readonly http: HttpClient,
@@ -217,6 +233,7 @@ export class AssessmentService {
                 const apiModuleId = resolvedId;
 
                 this.moduleDetailCache.set(moduleId, { apiModuleId, questions });
+                this.moduleRawCache.set(moduleId, { apiModuleId, moduleData });
 
                 return questions.map((q) => ({
                     id: q.questionID,
@@ -227,8 +244,94 @@ export class AssessmentService {
         );
     }
 
-    submit(moduleId: AssessmentModuleId, answers: number[]): Observable<AssessmentResult> {
-        // Evaluation/start requires consent accepted.
+    /**
+     * Devuelve los descriptores de cada instrumento dentro de un módulo.
+     * Usa la caché si ya se cargó el módulo; si no, lo carga primero.
+     * El índice `index` de cada descriptor corresponde a su posición en `module.instruments`.
+     */
+    getModuleInstruments(moduleId: AssessmentModuleId): Observable<InstrumentDescriptor[]> {
+        return this.resolveModuleRaw(moduleId).pipe(
+            map(({ moduleData }) => {
+                const moduleDef = getAssessmentModuleDefinition(moduleId);
+                const instruments = moduleData?.instruments ?? [];
+                return instruments.map((inst, i) => {
+                    const dim = moduleDef.dimensionLabels[i];
+                    // Try backend code first, fall back to dimensionLabels by index
+                    const code = String(
+                        (inst as any).code ?? (inst as any).instrumentCode ?? dim?.instrumentCode ?? ''
+                    ).toUpperCase().trim() || `INST_${i}`;
+                    const label = dim?.label ?? code;
+                    const rootQuestions = (inst.questions ?? []).filter(q => q.parentQuestionID == null);
+                    return { index: i, code, label, questionCount: rootQuestions.length };
+                });
+            })
+        );
+    }
+
+    /**
+     * Devuelve las preguntas de un instrumento específico dentro de un módulo.
+     * Guarda el `apiModuleId` en `moduleDetailCache` para que `submit()` funcione
+     * incluso cuando el usuario solo respondió ese instrumento.
+     *
+     * @param moduleId  ID del módulo (ej. 'mental-health')
+     * @param instrumentIndex  Índice posicional del instrumento (0=GAD7, 1=PHQ9, …)
+     */
+    getInstrumentQuestions(moduleId: AssessmentModuleId, instrumentIndex: number): Observable<AssessmentQuestion[]> {
+        return this.resolveModuleRaw(moduleId).pipe(
+            map(({ apiModuleId, moduleData }) => {
+                const instruments = moduleData?.instruments ?? [];
+                const instrument = instruments[instrumentIndex];
+                if (!instrument) {
+                    throw new Error(`Instrumento índice ${instrumentIndex} no encontrado en el módulo '${moduleId}'`);
+                }
+
+                const rootQuestions = (instrument.questions ?? [])
+                    .filter(q => q.parentQuestionID == null)
+                    .sort((a, b) =>
+                        (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0)
+                    );
+
+                // Guarda en moduleDetailCache SOLO las preguntas de este instrumento
+                // para que submit() las use correctamente al construir SubmitResponseDto[]
+                this.moduleDetailCache.set(moduleId, { apiModuleId, questions: rootQuestions });
+
+                return rootQuestions.map((q) => ({
+                    id: q.questionID,
+                    text: q.questionText ?? '',
+                    options: this.sortOptions(q.options ?? []).map((o) => o.optionText ?? ''),
+                }));
+            })
+        );
+    }
+
+    /**
+     * Obtiene la data raw del módulo (con instrumentos separados).
+     * Usa la caché `moduleRawCache` si ya se cargó; si no, hace el fetch completo.
+     */
+    private resolveModuleRaw(moduleId: AssessmentModuleId): Observable<{ apiModuleId: number; moduleData: SwaggerModuleFullDto }> {
+        const cached = this.moduleRawCache.get(moduleId);
+        if (cached) return of(cached);
+
+        return this.resolveApiModuleId(moduleId).pipe(
+            switchMap((apiModuleId) =>
+                this.http.get<unknown>(`${this.apiUrl}/assessmentmodule/modules/${apiModuleId}/full`).pipe(
+                    map((res) => {
+                        const moduleData = this.unwrapObject<SwaggerModuleFullDto>(res);
+                        const resolvedId = this.getModuleId(moduleData);
+                        if (!resolvedId) throw new Error('No fue posible obtener el módulo');
+                        // Populate both caches
+                        const allQuestions = this.extractQuestions(moduleData);
+                        this.moduleDetailCache.set(moduleId, { apiModuleId: resolvedId, questions: allQuestions });
+                        const entry = { apiModuleId: resolvedId, moduleData };
+                        this.moduleRawCache.set(moduleId, entry);
+                        return entry;
+                    })
+                )
+            )
+        );
+    }
+
+    submit(moduleId: AssessmentModuleId, answers: number[]): Observable<AssessmentResult> {        // Evaluation/start requires consent accepted.
         return this.consentService.hasAccepted().pipe(
             switchMap((hasAccepted) =>
                 hasAccepted

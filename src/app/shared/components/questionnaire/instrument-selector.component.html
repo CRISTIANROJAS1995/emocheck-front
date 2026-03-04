@@ -1,0 +1,112 @@
+@if (config) {
+<!-- Fase 2: Cuestionario -->
+<emo-questionnaire [config]="config" (back)="goBack()" (completed)="onCompleted($event)"></emo-questionnaire>
+} @else {
+<!-- Fase 1: Selección de instrumento -->
+<div class="is-page">
+    <app-background-circles></app-background-circles>
+
+    <div class="is-container">
+
+        <!-- Hero banner dinámico (color del módulo) -->
+        <section class="is-hero" [style.background]="heroGradient">
+            <div class="is-hero__left">
+                <div class="is-hero__title-row">
+                    <img [src]="moduleDef.icon" alt="" class="is-hero__icon" style="filter: brightness(0) invert(1);" />
+                    <h1 class="is-hero__title">{{ moduleDef.title }}</h1>
+                </div>
+                <p class="is-hero__subtitle">Selecciona el instrumento que deseas aplicar en esta sesión</p>
+            </div>
+            <button class="is-hero__back" mat-button [routerLink]="['/home']">
+                <span class="is-hero__back-content">
+                    <mat-icon svgIcon="heroicons_outline:arrow-left" class="is-hero__back-icon"></mat-icon>
+                    <span>Volver al inicio</span>
+                </span>
+            </button>
+        </section>
+
+        <!-- Título de sección -->
+        <div class="is-section-title">
+            <h2>¿Qué deseas evaluar?</h2>
+            <p>Cada instrumento mide una dimensión específica de {{ moduleDef.title | lowercase }}.</p>
+        </div>
+
+        <!-- Estado: cargando -->
+        @if (instruments === null && !loadError) {
+        <div class="is-loading">
+            <div class="is-spinner"></div>
+            <span>Cargando instrumentos...</span>
+        </div>
+        }
+
+        <!-- Estado: error -->
+        @if (loadError) {
+        <div class="is-error">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg> No fue posible cargar los instrumentos. Por favor intenta de nuevo.
+        </div>
+        }
+
+        <!-- Estado: sin instrumentos -->
+        @if (instruments && instruments.length === 0) {
+        <div class="is-empty">
+            <div class="is-empty__icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                    <line x1="9" y1="12" x2="15" y2="12"/>
+                    <line x1="9" y1="16" x2="12" y2="16"/>
+                </svg>
+            </div>
+            <h3 class="is-empty__title">No hay instrumentos disponibles</h3>
+            <p class="is-empty__body">
+                Este módulo aún no tiene instrumentos de evaluación configurados.<br> Comunícate con tu administrador para habilitarlos o intenta más tarde.
+            </p>
+            <button class="is-empty__btn" mat-stroked-button [routerLink]="['/home']">
+                <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                Volver al inicio
+            </button>
+        </div>
+        }
+
+        <!-- Grid de instrumentos -->
+        @if (instruments && instruments.length > 0) {
+        <div class="is-grid">
+            @for (card of instruments; track card.code) {
+            <button class="is-card" [class.is-card--loading]="loadingQuestions && selectedInstrument?.code === card.code" [disabled]="loadingQuestions" (click)="selectInstrument(card)" type="button">
+
+                <span class="is-card__bar" [style.background]="card.color"></span>
+
+                <span class="is-card__icon" [style.background]="card.color + '18'">
+                    <img [src]="card.icon" [alt]="card.label" width="26" height="26" />
+                </span>
+
+                <span class="is-card__body">
+                    <span class="is-card__code" [style.color]="card.color">{{ card.code }}</span>
+                    <span class="is-card__label">{{ card.label }}</span>
+                    <span class="is-card__description">{{ card.description }}</span>
+                    <span class="is-card__count">
+                        {{ card.questionCount }} pregunta{{ card.questionCount !== 1 ? 's' : '' }}
+                    </span>
+                </span>
+
+                <span class="is-card__arrow">
+                    @if (loadingQuestions && selectedInstrument?.code === card.code) {
+                    <span class="is-card__spinner" [style.border-top-color]="card.color"></span>
+                    } @else {
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                    }
+                </span>
+            </button> }
+        </div>
+        }
+
+    </div>
+</div>
+}
