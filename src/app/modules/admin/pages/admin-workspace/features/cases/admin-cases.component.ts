@@ -116,45 +116,14 @@ export class AdminCasesComponent implements OnInit {
 
     load(): void {
         this.loading = true;
-        forkJoin({
-            cases: this.service.list({ status: this.statusFilter || undefined, priority: this.priorityFilter || undefined })
-                .pipe(catchError(() => of<CaseTrackingDto[]>([]))),
-            users: this.usersService.listUsers().pipe(catchError(() => of<AdminUserListItemDto[]>([]))),
-            alerts: this.alertsService.list().pipe(catchError(() => of<AdminAlertDto[]>([]))),
-        })
-            .pipe(finalize(() => (this.loading = false)))
+        this.service.list({ status: this.statusFilter || undefined, priority: this.priorityFilter || undefined })
+            .pipe(
+                catchError(() => of<CaseTrackingDto[]>([])),
+                finalize(() => (this.loading = false)),
+            )
             .subscribe({
-                next: ({ cases, users, alerts }) => {
-                    const userMap = new Map<number, AdminUserListItemDto>(
-                        users.map(u => [u.userId, u] as [number, AdminUserListItemDto])
-                    );
-                    const alertMap = new Map<number, AdminAlertDto>(
-                        alerts.map(a => [a.alertId, a] as [number, AdminAlertDto])
-                    );
-                    this.cases = cases.map(c => {
-                        // Si el backend no trajo userId, intentar resolverlo desde la alerta
-                        let effectiveUserId = c.userId;
-                        if (!effectiveUserId && c.alertId) {
-                            const relatedAlert = alertMap.get(c.alertId);
-                            if (relatedAlert?.userId) effectiveUserId = relatedAlert.userId;
-                        }
-                        // Enriquecer con datos del usuario
-                        const u = userMap.get(effectiveUserId);
-                        if (u) {
-                            c.userId = effectiveUserId;
-                            c.userName = c.userName || u.fullName;
-                            c.userDocumentNumber = u.documentNumber;
-                            c.userEmail = u.email;
-                            c.userCompany = u.companyName;
-                            c.userArea = u.areaName;
-                        }
-                        // Enriquecer nombre del psicólogo si no vino del backend
-                        if (!c.assignedToPsychologistName && c.assignedToPsychologistId) {
-                            const psych = userMap.get(c.assignedToPsychologistId);
-                            if (psych) c.assignedToPsychologistName = psych.fullName;
-                        }
-                        return c;
-                    });
+                next: (cases) => {
+                    this.cases = cases;
                     this.applyFilter();
                 },
                 error: () => this.notify.error('No fue posible cargar casos'),
@@ -205,14 +174,11 @@ export class AdminCasesComponent implements OnInit {
 
     loadFollowUps(caseId: number): void {
         this.followUpLoading = true;
+        this.followUps = [];
         this.service.getFollowUps(caseId)
             .pipe(finalize(() => (this.followUpLoading = false)))
             .subscribe(rows => {
-                // GET endpoint currently returns [] — preserve any locally accumulated follow-ups
-                if (rows.length > 0) {
-                    this.followUps = rows;
-                }
-                // else keep whatever is already in this.followUps (accumulated via POST responses)
+                this.followUps = rows;
             });
     }
 
@@ -226,13 +192,11 @@ export class AdminCasesComponent implements OnInit {
         this.service.createFollowUp(this.selectedCase.caseTrackingId, payload)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
-                next: (created) => {
+                next: () => {
                     this.notify.success('Seguimiento agregado');
                     this.newFollowUpNotes = '';
-                    // Append directly — GET endpoint returns [] so we accumulate locally
-                    if (created) {
-                        this.followUps = [...this.followUps, created];
-                    }
+                    // Reload follow-ups from backend — GET now works correctly
+                    this.loadFollowUps(this.selectedCase!.caseTrackingId);
                 },
                 error: (e) => this.notify.error(e?.message || 'Error al agregar seguimiento'),
             });
