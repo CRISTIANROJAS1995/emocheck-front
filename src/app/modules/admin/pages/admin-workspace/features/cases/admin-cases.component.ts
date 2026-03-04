@@ -90,13 +90,17 @@ export class AdminCasesComponent implements OnInit {
         }).subscribe(({ alerts, users }) => {
             this.alerts = alerts;
             this.allUsers = users;
-            this.psychologists = users.filter(u =>
-                (u.roles ?? []).some(r => r.toLowerCase().includes('psychologist') || r.toLowerCase().includes('psicólogo'))
-            );
-            // If no psychologist role found, show all users as fallback
-            if (this.psychologists.length === 0) {
-                this.psychologists = users;
-            }
+
+            // Filtrar psicólogos: RoleID = 5 O nombre del rol contiene "psychologist"
+            this.psychologists = users.filter(u => {
+                const hasRoleId = (u.roleIds ?? []).includes(5);
+                const hasRoleName = (u.roles ?? []).some(r =>
+                    r.toLowerCase().replace(/[áéíóúü]/g, (c: string) =>
+                        ({ á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u' }[c] ?? c)
+                    ).includes('psychologist')
+                );
+                return hasRoleId || hasRoleName;
+            });
         });
     }
 
@@ -112,10 +116,47 @@ export class AdminCasesComponent implements OnInit {
 
     load(): void {
         this.loading = true;
-        this.service.list({ status: this.statusFilter || undefined, priority: this.priorityFilter || undefined })
+        forkJoin({
+            cases: this.service.list({ status: this.statusFilter || undefined, priority: this.priorityFilter || undefined })
+                .pipe(catchError(() => of<CaseTrackingDto[]>([]))),
+            users: this.usersService.listUsers().pipe(catchError(() => of<AdminUserListItemDto[]>([]))),
+            alerts: this.alertsService.list().pipe(catchError(() => of<AdminAlertDto[]>([]))),
+        })
             .pipe(finalize(() => (this.loading = false)))
             .subscribe({
-                next: (rows) => { this.cases = rows; this.applyFilter(); },
+                next: ({ cases, users, alerts }) => {
+                    const userMap = new Map<number, AdminUserListItemDto>(
+                        users.map(u => [u.userId, u] as [number, AdminUserListItemDto])
+                    );
+                    const alertMap = new Map<number, AdminAlertDto>(
+                        alerts.map(a => [a.alertId, a] as [number, AdminAlertDto])
+                    );
+                    this.cases = cases.map(c => {
+                        // Si el backend no trajo userId, intentar resolverlo desde la alerta
+                        let effectiveUserId = c.userId;
+                        if (!effectiveUserId && c.alertId) {
+                            const relatedAlert = alertMap.get(c.alertId);
+                            if (relatedAlert?.userId) effectiveUserId = relatedAlert.userId;
+                        }
+                        // Enriquecer con datos del usuario
+                        const u = userMap.get(effectiveUserId);
+                        if (u) {
+                            c.userId = effectiveUserId;
+                            c.userName = c.userName || u.fullName;
+                            c.userDocumentNumber = u.documentNumber;
+                            c.userEmail = u.email;
+                            c.userCompany = u.companyName;
+                            c.userArea = u.areaName;
+                        }
+                        // Enriquecer nombre del psicólogo si no vino del backend
+                        if (!c.assignedToPsychologistName && c.assignedToPsychologistId) {
+                            const psych = userMap.get(c.assignedToPsychologistId);
+                            if (psych) c.assignedToPsychologistName = psych.fullName;
+                        }
+                        return c;
+                    });
+                    this.applyFilter();
+                },
                 error: () => this.notify.error('No fue posible cargar casos'),
             });
     }
@@ -166,7 +207,13 @@ export class AdminCasesComponent implements OnInit {
         this.followUpLoading = true;
         this.service.getFollowUps(caseId)
             .pipe(finalize(() => (this.followUpLoading = false)))
-            .subscribe(rows => (this.followUps = rows));
+            .subscribe(rows => {
+                // GET endpoint currently returns [] — preserve any locally accumulated follow-ups
+                if (rows.length > 0) {
+                    this.followUps = rows;
+                }
+                // else keep whatever is already in this.followUps (accumulated via POST responses)
+            });
     }
 
     addFollowUp(): void {
@@ -179,10 +226,13 @@ export class AdminCasesComponent implements OnInit {
         this.service.createFollowUp(this.selectedCase.caseTrackingId, payload)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
-                next: () => {
+                next: (created) => {
                     this.notify.success('Seguimiento agregado');
                     this.newFollowUpNotes = '';
-                    this.loadFollowUps(this.selectedCase!.caseTrackingId);
+                    // Append directly — GET endpoint returns [] so we accumulate locally
+                    if (created) {
+                        this.followUps = [...this.followUps, created];
+                    }
                 },
                 error: (e) => this.notify.error(e?.message || 'Error al agregar seguimiento'),
             });

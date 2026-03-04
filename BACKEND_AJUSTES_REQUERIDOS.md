@@ -1,13 +1,13 @@
 # EmoCheck — Ajustes requeridos en el Backend
 
-> **Fecha de última actualización:** 22 de Febrero 2026
+> **Fecha de última actualización:** 04 de Marzo 2026
 > **Preparado por:** Equipo Frontend
 > **Versión API:** V5
-> **Estado:** ✅ Todos los ajustes fueron desplegados por el backend el 22/02/2026
+> **Estado:** 🔴 Nuevos ajustes pendientes — ver sección V2 al final del documento
 
 ---
 
-## Estado final
+## Estado final (lote anterior — 22/02/2026)
 
 | # | Endpoint | Problema | Estado |
 |---|---|---|---|
@@ -21,7 +21,150 @@
 | 8 | `GET /api/recommendation/by-result/{id}` | Confirmar nombre del campo de texto | ✅ Resuelto |
 | 9 | `GET /api/evaluation/my-completed` | `dimensionScores` y `recommendations` vienen vacíos | ✅ Resuelto |
 
-## Cambios en el frontend tras el despliegue
+---
+
+## 🔴 Nuevos ajustes requeridos — Lote V2 (04/03/2026)
+
+| # | Endpoint | Problema | Prioridad |
+|---|---|---|---|
+| 1 | `GET /api/casetracking/status/{status}` | `userID` viene `0` y `userFullName` viene `""` | 🔴 Alta |
+| 2 | `GET /api/casetracking/status/{status}` | `assignedToUserName` viene `""` | 🔴 Alta |
+| 3 | `GET /api/casetracking/{id}/follow-ups` | **Siempre devuelve `[]`** aunque existan follow-ups creados | 🔴 Alta |
+| 4 | `POST /api/casetracking/{id}/follow-ups` | El campo `caseFollowUpID` viene `0` en la respuesta | 🟡 Media |
+
+---
+
+### Detalle de cada problema
+
+---
+
+#### 🔴 Problema 1 y 2 — `GET /api/casetracking/status/{status}` devuelve `userID: 0` y nombres vacíos
+
+**Endpoint:** `GET /api/casetracking/status/OPEN`
+
+**Respuesta actual (incorrecta):**
+```json
+{
+  "caseTrackingID": 1,
+  "caseNumber": "CASE-2026-0001",
+  "alertID": 7,
+  "userID": 0,
+  "userFullName": "",
+  "assignedToUserID": 3,
+  "assignedToUserName": "",
+  ...
+}
+```
+
+**Respuesta esperada:**
+```json
+{
+  "caseTrackingID": 1,
+  "caseNumber": "CASE-2026-0001",
+  "alertID": 7,
+  "userID": 12,
+  "userFullName": "Simón Rojas",
+  "assignedToUserID": 3,
+  "assignedToUserName": "Psychologist Rojas",
+  ...
+}
+```
+
+**Causa probable:** Al crear el caso (`POST /casetracking`) el `userID` no se guarda correctamente en la base de datos, o la consulta de lista no hace JOIN con la tabla de usuarios.
+
+**Impacto:** La columna "Usuario" y "Psicólogo" de la tabla de casos aparece vacía.
+
+**Workaround actual en frontend:** Se cruza con `GET /api/users` para resolver nombres, usando el `userID` de la alerta relacionada como fallback cuando `userID = 0`.
+
+---
+
+#### 🔴 Problema 3 — `GET /api/casetracking/{id}/follow-ups` siempre devuelve `[]`
+
+**Endpoint:** `GET /api/casetracking/1/follow-ups`
+
+**Respuesta actual (incorrecta):**
+```json
+[]
+```
+
+**Respuesta esperada:**
+```json
+[
+  {
+    "caseFollowUpID": 1,
+    "caseTrackingID": 1,
+    "performedByUserID": 5,
+    "performedByUserName": "Psychologist Rojas",
+    "actionType": "SESSION",
+    "description": "Nota del seguimiento",
+    "outcome": null,
+    "nextActionDate": null,
+    "performedAt": "2026-03-04T21:30:22Z"
+  }
+]
+```
+
+**Causa probable:** La consulta de lista de follow-ups no está implementada o filtra por un campo incorrecto.
+
+**Impacto crítico:** El historial de seguimientos clínicos no es visible. Un psicólogo no puede ver los seguimientos anteriores de un paciente al reabrir el caso.
+
+**Workaround actual en frontend:** Los follow-ups se acumulan en memoria mientras el panel está abierto. Al cerrar y reabrir el caso, el historial se pierde.
+
+---
+
+#### 🟡 Problema 4 — `POST /api/casetracking/{id}/follow-ups` devuelve `caseFollowUpID: 0`
+
+**Endpoint:** `POST /api/casetracking/1/follow-ups`
+
+**Request (correcto):**
+```json
+{
+  "actionType": "SESSION",
+  "description": "Nota del seguimiento"
+}
+```
+
+**Respuesta actual:**
+```json
+{
+  "caseFollowUpID": 0,
+  "caseTrackingID": 1,
+  "performedByUserID": 0,
+  "performedByUserName": "",
+  "actionType": "SESSION",
+  "description": "Nota del seguimiento",
+  "outcome": null,
+  "nextActionDate": null,
+  "performedAt": "2026-03-04T21:30:22Z"
+}
+```
+
+**Respuesta esperada:**
+```json
+{
+  "caseFollowUpID": 3,
+  "caseTrackingID": 1,
+  "performedByUserID": 5,
+  "performedByUserName": "Psychologist Rojas",
+  ...
+}
+```
+
+**Causa probable:** El ID no se retorna después del INSERT, y el usuario autenticado (`performedByUserID`) no se toma del token JWT.
+
+**Impacto:** Menor — el seguimiento sí se guarda pero sin ID válido ni nombre del psicólogo que lo creó.
+
+---
+
+### Resumen de prioridades
+
+| Prioridad | # | Acción requerida |
+|---|---|---|
+| 🔴 URGENTE | 3 | Implementar correctamente `GET /casetracking/{id}/follow-ups` — devuelve los registros de la tabla |
+| 🔴 URGENTE | 1, 2 | En `GET /casetracking/status/{status}`, hacer JOIN con tabla Users para `userFullName` y `assignedToUserName` |
+| 🟡 MEDIA | 4 | En `POST /casetracking/{id}/follow-ups`, retornar el ID generado y tomar `performedByUserID` del token JWT |
+
+
 
 - **`evaluations.service.ts`**: eliminado el fallback a `GET /evaluation/results/my-results`. Ahora `getMyCompletedEvaluationsWithResult()` llama directamente a `GET /evaluation/my-completed` sin workarounds.
 - **`emotional-analysis.service.ts`**: eliminado el resultado neutro hardcodeado. `performFullAnalysis()` ahora recibe y muestra los datos reales del backend.

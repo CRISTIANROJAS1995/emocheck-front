@@ -17,6 +17,11 @@ export interface CaseTrackingDto {
     userId: number;
     userInitials?: string;
     userName?: string;
+    // Enriched fields (populated from users list after loading)
+    userDocumentNumber?: string;
+    userEmail?: string;
+    userCompany?: string;
+    userArea?: string;
     assignedToPsychologistId?: number;
     assignedToPsychologistName?: string;
     caseNumber?: string;
@@ -35,7 +40,10 @@ export interface FollowUpDto {
     followUpId: number;
     caseTrackingId: number;
     notes?: string;
+    actionType?: string;
+    outcome?: string;
     followUpDate?: string;
+    nextActionDate?: string;
     createdByUserId?: number;
     createdByName?: string;
     createdAt?: string;
@@ -67,26 +75,46 @@ type BackendCaseTrackingDto = {
     alertID?: number;
     userID?: number;
     userFullName?: string;
+    // Backend real fields (confirmed from API response)
+    assignedToUserID?: number;
+    assignedToUserName?: string;
+    // Legacy / alternative field names (kept for compatibility)
     assignedToPsychologistID?: number;
     psychologistName?: string;
     status?: string;
     priority?: string;
+    description?: string;        // backend uses "description" not "initialAssessment"
+    actionPlan?: string;         // backend uses "actionPlan"
+    closureReason?: string;
     initialAssessment?: string;
     interventionPlan?: string;
     progressNotes?: string;
     finalOutcome?: string;
+    createdAt?: string;          // backend uses "createdAt" not "openedAt"
     openedAt?: string;
     closedAt?: string;
+    updatedAt?: string;
     nextFollowUpDate?: string;
+    followUps?: unknown[];
 };
 
 type BackendFollowUpDto = {
     followUpID?: number;
+    caseFollowUpID?: number;      // real backend field name
     caseTrackingID?: number;
     notes?: string;
+    description?: string;         // real backend field name
+    actionType?: string;
+    followUpType?: string;
+    outcome?: string;
     followUpDate?: string;
+    scheduledDate?: string;
+    nextActionDate?: string;
+    performedAt?: string;         // real backend field name for createdAt
     createdByUserID?: number;
+    performedByUserID?: number;   // real backend field name
     createdByName?: string;
+    performedByUserName?: string; // real backend field name
     createdAt?: string;
 };
 
@@ -107,23 +135,27 @@ export class AdminCaseTrackingService {
     }
 
     private mapCase(row: BackendCaseTrackingDto): CaseTrackingDto {
+        const assignedId = row.assignedToUserID ?? row.assignedToPsychologistID;
+        const assignedName = row.assignedToUserName ?? row.psychologistName;
+        const userName = row.userFullName?.trim() || undefined;
         return {
             caseTrackingId: Number(row.caseTrackingID ?? 0),
             alertId: Number(row.alertID ?? 0),
             userId: Number(row.userID ?? 0),
-            userInitials: this.toInitials(row.userFullName),
-            userName: row.userFullName,
-            assignedToPsychologistId:
-                typeof row.assignedToPsychologistID === 'number' ? row.assignedToPsychologistID : undefined,
-            assignedToPsychologistName: row.psychologistName,
+            userInitials: this.toInitials(userName),
+            userName: userName,
+            assignedToPsychologistId: typeof assignedId === 'number' ? assignedId : undefined,
+            assignedToPsychologistName: assignedName?.trim() || undefined,
             caseNumber: row.caseNumber,
             status: row.status,
             priority: row.priority,
-            initialAssessment: row.initialAssessment,
-            interventionPlan: row.interventionPlan,
+            // description/actionPlan are the real backend fields; fallback to old names
+            initialAssessment: row.description ?? row.initialAssessment,
+            interventionPlan: row.actionPlan ?? row.interventionPlan,
             progressNotes: row.progressNotes,
-            finalOutcome: row.finalOutcome,
-            openedAt: row.openedAt,
+            finalOutcome: row.closureReason ?? row.finalOutcome,
+            // createdAt is the real backend field for opening date
+            openedAt: row.createdAt ?? row.openedAt,
             closedAt: row.closedAt,
             nextFollowUpDate: row.nextFollowUpDate,
         };
@@ -131,13 +163,16 @@ export class AdminCaseTrackingService {
 
     private mapFollowUp(row: BackendFollowUpDto): FollowUpDto {
         return {
-            followUpId: Number(row.followUpID ?? 0),
+            followUpId: Number(row.caseFollowUpID ?? row.followUpID ?? 0),
             caseTrackingId: Number(row.caseTrackingID ?? 0),
-            notes: row.notes,
-            followUpDate: row.followUpDate,
-            createdByUserId: typeof row.createdByUserID === 'number' ? row.createdByUserID : undefined,
-            createdByName: row.createdByName,
-            createdAt: row.createdAt,
+            notes: row.description ?? row.notes,
+            actionType: row.actionType ?? row.followUpType,
+            outcome: row.outcome ?? undefined,
+            followUpDate: row.scheduledDate ?? row.followUpDate,
+            nextActionDate: row.nextActionDate ?? undefined,
+            createdByUserId: row.performedByUserID ?? row.createdByUserID,
+            createdByName: row.performedByUserName ?? row.createdByName,
+            createdAt: row.performedAt ?? row.createdAt,
         };
     }
 
@@ -148,9 +183,12 @@ export class AdminCaseTrackingService {
         return this.http
             .get<unknown>(`${this.apiUrl}/casetracking/status/${status}`)
             .pipe(
-                map((res) => this.unwrapArray<BackendCaseTrackingDto>(res).map((x) => this.mapCase(x))),
+                map((res) => {
+                    const rows = this.unwrapArray<BackendCaseTrackingDto>(res);
+                    return rows.map((x) => this.mapCase(x));
+                }),
                 map((rows) => this.applyClientFilters(rows, query)),
-                catchError(() => of([])),
+                catchError((err) => { console.error('[CaseTracking] ERROR:', err); return of([]); }),
             );
     }
 
@@ -208,16 +246,17 @@ export class AdminCaseTrackingService {
     }
 
     createFollowUp(caseId: number, payload: CreateFollowUpDto): Observable<FollowUpDto | null> {
+        // Backend requires: ActionType (string) + Description (string)
         const body = {
-            notes: payload.notes,
-            followUpType: payload.followUpType ?? 'SESSION',
-            scheduledDate: payload.scheduledDate,
+            actionType: payload.followUpType ?? 'SESSION',
+            description: payload.notes,
+            scheduledDate: payload.scheduledDate ?? null,
         };
         return this.http
             .post<unknown>(`${this.apiUrl}/casetracking/${caseId}/follow-ups`, body)
             .pipe(
                 map((res) => this.mapFollowUp(this.unwrapObject<BackendFollowUpDto>(res))),
-                catchError(() => of(null)),
+                catchError((err) => { console.error('[FollowUps] POST error:', err?.error ?? err); return of(null); }),
             );
     }
 

@@ -54,7 +54,11 @@ export class SupportComponent implements OnInit {
                 catchError(() => of([])),
                 finalize(() => { this.loading = false; })
             )
-            .subscribe((emergency) => { this.emergencyContacts = emergency; });
+            .subscribe(() => {
+                // La sección de emergencias muestra información estática de EmoCheck.
+                // Se ignora la respuesta del backend para siempre mostrar los contactos fijos.
+                this.emergencyContacts = [];
+            });
     }
 
     call123(): void {

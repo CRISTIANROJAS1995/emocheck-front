@@ -90,7 +90,7 @@ export class TeamTrackingComponent implements OnInit {
         { id: 'last-6-months', label: 'Últimos 6 meses' },
         { id: 'last-year', label: 'Último año' },
     ];
-    selectedTimeRange: TimeRangeId = 'last-6-months';
+    selectedTimeRange: TimeRangeId = 'last-year';
 
     readonly groupByOptions: Array<{ id: GroupById; label: string }> = [
         { id: 'day', label: 'Día' },
@@ -102,6 +102,8 @@ export class TeamTrackingComponent implements OnInit {
     // Charts
     riskDonutChart: TeamDonutChartOptions | null = null;
     riskTrendChart: TeamStackedAreaChartOptions | null = null;
+    hasDonutData = false;
+    hasTrendData = false;
 
     constructor(private readonly dashboard: DashboardService) { }
 
@@ -125,20 +127,26 @@ export class TeamTrackingComponent implements OnInit {
         const { startDate, endDate } = this.getPeriodIsoRange(this.selectedTimeRange);
         const periodType = this.mapGroupByToPeriodType(this.selectedGroupBy);
 
+        console.log('[TeamTracking] Cargando datos. Params:', { startDate, endDate, periodType });
+
         forkJoin({
-            indicators: this.dashboard.getIndicators({ startDate, endDate }).pipe(catchError(() => of(null))),
-            risk: this.dashboard.getRiskDistribution({ startDate, endDate }).pipe(catchError(() => of(null))),
-            trends: this.dashboard
-                .getTrends({
-                    startDate,
-                    endDate,
-                    periodType,
-                })
-                .pipe(catchError(() => of([] as TrendDataDto[]))),
+            indicators: this.dashboard.getIndicators({ startDate, endDate }).pipe(
+                catchError((err) => { console.error('[TeamTracking] ❌ /dashboard/indicators:', err?.status, err?.error ?? err?.message); return of(null); })
+            ),
+            risk: this.dashboard.getRiskDistribution({ startDate, endDate }).pipe(
+                catchError((err) => { console.error('[TeamTracking] ❌ /dashboard/risk-distribution:', err?.status, err?.error ?? err?.message); return of(null); })
+            ),
+            trends: this.dashboard.getTrends({ startDate, endDate, periodType }).pipe(
+                catchError((err) => { console.error('[TeamTracking] ❌ /dashboard/trends:', err?.status, err?.error ?? err?.message); return of([] as TrendDataDto[]); })
+            ),
         })
             .pipe(finalize(() => (this.loading = false)))
             .subscribe({
                 next: ({ indicators, risk, trends }) => {
+                    console.log('[TeamTracking] ✅ indicators RAW:', indicators);
+                    console.log('[TeamTracking] ✅ risk RAW:', risk);
+                    console.log('[TeamTracking] ✅ trends RAW:', trends);
+
                     this.indicators = indicators;
                     this.risk = risk;
                     this.trends = trends;
@@ -175,43 +183,63 @@ export class TeamTrackingComponent implements OnInit {
     private buildCharts(): void {
         this.riskDonutChart = null;
         this.riskTrendChart = null;
+        this.hasDonutData = false;
+        this.hasTrendData = false;
 
         const dist = this.risk ?? this.indicators?.riskDistribution;
-        if (dist) {
-            const green = dist.greenCount ?? 0;
-            const yellow = dist.yellowCount ?? 0;
-            const red = dist.redCount ?? 0;
 
-            this.riskDonutChart = {
-                series: [green, yellow, red],
-                labels: ['Verde', 'Amarillo', 'Rojo'],
-                colors: ['#00C950', '#F59E0B', '#EF4444'],
-                chart: {
-                    type: 'donut',
-                    height: 260,
-                    toolbar: { show: false },
-                    fontFamily: 'Montserrat, ui-sans-serif, system-ui',
-                },
-                legend: {
-                    position: 'bottom',
-                    fontSize: '11px',
-                    itemMargin: { horizontal: 12, vertical: 6 },
-                },
-                dataLabels: { enabled: false },
-                stroke: { width: 0 },
-                tooltip: { enabled: true },
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '70%',
+        // Siempre construir el donut — si no hay datos usar placeholder gris
+        const green  = dist?.greenCount  ?? 0;
+        const yellow = dist?.yellowCount ?? 0;
+        const red    = dist?.redCount    ?? 0;
+        this.hasDonutData = (green + yellow + red) > 0;
+
+        this.riskDonutChart = {
+            // Si todos son 0 usamos [1,1,1] para que el donut se renderice en gris
+            series: this.hasDonutData ? [green, yellow, red] : [1, 1, 1],
+            labels: ['Verde', 'Amarillo', 'Rojo'],
+            colors: this.hasDonutData
+                ? ['#00C950', '#F59E0B', '#EF4444']
+                : ['#CBD5E1', '#CBD5E1', '#CBD5E1'],
+            chart: {
+                type: 'donut',
+                height: 260,
+                toolbar: { show: false },
+                fontFamily: 'Montserrat, ui-sans-serif, system-ui',
+            },
+            legend: {
+                position: 'bottom',
+                fontSize: '11px',
+                itemMargin: { horizontal: 12, vertical: 6 },
+                // Ocultar leyenda si no hay datos reales
+                show: this.hasDonutData,
+            } as any,
+            dataLabels: { enabled: false },
+            stroke: { width: 0 },
+            tooltip: { enabled: this.hasDonutData },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '70%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: this.hasDonutData ? 'Total' : 'Sin datos',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                color: this.hasDonutData ? '#1e293b' : '#94a3b8',
+                                formatter: () => this.hasDonutData ? String(green + yellow + red) : '-',
+                            },
                         },
                     },
                 },
-            };
-        }
+            },
+        };
 
         const points = this.trends || [];
-        if (points.length) {
+        this.hasTrendData = points.length > 0;
+        if (this.hasTrendData) {
             const categories = points.map((p) => this.formatTrendLabel(p.period ?? ''));
             this.riskTrendChart = {
                 series: [

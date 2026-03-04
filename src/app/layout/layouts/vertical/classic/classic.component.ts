@@ -11,6 +11,7 @@ import {
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
 import { NavigationService } from 'app/core/navigation/navigation.service';
 import { Navigation } from 'app/core/navigation/navigation.types';
+import { AuthService } from 'app/core/services/auth.service';
 import { UserComponent } from 'app/layout/common/user/user.component';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -34,15 +35,26 @@ export class ClassicLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
     navigation: Navigation;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    /**
-     * Constructor
-     */
+    /** Ruta a la que lleva el logo del header según el rol */
+    get homeLink(): string {
+        const roles = this._authService.getCurrentUser()?.roles ?? [];
+        if (roles.includes('Psychologist')) return '/team-tracking';
+        if (roles.includes('Admin') || roles.includes('CompanyAdmin') ||
+            roles.includes('SystemAdmin') || roles.includes('SuperAdmin')) return '/admin';
+        return '/home';
+    }
+
+    get isPsychologist(): boolean {
+        return (this._authService.getCurrentUser()?.roles ?? []).includes('Psychologist');
+    }
+
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _router: Router,
         private _navigationService: NavigationService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _fuseNavigationService: FuseNavigationService
+        private _fuseNavigationService: FuseNavigationService,
+        private _authService: AuthService,
     ) { }
 
     // -----------------------------------------------------------------------------------------------------

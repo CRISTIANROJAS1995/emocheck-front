@@ -80,12 +80,17 @@
             </label>
             <label class="editor-panel__field">
                 <span>Psicólogo asignado *</span>
-                <select [(ngModel)]="form.assignedToUserID">
+                <select [(ngModel)]="form.assignedToUserID" [disabled]="psychologists.length === 0">
                     <option [ngValue]="0" disabled>-- Seleccionar psicólogo --</option>
                     @for (p of psychologists; track p.userId) {
-                    <option [ngValue]="p.userId">{{ p.fullName }} ({{ p.email }})</option>
+                    <option [ngValue]="p.userId">{{ p.fullName }}</option>
                     }
                 </select>
+                @if (psychologists.length === 0) {
+                <span class="field-hint field-hint--warn">
+                    <mat-icon>info</mat-icon> No hay usuarios con rol de Psicólogo registrados.
+                </span>
+                }
             </label>
             <label class="editor-panel__field">
                 <span>Prioridad</span>
@@ -162,6 +167,7 @@
                     <th>Usuario</th>
                     <th>Psicólogo</th>
                     <th (click)="toggleSort('openedAt')" [class]="sortClass('openedAt')">Apertura</th>
+                    <th (click)="toggleSort('nextFollowUpDate')" [class]="sortClass('nextFollowUpDate')">Próx. Seguimiento</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -173,16 +179,19 @@
                     <td><span [class]="statusBadge(c.status)">{{ statusLabel(c.status) }}</span></td>
                     <td><span [class]="priorityBadge(c.priority)">{{ priorityLabel(c.priority) }}</span></td>
                     <td>
-                        @if (c.userInitials) {
-                        <span class="avatar-sm">{{ c.userInitials }}</span> } {{ c.userName || '-' }}
+                        @if (c.userName) {
+                        <span class="user-name">{{ c.userName }}</span> @if (c.userDocumentNumber) {
+                        <br><span class="user-doc">{{ c.userDocumentNumber }}</span> } } @else {
+                        <span class="text-muted">-</span> }
                     </td>
                     <td>{{ c.assignedToPsychologistName || '-' }}</td>
-                    <td>{{ c.openedAt | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ c.openedAt ? (c.openedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+                    <td>{{ c.nextFollowUpDate ? (c.nextFollowUpDate | date:'dd/MM/yyyy') : '-' }}</td>
                     <td class="actions-cell">
-                        <button class="btn btn--outline btn--xs" (click)="selectCase(c); $event.stopPropagation()">
+                        <button class="btn btn--outline btn--xs" title="Ver detalle" (click)="selectCase(c); $event.stopPropagation()">
                             <mat-icon>visibility</mat-icon>
                         </button> @if (c.status !== 'CLOSED' && c.status !== 'ESCALATED') {
-                        <button class="btn btn--danger btn--xs" (click)="selectCase(c); $event.stopPropagation()" [disabled]="saving">
+                        <button class="btn btn--danger btn--xs" title="Cerrar caso" (click)="selectCase(c); $event.stopPropagation()" [disabled]="saving">
                             <mat-icon>lock</mat-icon>
                         </button> }
                     </td>
@@ -208,6 +217,20 @@
                 <mat-icon>close</mat-icon>
             </button>
         </div>
+
+        <!-- User info block -->
+        @if (current.userName) {
+        <div class="user-detail-block">
+            <mat-icon>person</mat-icon>
+            <div>
+                <span class="user-detail-name">{{ current.userName }}</span> @if (current.userDocumentNumber) {
+                <span class="user-detail-doc">Doc: {{ current.userDocumentNumber }}</span> } @if (current.userEmail) {
+                <span class="user-detail-extra">{{ current.userEmail }}</span> } @if (current.userCompany || current.userArea) {
+                <span class="user-detail-extra">{{ current.userCompany }}{{ current.userCompany && current.userArea ? ' · ' : '' }}{{ current.userArea }}</span> }
+            </div>
+        </div>
+        }
+
         <div class="detail-panel__grid">
             <div class="detail-panel__field">
                 <label>Estado</label>
@@ -218,31 +241,53 @@
                 <span [class]="priorityBadge(current.priority)">{{ priorityLabel(current.priority) }}</span>
             </div>
             <div class="detail-panel__field">
-                <label>Usuario</label>
-                <span>{{ current.userName || current.userInitials || current.userId }}</span>
-            </div>
-            <div class="detail-panel__field">
-                <label>Psicólogo</label>
+                <label>Psicólogo asignado</label>
                 <span>{{ current.assignedToPsychologistName || 'No asignado' }}</span>
             </div>
             <div class="detail-panel__field">
+                <label>Alerta origen</label>
+                <span>#{{ current.alertId }}</span>
+            </div>
+            <div class="detail-panel__field">
                 <label>Apertura</label>
-                <span>{{ current.openedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span>{{ current.openedAt ? (current.openedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</span>
             </div>
             <div class="detail-panel__field">
                 <label>Cierre</label>
                 <span>{{ current.closedAt ? (current.closedAt | date:'dd/MM/yyyy HH:mm') : 'Abierto' }}</span>
             </div>
-            <div class="detail-panel__field detail-panel__field--full">
-                <label>Descripción</label>
-                <span>{{ current.initialAssessment || current.progressNotes || '-' }}</span>
+            <div class="detail-panel__field">
+                <label>Próx. seguimiento</label>
+                <span>{{ current.nextFollowUpDate ? (current.nextFollowUpDate | date:'dd/MM/yyyy') : '-' }}</span>
             </div>
+            @if (current.initialAssessment) {
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Evaluación inicial</label>
+                <span>{{ current.initialAssessment }}</span>
+            </div>
+            } @if (current.interventionPlan) {
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Plan de intervención</label>
+                <span>{{ current.interventionPlan }}</span>
+            </div>
+            } @if (current.progressNotes) {
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Notas de progreso</label>
+                <span>{{ current.progressNotes }}</span>
+            </div>
+            } @if (current.finalOutcome) {
+            <div class="detail-panel__field detail-panel__field--full">
+                <label>Resultado final</label>
+                <span>{{ current.finalOutcome }}</span>
+            </div>
+            }
         </div>
 
         <!-- Edit section -->
         @if (current.status !== 'CLOSED' && current.status !== 'ESCALATED') {
         <div class="edit-section">
-            <h4>Actualizar caso</h4>
+            <h4>
+                <mat-icon>edit</mat-icon> Actualizar caso</h4>
             <div class="edit-section__row">
                 <label class="editor-panel__field">
                     <span>Estado</span>
@@ -262,7 +307,7 @@
                     </select>
                 </label>
             </div>
-            <div class="edit-section__row" style="margin-top:8px">
+            <div class="edit-section__row" style="margin-top:12px">
                 <label class="editor-panel__field editor-panel__field--full">
                     <span>Razón de cierre</span>
                     <textarea rows="2" [(ngModel)]="closeReason"
@@ -293,10 +338,14 @@
                 <div class="follow-up-item__dot"></div>
                 <div class="follow-up-item__content">
                     <div class="follow-up-item__meta">
-                        <strong>{{ fu.createdByName || 'Sistema' }}</strong>
+                        <strong>{{ fu.createdByName || 'Sistema' }}</strong> @if (fu.actionType) {
+                        <span class="follow-up-item__type">{{ fu.actionType }}</span> }
                         <span>{{ fu.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
                     </div>
                     <p>{{ fu.notes }}</p>
+                    @if (fu.outcome) {
+                    <p class="follow-up-item__outcome"><strong>Resultado:</strong> {{ fu.outcome }}</p>
+                    }
                 </div>
             </div>
             } @if (!followUpLoading && followUps.length === 0) {

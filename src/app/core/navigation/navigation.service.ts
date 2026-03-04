@@ -41,8 +41,9 @@ export class NavigationService {
      */
     get(): Observable<Navigation> {
         const roles = this.auth.getCurrentUser()?.roles ?? [];
-        const isAdmin = hasAnyRole(roles, ['Admin', 'CompanyAdmin']);
-        const isSupportStaff = hasAnyRole(roles, ['Psychologist', 'HSE']);
+        const isAdmin = hasAnyRole(roles, ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin']);
+        const isPsychologist = hasAnyRole(roles, ['Psychologist']);
+        const isSupportStaff = hasAnyRole(roles, ['SuperAdmin', 'SystemAdmin', 'Psychologist', 'HSE']);
 
         const defaultItems: FuseNavigationItem[] = [];
         const baseItemClasses = {
@@ -158,38 +159,52 @@ export class NavigationService {
                         link: '/admin/evaluations',
                         classes: baseItemClasses,
                     },
+                    {
+                        id: 'seguimiento-colaboradores',
+                        title: 'Seguimiento Colaboradores',
+                        type: 'basic',
+                        icon: 'heroicons_outline:chart-bar-square',
+                        link: '/team-tracking',
+                        classes: {
+                            ...baseItemClasses,
+                            wrapper: '!mb-3 nav-hover-green',
+                        },
+                    },
                 ],
             });
         } else {
-            defaultItems.push({
-                id: 'mis-evaluaciones',
-                title: 'Mis Evaluaciones',
-                type: 'basic',
-                icon: 'emocheck:mis-evaluaciones',
-                link: '/home',
-                classes: baseItemClasses,
-            });
+            // Ítems de empleado — NO mostrar si es Psychologist
+            if (!isPsychologist) {
+                defaultItems.push({
+                    id: 'mis-evaluaciones',
+                    title: 'Mis Evaluaciones',
+                    type: 'basic',
+                    icon: 'emocheck:mis-evaluaciones',
+                    link: '/home',
+                    classes: baseItemClasses,
+                });
 
-            defaultItems.push({
-                id: 'my-tracking',
-                title: 'Mi Seguimiento',
-                type: 'basic',
-                icon: 'heroicons_outline:chart-bar-square',
-                link: '/my-tracking',
-                classes: {
-                    ...baseItemClasses,
-                    wrapper: '!mb-3 nav-hover-green',
-                },
-            });
+                defaultItems.push({
+                    id: 'my-tracking',
+                    title: 'Mi Seguimiento',
+                    type: 'basic',
+                    icon: 'heroicons_outline:chart-bar-square',
+                    link: '/my-tracking',
+                    classes: {
+                        ...baseItemClasses,
+                        wrapper: '!mb-3 nav-hover-green',
+                    },
+                });
 
-            defaultItems.push({
-                id: 'mi-plan',
-                title: 'Mi Plan',
-                type: 'basic',
-                icon: 'emocheck:mi-plan',
-                link: '/home',
-                classes: baseItemClasses,
-            });
+                defaultItems.push({
+                    id: 'mi-plan',
+                    title: 'Mi Plan',
+                    type: 'basic',
+                    icon: 'emocheck:mi-plan',
+                    link: '/home',
+                    classes: baseItemClasses,
+                });
+            }
 
             if (isSupportStaff) {
                 defaultItems.push({

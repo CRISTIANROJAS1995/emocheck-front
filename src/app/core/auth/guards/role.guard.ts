@@ -14,10 +14,17 @@ function hasAnyRole(userRoles: string[] | null | undefined, requiredRoles: strin
     return requiredRoles.some((r) => userSet.has(normalizeRole(r)));
 }
 
+function getFallbackUrl(roles: string[] | null | undefined): string {
+    const r = roles ?? [];
+    if (r.some(x => normalizeRole(x) === 'psychologist')) return '/team-tracking';
+    if (r.some(x => ['admin', 'companyadmin', 'systemadmin', 'superadmin'].includes(normalizeRole(x)))) return '/admin';
+    return '/home';
+}
+
 /**
  * Guard de roles basado en `route.data.roles`.
  * - Si no hay token → /sign-in
- * - Si el usuario no tiene el rol → /home
+ * - Si el usuario no tiene el rol → fallback según su rol (Psychologist→/team-tracking, Admin→/admin, resto→/home)
  * - Si ya tiene el usuario en memoria → verificación síncrona (sin HTTP)
  * - Si aún no cargó el usuario → espera a ensureCurrentUserLoaded()
  */
@@ -38,7 +45,7 @@ export const RoleGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
     if (cachedUser) {
         return hasAnyRole(cachedUser.roles, requiredRoles)
             ? true
-            : router.parseUrl('/home');
+            : router.parseUrl(getFallbackUrl(cachedUser.roles));
     }
 
     // 3. Usuario no cargado aún → esperar la rehidratación (ya disparada en initializeAuth)
@@ -48,7 +55,7 @@ export const RoleGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
             return of(
                 hasAnyRole(userRoles, requiredRoles)
                     ? true
-                    : router.parseUrl('/home')
+                    : router.parseUrl(getFallbackUrl(userRoles))
             );
         }),
         catchError(() => {

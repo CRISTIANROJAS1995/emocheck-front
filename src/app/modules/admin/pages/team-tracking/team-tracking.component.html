@@ -83,21 +83,27 @@
             <!-- KPIs -->
             <section class="team-kpis" *ngIf="indicators as kpi">
                 <div class="kpi-card kpi-card--teal">
-                    <div class="kpi-card__icon"><mat-icon svgIcon="heroicons_outline:users"></mat-icon></div>
+                    <div class="kpi-card__icon">
+                        <mat-icon svgIcon="heroicons_outline:users"></mat-icon>
+                    </div>
                     <div class="kpi-card__value">{{ kpi.totalUsers }}</div>
                     <div class="kpi-card__label">Total colaboradores</div>
                     <div class="kpi-card__meta">Evaluaciones completadas: {{ kpi.totalEvaluationsCompleted }}</div>
                 </div>
 
                 <div class="kpi-card kpi-card--blue">
-                    <div class="kpi-card__icon"><mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon></div>
+                    <div class="kpi-card__icon">
+                        <mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon>
+                    </div>
                     <div class="kpi-card__value">{{ kpi.participationRate }}%</div>
                     <div class="kpi-card__label">Participación</div>
                     <div class="kpi-card__meta">Alertas sin atender: {{ kpi.unattendedAlerts }}</div>
                 </div>
 
                 <div class="kpi-card kpi-card--amber">
-                    <div class="kpi-card__icon"><mat-icon svgIcon="heroicons_outline:bell-alert"></mat-icon></div>
+                    <div class="kpi-card__icon">
+                        <mat-icon svgIcon="heroicons_outline:bell-alert"></mat-icon>
+                    </div>
                     <div class="kpi-card__value">{{ kpi.unattendedAlerts }}</div>
                     <div class="kpi-card__label">Alertas sin atender</div>
                     <div class="kpi-card__meta">Evaluaciones completadas: {{ kpi.totalEvaluationsCompleted }}</div>
@@ -111,11 +117,11 @@
                     <div class="chart-card__subtitle">Resumen agregado del período seleccionado</div>
 
                     <div class="chart-card__body" *ngIf="riskDonutChart">
-                        <apx-chart class="team-chart" [series]="riskDonutChart.series" [chart]="riskDonutChart.chart"
-                            [labels]="riskDonutChart.labels" [colors]="riskDonutChart.colors"
-                            [legend]="riskDonutChart.legend" [dataLabels]="riskDonutChart.dataLabels"
-                            [plotOptions]="riskDonutChart.plotOptions" [stroke]="riskDonutChart.stroke"
-                            [tooltip]="riskDonutChart.tooltip"></apx-chart>
+                        <apx-chart class="team-chart" [series]="riskDonutChart.series" [chart]="riskDonutChart.chart" [labels]="riskDonutChart.labels" [colors]="riskDonutChart.colors" [legend]="riskDonutChart.legend" [dataLabels]="riskDonutChart.dataLabels" [plotOptions]="riskDonutChart.plotOptions"
+                            [stroke]="riskDonutChart.stroke" [tooltip]="riskDonutChart.tooltip"></apx-chart>
+                        @if (!hasDonutData) {
+                        <p class="chart-card__no-data">No hay evaluaciones completadas en el período seleccionado</p>
+                        }
                     </div>
 
                     <div class="chart-card__empty" *ngIf="!riskDonutChart">Sin datos para graficar</div>
@@ -126,15 +132,15 @@
                     <div class="chart-card__subtitle">Evolución (verde/amarillo/rojo)</div>
 
                     <div class="chart-card__body" *ngIf="riskTrendChart">
-                        <apx-chart class="team-chart" [series]="riskTrendChart.series" [chart]="riskTrendChart.chart"
-                            [xaxis]="riskTrendChart.xaxis" [yaxis]="riskTrendChart.yaxis"
-                            [stroke]="riskTrendChart.stroke" [grid]="riskTrendChart.grid"
-                            [dataLabels]="riskTrendChart.dataLabels" [markers]="riskTrendChart.markers"
-                            [tooltip]="riskTrendChart.tooltip" [colors]="riskTrendChart.colors"
-                            [fill]="riskTrendChart.fill" [legend]="riskTrendChart.legend"></apx-chart>
+                        <apx-chart class="team-chart" [series]="riskTrendChart.series" [chart]="riskTrendChart.chart" [xaxis]="riskTrendChart.xaxis" [yaxis]="riskTrendChart.yaxis" [stroke]="riskTrendChart.stroke" [grid]="riskTrendChart.grid" [dataLabels]="riskTrendChart.dataLabels"
+                            [markers]="riskTrendChart.markers" [tooltip]="riskTrendChart.tooltip" [colors]="riskTrendChart.colors" [fill]="riskTrendChart.fill" [legend]="riskTrendChart.legend"></apx-chart>
                     </div>
 
-                    <div class="chart-card__empty" *ngIf="!riskTrendChart">Sin datos para graficar</div>
+                    <div class="chart-card__empty" *ngIf="!riskTrendChart">
+                        <mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon>
+                        <p>Sin datos de tendencia para el período seleccionado</p>
+                        <span>Completa evaluaciones para ver la evolución aquí</span>
+                    </div>
                 </div>
             </section>
 

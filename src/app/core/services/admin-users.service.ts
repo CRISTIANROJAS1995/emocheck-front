@@ -32,6 +32,7 @@ export interface AdminUserListItemDto {
     stateName?: string;
     isActive?: boolean;
     roles?: string[];
+    roleIds?: number[];   // IDs numéricos de los roles (ej: 5 = Psychologist)
     creationDate?: string;
     lastLoginAt?: string;
     lastEvaluationDate?: string;
@@ -125,6 +126,9 @@ export class AdminUsersService {
             isActive: u.isActive ?? true,
             roles: Array.isArray(u.roles)
                 ? u.roles.map((r) => (typeof r === 'string' ? r : String(r?.name ?? ''))).filter(Boolean)
+                : [],
+            roleIds: Array.isArray(u.roles)
+                ? u.roles.map((r) => (typeof r === 'object' && r?.id != null ? Number(r.id) : null)).filter((id): id is number => id !== null)
                 : [],
             creationDate: u.createdAt ?? undefined,
             lastLoginAt: u.lastLoginAt ?? undefined,

@@ -26,9 +26,13 @@ export class SignedInRedirectComponent implements OnInit {
                     const isSystemAdmin = roles.includes('SystemAdmin');
                     const isAdmin = roles.includes('Admin') || roles.includes('CompanyAdmin');
                     const isEmployee = roles.includes('Employee');
+                    const isPsychologist = roles.includes('Psychologist');
 
                     // Admin roles go straight to admin panel.
                     if (isSystemAdmin || isAdmin) return of('/admin');
+
+                    // Psychologist goes straight to team-tracking.
+                    if (isPsychologist) return of('/team-tracking');
 
                     // Everyone else: Consent -> (Employee => Instructions) else Home.
                     // Profile is completed by admin during user creation, no need to check here.

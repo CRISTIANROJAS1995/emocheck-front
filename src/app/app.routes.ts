@@ -57,21 +57,31 @@ export const appRoutes: Route[] = [
             initialData: initialDataResolver
         },
         children: [
-            { path: 'home', loadChildren: () => import('app/modules/admin/home/home.routes') },
-            { path: 'my-tracking', loadChildren: () => import('app/modules/admin/pages/my-tracking/my-tracking.routes') },
+            {
+                path: 'home',
+                canActivate: [RoleGuard],
+                data: { roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'Employee', 'HSE'] },
+                loadChildren: () => import('app/modules/admin/home/home.routes'),
+            },
+            {
+                path: 'my-tracking',
+                canActivate: [RoleGuard],
+                data: { roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'Employee', 'HSE'] },
+                loadChildren: () => import('app/modules/admin/pages/my-tracking/my-tracking.routes'),
+            },
             { path: 'support', loadChildren: () => import('app/modules/admin/pages/support/support.routes') },
             { path: 'profile', loadChildren: () => import('app/modules/admin/pages/profile/profile.routes') },
             { path: 'resources', loadChildren: () => import('app/modules/admin/pages/resources/resources.routes') },
             {
                 path: 'team-tracking',
                 canActivate: [RoleGuard],
-                data: { roles: ['Psychologist', 'HSE', 'Admin', 'CompanyAdmin'] },
+                data: { roles: ['SuperAdmin', 'SystemAdmin', 'Psychologist', 'HSE', 'Admin', 'CompanyAdmin'] },
                 loadChildren: () => import('app/modules/admin/pages/team-tracking/team-tracking.routes'),
             },
             {
                 path: 'admin',
                 canActivate: [RoleGuard],
-                data: { roles: ['Admin', 'CompanyAdmin'] },
+                data: { roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin'] },
                 loadChildren: () => import('app/modules/admin/pages/admin-workspace/admin-workspace.routes'),
             },
             {
