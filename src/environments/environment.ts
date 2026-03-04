@@ -25,8 +25,8 @@ export const environment = {
     facePlusPlusApiUrl: '/facepp/v3/detect',
 
     // 📞 Soporte WhatsApp (número en formato internacional sin + ni espacios)
-    whatsappNumber: '573244563035',
-    whatsappMessage: '¡Hola! Necesito ayuda con EmoCheck.',
+    whatsappNumber: '573175930202',
+    whatsappMessage: 'Hola! Necesito ayuda con EmoCheck.',
 
     // ☁️ AWS S3 — almacenamiento de recursos de bienestar
     // Las credenciales se leen desde .env.local (NG_APP_AWS_KEY_ID / NG_APP_AWS_SECRET)

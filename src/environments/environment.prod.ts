@@ -18,7 +18,7 @@
     facePlusPlusApiUrl: '/facepp/v3/detect',
 
     // Soporte WhatsApp (numero en formato internacional sin + ni espacios)
-    whatsappNumber: '573244563035',
+    whatsappNumber: '573175930202',
     whatsappMessage: 'Hola! Necesito ayuda con EmoCheck.',
 
     // ☁️ AWS S3 — almacenamiento de recursos de bienestar

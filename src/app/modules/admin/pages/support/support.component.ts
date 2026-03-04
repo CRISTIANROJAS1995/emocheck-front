@@ -29,12 +29,12 @@ export class SupportComponent implements OnInit {
 
     // ── WhatsApp ──────────────────────────────────────────────────────────────
     /** Número en formato internacional sin + ni espacios, ej: 573001234567 */
-    readonly whatsappNumber = '573001234567';
-    readonly whatsappDisplay = '+57 300 123 4567';
+    readonly whatsappNumber = '573175930202';
+    readonly whatsappDisplay = '+57 317 593 0202';
 
     get whatsappUrl(): string {
         const text = encodeURIComponent(
-            '¡Hola! Me comunico desde EmoCheck y necesito apoyo psicológico. 🙏'
+            'Hola! Me comunico desde EmoCheck y necesito apoyo psicologico.'
         );
         return `https://wa.me/${this.whatsappNumber}?text=${text}`;
     }
