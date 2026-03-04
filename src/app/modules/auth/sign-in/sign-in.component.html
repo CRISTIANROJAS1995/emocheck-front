@@ -40,8 +40,13 @@
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <img class="h-5 w-5" src="icons/password-login.svg" alt="" aria-hidden="true" />
                             </div>
-                            <input type="password" [formControlName]="'password'" placeholder="•••••••" class="h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-3 py-1 pl-[44px] text-[14px] font-normal leading-[20px] text-[#0A0A0A] placeholder:text-slate-400 focus:border-[#96F7E4] focus:outline-none focus:ring-0"
+                            <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'" placeholder="•••••••" class="h-[44px] w-full rounded-[14px] border-[0.667px] border-[#96F7E4] bg-[#F3F3F5] px-3 py-1 pl-[44px] pr-[44px] text-[14px] font-normal leading-[20px] text-[#0A0A0A] placeholder:text-slate-400 focus:border-[#96F7E4] focus:outline-none focus:ring-0"
                             />
+                            <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Ver contraseña'">
+                                <mat-icon class="text-[18px] leading-none" style="width:18px;height:18px;font-size:18px;">
+                                    {{ showPassword ? 'visibility_off' : 'visibility' }}
+                                </mat-icon>
+                            </button>
                         </div>
                         @if (signInForm.get('password')?.hasError('required')) {
                         <div class="mt-1 text-sm text-red-600">La contraseña es requerida.</div>
@@ -56,8 +61,9 @@
                             <span
                                 class="text-montserrat-480 text-[14px] leading-[20px] text-[#4A5565]">Recordarme</span>
                         </label>
-                        <a class="text-montserrat-480 text-[14px] leading-[20px] text-[#009689]" href="#">¿Olvidaste tu
-                            contraseña?</a>
+                        <button type="button" class="text-montserrat-480 cursor-pointer border-none bg-transparent text-[14px] leading-[20px] text-[#009689] hover:underline" (click)="showForgotModal = true">
+                            ¿Olvidaste tu contraseña?
+                        </button>
                     </div>
 
                     <!-- Submit button -->
@@ -93,3 +99,63 @@
         </div>
     </div>
 </div>
+
+<!-- ── Modal: ¿Olvidaste tu contraseña? ─────────────────────────────────── -->
+@if (showForgotModal) {
+<div class="forgot-overlay" (click)="showForgotModal = false">
+    <div class="forgot-modal" (click)="$event.stopPropagation()">
+
+        <button class="forgot-modal__close" type="button" (click)="showForgotModal = false" aria-label="Cerrar">
+            <mat-icon>close</mat-icon>
+        </button>
+
+        <div class="forgot-modal__icon" aria-hidden="true">
+            <mat-icon>lock_reset</mat-icon>
+        </div>
+
+        <h2 class="forgot-modal__title">¿Olvidaste tu contraseña?</h2>
+        <p class="forgot-modal__text">
+            El restablecimiento de contraseña es gestionado por el administrador del sistema.
+            Comunícate con nosotros a través de los siguientes medios y te ayudaremos a recuperar el acceso:
+        </p>
+
+        <div class="forgot-modal__contacts">
+            <a class="forgot-contact" href="tel:+573175930202">
+                <span class="forgot-contact__icon forgot-contact__icon--phone">
+                    <mat-icon>phone</mat-icon>
+                </span>
+                <div class="forgot-contact__info">
+                    <div class="forgot-contact__label">Teléfono / WhatsApp</div>
+                    <div class="forgot-contact__value">+57 317 593 0202</div>
+                </div>
+            </a>
+
+            <a class="forgot-contact" href="https://wa.me/573175930202?text=Hola!%20Necesito%20ayuda%20para%20restablecer%20mi%20contrasena%20en%20EmoCheck." target="_blank" rel="noopener noreferrer">
+                <span class="forgot-contact__icon forgot-contact__icon--whatsapp">
+                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.9 9.06A9.73 9.73 0 0 0 16.05 6C10.52 6 6.01 10.51 6 16.04a9.97 9.97 0 0 0 1.34 4.99L6 26l5.1-1.34a9.96 9.96 0 0 0 4.77 1.21h.01c5.52 0 10.03-4.51 10.04-10.05a9.98 9.98 0 0 0-2.93-7.76ZM16.06 24.3a8.28 8.28 0 0 1-4.22-1.16l-.3-.18-3.12.82.83-3.05-.2-.31a8.27 8.27 0 0 1-1.27-4.38c0-4.57 3.72-8.28 8.3-8.28a8.3 8.3 0 0 1 8.28 8.3c-.01 4.57-3.73 8.24-8.3 8.24Zm4.55-6.2c-.25-.12-1.47-.72-1.7-.81-.22-.08-.39-.12-.55.13-.16.25-.63.8-.77.97-.14.17-.29.19-.53.06-.25-.12-1.04-.38-1.98-1.22a7.4 7.4 0 0 1-1.37-1.7c-.14-.25-.01-.38.1-.5.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.66.3-.22.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.13.16 1.73 2.64 4.2 3.7.59.25 1.04.4 1.4.52.59.18 1.12.16 1.54.1.47-.08 1.46-.6 1.67-1.17.2-.58.2-1.07.14-1.17-.06-.1-.22-.16-.47-.28Z" fill="white"/>
+                    </svg>
+                </span>
+                <div class="forgot-contact__info">
+                    <div class="forgot-contact__label">WhatsApp</div>
+                    <div class="forgot-contact__value">Escribir mensaje</div>
+                </div>
+            </a>
+
+            <a class="forgot-contact" href="mailto:soluciones@emocheck.co">
+                <span class="forgot-contact__icon forgot-contact__icon--email">
+                    <mat-icon>email</mat-icon>
+                </span>
+                <div class="forgot-contact__info">
+                    <div class="forgot-contact__label">Correo electrónico</div>
+                    <div class="forgot-contact__value">soluciones&#64;emocheck.co</div>
+                </div>
+            </a>
+        </div>
+
+        <button class="forgot-modal__btn" type="button" (click)="showForgotModal = false">
+            Entendido
+        </button>
+    </div>
+</div>
+}

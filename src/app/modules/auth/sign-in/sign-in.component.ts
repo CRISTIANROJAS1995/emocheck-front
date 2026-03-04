@@ -48,8 +48,11 @@ export class AuthSignInComponent implements OnInit {
     };
     signInForm: UntypedFormGroup;
     showAlert: boolean = false;
-
     loading: boolean = false;
+
+    // ── UI state ──────────────────────────────────────────────────────────────
+    showPassword    = false;
+    showForgotModal = false;
 
     /**
      * Constructor

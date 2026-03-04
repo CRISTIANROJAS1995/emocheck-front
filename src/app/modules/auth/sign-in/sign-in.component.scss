@@ -39,3 +39,161 @@
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
 }
+
+// ── Modal: Olvidé mi contraseña ───────────────────────────────────────────────
+.forgot-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: fo-fade 0.18s ease;
+}
+
+.forgot-modal {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 24px;
+    padding: 36px 28px 28px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+    animation: fo-scale 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-family: 'Montserrat', sans-serif;
+}
+
+.forgot-modal__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #F1F5F9;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+    &:hover { background: #E2E8F0; color: #1E293B; }
+}
+
+.forgot-modal__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(0, 150, 137, 0.12) 0%, rgba(21, 93, 252, 0.10) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+
+    mat-icon { font-size: 28px; width: 28px; height: 28px; color: #009689; }
+}
+
+.forgot-modal__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #101828;
+    margin: 0 0 10px;
+}
+
+.forgot-modal__text {
+    font-size: 13.5px;
+    color: #4A5565;
+    line-height: 1.6;
+    margin: 0 0 20px;
+}
+
+.forgot-modal__contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.forgot-contact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: #F8FAFC;
+    text-decoration: none;
+    transition: background 0.14s, transform 0.14s, border-color 0.14s;
+
+    &:hover {
+        background: #F0FDF9;
+        border-color: rgba(0, 150, 137, 0.30);
+        transform: translateY(-1px);
+    }
+}
+
+.forgot-contact__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+
+    mat-icon  { font-size: 20px; width: 20px; height: 20px; color: #fff; }
+    svg       { width: 22px; height: 22px; }
+
+    &--phone    { background: #009689; }
+    &--whatsapp { background: #25D366; }
+    &--email    { background: #155DFC; }
+}
+
+.forgot-contact__info { min-width: 0; }
+
+.forgot-contact__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.forgot-contact__value {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #101828;
+    margin-top: 1px;
+}
+
+.forgot-modal__btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #009689 0%, #155DFC 100%);
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+
+    &:hover { opacity: 0.92; transform: translateY(-1px); }
+}
+
+@keyframes fo-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes fo-scale {
+    from { transform: scale(0.85); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
