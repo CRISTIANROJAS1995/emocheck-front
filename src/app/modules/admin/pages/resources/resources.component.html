@@ -115,88 +115,114 @@
                 </div>
             </section>
 
-            <!-- Recomendados -->
-            <section class="resources-section">
-                <div class="resources-section__title">Recomendados para ti</div>
+            <!-- ── Vista SIN filtro: Recomendados + Destacados + Todos ─────── -->
+            <ng-container *ngIf="selectedCategoryId === null">
 
-                <div class="resources-empty" *ngIf="!loading && !error && !(recommended?.length)">
-                    No hay recomendados disponibles por ahora.
-                </div>
-
-                <div class="resources-grid" *ngIf="recommended?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of recommended">
-                        <div class="resource-card__top">
-                            <div class="resource-card__title">{{ r.title }}</div>
-                            <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">
-                                Abrir
-                            </button>
+                <!-- Recomendados -->
+                <section class="resources-section" *ngIf="recommended?.length">
+                    <div class="resources-section__title">Recomendados para ti</div>
+                    <div class="resources-grid">
+                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of recommended">
+                            <div class="resource-card__top">
+                                <div class="resource-card__title">{{ r.title }}</div>
+                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
+                            </div>
+                            <div class="resource-card__meta">
+                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
+                                <span class="resource-badge">{{ r.contentType }}</span>
+                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
+                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
+                            </div>
+                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
                         </div>
-                        <div class="resource-card__meta">
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
-                            <span class="resource-badge">{{ r.contentType }}</span>
-                            <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
-                            <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
-                        </div>
-                        <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Destacados -->
-            <section class="resources-section">
-                <div class="resources-section__title">Destacados</div>
-                <div class="resources-section__subtitle">Selección curada para empezar hoy</div>
-
-                <div class="resources-empty" *ngIf="!loading && !error && !(featured?.length)">
-                    No hay recursos destacados por ahora.
-                </div>
-
-                <div class="resources-grid" *ngIf="featured?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of featured">
-                        <div class="resource-card__top">
-                            <div class="resource-card__title">{{ r.title }}</div>
-                            <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
+                <!-- Destacados -->
+                <section class="resources-section" *ngIf="featured?.length">
+                    <div class="resources-section__title">Destacados</div>
+                    <div class="resources-section__subtitle">Selección curada para empezar hoy</div>
+                    <div class="resources-grid">
+                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of featured">
+                            <div class="resource-card__top">
+                                <div class="resource-card__title">{{ r.title }}</div>
+                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
+                            </div>
+                            <div class="resource-card__meta">
+                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
+                                <span class="resource-badge">{{ r.contentType }}</span>
+                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
+                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
+                            </div>
+                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
                         </div>
-                        <div class="resource-card__meta">
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
-                            <span class="resource-badge">{{ r.contentType }}</span>
-                            <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
-                            <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
-                        </div>
-                        <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Todos los recursos -->
-            <section class="resources-section">
-                <div class="resources-section__title">Todos los recursos</div>
-                <div class="resources-section__subtitle" *ngIf="selectedCategoryId !== null">
-                    Filtrando por categoría
-                </div>
-
-                <div class="resources-empty" *ngIf="!loading && !error && !resources?.length">
-                    No hay recursos para mostrar.
-                </div>
-
-                <div class="resources-grid" *ngIf="resources?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of resources">
-                        <div class="resource-card__top">
-                            <div class="resource-card__title">{{ r.title }}</div>
-                            <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
-                        </div>
-                        <div class="resource-card__meta">
-                            <span class="resource-category" *ngIf="r.categoryName">{{ r.categoryName }}</span>
-                            <span class="resource-dot" *ngIf="r.categoryName">•</span>
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
-                            <span class="resource-badge">{{ r.contentType }}</span>
-                            <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
-                            <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
-                        </div>
-                        <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
+                <!-- Todos -->
+                <section class="resources-section">
+                    <div class="resources-section__title">Todos los recursos</div>
+                    <div class="resources-empty" *ngIf="!loading && !error && !resources?.length">
+                        No hay recursos disponibles por ahora.
                     </div>
-                </div>
-            </section>
+                    <div class="resources-grid" *ngIf="resources?.length">
+                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of resources">
+                            <div class="resource-card__top">
+                                <div class="resource-card__title">{{ r.title }}</div>
+                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
+                            </div>
+                            <div class="resource-card__meta">
+                                <span class="resource-category" *ngIf="r.categoryName">{{ r.categoryName }}</span>
+                                <span class="resource-dot" *ngIf="r.categoryName">•</span>
+                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
+                                <span class="resource-badge">{{ r.contentType }}</span>
+                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
+                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
+                            </div>
+                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
+                        </div>
+                    </div>
+                </section>
+
+            </ng-container>
+
+            <!-- ── Vista CON filtro: solo resultados de la categoría ─────── -->
+            <ng-container *ngIf="selectedCategoryId !== null">
+                <section class="resources-section">
+                    <div class="resources-section__title">{{ selectedCategoryName }}</div>
+                    <div class="resources-section__subtitle">Recursos disponibles en esta categoría</div>
+
+                    <!-- Sin resultados -->
+                    <div class="resources-empty-category" *ngIf="!loading && !error && !resources?.length">
+                        <mat-icon svgIcon="heroicons_outline:folder-open"></mat-icon>
+                        <p class="resources-empty-category__title">Sin contenido en esta categoría</p>
+                        <p class="resources-empty-category__text">
+                            Aún no hay recursos publicados en <strong>{{ selectedCategoryName }}</strong>.
+                            Estamos trabajando para traerte contenido muy pronto.
+                        </p>
+                        <button mat-button class="resources-chip is-active" type="button" (click)="selectCategory(null)">
+                            Ver todos los recursos
+                        </button>
+                    </div>
+
+                    <!-- Con resultados -->
+                    <div class="resources-grid" *ngIf="resources?.length">
+                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of resources">
+                            <div class="resource-card__top">
+                                <div class="resource-card__title">{{ r.title }}</div>
+                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
+                            </div>
+                            <div class="resource-card__meta">
+                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
+                                <span class="resource-badge">{{ r.contentType }}</span>
+                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
+                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
+                            </div>
+                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
+                        </div>
+                    </div>
+                </section>
+            </ng-container>
 
         </div>
     </div>

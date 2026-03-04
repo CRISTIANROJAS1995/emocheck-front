@@ -33,6 +33,11 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     categories: ResourceCategoryDto[] = [];
     selectedCategoryId: number | null = null;
 
+    get selectedCategoryName(): string | null {
+        if (this.selectedCategoryId == null) return null;
+        return this.categories.find(c => c.resourceCategoryID === this.selectedCategoryId)?.name ?? null;
+    }
+
     featured: WellnessResourceDto[] = [];
     recommended: WellnessResourceDto[] = [];
     resources: WellnessResourceDto[] = [];
