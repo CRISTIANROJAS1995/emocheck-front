@@ -89,6 +89,18 @@ export class ProfileComponent implements OnInit {
     openLightbox(): void  { if (this.avatarUrl) this.lightboxOpen = true; }
     closeLightbox(): void { this.lightboxOpen = false; }
 
+    downloadPhoto(): void {
+        if (!this.avatarUrl) return;
+        const a = document.createElement('a');
+        a.href = this.avatarUrl;
+        a.download = `foto-perfil-${this.profile?.fullName?.replace(/\s+/g, '-') ?? 'usuario'}.jpg`;
+        a.target = '_blank';      // fallback para URLs cross-origin
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
     onPhotoSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
