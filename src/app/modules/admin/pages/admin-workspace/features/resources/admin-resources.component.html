@@ -14,21 +14,27 @@
     <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>folder</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>folder</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ resources.length }}</span>
                 <span class="kpi-card__label">Total Recursos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--sky">
-            <div class="kpi-card__icon"><mat-icon>category</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>category</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ categories.length }}</span>
                 <span class="kpi-card__label">Categorías</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ resources.length }}</span>
                 <span class="kpi-card__label">Activos</span>
@@ -46,14 +52,14 @@
         <button class="btn btn--outline btn--sm" (click)="showCategoryPanel = !showCategoryPanel">
             <mat-icon>{{ showCategoryPanel ? 'close' : 'add' }}</mat-icon>
             {{ showCategoryPanel ? 'Cerrar' : 'Nueva Categoría' }}
-        </button>
-        }
+        </button> }
     </div>
 
     <!-- Formulario crear categoría -->
     @if (showCategoryPanel && canWrite) {
     <div class="editor-panel editor-panel--compact">
-        <h3><mat-icon>label</mat-icon> Nueva Categoría</h3>
+        <h3>
+            <mat-icon>label</mat-icon> Nueva Categoría</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Nombre * <em style="font-weight:400;color:#64748b">(ej: Mindfulness, Neuropausas, Calibración Emocional)</em></span>
@@ -91,21 +97,15 @@
             </div>
             } @else {
             <span class="category-chip__name">{{ c.name ?? c.categoryName }}</span>
-            <span class="category-chip__count" *ngIf="c.resourceCount != null">{{ c.resourceCount }} recursos</span>
-            @if (canWrite) {
+            <span class="category-chip__count" *ngIf="c.resourceCount != null">{{ c.resourceCount }} recursos</span> @if (canWrite) {
             <button class="category-chip__btn" (click)="startEditCategory(c)" title="Editar">
                 <mat-icon>edit</mat-icon>
-            </button>
-            }
-            @if (canDelete) {
+            </button> } @if (canDelete) {
             <button class="category-chip__btn category-chip__btn--danger" (click)="deleteCategory(c)" [disabled]="deletingCategoryId === c.resourceCategoryID" title="Eliminar">
                 <mat-icon>delete</mat-icon>
-            </button>
-            }
-            }
+            </button> } }
         </div>
-        }
-        @if (!categories.length) {
+        } @if (!categories.length) {
         <p class="text-muted" style="font-size:13px;padding:8px 0;">No hay categorías creadas. Crea la primera arriba.</p>
         }
     </div>

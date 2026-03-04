@@ -303,7 +303,6 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     position: relative;
     display: flex;
     align-items: center;
-
     .profile-input {
         width: 100%;
         padding-right: 42px;
@@ -324,15 +323,17 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     justify-content: center;
     color: #94A3B8;
     transition: color 0.15s;
-
     mat-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
     }
-
-    &:hover { color: #009689; }
-    &:focus { outline: none; }
+    &:hover {
+        color: #009689;
+    }
+    &:focus {
+        outline: none;
+    }
 }
 
 .profile-actions {
