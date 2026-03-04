@@ -6,7 +6,10 @@
         <div class="admin-hub__header-blob admin-hub__header-blob--1"></div>
         <div class="admin-hub__header-blob admin-hub__header-blob--2"></div>
         <div class="admin-hub__header-blob admin-hub__header-blob--3"></div>
+        <!-- Grid texture overlay -->
+        <div class="admin-hub__header-grid"></div>
 
+        <!-- Left: title block -->
         <div class="admin-hub__header-content">
             <div class="admin-hub__badge">PANEL DE ADMINISTRACIÓN</div>
             <h1 class="admin-hub__title">Centro de Control</h1>
@@ -16,30 +19,26 @@
             </p>
         </div>
 
-        <!-- Quick stats strip inside header -->
+        <!-- Right: stats panel -->
         <div class="admin-hub__header-stats">
             <div class="admin-hub__hstat">
-                <mat-icon svgIcon="heroicons_outline:users"></mat-icon>
                 <span class="admin-hub__hstat-val">{{ indicators?.totalUsers ?? '—' }}</span>
-                <span class="admin-hub__hstat-lbl">usuarios</span>
+                <span class="admin-hub__hstat-lbl">Usuarios</span>
             </div>
             <div class="admin-hub__hstat-divider"></div>
             <div class="admin-hub__hstat">
-                <mat-icon svgIcon="heroicons_outline:clipboard-document-check"></mat-icon>
                 <span class="admin-hub__hstat-val">{{ indicators?.totalEvaluationsCompleted ?? '—' }}</span>
-                <span class="admin-hub__hstat-lbl">evaluaciones</span>
+                <span class="admin-hub__hstat-lbl">Evaluaciones</span>
             </div>
             <div class="admin-hub__hstat-divider"></div>
             <div class="admin-hub__hstat">
-                <mat-icon svgIcon="heroicons_outline:bell-alert"></mat-icon>
                 <span class="admin-hub__hstat-val">{{ alertStats?.totalAlerts ?? '—' }}</span>
-                <span class="admin-hub__hstat-lbl">alertas</span>
+                <span class="admin-hub__hstat-lbl">Alertas</span>
             </div>
             <div class="admin-hub__hstat-divider"></div>
             <div class="admin-hub__hstat">
-                <mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon>
                 <span class="admin-hub__hstat-val">{{ (indicators?.participationRate ?? 0) | number:'1.0-1' }}%</span>
-                <span class="admin-hub__hstat-lbl">participación</span>
+                <span class="admin-hub__hstat-lbl">Participación</span>
             </div>
         </div>
     </header>
@@ -49,7 +48,7 @@
     <!-- ── KPI Row ──────────────────────────────────────────────────────── -->
     <div class="admin-hub__kpis">
 
-        <div class="kpi-card kpi-card--indigo">
+        <div class="kpi-card kpi-card--teal">
             <div class="kpi-card__icon-wrap">
                 <mat-icon>people</mat-icon>
             </div>
@@ -57,10 +56,9 @@
                 <span class="kpi-card__value">{{ indicators?.totalUsers ?? 0 }}</span>
                 <span class="kpi-card__label">Usuarios Totales</span>
             </div>
-            <div class="kpi-card__bar"></div>
         </div>
 
-        <div class="kpi-card kpi-card--emerald">
+        <div class="kpi-card kpi-card--blue">
             <div class="kpi-card__icon-wrap">
                 <mat-icon>assignment_turned_in</mat-icon>
             </div>
@@ -68,10 +66,9 @@
                 <span class="kpi-card__value">{{ indicators?.totalEvaluationsCompleted ?? 0 }}</span>
                 <span class="kpi-card__label">Evaluaciones</span>
             </div>
-            <div class="kpi-card__bar"></div>
         </div>
 
-        <div class="kpi-card kpi-card--amber">
+        <div class="kpi-card kpi-card--emerald">
             <div class="kpi-card__icon-wrap">
                 <mat-icon>trending_up</mat-icon>
             </div>
@@ -79,7 +76,6 @@
                 <span class="kpi-card__value">{{ (indicators?.participationRate ?? 0) | number:'1.0-1' }}%</span>
                 <span class="kpi-card__label">Participación</span>
             </div>
-            <div class="kpi-card__bar"></div>
         </div>
 
         <div class="kpi-card kpi-card--rose">
@@ -90,7 +86,6 @@
                 <span class="kpi-card__value">{{ alertStats?.totalAlerts ?? 0 }}</span>
                 <span class="kpi-card__label">Alertas Activas</span>
             </div>
-            <div class="kpi-card__bar"></div>
         </div>
 
     </div>
@@ -105,21 +100,22 @@
     <div class="admin-hub__grid">
         @for (card of cards; track card.route) {
         <a class="feature-card feature-card--{{ card.color }}" [routerLink]="card.route">
-            <!-- Gradient accent stripe at top -->
-            <div class="feature-card__stripe"></div>
-
-            <div class="feature-card__top">
-                <div class="feature-card__icon-wrap">
-                    <mat-icon [svgIcon]="card.icon"></mat-icon>
-                </div>
-                <div class="feature-card__metric-pill">
+            <!-- Body -->
+            <div class="feature-card__body">
+                <div class="feature-card__top">
+                    <div class="feature-card__icon-wrap">
+                        <mat-icon [svgIcon]="card.icon"></mat-icon>
+                    </div>
                     <span class="feature-card__metric">{{ card.metric }}</span>
                 </div>
+                <h3 class="feature-card__title">{{ card.title }}</h3>
+                <p class="feature-card__desc">{{ card.description }}</p>
             </div>
 
-            <h3 class="feature-card__title">{{ card.title }}</h3>
-            <p class="feature-card__desc">{{ card.description }}</p>
+            <!-- Divider -->
+            <div class="feature-card__divider"></div>
 
+            <!-- Colored footer band -->
             <div class="feature-card__footer">
                 <span class="feature-card__link">
                     Gestionar
