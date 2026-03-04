@@ -198,40 +198,6 @@
                 </div>
             </section>
 
-            <!-- Apoyo profesional -->
-            <section class="resources-section">
-                <div class="resources-section__title">Apoyo profesional</div>
-                <div class="resources-section__subtitle">
-                    Si necesitas hablar con alguien, aquí tienes opciones de contacto
-                </div>
-
-                <div class="resources-empty" *ngIf="!loading && !error && !(professionals?.length || emergencyContacts?.length)">
-                    No hay contactos disponibles por ahora.
-                </div>
-
-                <div class="support-grid" *ngIf="professionals?.length || emergencyContacts?.length">
-                    <div class="support-card" *ngIf="emergencyContacts?.length">
-                        <div class="support-card__title">Emergencias</div>
-                        <div class="support-item" *ngFor="let p of emergencyContacts">
-                            <div class="support-item__name">{{ p.name }}</div>
-                            <div class="support-item__meta" *ngIf="p.phone">Tel: {{ p.phone }}</div>
-                            <div class="support-item__meta" *ngIf="p.email">Email: {{ p.email }}</div>
-                            <div class="support-item__meta" *ngIf="p.availableHours">Horario: {{ p.availableHours }}</div>
-                        </div>
-                    </div>
-
-                    <div class="support-card" *ngIf="professionals?.length">
-                        <div class="support-card__title">Profesionales</div>
-                        <div class="support-item" *ngFor="let p of professionals">
-                            <div class="support-item__name">{{ p.name }}</div>
-                            <div class="support-item__meta" *ngIf="p.specialty">{{ p.specialty }}</div>
-                            <div class="support-item__meta" *ngIf="p.phone">Tel: {{ p.phone }}</div>
-                            <div class="support-item__meta" *ngIf="p.email">Email: {{ p.email }}</div>
-                            <div class="support-item__meta" *ngIf="p.availableHours">Horario: {{ p.availableHours }}</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
     </div>
 </div>
