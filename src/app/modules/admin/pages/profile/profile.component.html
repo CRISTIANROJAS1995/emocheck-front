@@ -30,8 +30,7 @@
 
                 <div class="avatar-row">
                     <div class="avatar" [class.avatar--has-photo]="!!avatarUrl">
-                        <img *ngIf="avatarUrl" class="avatar__img avatar__img--clickable" [src]="avatarUrl"
-                             alt="Foto de perfil" (click)="openLightbox()" title="Ver foto en grande" />
+                        <img *ngIf="avatarUrl" class="avatar__img avatar__img--clickable" [src]="avatarUrl" alt="Foto de perfil" (click)="openLightbox()" title="Ver foto en grande" />
                         <span *ngIf="!avatarUrl" class="avatar__initials">{{ initials }}</span>
                         <!-- Overlay de carga -->
                         <div class="avatar__uploading" *ngIf="uploadingPhoto">

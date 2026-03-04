@@ -150,6 +150,3 @@ export class UsersService {
             );
     }
 }
-
-export interface UserProfileDto {
-

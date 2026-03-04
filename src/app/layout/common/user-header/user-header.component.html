@@ -6,11 +6,7 @@
                 <!-- Avatar -->
                 <div class="h-16 w-16 flex-0 overflow-hidden rounded-full bg-gray-200">
                     <!-- Foto de perfil si existe, sino avatar por defecto -->
-                    <img *ngIf="user?.avatar; else defaultAvatar"
-                         [src]="user.avatar"
-                         class="h-full w-full object-cover"
-                         alt="Avatar Usuario"
-                         (error)="onAvatarError($event)" />
+                    <img *ngIf="user?.avatar; else defaultAvatar" [src]="user.avatar" class="h-full w-full object-cover" alt="Avatar Usuario" (error)="onAvatarError($event)" />
                     <ng-template #defaultAvatar>
                         <div class="flex h-full w-full items-center justify-center bg-teal-500 text-white font-bold text-2xl">
                             {{ getInitials() }}

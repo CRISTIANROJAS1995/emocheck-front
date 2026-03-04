@@ -449,9 +449,11 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
     border: 1px solid rgba(21, 93, 252, 0.18);
     transition: background 0.14s, transform 0.14s;
     white-space: nowrap;
-
-    mat-icon { font-size: 14px; width: 14px; height: 14px; }
-
+    mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+    }
     &:hover {
         background: rgba(21, 93, 252, 0.14);
         transform: translateY(-1px);
