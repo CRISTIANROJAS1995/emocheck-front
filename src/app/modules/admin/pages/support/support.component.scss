@@ -443,6 +443,84 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
     margin-top: 10px;
 }
 
+// ── WhatsApp card ─────────────────────────────────────────────────────────────
+.wa-info {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.wa-info__icon {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+
+    svg { width: 100%; height: 100%; }
+}
+
+.wa-info__content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.wa-info__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #101828;
+}
+
+.wa-info__text {
+    font-size: 13.5px;
+    color: #4A5565;
+    line-height: 1.55;
+}
+
+.wa-info__number {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(37, 211, 102, 0.10);
+    color: #15803D;
+    font-weight: 700;
+    font-size: 13px;
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; color: #16A34A; }
+}
+
+.support-btn--whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    background: #25D366;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.16s, transform 0.16s, box-shadow 0.16s;
+
+    &:hover {
+        background: #1ebe5a;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(37, 211, 102, 0.30);
+    }
+}
+
+.wa-btn-icon {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+}
+
 .support-btn--danger {
     background: linear-gradient(135deg, rgba(185, 28, 28, 0.86) 0%, rgba(246, 51, 154, 0.70) 100%);
     border: 1px solid rgba(185, 28, 28, 0.22);
@@ -485,6 +563,7 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
     color: var(--emocheck-ink);
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }

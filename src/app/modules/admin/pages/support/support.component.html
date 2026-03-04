@@ -103,91 +103,45 @@
                                 </span>
                                 <span>Apoyo psicológico</span>
                             </div>
-                            <button mat-button class="support-card__cta" type="button" (click)="openForm()">
-                                Nueva solicitud
-                            </button>
                         </div>
 
                         <div class="support-card__body">
-                            <div class="support-empty" *ngIf="!myRequests?.length">
-                                <div class="support-empty__icon" aria-hidden="true">
-                                    <mat-icon svgIcon="heroicons_outline:chat-bubble-left-right"></mat-icon>
+                            <div class="wa-info">
+                                <div class="wa-info__icon" aria-hidden="true">
+                                    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="16" cy="16" r="16" fill="#25D366"/>
+                                        <path d="M22.9 9.06A9.73 9.73 0 0 0 16.05 6C10.52 6 6.01 10.51 6 16.04a9.97 9.97 0 0 0 1.34 4.99L6 26l5.1-1.34a9.96 9.96 0 0 0 4.77 1.21h.01c5.52 0 10.03-4.51 10.04-10.05a9.98 9.98 0 0 0-2.93-7.76ZM16.06 24.3a8.28 8.28 0 0 1-4.22-1.16l-.3-.18-3.12.82.83-3.05-.2-.31a8.27 8.27 0 0 1-1.27-4.38c0-4.57 3.72-8.28 8.3-8.28a8.3 8.3 0 0 1 8.28 8.3c-.01 4.57-3.73 8.24-8.3 8.24Zm4.55-6.2c-.25-.12-1.47-.72-1.7-.81-.22-.08-.39-.12-.55.13-.16.25-.63.8-.77.97-.14.17-.29.19-.53.06-.25-.12-1.04-.38-1.98-1.22a7.4 7.4 0 0 1-1.37-1.7c-.14-.25-.01-.38.1-.5.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.66.3-.22.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.13.16 1.73 2.64 4.2 3.7.59.25 1.04.4 1.4.52.59.18 1.12.16 1.54.1.47-.08 1.46-.6 1.67-1.17.2-.58.2-1.07.14-1.17-.06-.1-.22-.16-.47-.28Z" fill="white"/>
+                                    </svg>
                                 </div>
-                                <div class="support-empty__content">
-                                    <div class="support-empty__title">Aún no tienes solicitudes</div>
-                                    <div class="support-empty__text">Crea una solicitud y te contactaremos pronto.</div>
-                                </div>
-                            </div>
-
-                            <div class="support-request" *ngFor="let r of myRequests">
-                                <div class="support-request__row">
-                                    <div class="support-request__subject">{{ r.subject }}</div>
-                                    <div class="support-request__status support-request__status--{{ statusTone(r.status) }}">
-                                        {{ statusLabel(r.status) }}
+                                <div class="wa-info__content">
+                                    <div class="wa-info__title">Habla con un psicólogo</div>
+                                    <div class="wa-info__text">
+                                        Nuestro equipo de profesionales está disponible para apoyarte.
+                                        Escríbenos por WhatsApp y te responderemos a la brevedad.
                                     </div>
-                                </div>
-                                <div class="support-request__meta">
-                                    {{ priorityLabel(r.priority) }} • {{ r.requestedAt | date: 'dd/MM/yyyy HH:mm' }}
-                                </div>
-                                <div class="support-request__meta" *ngIf="r.assignedToPsychologistName">
-                                    Asignado a: <strong>{{ r.assignedToPsychologistName }}</strong>
-                                    <span *ngIf="r.assignedToPsychologistPhone"> ({{ r.assignedToPsychologistPhone }})</span>
+                                    <div class="wa-info__number">
+                                        <mat-icon svgIcon="heroicons_outline:phone"></mat-icon>
+                                        <span>{{ whatsappDisplay }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="support-card__actions">
+                            <a class="support-btn support-btn--whatsapp" [href]="whatsappUrl" target="_blank" rel="noopener noreferrer">
+                                <svg class="wa-btn-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M22.9 9.06A9.73 9.73 0 0 0 16.05 6C10.52 6 6.01 10.51 6 16.04a9.97 9.97 0 0 0 1.34 4.99L6 26l5.1-1.34a9.96 9.96 0 0 0 4.77 1.21h.01c5.52 0 10.03-4.51 10.04-10.05a9.98 9.98 0 0 0-2.93-7.76ZM16.06 24.3a8.28 8.28 0 0 1-4.22-1.16l-.3-.18-3.12.82.83-3.05-.2-.31a8.27 8.27 0 0 1-1.27-4.38c0-4.57 3.72-8.28 8.3-8.28a8.3 8.3 0 0 1 8.28 8.3c-.01 4.57-3.73 8.24-8.3 8.24Zm4.55-6.2c-.25-.12-1.47-.72-1.7-.81-.22-.08-.39-.12-.55.13-.16.25-.63.8-.77.97-.14.17-.29.19-.53.06-.25-.12-1.04-.38-1.98-1.22a7.4 7.4 0 0 1-1.37-1.7c-.14-.25-.01-.38.1-.5.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.66.3-.22.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.13.16 1.73 2.64 4.2 3.7.59.25 1.04.4 1.4.52.59.18 1.12.16 1.54.1.47-.08 1.46-.6 1.67-1.17.2-.58.2-1.07.14-1.17-.06-.1-.22-.16-.47-.28Z" fill="white"/>
+                                </svg>
+                                Escribir por WhatsApp
+                            </a>
+                        </div>
                     </section>
+
                 </div>
 
                 <div class="support-hint" *ngIf="evaluationResultId">
                     Resultado asociado: <strong>#{{ evaluationResultId }}</strong>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal formulario nueva solicitud -->
-    <div class="support-modal-overlay" *ngIf="showForm" (click)="closeForm()">
-        <div class="support-modal" (click)="$event.stopPropagation()">
-            <div class="support-modal__header">
-                <span class="support-modal__title">Nueva solicitud de apoyo</span>
-                <button class="support-modal__close" type="button" (click)="closeForm()" aria-label="Cerrar">
-                    <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
-                </button>
-            </div>
-
-            <div class="support-modal__body">
-                <!-- Error de formulario -->
-                <div class="support-form-error" *ngIf="formError">
-                    <mat-icon svgIcon="heroicons_outline:exclamation-circle"></mat-icon>
-                    <span>{{ formError }}</span>
-                </div>
-
-                <div class="support-form-group">
-                    <label class="support-form-label" for="formSubject">Asunto <span class="required">*</span></label>
-                    <input id="formSubject" class="support-form-input" type="text" [(ngModel)]="formSubject" placeholder="Ej: Necesito orientación sobre mi evaluación" maxlength="150" />
-                </div>
-
-                <div class="support-form-group">
-                    <label class="support-form-label" for="formDescription">Descripción <span class="required">*</span></label>
-                    <textarea id="formDescription" class="support-form-textarea" [(ngModel)]="formDescription" placeholder="Cuéntanos brevemente cómo te sientes o qué necesitas..." rows="4" maxlength="500"></textarea>
-                </div>
-
-                <div class="support-form-group">
-                    <label class="support-form-label" for="formPriority">Prioridad</label>
-                    <select id="formPriority" class="support-form-select" [(ngModel)]="formPriority">
-                        <option *ngFor="let p of priorityOptions" [value]="p.value">{{ p.label }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="support-modal__footer">
-                <button class="support-btn support-btn--ghost" type="button" (click)="closeForm()">
-                    Cancelar
-                </button>
-                <button class="support-btn support-btn--primary" type="button" [disabled]="submitting" (click)="submitForm()">
-                    <mat-progress-spinner *ngIf="submitting" diameter="16" mode="indeterminate"></mat-progress-spinner>
-                    <span>{{ submitting ? 'Enviando...' : 'Enviar solicitud' }}</span>
-                </button>
             </div>
         </div>
     </div>
