@@ -96,7 +96,7 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     }
 
     selectCategory(categoryId: number | null): void {
-        this.selectedCategoryId = categoryId;
+        this.selectedCategoryId = categoryId != null ? Number(categoryId) : null;
         this.loadResources();
     }
 
@@ -104,12 +104,16 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         this.loading = true;
         this.error = null;
 
-        this.resourcesApi
-            .getResources()
+        const source$ = this.selectedCategoryId != null
+            ? this.resourcesApi.getByCategory(this.selectedCategoryId)
+            : this.resourcesApi.getResources();
+
+        source$
             .pipe(
                 map((items) =>
+                    // doble seguridad: también filtramos en memoria por si el backend no filtra
                     this.selectedCategoryId != null
-                        ? items.filter((r) => r.resourceCategoryID === this.selectedCategoryId)
+                        ? items.filter((r) => Number(r.resourceCategoryID) === Number(this.selectedCategoryId))
                         : items
                 ),
                 finalize(() => (this.loading = false))
