@@ -108,7 +108,7 @@ $gray-900: #111827;
     &.active {
         color: $primary;
         border-bottom-color: $primary;
-        background: lighten($primary, 40%);
+        background: color.scale($primary, $lightness: 100%);
     }
 }
 
@@ -122,7 +122,7 @@ $gray-900: #111827;
     min-width: 1.25rem;
     text-align: center;
     .active & {
-        background: lighten($primary, 30%);
+        background: color.scale($primary, $lightness: 90%);
         color: $primary;
     }
 }
@@ -189,7 +189,7 @@ $gray-900: #111827;
 // ── Inline Form ───────────────────────────────────────────────────────────────
 .inline-form {
     background: #eef2ff;
-    border: 1px solid lighten($primary, 25%);
+    border: 1px solid color.scale($primary, $lightness: 75%);
     border-radius: .75rem;
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.25rem;
@@ -257,7 +257,7 @@ $gray-900: #111827;
     transition: background .15s;
     white-space: nowrap;
     &:hover:not(:disabled) {
-        background: darken($primary, 8%);
+        background: color.adjust($primary, $lightness: -8%);
     }
     &:disabled {
         opacity: .6;
