@@ -29,6 +29,7 @@ export class ProfileComponent implements OnInit {
     photoFile: File | null = null;
     photoPreviewUrl: string | null = null;
     uploadingPhoto = false;
+    lightboxOpen = false;
 
     // ── Contraseña ────────────────────────────────────────────────────────────
     savingPassword = false;
@@ -84,6 +85,9 @@ export class ProfileComponent implements OnInit {
     }
 
     triggerPhotoInput(input: HTMLInputElement): void { input.click(); }
+
+    openLightbox(): void  { if (this.avatarUrl) this.lightboxOpen = true; }
+    closeLightbox(): void { this.lightboxOpen = false; }
 
     onPhotoSelected(event: Event): void {
         const input = event.target as HTMLInputElement;

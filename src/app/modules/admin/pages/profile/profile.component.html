@@ -30,7 +30,8 @@
 
                 <div class="avatar-row">
                     <div class="avatar" [class.avatar--has-photo]="!!avatarUrl">
-                        <img *ngIf="avatarUrl" class="avatar__img" [src]="avatarUrl" alt="Foto de perfil" />
+                        <img *ngIf="avatarUrl" class="avatar__img avatar__img--clickable" [src]="avatarUrl"
+                             alt="Foto de perfil" (click)="openLightbox()" title="Ver foto en grande" />
                         <span *ngIf="!avatarUrl" class="avatar__initials">{{ initials }}</span>
                         <!-- Overlay de carga -->
                         <div class="avatar__uploading" *ngIf="uploadingPhoto">
@@ -120,5 +121,15 @@
         <div class="profile-meta" *ngIf="profile?.companyName">
             Empresa: {{ profile?.companyName }} <span *ngIf="profile?.siteName">• Sede: {{ profile?.siteName }}</span>
         </div>
+    </div>
+</div>
+
+<!-- ── Lightbox ─────────────────────────────────────────────────────────── -->
+<div class="lb-overlay" *ngIf="lightboxOpen" (click)="closeLightbox()">
+    <div class="lb-container" (click)="$event.stopPropagation()">
+        <button class="lb-close" (click)="closeLightbox()" type="button" aria-label="Cerrar">
+            <mat-icon>close</mat-icon>
+        </button>
+        <img class="lb-img" [src]="avatarUrl" alt="Foto de perfil" />
     </div>
 </div>
