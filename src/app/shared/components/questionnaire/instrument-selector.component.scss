@@ -329,6 +329,49 @@
     display: block;
 }
 
+// ─── Card completada ──────────────────────────────────────────────────────────
+.is-card--completed {
+    opacity: 0.72;
+    cursor: not-allowed !important;
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    &:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    .is-card__bar {
+        opacity: 0.45;
+    }
+    // El contenedor del badge deja de ser absoluto para fluir con el contenido
+    .is-card__arrow {
+        position: static;
+        width: auto;
+        height: auto;
+        background: transparent;
+        border-radius: 0;
+        margin-top: 10px;
+        align-self: flex-start;
+    }
+}
+
+.is-card__done-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #16a34a;
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 1;
+}
+
 // ─── Estado vacío (sin instrumentos) ─────────────────────────────────────────
 .is-empty {
     display: flex;

@@ -49,6 +49,8 @@ export interface InstrumentCard extends InstrumentDescriptor {
     icon: string;
     description: string;
     color: string;
+    /** true si el usuario ya completó este instrumento en la evaluación más reciente */
+    completed?: boolean;
 }
 
 @Component({
@@ -92,17 +94,23 @@ export class InstrumentSelectorComponent implements OnInit {
 
         this.assessmentService.getModuleInstruments(this.moduleId).subscribe({
             next: (descriptors) => {
+                // Códigos de instrumentos ya presentados (del estado local)
+                const completedResult = this.assessmentState.getResult(this.moduleId);
+                const completedCodes = new Set(
+                    (completedResult?.dimensions ?? [])
+                        .map(d => (d.instrumentCode ?? '').toUpperCase().trim())
+                        .filter(Boolean)
+                );
+
                 this.instruments = descriptors.map((d, i) => {
                     const meta = INSTRUMENT_META[d.code];
                     return {
                         ...d,
-                        // Label: prefer dimensionLabels > backendName > code
                         label: d.label || d.backendName || d.code,
-                        // Description: always prefer backend first, then hardcoded meta
                         description: d.backendDescription || meta?.description || '',
-                        // Icon & color: from hardcoded meta or fallback
                         icon:  meta?.icon  ?? this.moduleDef.icon,
                         color: meta?.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
+                        completed: completedCodes.has(d.code.toUpperCase()),
                     };
                 });
             },
@@ -115,7 +123,7 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     selectInstrument(card: InstrumentCard): void {
-        if (this.loadingQuestions) return;
+        if (this.loadingQuestions || card.completed) return;
         this.loadingQuestions = true;
         this.selectedInstrument = card;
 
@@ -159,7 +167,9 @@ export class InstrumentSelectorComponent implements OnInit {
             finalize(() => { this.isSubmitting = false; })
         ).subscribe({
             next: (result) => {
-                this.assessmentState.setResult(result);
+                // Use mergeResult so previously completed instrument dimensions are
+                // preserved (e.g. DASS-21 stays "completado" after submitting BAI).
+                this.assessmentState.mergeResult(result);
                 this.router.navigate([`/${this.moduleId}/results`]);
             },
             error: (e) => {

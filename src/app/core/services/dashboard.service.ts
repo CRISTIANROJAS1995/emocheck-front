@@ -152,20 +152,35 @@ export class DashboardService {
     }
 
     getIndicators(query?: DashboardQuery): Observable<DashboardIndicatorsDto> {
-        return this.http.get<unknown>(`${this.apiUrl}/dashboard/indicators`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.mapIndicators(this.unwrapObject<any>(res)))
+        const params = this.buildParams(query);
+        console.log('[Dashboard] GET /dashboard/indicators', params.toString());
+        return this.http.get<unknown>(`${this.apiUrl}/dashboard/indicators`, { params }).pipe(
+            map((res) => {
+                console.log('[Dashboard] /indicators raw:', res);
+                return this.mapIndicators(this.unwrapObject<any>(res));
+            })
         );
     }
 
     getRiskDistribution(query?: DashboardQuery): Observable<RiskDistributionDto> {
-        return this.http.get<unknown>(`${this.apiUrl}/dashboard/risk-distribution`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.mapRiskDistribution(this.unwrapObject<any>(res)))
+        const params = this.buildParams(query);
+        console.log('[Dashboard] GET /dashboard/risk-distribution', params.toString());
+        return this.http.get<unknown>(`${this.apiUrl}/dashboard/risk-distribution`, { params }).pipe(
+            map((res) => {
+                console.log('[Dashboard] /risk-distribution raw:', res);
+                return this.mapRiskDistribution(this.unwrapObject<any>(res));
+            })
         );
     }
 
     getTrends(query: DashboardQuery): Observable<TrendDataDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/dashboard/trends`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.unwrapArray<any>(res).map((t: any) => this.mapTrend(t)))
+        const params = this.buildParams(query);
+        console.log('[Dashboard] GET /dashboard/trends', params.toString());
+        return this.http.get<unknown>(`${this.apiUrl}/dashboard/trends`, { params }).pipe(
+            map((res) => {
+                console.log('[Dashboard] /trends raw:', res);
+                return this.unwrapArray<any>(res).map((t: any) => this.mapTrend(t));
+            })
         );
     }
 

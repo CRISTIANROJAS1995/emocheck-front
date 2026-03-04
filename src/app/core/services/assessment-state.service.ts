@@ -64,6 +64,70 @@ export class AssessmentStateService {
         this.saveToStorage(next, this.currentUserId);
     }
 
+    /**
+     * Merges a new instrument result into the existing module result, preserving
+     * all previously completed dimensions. This allows multi-instrument modules
+     * (e.g. mental-health with DASS-21 + BAI) to accumulate results without losing
+     * prior instrument completions.
+     *
+     * Dimensions are deduplicated by `instrumentCode` (latest wins) and by `id`.
+     * The overall score, outcome, headline and evaluationId are updated from the
+     * incoming result.
+     */
+    mergeResult(incoming: AssessmentResult): void {
+        const existing = this._results$.value[incoming.moduleId];
+
+        if (!existing) {
+            // No prior result — just store as-is
+            this.setResult(incoming);
+            return;
+        }
+
+        // Build a unified list of dimensions: keep all prior ones, then upsert
+        // the incoming ones (matched by instrumentCode first, then by id).
+        const merged = [...(existing.dimensions ?? [])];
+        for (const incomingDim of incoming.dimensions ?? []) {
+            const byCode = incomingDim.instrumentCode
+                ? merged.findIndex(
+                      (d) =>
+                          d.instrumentCode &&
+                          d.instrumentCode.toUpperCase() === incomingDim.instrumentCode!.toUpperCase()
+                  )
+                : -1;
+            const byId = merged.findIndex((d) => d.id === incomingDim.id && incomingDim.id);
+
+            const replaceIdx = byCode >= 0 ? byCode : byId;
+            if (replaceIdx >= 0) {
+                merged[replaceIdx] = incomingDim; // update in-place
+            } else {
+                merged.push(incomingDim); // new dimension — append
+            }
+        }
+
+        const combined: AssessmentResult = {
+            ...existing,
+            // Update aggregated fields from the new submission
+            evaluationId: incoming.evaluationId ?? existing.evaluationId,
+            evaluationResultId: incoming.evaluationResultId ?? existing.evaluationResultId,
+            outcome: incoming.outcome,
+            score: incoming.score,
+            evaluatedAt: incoming.evaluatedAt,
+            headline: incoming.headline !== 'Resultado disponible' ? incoming.headline : existing.headline,
+            message: incoming.message,
+            // Merge recommendations (union, no duplicates)
+            recommendations: [
+                ...new Set([
+                    ...(existing.recommendations ?? []),
+                    ...(incoming.recommendations ?? []),
+                ]),
+            ],
+            // Accumulated dimensions from all instruments
+            dimensions: merged,
+        };
+
+        this.setResult(combined);
+    }
+
     clearModule(moduleId: AssessmentModuleId): void {
         const next: StoredResults = { ...this._results$.value };
         delete next[moduleId];

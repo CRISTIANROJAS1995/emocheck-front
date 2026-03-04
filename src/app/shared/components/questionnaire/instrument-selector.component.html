@@ -76,9 +76,18 @@
         @if (instruments && instruments.length > 0) {
         <div class="is-grid">
             @for (card of instruments; track card.code) {
-            <button class="is-card" [class.is-card--loading]="loadingQuestions && selectedInstrument?.code === card.code" [disabled]="loadingQuestions" (click)="selectInstrument(card)" type="button">
+            <button class="is-card" [class.is-card--loading]="loadingQuestions && selectedInstrument?.code === card.code" [class.is-card--completed]="card.completed" [disabled]="loadingQuestions || card.completed" (click)="selectInstrument(card)" type="button">
 
                 <span class="is-card__bar" [style.background]="card.color"></span>
+
+                @if (card.completed) {
+                <span class="is-card__done-badge">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Completado
+                </span>
+                }
 
                 <span class="is-card__icon" [style.background]="card.color + '18'">
                     <img [src]="card.icon" [alt]="card.label" width="26" height="26" />
@@ -96,7 +105,7 @@
                 <span class="is-card__arrow">
                     @if (loadingQuestions && selectedInstrument?.code === card.code) {
                     <span class="is-card__spinner" [style.border-top-color]="card.color"></span>
-                    } @else {
+                    } @else if (!card.completed) {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>

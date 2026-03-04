@@ -93,7 +93,7 @@
 
                 <!-- ── TIME (campo de hora) ── -->
                 @if (isTime) {
-                <p class="question-help">Ingresa la hora en formato HH:MM (ej. 22:30)</p>
+                <p class="question-help">Ingresa la hora en formato de 12 horas (ej. 10:30 PM). Usa valores del 1 al 12.</p>
                 <div class="input-field-wrap">
                     <label class="input-field-label" [for]="'time-' + currentQuestion.id">Hora</label>
                     <input class="input-field input-field--time" type="time" [id]="'time-' + currentQuestion.id" [value]="timeValue" (change)="onTimeChange($any($event.target).value)" [disabled]="isLocked || hasSubmitted" />

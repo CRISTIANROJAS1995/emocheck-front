@@ -30,6 +30,12 @@ export interface AssessmentDimensionBreakdown {
     instrumentCode?: string;
     /** 0-100 */
     percent: number;
+    /** Raw score from backend */
+    score?: number;
+    /** Max possible score for this instrument */
+    maxScore?: number;
+    /** Risk level for this specific dimension (Green / Yellow / Red) */
+    riskLevel?: string;
 }
 
 export interface AssessmentResult {

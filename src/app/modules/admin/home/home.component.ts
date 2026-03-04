@@ -139,7 +139,7 @@ export class HomeComponent implements OnInit {
             return {
                 ...module,
                 points: result?.score,
-                disabled: !!result,
+                disabled: false,   // Siempre navegable — el bloqueo por instrumento ya presentado va en la pantalla del selector
                 status: result
                     ? {
                         label: this.getOutcomeLabel(result.outcome),
@@ -186,7 +186,7 @@ export class HomeComponent implements OnInit {
 
     startEvaluation(moduleId: string): void {
         const module = this.modules.find(m => m.id === moduleId);
-        if (module && !module.disabled) {
+        if (module) {
             this.router.navigate([module.route]);
         }
     }

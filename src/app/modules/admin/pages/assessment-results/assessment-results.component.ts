@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, finalize, switchMap } from 'rxjs';
 import { EmoButtonComponent } from 'app/shared/components';
 import { AssessmentModuleDefinition, getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
-import { AssessmentResult } from 'app/core/models/assessment.model';
+import { AssessmentOutcome, AssessmentResult } from 'app/core/models/assessment.model';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
 import { environment } from 'environments/environment';
@@ -44,79 +44,50 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         this.moduleId = moduleId;
         this.moduleDef = getAssessmentModuleDefinition(moduleId);
 
+        // Always keep the view in sync with state changes triggered by hydration
         this.subscriptions.add(this.state.results$.subscribe(() => {
             this.result = this.state.getResult(this.moduleId);
         }));
 
-        // If user refreshes on results and there is no state, hydrate from backend.
-        // Supports deep-linking via `?evaluationId=123`.
+        // Seed the view immediately from whatever is already in local state (avoids blank flash)
         this.result = this.state.getResult(this.moduleId);
-        if (!this.result) {
-            const rawEvaluationId = this.route.snapshot.queryParamMap.get('evaluationId');
-            const evaluationId = rawEvaluationId ? Number(rawEvaluationId) : undefined;
-            const safeEvaluationId = Number.isFinite(evaluationId as any) && (evaluationId as any) > 0 ? (evaluationId as number) : undefined;
 
-            this.isHydrating = true;
-            this.hydrationAttempted = true;
+        // Always re-hydrate from backend to ensure the latest completed instruments
+        // are reflected (e.g. after submitting BDI, the local state only has the partial
+        // submission result; the backend my-completed has the authoritative merged data).
+        const rawEvaluationId = this.route.snapshot.queryParamMap.get('evaluationId');
+        const evaluationId = rawEvaluationId ? Number(rawEvaluationId) : undefined;
+        const safeEvaluationId = Number.isFinite(evaluationId as any) && (evaluationId as any) > 0 ? (evaluationId as number) : undefined;
 
-            this.subscriptions.add(
-                this.assessmentHydration
-                    .hydrateModuleResultFromCompletedEvaluations(this.moduleId, safeEvaluationId)
-                    .pipe(
-                        switchMap(() => this.assessmentHydration.hydrateRecommendationsIfMissing(this.moduleId)),
-                        finalize(() => {
-                            this.isHydrating = false;
-                        })
-                    )
-                    .subscribe({
-                        next: () => {
-                            this.result = this.state.getResult(this.moduleId);
-                            if (!this.result) {
-                                this.router.navigate([this.moduleDef.route]);
-                            }
-                        },
-                        error: () => {
-                            this.isHydrating = false;
+        this.isHydrating = true;
+        this.hydrationAttempted = true;
+
+        this.subscriptions.add(
+            this.assessmentHydration
+                .hydrateModuleResultFromCompletedEvaluations(this.moduleId, safeEvaluationId)
+                .pipe(
+                    switchMap(() => this.assessmentHydration.hydrateRecommendationsIfMissing(this.moduleId)),
+                    finalize(() => {
+                        this.isHydrating = false;
+                    })
+                )
+                .subscribe({
+                    next: () => {
+                        this.result = this.state.getResult(this.moduleId);
+                        // Only redirect away if we have absolutely no result after hydration
+                        if (!this.result) {
                             this.router.navigate([this.moduleDef.route]);
-                        },
-                    })
-            );
-
-            return;
-        }
-
-        // If backend omitted recommendations/dimensions in the completion response,
-        // hydrate from real API sources (no fallback/mock values).
-        const shouldHydrate =
-            (this.result.dimensions ?? []).length === 0 ||
-            (this.result.recommendations ?? []).length === 0;
-
-        this.hydrationAttempted = shouldHydrate;
-
-        if (shouldHydrate) {
-            this.isHydrating = true;
-            // Use hydrateModuleResultFromCompletedEvaluations as primary path:
-            // it always re-fetches from my-completed regardless of stored evaluationId,
-            // fixing cases where stale localStorage state has no evaluationId or empty dims.
-            this.subscriptions.add(
-                this.assessmentHydration
-                    .hydrateModuleResultFromCompletedEvaluations(this.moduleId, this.result.evaluationId)
-                    .pipe(
-                        switchMap(() => this.assessmentHydration.hydrateRecommendationsIfMissing(this.moduleId)),
-                        finalize(() => {
-                            this.isHydrating = false;
-                        })
-                    )
-                    .subscribe({
-                        next: () => {
-                            this.result = this.state.getResult(this.moduleId);
-                        },
-                        error: () => {
-                            this.isHydrating = false;
-                        },
-                    })
-            );
-        }
+                        }
+                    },
+                    error: () => {
+                        this.isHydrating = false;
+                        // If hydration fails but we already have local state, stay on page
+                        if (!this.result) {
+                            this.router.navigate([this.moduleDef.route]);
+                        }
+                    },
+                })
+        );
     }
 
     ngOnDestroy(): void {
@@ -191,7 +162,7 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     }
 
     get outcomeClass(): string {
-        switch (this.result?.outcome) {
+        switch (this.effectiveOutcome) {
             case 'adequate':
                 return 'outcome-adequate';
             case 'mild':
@@ -215,7 +186,7 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     }
 
     get outcomeIcon(): 'check' | 'warn' | 'alert' {
-        switch (this.result?.outcome) {
+        switch (this.effectiveOutcome) {
             case 'adequate':
                 return 'check';
             case 'mild':
@@ -225,6 +196,89 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
             default:
                 return 'check';
         }
+    }
+
+    /**
+     * Returns the effective outcome, deriving it from the worst dimension when the
+     * top-level riskLevel from the backend was unresolvable (headline = 'Resultado disponible').
+     */
+    get effectiveOutcome(): AssessmentOutcome {
+        if (!this.result) return 'mild';
+
+        // If the backend resolved a proper risk level, trust it
+        if (this.result.headline && this.result.headline !== 'Resultado disponible') {
+            return this.result.outcome;
+        }
+
+        // Derive from worst dimension
+        return this.deriveOutcomeFromDimensions();
+    }
+
+    /** Effective headline derived from effectiveOutcome when backend label is generic. */
+    get effectiveHeadline(): string {
+        if (!this.result) return '';
+        if (this.result.headline && this.result.headline !== 'Resultado disponible') {
+            return this.result.headline;
+        }
+        switch (this.effectiveOutcome) {
+            case 'adequate':   return 'Riesgo Bajo';
+            case 'mild':       return 'Riesgo Moderado';
+            case 'high-risk':  return 'Riesgo Alto';
+        }
+    }
+
+    /** Effective message updated to reflect the derived outcome. */
+    get effectiveMessage(): string {
+        if (!this.result) return '';
+        const outcome = this.effectiveOutcome;
+        const score = this.result.score;
+        switch (outcome) {
+            case 'adequate':
+                return `Tu puntaje es ${score}/100. Los indicadores se encuentran dentro de rangos saludables. Continúa con tus hábitos de bienestar.`;
+            case 'mild':
+                return `Tu puntaje es ${score}/100. Se detectaron algunas señales que vale la pena atender. Te recomendamos revisar las sugerencias personalizadas.`;
+            case 'high-risk':
+                return `Tu puntaje es ${score}/100. Los resultados indican niveles elevados que requieren atención. Te recomendamos buscar orientación profesional.`;
+        }
+    }
+
+    private deriveOutcomeFromDimensions(): AssessmentOutcome {
+        const dims = this.result?.dimensions ?? [];
+        if (!dims.length) return this.result?.outcome ?? 'mild';
+
+        let worst: AssessmentOutcome = 'adequate';
+        for (const d of dims) {
+            const tone = this.getBarTone(d.percent);
+            if (tone === 'bad') return 'high-risk'; // can't get worse
+            if (tone === 'warn' && worst === 'adequate') worst = 'mild';
+        }
+        return worst;
+    }
+
+    getRiskLabel(riskLevel: string | undefined, percent: number): string {
+        const v = (riskLevel ?? '').toLowerCase();
+        if (v.includes('green') || v.includes('low'))    return 'Bajo';
+        if (v.includes('yellow') || v.includes('medium') || v.includes('moderate')) return 'Moderado';
+        if (v.includes('severe')) return 'Severo';
+        if (v.includes('red') || v.includes('high'))     return 'Alto';
+        // Fallback por percent si no hay riskLevel
+        const tone = this.getBarTone(percent);
+        if (tone === 'good')  return 'Bajo';
+        if (tone === 'warn')  return 'Moderado';
+        return 'Alto';
+    }
+
+    getDimensionInterpretation(dimension: { percent: number; riskLevel?: string }, _idx: number): string {
+        const tone = this.getBarTone(dimension.percent);
+        const higherIsWorse = this.moduleDef?.higherIsWorse ?? false;
+        if (higherIsWorse) {
+            if (tone === 'good')  return 'Dentro del rango normal. Sin indicadores de alerta.';
+            if (tone === 'warn')  return 'Nivel moderado. Se recomienda atención y seguimiento.';
+            return 'Nivel elevado. Requiere atención prioritaria.';
+        }
+        if (tone === 'good')  return 'Nivel adecuado. Continúa con tus hábitos actuales.';
+        if (tone === 'warn')  return 'Nivel medio. Hay oportunidades de mejora.';
+        return 'Nivel bajo. Se recomienda intervención.';
     }
 
     getBarTone(percent: number): 'good' | 'warn' | 'bad' {

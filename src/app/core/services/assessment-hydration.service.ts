@@ -62,7 +62,9 @@ export class AssessmentHydrationService {
 
     /**
      * Hydrates a single module result from `/evaluation/my-completed`.
-     * Useful for deep-links (e.g. opening results from history) where there is no in-memory state.
+     * When no specific evaluationId is given, it collects ALL evaluations for the module
+     * and merges their dimensions so that multi-instrument modules (e.g. DASS-21 + BAI)
+     * show every completed instrument on the results page after a reload.
      */
     hydrateModuleResultFromCompletedEvaluations(moduleId: AssessmentModuleId, evaluationId?: number): Observable<void> {
         const targetEvaluationId = Number(evaluationId ?? 0);
@@ -71,25 +73,38 @@ export class AssessmentHydrationService {
             map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
             map((items) => {
                 const all = items ?? [];
+                console.log('[Hydration] my-completed items:', all.length, all);
 
                 if (Number.isFinite(targetEvaluationId) && targetEvaluationId > 0) {
+                    // Deep-link to a specific evaluation — return just that one
                     return (
                         all.find((i: any) => Number((i as any)?.evaluationID ?? (i as any)?.evaluationId ?? 0) === targetEvaluationId) ??
                         null
                     );
                 }
 
+                // Return ALL evaluations for this module sorted newest-first so we can merge them
                 const candidates = all
                     .filter((i) => this.mapModuleNameToAssessmentModuleId(i?.assessmentModuleName ?? undefined) === moduleId)
                     .slice()
                     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
 
-                return candidates[0] ?? null;
+                console.log('[Hydration] candidates for module', moduleId, ':', candidates);
+                return candidates.length ? candidates : null;
             }),
-            tap((match) => {
-                if (!match) return;
-                const mapped = this.mapToAssessmentResult(moduleId, match);
-                this.state.setResult(mapped);
+            tap((matchOrList) => {
+                if (!matchOrList) return;
+
+                if (Array.isArray(matchOrList)) {
+                    // Merge all evaluations for this module into a single accumulated result
+                    const merged = this.mergeEvaluationsForModule(moduleId, matchOrList);
+                    console.log('[Hydration] merged result from', matchOrList.length, 'evaluations:', merged);
+                    if (merged) this.state.mergeResult(merged);
+                } else {
+                    const mapped = this.mapToAssessmentResult(moduleId, matchOrList);
+                    console.log('[Hydration] mapped result:', mapped);
+                    this.state.mergeResult(mapped);
+                }
             }),
             map(() => void 0),
             catchError(() => of(void 0))
@@ -99,52 +114,37 @@ export class AssessmentHydrationService {
     /**
      * Pulls the latest completed evaluations from backend and stores them locally
      * so Home cards reflect real outcomes even after reload/storage clear.
+     * For multi-instrument modules, all evaluations are merged so no dimension is lost.
      */
     hydrateLatestCompletedResults(): Observable<void> {
         return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
             map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
-            map((items) => this.pickLatestPerModule(items)),
-            tap((latest) => {
+            map((items) => this.groupAllByModule(items)),
+            tap((grouped) => {
                 // Source of truth: if backend doesn't report a completed evaluation for a module,
                 // we must NOT keep a stale local result around (prevents cross-user/localStorage leaks).
                 const existing = this.state.getAllResults();
-                const latestModuleIds = new Set(Object.keys(latest ?? {}));
+                const groupedModuleIds = new Set(Object.keys(grouped ?? {}));
 
                 for (const moduleId of Object.keys(existing ?? {})) {
-                    if (!latestModuleIds.has(moduleId)) {
+                    if (!groupedModuleIds.has(moduleId)) {
                         this.state.clearModule(moduleId as unknown as AssessmentModuleId);
                     }
                 }
 
-                for (const [moduleId, item] of Object.entries(latest) as Array<[AssessmentModuleId, SwaggerEvaluationWithResultDto]>) {
-                    const result = this.mapToAssessmentResult(moduleId, item);
-                    const existing = this.state.getResult(moduleId);
+                for (const [moduleId, evaluations] of Object.entries(grouped) as Array<[AssessmentModuleId, SwaggerEvaluationWithResultDto[]]>) {
+                    const merged = this.mergeEvaluationsForModule(moduleId, evaluations);
+                    if (!merged) continue;
 
-                    // Update if the hydrated result is newer OR if it can enrich an existing
-                    // result that lacks dimensions/recommendations/resultId.
-                    const shouldReplace = this.isNewer(existing?.evaluatedAt, result.evaluatedAt);
-                    const canEnrichExisting =
-                        !!existing &&
-                        (
-                            (!existing.evaluationResultId && !!result.evaluationResultId) ||
-                            ((existing.dimensions ?? []).length === 0 && (result.dimensions ?? []).length > 0) ||
-                            ((existing.recommendations ?? []).length === 0 && (result.recommendations ?? []).length > 0)
-                        );
+                    const existingResult = this.state.getResult(moduleId);
 
-                    if (shouldReplace) {
-                        this.state.setResult(result);
+                    if (!existingResult) {
+                        this.state.setResult(merged);
                         continue;
                     }
 
-                    if (canEnrichExisting) {
-                        this.state.setResult({
-                            ...existing,
-                            evaluationId: existing.evaluationId ?? result.evaluationId,
-                            evaluationResultId: existing.evaluationResultId ?? result.evaluationResultId,
-                            dimensions: (existing.dimensions ?? []).length ? existing.dimensions : result.dimensions,
-                            recommendations: (existing.recommendations ?? []).length ? existing.recommendations : result.recommendations,
-                        });
-                    }
+                    // Always merge so all instrument dimensions are preserved
+                    this.state.mergeResult(merged);
                 }
             }),
             map(() => void 0),
@@ -208,18 +208,32 @@ export class AssessmentHydrationService {
         const current = this.state.getResult(moduleId);
         const evaluationResultId = current?.evaluationResultId;
 
-        if (!current) return of(void 0);
-        if (!evaluationResultId || evaluationResultId <= 0) return of(void 0);
-        if ((current.recommendations ?? []).length > 0) return of(void 0);
+        console.log('[Hydration] hydrateRecommendationsIfMissing — current:', current);
+        console.log('[Hydration] evaluationResultId:', evaluationResultId);
 
+        if (!current) return of(void 0);
+        if (!evaluationResultId || evaluationResultId <= 0) {
+            console.warn('[Hydration] ⚠️ No evaluationResultId — no se puede llamar /recommendation/by-result');
+            return of(void 0);
+        }
+        if ((current.recommendations ?? []).length > 0) {
+            console.log('[Hydration] Ya tiene recomendaciones, no se rehidrata.');
+            return of(void 0);
+        }
+
+        console.log('[Hydration] Llamando GET /recommendation/by-result/' + evaluationResultId);
         return this.http.get<unknown>(`${this.apiUrl}/recommendation/by-result/${evaluationResultId}`).pipe(
-            map((res) => this.unwrapArray<SwaggerRecommendationDto>(res)),
+            map((res) => {
+                console.log('[Hydration] /recommendation/by-result raw:', res);
+                return this.unwrapArray<SwaggerRecommendationDto>(res);
+            }),
             map((items) =>
                 (items ?? [])
                     .map((r: any) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
                     .filter(Boolean)
             ),
             tap((recs) => {
+                console.log('[Hydration] recomendaciones mapeadas:', recs);
                 if (!recs.length) return;
                 const latest = this.state.getResult(moduleId);
                 if (!latest) return;
@@ -230,7 +244,7 @@ export class AssessmentHydrationService {
                 });
             }),
             map(() => void 0),
-            catchError(() => of(void 0))
+            catchError((err) => { console.error('[Hydration] ERROR /recommendation/by-result:', err); return of(void 0); })
         );
     }
 
@@ -268,6 +282,9 @@ export class AssessmentHydrationService {
                     id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
                     label: d?.dimensionName ?? '',
                     instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
+                    score: Number(d?.score ?? 0),
+                    maxScore: Number(d?.maxScore ?? 0),
+                    riskLevel: d?.riskLevel ?? undefined,
                     percent: d?.percentageScore != null
                         ? Math.round(Math.max(0, Math.min(100, Number(d.percentageScore))))
                         : this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
@@ -313,6 +330,9 @@ export class AssessmentHydrationService {
                 id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
                 label: d?.dimensionName ?? '',
                 instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
+                score: Number(d?.score ?? 0),
+                maxScore: Number(d?.maxScore ?? 0),
+                riskLevel: d?.riskLevel ?? undefined,
                 percent: d?.percentageScore != null
                     ? Math.round(Math.max(0, Math.min(100, Number(d.percentageScore))))
                     : this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
@@ -384,6 +404,70 @@ export class AssessmentHydrationService {
         if (name.includes('clima') || name.includes('climate')) return 'organizational-climate';
         if (name.includes('psicosocial')) return 'psychosocial-risk';
         return null;
+    }
+
+    /**
+     * Groups ALL completed evaluations by module.
+     * Returns every evaluation per module (not just the latest) so that
+     * multi-instrument modules can merge all their dimensions.
+     */
+    private groupAllByModule(items: SwaggerEvaluationWithResultDto[]): Partial<Record<AssessmentModuleId, SwaggerEvaluationWithResultDto[]>> {
+        const result: Partial<Record<AssessmentModuleId, SwaggerEvaluationWithResultDto[]>> = {};
+
+        for (const e of items ?? []) {
+            const moduleId = this.mapModuleNameToAssessmentModuleId(e?.assessmentModuleName ?? undefined);
+            if (!moduleId) continue;
+            if (!result[moduleId]) result[moduleId] = [];
+            result[moduleId]!.push(e);
+        }
+
+        // Sort each group newest-first
+        for (const key of Object.keys(result) as AssessmentModuleId[]) {
+            result[key]!.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+        }
+
+        return result;
+    }
+
+    /**
+     * Merges a list of evaluations for the same module into a single AssessmentResult.
+     * The most recent evaluation provides the aggregate score/outcome/headline.
+     * All dimensions from all evaluations are union-merged (by instrumentCode then id).
+     */
+    private mergeEvaluationsForModule(moduleId: AssessmentModuleId, evaluations: SwaggerEvaluationWithResultDto[]): AssessmentResult | null {
+        if (!evaluations.length) return null;
+
+        // Most recent first (already sorted by caller but sort again to be safe)
+        const sorted = evaluations.slice().sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+
+        // Base result from the most recent evaluation
+        const base = this.mapToAssessmentResult(moduleId, sorted[0]);
+
+        // Accumulate dimensions from older evaluations
+        const allDims = [...base.dimensions];
+        for (const older of sorted.slice(1)) {
+            const olderResult = this.mapToAssessmentResult(moduleId, older);
+            for (const dim of olderResult.dimensions) {
+                const byCode = dim.instrumentCode
+                    ? allDims.findIndex(
+                          (d) => d.instrumentCode && d.instrumentCode.toUpperCase() === dim.instrumentCode!.toUpperCase()
+                      )
+                    : -1;
+                const byId = allDims.findIndex((d) => d.id === dim.id && dim.id);
+                const replaceIdx = byCode >= 0 ? byCode : byId;
+                if (replaceIdx < 0) {
+                    allDims.push(dim); // dimension from older instrument not yet in list
+                }
+                // If already present (same instrumentCode/id), keep the newer one (already in allDims)
+            }
+
+            // Merge recommendations (union)
+            for (const rec of olderResult.recommendations ?? []) {
+                if (!base.recommendations.includes(rec)) base.recommendations.push(rec);
+            }
+        }
+
+        return { ...base, dimensions: allDims };
     }
 
     private pickLatestPerModule(items: SwaggerEvaluationWithResultDto[]): Partial<Record<AssessmentModuleId, SwaggerEvaluationWithResultDto>> {

@@ -559,6 +559,8 @@ export class MyTrackingComponent implements OnInit {
 
     private applyCompletedEvaluations(items: CompletedEvaluationWithResultDto[]): void {
         const latestPerModule = new Map<ModuleProgressId, CompletedEvaluationWithResultDto>();
+        // All evaluations grouped by module (for dimension merging)
+        const allPerModule = new Map<ModuleProgressId, CompletedEvaluationWithResultDto[]>();
 
         const sorted = (items ?? [])
             .filter((i) => !!i?.completedAt)
@@ -569,24 +571,30 @@ export class MyTrackingComponent implements OnInit {
         for (const item of sorted) {
             const moduleId = this.mapModuleNameToProgressId(item.assessmentModuleName ?? undefined);
             if (!moduleId) continue;
+            // Latest per module (for score/risk badges)
             if (!latestPerModule.has(moduleId)) {
                 latestPerModule.set(moduleId, item);
             }
+            // All per module (for dimension merging)
+            if (!allPerModule.has(moduleId)) allPerModule.set(moduleId, []);
+            allPerModule.get(moduleId)!.push(item);
         }
 
         const completedIds = new Set(Array.from(latestPerModule.keys()));
         this.stats.completedCount = completedIds.size;
         this.stats.pendingCount = Math.max(0, 4 - completedIds.size);
 
-        const latestScores = Array.from(latestPerModule.values())
-            .map((i) => Number(i?.result?.scorePercentage ?? 0))
-            .filter((n) => Number.isFinite(n));
+        // For stats avg — use the worst (highest) score per module across all instruments
+        const worstScores = Array.from(allPerModule.entries()).map(([, evals]) =>
+            this.worstScoreAcrossEvaluations(evals)
+        ).filter((n) => Number.isFinite(n));
 
-        const avg = latestScores.length ? latestScores.reduce((a, b) => a + b, 0) / latestScores.length : 0;
+        const avg = worstScores.length ? worstScores.reduce((a, b) => a + b, 0) / worstScores.length : 0;
         this.stats.averageWellbeingPercent = Math.round(Math.max(0, Math.min(100, avg)));
 
         this.moduleProgress = this.moduleProgress.map((m) => {
             const latest = latestPerModule.get(m.id);
+            const all = allPerModule.get(m.id) ?? [];
             if (!latest) {
                 return {
                     ...m,
@@ -598,8 +606,8 @@ export class MyTrackingComponent implements OnInit {
                 };
             }
 
-            const risk = latest?.result?.riskLevel ? String(latest.result.riskLevel) : '';
-            const score = this.safePercent(latest?.result?.scorePercentage ?? 0, 100);
+            // Use worst risk/score across all instruments of this module
+            const { risk, score } = this.worstRiskAcrossEvaluations(all);
 
             return {
                 ...m,
@@ -613,26 +621,41 @@ export class MyTrackingComponent implements OnInit {
 
         this.moduleResults = this.moduleProgress.map((m) => {
             const latest = latestPerModule.get(m.id);
-            const score = latest ? this.safePercent(latest.result.scorePercentage, 100) : undefined;
-            const risk = latest?.result?.riskLevel ? String(latest.result.riskLevel) : undefined;
-            const toneClass = latest ? this.toneClassForRisk(risk) : 'disabled';
-            const riskLabel = latest ? this.badgeLabelForRiskLevel(risk) : undefined;
+            const all = allPerModule.get(m.id) ?? [];
+            if (!latest) {
+                return {
+                    id: m.id,
+                    title: m.title,
+                    completedAt: undefined,
+                    evaluationId: undefined,
+                    scorePercent: undefined,
+                    riskLevel: undefined,
+                    riskLabel: undefined,
+                    isCompleted: false,
+                    toneClass: 'disabled' as const,
+                };
+            }
+
+            // Derive risk and score from worst instrument across all evaluations
+            const { risk, score } = this.worstRiskAcrossEvaluations(all);
+            const toneClass = this.toneClassForRisk(risk);
+            const riskLabel = this.badgeLabelForRiskLevel(risk);
 
             return {
                 id: m.id,
                 title: m.title,
                 completedAt: latest?.completedAt ? this.formatDateLong(latest.completedAt) : undefined,
                 evaluationId: latest?.evaluationID,
-                scorePercent: typeof score === 'number' ? score : undefined,
-                riskLevel: risk,
+                scorePercent: score,
+                riskLevel: risk || undefined,
                 riskLabel,
-                isCompleted: !!latest,
+                isCompleted: true,
                 toneClass,
             };
         });
 
-        // Build the detailed section as a list: one card per completed module (latest evaluation per module).
-        this.moduleDetailCards = this.buildModuleDetailCards(latestPerModule);
+        // Build the detailed section: one card per module, merging ALL instrument dimensions
+        this.moduleDetailCards = this.buildModuleDetailCards(latestPerModule, allPerModule);
 
         // Fallback: if backend doesn't return completed-evaluation details (or sends incomplete payload),
         // still render the section from `/evaluation/my-evaluations` so the user can at least see Progress.
@@ -659,21 +682,37 @@ export class MyTrackingComponent implements OnInit {
         }
     }
 
-    private buildModuleDetailCards(latestPerModule: Map<ModuleProgressId, CompletedEvaluationWithResultDto>): ModuleDetailCardVm[] {
+    private buildModuleDetailCards(
+        latestPerModule: Map<ModuleProgressId, CompletedEvaluationWithResultDto>,
+        allPerModule: Map<ModuleProgressId, CompletedEvaluationWithResultDto[]>
+    ): ModuleDetailCardVm[] {
         const order: ModuleProgressId[] = ['mental-health', 'work-fatigue', 'organizational-climate', 'psychosocial-risk'];
 
         return order
-            .map((moduleId) => ({ moduleId, latest: latestPerModule.get(moduleId) ?? null }))
+            .map((moduleId) => ({ moduleId, latest: latestPerModule.get(moduleId) ?? null, all: allPerModule.get(moduleId) ?? [] }))
             .filter(({ latest }) => !!latest)
-            .map(({ moduleId, latest }) => {
+            .map(({ moduleId, latest, all }) => {
                 const definition = getAssessmentModuleDefinition(moduleId);
                 const title = definition?.title ?? this.moduleProgress.find((m) => m.id === moduleId)?.title ?? 'Evaluación';
 
                 const evaluationResultId = Number((latest as any)?.result?.evaluationResultID ?? (latest as any)?.result?.evaluationResultId ?? 0);
                 const safeEvaluationResultId = Number.isFinite(evaluationResultId) && evaluationResultId > 0 ? evaluationResultId : undefined;
 
-                const dims = latest!.result?.dimensionScores ?? [];
-                const findings = (dims ?? []).map((d) => {
+                // Merge dimension scores from ALL evaluations for this module
+                // so multi-instrument modules (DASS-21 + BAI + BDI) show every instrument
+                const mergedDimsMap = new Map<string, typeof all[0]['result']['dimensionScores'][0]>();
+                // Process oldest-first so latest evaluation wins on conflicts
+                for (const ev of [...all].reverse()) {
+                    for (const d of ev.result?.dimensionScores ?? []) {
+                        const code = String((d as any)?.instrumentCode ?? '').toUpperCase().trim();
+                        const id   = String((d as any)?.dimensionScoreID ?? (d as any)?.dimensionScoreId ?? '');
+                        const key  = code || id;
+                        if (key) mergedDimsMap.set(key, d); // latest wins
+                    }
+                }
+                const mergedDims = Array.from(mergedDimsMap.values());
+
+                const findings = mergedDims.map((d) => {
                     const tone = this.riskToneFor(d?.riskLevel);
                     const pct = (d as any)?.percentageScore != null
                         ? Math.round(Math.max(0, Math.min(100, Number((d as any).percentageScore))))
@@ -686,10 +725,15 @@ export class MyTrackingComponent implements OnInit {
                     };
                 });
 
-                const recs = latest!.result?.recommendations ?? [];
-                const recommendations = (recs ?? [])
-                    .map((r) => (r?.recommendationText || r?.title || '').trim())
-                    .filter(Boolean);
+                // Merge recommendations from all evaluations (union, no duplicates)
+                const allRecs = new Set<string>();
+                for (const ev of all) {
+                    for (const r of ev.result?.recommendations ?? []) {
+                        const text = (r?.recommendationText || r?.title || '').trim();
+                        if (text) allRecs.add(text);
+                    }
+                }
+                const recommendations = Array.from(allRecs);
 
                 const interpretation = String(latest!.result?.interpretation ?? '').trim() || undefined;
 
@@ -1041,6 +1085,52 @@ export class MyTrackingComponent implements OnInit {
         if (name.includes('clima') || name.includes('climate')) return 'organizational-climate';
         if (name.includes('psicosocial')) return 'psychosocial-risk';
         return null;
+    }
+
+    /**
+     * Given all evaluations for a module, returns the worst (most severe) risk level
+     * and its associated score percentage. For instruments where higher = worse (BAI, PHQ9, etc.)
+     * the one with the highest scorePercentage is the most dangerous.
+     * Priority order: bad > warn > good > none.
+     */
+    private worstRiskAcrossEvaluations(evals: CompletedEvaluationWithResultDto[]): { risk: string; score: number } {
+        const SEVERITY: Record<string, number> = { bad: 3, warn: 2, good: 1, none: 0 };
+        let worstRisk = '';
+        let worstScore = 0;
+        let worstSeverity = -1;
+
+        for (const ev of evals) {
+            // Check dimension-level risks first (most granular)
+            for (const dim of ev.result?.dimensionScores ?? []) {
+                const risk = String(dim?.riskLevel ?? '');
+                const tone = this.badgeToneForRiskLabel(risk);
+                const sev = SEVERITY[tone] ?? 0;
+                const pct = (dim as any)?.percentageScore != null
+                    ? Math.round(Math.max(0, Math.min(100, Number((dim as any).percentageScore))))
+                    : this.safePercent(dim?.score ?? 0, dim?.maxScore ?? 0);
+                if (sev > worstSeverity || (sev === worstSeverity && pct > worstScore)) {
+                    worstSeverity = sev;
+                    worstRisk = risk;
+                    worstScore = pct;
+                }
+            }
+            // Also consider the evaluation-level risk as fallback
+            const evalRisk = String(ev.result?.riskLevel ?? '');
+            const evalTone = this.badgeToneForRiskLabel(evalRisk);
+            const evalSev = SEVERITY[evalTone] ?? 0;
+            const evalScore = this.safePercent(ev.result?.scorePercentage ?? 0, 100);
+            if (evalSev > worstSeverity || (worstSeverity === -1)) {
+                worstSeverity = evalSev;
+                worstRisk = evalRisk;
+                worstScore = evalScore;
+            }
+        }
+
+        return { risk: worstRisk, score: worstScore };
+    }
+
+    private worstScoreAcrossEvaluations(evals: CompletedEvaluationWithResultDto[]): number {
+        return this.worstRiskAcrossEvaluations(evals).score;
     }
 
     private toneClassForRisk(riskLevel?: string): 'good' | 'warn' | 'bad' | 'disabled' {

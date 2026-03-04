@@ -732,6 +732,9 @@ export class AssessmentService {
                 id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
                 label: d?.dimensionName ?? '',
                 instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
+                score: Number(d?.score ?? 0),
+                maxScore: Number(d?.maxScore ?? 0),
+                riskLevel: d?.riskLevel ?? undefined,
                 percent: d?.percentageScore != null
                     ? Math.round(Math.max(0, Math.min(100, Number(d.percentageScore))))
                     : this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),

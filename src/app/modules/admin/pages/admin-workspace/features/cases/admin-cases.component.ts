@@ -116,17 +116,26 @@ export class AdminCasesComponent implements OnInit {
 
     load(): void {
         this.loading = true;
-        this.service.list({ status: this.statusFilter || undefined, priority: this.priorityFilter || undefined })
+        const params = { status: this.statusFilter || undefined, priority: this.priorityFilter || undefined };
+        console.log('[Cases] load() params:', params);
+        this.service.list(params)
             .pipe(
-                catchError(() => of<CaseTrackingDto[]>([])),
+                catchError((err) => {
+                    console.error('[Cases] load() catchError:', err);
+                    return of<CaseTrackingDto[]>([]);
+                }),
                 finalize(() => (this.loading = false)),
             )
             .subscribe({
                 next: (cases) => {
+                    console.log('[Cases] load() response:', cases);
                     this.cases = cases;
                     this.applyFilter();
                 },
-                error: () => this.notify.error('No fue posible cargar casos'),
+                error: (err) => {
+                    console.error('[Cases] load() error:', err);
+                    this.notify.error('No fue posible cargar casos');
+                },
             });
     }
 

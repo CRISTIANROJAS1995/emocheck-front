@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse } from 'app/core/models/auth.model';
 import { environment } from '../../../environments/environment';
-import { Observable, of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 export interface AdminCaseQuery {
@@ -178,16 +178,42 @@ export class AdminCaseTrackingService {
 
     // ── Cases CRUD ─────────────────────────────
     list(query?: AdminCaseQuery): Observable<CaseTrackingDto[]> {
-        // Use /status/OPEN as default — API has no "list all" endpoint
-        const status = (query?.status ?? 'OPEN').toUpperCase();
+        // Si no hay filtro de status, traer todos los estados en paralelo (no existe endpoint "list all")
+        if (!query?.status) {
+            const ALL_STATUSES = ['OPEN', 'IN_PROGRESS', 'CLOSED', 'ESCALATED'];
+            console.log('[CaseTracking] list() — sin filtro, forkJoin de todos los estados');
+            return forkJoin(
+                ALL_STATUSES.map(s =>
+                    this.http.get<unknown>(`${this.apiUrl}/casetracking/status/${s}`).pipe(
+                        map(res => this.unwrapArray<BackendCaseTrackingDto>(res).map(x => this.mapCase(x))),
+                        catchError(() => of([] as CaseTrackingDto[])),
+                    )
+                )
+            ).pipe(
+                map(results => {
+                    const all = results.flat();
+                    console.log('[CaseTracking] list() todos los estados:', all);
+                    return this.applyClientFilters(all, query);
+                }),
+            );
+        }
+
+        const status = query.status.toUpperCase();
+        const url = `${this.apiUrl}/casetracking/status/${status}`;
+        console.log('[CaseTracking] list() GET', url);
         return this.http
-            .get<unknown>(`${this.apiUrl}/casetracking/status/${status}`)
+            .get<unknown>(url)
             .pipe(
                 map((res) => {
+                    console.log('[CaseTracking] list() raw response:', res);
                     const rows = this.unwrapArray<BackendCaseTrackingDto>(res);
+                    console.log('[CaseTracking] list() unwrapped rows:', rows);
                     return rows.map((x) => this.mapCase(x));
                 }),
-                map((rows) => this.applyClientFilters(rows, query)),
+                map((rows) => {
+                    console.log('[CaseTracking] list() mapped cases:', rows);
+                    return this.applyClientFilters(rows, query);
+                }),
                 catchError((err) => { console.error('[CaseTracking] ERROR:', err); return of([]); }),
             );
     }
@@ -229,7 +255,7 @@ export class AdminCaseTrackingService {
 
     /** Close a case — PATCH /casetracking/{id}/close */
     close(caseId: number, closeReason?: string): Observable<CaseTrackingDto> {
-        const body = { closeReason: closeReason ?? 'Caso cerrado' };
+        const body = { ClosureReason: closeReason ?? 'Caso cerrado' };
         return this.http
             .patch<unknown>(`${this.apiUrl}/casetracking/${caseId}/close`, body)
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));

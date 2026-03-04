@@ -17,9 +17,7 @@ export class ModuleCardComponent {
     @Output() onViewPlan = new EventEmitter<string>();
 
     startEvaluation(): void {
-        if (!this.module.disabled) {
-            this.onStartEvaluation.emit(this.module.id);
-        }
+        this.onStartEvaluation.emit(this.module.id);
     }
 
     viewPlan(): void {
