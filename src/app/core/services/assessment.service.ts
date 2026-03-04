@@ -8,6 +8,18 @@ import {
 } from 'app/core/models/assessment.model';
 import { ASSESSMENT_MODULES, getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 import { environment } from '../../../environments/environment';
+
+/** Detailed answer for a single question, used by submitRich(). */
+export interface RichAnswer {
+    /** Frontend question id */
+    questionId: number;
+    /** Option index for LIKERT/ROUTING; integer value for INTEGER; null for TIME */
+    value: number | null;
+    /** Free text for TIME or ROUTING companion field */
+    text: string | null;
+    /** Sub-item answers keyed by sub-question id (ICSP_VC) */
+    subAnswers?: { questionId: number; value: number | null; text: string | null }[];
+}
 import {
     Observable,
     catchError,
@@ -91,8 +103,12 @@ export interface InstrumentDescriptor {
     index: number;
     /** Código del instrumento, ej. "GAD7", "PHQ9", "ISI", "PSS4". */
     code: string;
-    /** Etiqueta amigable, ej. "Ansiedad", "Depresión". */
+    /** Etiqueta amigable — viene de dimensionLabels si hay match, si no del backend. */
     label: string;
+    /** Nombre original del instrumento tal como lo envía el backend. */
+    backendName: string;
+    /** Descripción del instrumento tal como la envía el backend. */
+    backendDescription: string;
     /** Número de preguntas del instrumento. */
     questionCount: number;
 }
@@ -235,11 +251,7 @@ export class AssessmentService {
                 this.moduleDetailCache.set(moduleId, { apiModuleId, questions });
                 this.moduleRawCache.set(moduleId, { apiModuleId, moduleData });
 
-                return questions.map((q) => ({
-                    id: q.questionID,
-                    text: q.questionText ?? '',
-                    options: this.sortOptions(q.options ?? []).map((o) => o.optionText ?? ''),
-                }));
+                return questions.map((q) => this.mapQuestion(q));
             })
         );
     }
@@ -256,13 +268,15 @@ export class AssessmentService {
                 const instruments = moduleData?.instruments ?? [];
                 return instruments.map((inst, i) => {
                     const dim = moduleDef.dimensionLabels[i];
-                    // Try backend code first, fall back to dimensionLabels by index
                     const code = String(
                         (inst as any).code ?? (inst as any).instrumentCode ?? dim?.instrumentCode ?? ''
                     ).toUpperCase().trim() || `INST_${i}`;
-                    const label = dim?.label ?? code;
+                    const backendName = String((inst as any).name ?? (inst as any).instrumentName ?? '').trim();
+                    const backendDescription = String((inst as any).description ?? '').trim();
+                    // Use dimensionLabels label only if backend name is empty
+                    const label = backendName || dim?.label || code;
                     const rootQuestions = (inst.questions ?? []).filter(q => q.parentQuestionID == null);
-                    return { index: i, code, label, questionCount: rootQuestions.length };
+                    return { index: i, code, label, backendName, backendDescription, questionCount: rootQuestions.length };
                 });
             })
         );
@@ -295,11 +309,7 @@ export class AssessmentService {
                 // para que submit() las use correctamente al construir SubmitResponseDto[]
                 this.moduleDetailCache.set(moduleId, { apiModuleId, questions: rootQuestions });
 
-                return rootQuestions.map((q) => ({
-                    id: q.questionID,
-                    text: q.questionText ?? '',
-                    options: this.sortOptions(q.options ?? []).map((o) => o.optionText ?? ''),
-                }));
+                return rootQuestions.map((q) => this.mapQuestion(q));
             })
         );
     }
@@ -391,6 +401,68 @@ export class AssessmentService {
                                     throw new Error('No fue posible completar la evaluación');
                                 }
                                 return result;
+                            })
+                        )
+                    ),
+                    map((completed: SwaggerEvaluationResultDto) => this.mapToAssessmentResult(moduleId, completed))
+                )
+            )
+        );
+    }
+
+    /**
+     * Submits an assessment using rich answers (supports TIME, INTEGER, ROUTING, sub-items).
+     * Use this instead of submit() when the questionnaire has non-LIKERT questions.
+     */
+    submitRich(moduleId: AssessmentModuleId, richAnswers: RichAnswer[]): Observable<AssessmentResult> {
+        return this.consentService.hasAccepted().pipe(
+            switchMap((hasAccepted) =>
+                hasAccepted
+                    ? of(true)
+                    : throwError(() => ({
+                        code: 'CONSENT_REQUIRED',
+                        message: 'Debes aceptar el consentimiento informado antes de iniciar la evaluación.',
+                    }))
+            ),
+            switchMap(() => this.getModuleDetail(moduleId)),
+            switchMap((detail) =>
+                this.getInProgressEvaluation(detail.apiModuleId).pipe(
+                    switchMap((existing) => {
+                        if (existing?.evaluationID) return of(existing);
+                        return this.http
+                            .post<unknown>(`${this.apiUrl}/evaluation/start`, { moduleID: detail.apiModuleId })
+                            .pipe(
+                                map((res) => {
+                                    const evaluation = this.unwrapObject<SwaggerEvaluationDto>(res);
+                                    if (!evaluation?.evaluationID) throw new Error('No fue posible iniciar la evaluación');
+                                    return evaluation;
+                                })
+                            );
+                    }),
+                    switchMap((evaluation) =>
+                        this.submitRichResponses(evaluation.evaluationID, detail.questions, richAnswers).pipe(
+                            switchMap(() =>
+                                this.http
+                                    .post<unknown>(`${this.apiUrl}/evaluation/${evaluation.evaluationID}/complete`, null)
+                                    .pipe(
+                                        map((res) => this.unwrapObject<SwaggerEvaluationResultDto>(res) as SwaggerEvaluationResultDto),
+                                        switchMap((result: SwaggerEvaluationResultDto) =>
+                                            result?.evaluationResultID
+                                                ? of(result)
+                                                : this.loadCompletedResultForEvaluation(evaluation.evaluationID)
+                                        )
+                                    )
+                            ),
+                            catchError((err) =>
+                                this.loadCompletedResultForEvaluation(evaluation.evaluationID).pipe(
+                                    switchMap((result) =>
+                                        result?.evaluationResultID ? of(result) : throwError(() => err)
+                                    )
+                                )
+                            ),
+                            map((result: SwaggerEvaluationResultDto | null) => {
+                                if (!(result as SwaggerEvaluationResultDto)?.evaluationResultID) throw new Error('No fue posible completar la evaluación');
+                                return result as SwaggerEvaluationResultDto;
                             })
                         )
                     ),
@@ -510,6 +582,92 @@ export class AssessmentService {
             evaluationID: evaluationId,
             responses,
         });
+    }
+
+    /**
+     * Submits rich answers, properly resolving sub-items for grouped questions (ICSP_VC).
+     * For each root question:
+     *   - If it has subAnswers → emit one SubmitResponseDto per sub-item (by questionId)
+     *   - Otherwise → emit one SubmitResponseDto for the root question
+     */
+    private submitRichResponses(
+        evaluationId: number,
+        questions: SwaggerQuestionDto[],
+        richAnswers: RichAnswer[]
+    ): Observable<unknown> {
+        const answerMap = new Map<number, RichAnswer>(richAnswers.map((a) => [a.questionId, a]));
+        const responses: SubmitResponseDto[] = [];
+
+        for (const q of questions) {
+            const rich = answerMap.get(q.questionID);
+            const questionType: QuestionType = q.questionType ?? 'LIKERT';
+
+            // Root question has sub-items → expand to individual sub-item responses
+            const subItems = q.subItems ?? [];
+            if (subItems.length && rich?.subAnswers?.length) {
+                for (const sub of subItems) {
+                    const subAns = rich.subAnswers.find((sa) => sa.questionId === sub.questionID);
+                    if (!subAns) continue;
+                    const subOpts = this.sortOptions(sub.options ?? []);
+                    const idx = Math.max(0, Math.min(subOpts.length - 1, subAns.value ?? 0));
+                    const sel = subOpts[idx] ?? subOpts[0];
+                    responses.push({
+                        evaluationID: evaluationId,
+                        questionID: sub.questionID,
+                        selectedValue: Number(sel?.numericValue ?? sel?.optionValue ?? idx),
+                        textValue: null,
+                    });
+                }
+                continue;
+            }
+
+            if (!rich) continue;
+
+            if (questionType === 'TIME') {
+                responses.push({ evaluationID: evaluationId, questionID: q.questionID, selectedValue: null, textValue: rich.text ?? '' });
+                continue;
+            }
+            if (questionType === 'INTEGER') {
+                responses.push({ evaluationID: evaluationId, questionID: q.questionID, selectedValue: rich.value ?? 0, textValue: null });
+                continue;
+            }
+            // LIKERT / ROUTING
+            const opts = this.sortOptions(q.options ?? []);
+            const idx = Math.max(0, Math.min(opts.length - 1, rich.value ?? 0));
+            const sel = opts[idx] ?? opts[0];
+            responses.push({
+                evaluationID: evaluationId,
+                questionID: q.questionID,
+                selectedValue: Number(sel?.numericValue ?? sel?.optionValue ?? idx),
+                textValue: questionType === 'ROUTING' ? (rich.text ?? null) : null,
+            });
+        }
+
+        return this.http.post<unknown>(`${this.apiUrl}/evaluation/respond-multiple`, {
+            evaluationID: evaluationId,
+            responses,
+        });
+    }
+
+    /**
+     * Maps a raw SwaggerQuestionDto to the frontend AssessmentQuestion model,
+     * preserving questionType, subItemLabel, enableTextIfValue, and subItems.
+     */
+    private mapQuestion(q: SwaggerQuestionDto): AssessmentQuestion {
+        const subItems = (q.subItems ?? [])
+            .slice()
+            .sort((a, b) => (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0))
+            .map((sub) => this.mapQuestion(sub));
+
+        return {
+            id: q.questionID,
+            text: q.questionText ?? '',
+            options: this.sortOptions(q.options ?? []).map((o) => o.optionText ?? ''),
+            questionType: (q.questionType as any) ?? 'LIKERT',
+            subItemLabel: q.subItemLabel ?? undefined,
+            enableTextIfValue: q.enableTextIfValue ?? null,
+            subItems: subItems.length ? subItems : undefined,
+        };
     }
 
     /**

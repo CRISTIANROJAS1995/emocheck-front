@@ -6,10 +6,21 @@ export type AssessmentModuleId =
 
 export type AssessmentOutcome = 'adequate' | 'mild' | 'high-risk';
 
+export type AssessmentQuestionType = 'LIKERT' | 'TIME' | 'INTEGER' | 'ROUTING';
+
 export interface AssessmentQuestion {
     id: number;
     text: string;
+    /** Options for LIKERT / ROUTING questions. Empty for TIME / INTEGER. */
     options: string[];
+    /** Question type. Defaults to 'LIKERT' when absent. */
+    questionType?: AssessmentQuestionType;
+    /** Sub-label for sub-items, e.g. "a", "b" (ICSP_VC P5a-P5j) */
+    subItemLabel?: string;
+    /** If selectedValue equals this number, a free-text companion field appears (ROUTING). */
+    enableTextIfValue?: number | null;
+    /** Child questions (sub-items, e.g. ICSP_VC P5a-P5j). Rendered as a nested group. */
+    subItems?: AssessmentQuestion[];
 }
 
 export interface AssessmentDimensionBreakdown {

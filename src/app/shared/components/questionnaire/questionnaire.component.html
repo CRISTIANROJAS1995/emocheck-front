@@ -38,22 +38,116 @@
             <section class="question-card">
                 <h2 class="question-title">{{ currentQuestion.text }}</h2>
 
-                <p class="question-help">Selecciona la opción que mejor describe tu situación</p>
+                <!-- ── LIKERT con sub-items (tabla de sub-preguntas, ej. ICSP_VC P5a-P5j) ── -->
+                @if (isLikert && currentQuestion.subItems?.length) {
+                <div class="subitem-group">
+                    <p class="question-help">Califica cada aspecto seleccionando una opción por fila</p>
+                    <div class="subitem-header">
+                        <div class="subitem-header__label"></div>
+                        @for (opt of currentQuestion.subItems![0].options; track opt) {
+                        <div class="subitem-header__opt">{{ opt }}</div>
+                        }
+                    </div>
+                    @for (sub of currentQuestion.subItems!; track sub.id; let si = $index) {
+                    <div class="subitem-row" [class.subitem-row--answered]="subItemAnswers[si]?.value !== null">
+                        <div class="subitem-row__label">
+                            @if (sub.subItemLabel) {<span class="subitem-row__letter">{{ sub.subItemLabel }}.</span>} {{ sub.text }}
+                        </div>
+                        <div class="subitem-row__options">
+                            @for (opt of sub.options; track opt; let oi = $index) {
+                            <button class="subitem-opt" [class.subitem-opt--selected]="isSubItemSelected(si, oi)" [disabled]="isLocked || hasSubmitted" type="button" (click)="selectSubItemOption(si, oi)" [attr.aria-label]="opt">
+                                <span class="subitem-opt__radio">
+                                    @if (isSubItemSelected(si, oi)) {
+                                    <span class="subitem-opt__radio-inner"></span>
+                                    }
+                                </span>
+                            </button> }
+                        </div>
+                    </div>
+                    }
+                    <div class="input-action-row">
+                        <button class="continue-btn" type="button" [disabled]="!currentAnswerComplete || isLocked || hasSubmitted" (click)="nextQuestion()">
+                            Continuar
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+                }
 
+                <!-- ── LIKERT estándar (sin sub-items) ── -->
+                @if (isLikert && !currentQuestion.subItems?.length) {
+                <p class="question-help">Selecciona la opción que mejor describe tu situación</p>
                 <div class="options" role="list">
-                    <button *ngFor="let option of currentQuestion.options; let i = index" class="option"
-                        [class.selected]="isOptionSelected(i)" type="button" role="listitem" (click)="selectOption(i)"
-                        [disabled]="isLocked || hasSubmitted">
+                    @for (option of currentQuestion.options; track option; let i = $index) {
+                    <button class="option" [class.selected]="isOptionSelected(i)" type="button" role="listitem" (click)="selectOption(i)" [disabled]="isLocked || hasSubmitted">
                         <span class="radio" aria-hidden="true">
-                            <span class="radio-inner" *ngIf="isOptionSelected(i)"></span>
+                            @if (isOptionSelected(i)) {<span class="radio-inner"></span>}
                         </span>
                         <span class="option-label">{{ option }}</span>
                         <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
-                            <path
-                                d="M9 18a1 1 0 0 1-.707-1.707L12.586 12 8.293 7.707A1 1 0 1 1 9.707 6.293l5 5a1 1 0 0 1 0 1.414l-5 5A1 1 0 0 1 9 18Z" />
+                            <path d="M9 18a1 1 0 0 1-.707-1.707L12.586 12 8.293 7.707A1 1 0 1 1 9.707 6.293l5 5a1 1 0 0 1 0 1.414l-5 5A1 1 0 0 1 9 18Z" />
                         </svg>
+                    </button> }
+                </div>
+                }
+
+                <!-- ── TIME (campo de hora) ── -->
+                @if (isTime) {
+                <p class="question-help">Ingresa la hora en formato HH:MM (ej. 22:30)</p>
+                <div class="input-field-wrap">
+                    <label class="input-field-label" [for]="'time-' + currentQuestion.id">Hora</label>
+                    <input class="input-field input-field--time" type="time" [id]="'time-' + currentQuestion.id" [value]="timeValue" (change)="onTimeChange($any($event.target).value)" [disabled]="isLocked || hasSubmitted" />
+                </div>
+                <div class="input-action-row">
+                    <button class="continue-btn" type="button" [disabled]="!currentAnswerComplete || isLocked || hasSubmitted" (click)="nextQuestion()">
+                        Continuar
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </div>
+                }
+
+                <!-- ── INTEGER (campo numérico) ── -->
+                @if (isInteger) {
+                <p class="question-help">Ingresa un número entero</p>
+                <div class="input-field-wrap">
+                    <label class="input-field-label" [for]="'int-' + currentQuestion.id">Valor</label>
+                    <input class="input-field input-field--integer" type="number" min="0" step="1" [id]="'int-' + currentQuestion.id" [value]="integerValue" (input)="onIntegerChange($any($event.target).value)" [disabled]="isLocked || hasSubmitted" placeholder="0" />
+                </div>
+                <div class="input-action-row">
+                    <button class="continue-btn" type="button" [disabled]="!currentAnswerComplete || isLocked || hasSubmitted" (click)="nextQuestion()">
+                        Continuar
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+                }
+
+                <!-- ── ROUTING (opciones + texto condicional) ── -->
+                @if (isRouting) {
+                <p class="question-help">Selecciona la opción que mejor describe tu situación</p>
+                <div class="options" role="list">
+                    @for (option of currentQuestion.options; track option; let i = $index) {
+                    <button class="option" [class.selected]="isRoutingSelected(i)" type="button" role="listitem" (click)="selectRoutingOption(i)" [disabled]="isLocked || hasSubmitted">
+                        <span class="radio" aria-hidden="true">
+                            @if (isRoutingSelected(i)) {<span class="radio-inner"></span>}
+                        </span>
+                        <span class="option-label">{{ option }}</span>
+                        <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M9 18a1 1 0 0 1-.707-1.707L12.586 12 8.293 7.707A1 1 0 1 1 9.707 6.293l5 5a1 1 0 0 1 0 1.414l-5 5A1 1 0 0 1 9 18Z" />
+                        </svg>
+                    </button> }
+                </div>
+                @if (showRoutingText) {
+                <div class="routing-text-wrap">
+                    <label class="input-field-label" [for]="'rt-' + currentQuestion.id">Especifica:</label>
+                    <input class="input-field" type="text" [id]="'rt-' + currentQuestion.id" [value]="currentAnswer.text ?? ''" (input)="onRoutingTextChange($any($event.target).value)" [disabled]="isLocked || hasSubmitted" placeholder="Escribe aquí..." />
+                    <div class="input-action-row">
+                        <button class="continue-btn" type="button" [disabled]="!currentAnswerComplete || isLocked || hasSubmitted" (click)="nextQuestion()">
+                            Continuar
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+                } }
 
                 <div class="card-footer">
                     <button class="prev-button" type="button" [disabled]="!canGoBack" (click)="previousQuestion()">

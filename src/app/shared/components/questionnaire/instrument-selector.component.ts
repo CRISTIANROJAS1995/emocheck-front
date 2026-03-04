@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AssessmentService, InstrumentDescriptor } from 'app/core/services/assessment.service';
+import { AssessmentService, InstrumentDescriptor, RichAnswer } from 'app/core/services/assessment.service';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AssessmentModuleId } from 'app/core/models/assessment.model';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
@@ -93,12 +93,17 @@ export class InstrumentSelectorComponent implements OnInit {
         this.assessmentService.getModuleInstruments(this.moduleId).subscribe({
             next: (descriptors) => {
                 this.instruments = descriptors.map((d, i) => {
-                    const meta = INSTRUMENT_META[d.code] ?? {
-                        icon: this.moduleDef.icon,
-                        description: '',
-                        color: FALLBACK_COLORS[i % FALLBACK_COLORS.length],
+                    const meta = INSTRUMENT_META[d.code];
+                    return {
+                        ...d,
+                        // Label: prefer dimensionLabels > backendName > code
+                        label: d.label || d.backendName || d.code,
+                        // Description: always prefer backend first, then hardcoded meta
+                        description: d.backendDescription || meta?.description || '',
+                        // Icon & color: from hardcoded meta or fallback
+                        icon:  meta?.icon  ?? this.moduleDef.icon,
+                        color: meta?.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
                     };
-                    return { ...d, ...meta };
                 });
             },
             error: (e) => {
@@ -143,10 +148,14 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     onCompleted(answers: number[]): void {
+        // Legacy: not used when completedRich is available
+    }
+
+    onCompletedRich(richAnswers: RichAnswer[]): void {
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        this.assessmentService.submit(this.moduleId, answers).pipe(
+        this.assessmentService.submitRich(this.moduleId, richAnswers).pipe(
             finalize(() => { this.isSubmitting = false; })
         ).subscribe({
             next: (result) => {

@@ -1,6 +1,6 @@
 @if (config) {
 <!-- Fase 2: Cuestionario -->
-<emo-questionnaire [config]="config" (back)="goBack()" (completed)="onCompleted($event)"></emo-questionnaire>
+<emo-questionnaire [config]="config" (back)="goBack()" (completed)="onCompleted($event)" (completedRich)="onCompletedRich($event)"></emo-questionnaire>
 } @else {
 <!-- Fase 1: Selección de instrumento -->
 <div class="is-page">
