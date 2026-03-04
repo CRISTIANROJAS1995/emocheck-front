@@ -8,9 +8,10 @@ import { AssessmentStateService } from 'app/core/services/assessment-state.servi
 import { AssessmentModuleId } from 'app/core/models/assessment.model';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
+import { AuthService } from 'app/core/services/auth.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { EmoQuestionnaireComponent, QuestionnaireConfig } from 'app/shared/components/questionnaire';
-import { finalize } from 'rxjs';
+import { finalize, take } from 'rxjs';
 
 // ── Paleta de colores para instrumentos sin metadato explícito ───────────────
 const FALLBACK_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444'];
@@ -76,6 +77,11 @@ export class InstrumentSelectorComponent implements OnInit {
     loadingQuestions = false;
     loadError = false;
 
+    /** Controls the welcome modal visibility */
+    showWelcomeModal = false;
+    /** First name of the current user for the welcome modal greeting */
+    userName = '';
+
     moduleDef = getAssessmentModuleDefinition('mental-health'); // sobrescrito en ngOnInit
     heroGradient = '';
 
@@ -86,11 +92,25 @@ export class InstrumentSelectorComponent implements OnInit {
         private readonly assessmentService: AssessmentService,
         private readonly assessmentState: AssessmentStateService,
         private readonly alert: AlertService,
+        private readonly authService: AuthService,
     ) {}
 
     ngOnInit(): void {
         this.moduleDef = getAssessmentModuleDefinition(this.moduleId);
         this.heroGradient = this._buildGradient();
+
+        // Resolve current user's first name for the welcome modal greeting
+        const cached = this.authService.getCurrentUser();
+        if (cached?.name) {
+            this.userName = cached.name.split(' ')[0];
+        }
+        this.authService.ensureCurrentUserLoaded().pipe(take(1)).subscribe({
+            next: (u) => { if (u?.name) this.userName = u.name.split(' ')[0]; },
+            error: () => {},
+        });
+
+        // Show welcome modal every time the module page loads
+        this.showWelcomeModal = true;
 
         this.assessmentService.getModuleInstruments(this.moduleId).subscribe({
             next: (descriptors) => {
@@ -188,6 +208,10 @@ export class InstrumentSelectorComponent implements OnInit {
                 this.alert.error(msg);
             },
         });
+    }
+
+    closeWelcomeModal(): void {
+        this.showWelcomeModal = false;
     }
 
     private _buildGradient(): string {
