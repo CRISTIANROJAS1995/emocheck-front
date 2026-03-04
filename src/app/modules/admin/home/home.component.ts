@@ -205,6 +205,12 @@ export class HomeComponent implements OnInit {
             case 'professional-support':
                 this.router.navigate(['/support']);
                 return;
+            case 'mindfulness':
+                this.router.navigate(['/resources'], { queryParams: { category: 'mindfulness' } });
+                return;
+            case 'neuropauses':
+                this.router.navigate(['/resources'], { queryParams: { category: 'neuropauses' } });
+                return;
             default:
                 this.router.navigate(['/resources']);
                 return;

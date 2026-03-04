@@ -28,6 +28,7 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     warnings: string[] = [];
 
     private readonly subscriptions = new Subscription();
+    private _pendingCategorySlug: string | null = null;
 
     categories: ResourceCategoryDto[] = [];
     selectedCategoryId: number | null = null;
@@ -45,6 +46,9 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit(): void {
+        // Leer query param ?category= si viene desde el home
+        const categoryParam = this.route.snapshot.queryParamMap.get('category');
+        this._pendingCategorySlug = categoryParam ?? null;
         this.loadInitial();
     }
 
@@ -87,7 +91,14 @@ export class ResourcesComponent implements OnInit, OnDestroy {
                     this.recommended = recommended;
                     this.professionals = professionals;
                     this.emergencyContacts = emergency;
-                    this.loadResources();
+
+                    // Aplicar filtro automático si viene de un acceso directo (home)
+                    if (this._pendingCategorySlug) {
+                        this.openQuickAccess(this._pendingCategorySlug as any);
+                        this._pendingCategorySlug = null;
+                    } else {
+                        this.loadResources();
+                    }
                 },
                 error: () => {
                     this.error = 'No fue posible cargar recursos';
