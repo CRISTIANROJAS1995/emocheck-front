@@ -7,14 +7,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
     ProfessionalSupportDto,
-    RecommendedResourcesDto,
     ResourceCategoryDto,
     ResourcesService,
     WellnessResourceDto,
 } from 'app/core/services/resources.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { forkJoin, of, Subscription } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-resources',
@@ -34,7 +33,7 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     selectedCategoryId: number | null = null;
 
     featured: WellnessResourceDto[] = [];
-    recommended: RecommendedResourcesDto | null = null;
+    recommended: WellnessResourceDto[] = [];
     resources: WellnessResourceDto[] = [];
     professionals: ProfessionalSupportDto[] = [];
     emergencyContacts: ProfessionalSupportDto[] = [];
@@ -67,11 +66,11 @@ export class ResourcesComponent implements OnInit, OnDestroy {
             categories: this.resourcesApi.getCategories().pipe(
                 catchError((e) => { warn('Categorías', e); return of([]); })
             ),
-            featured: this.resourcesApi.getFeatured().pipe(
+            featured: this.resourcesApi.getRecommended().pipe(
                 catchError((e) => { warn('Destacados', e); return of([]); })
             ),
             recommended: this.resourcesApi.getRecommended().pipe(
-                catchError((e) => { warn('Recomendados', e); return of(null); })
+                catchError((e) => { warn('Recomendados', e); return of([]); })
             ),
             professionals: this.resourcesApi.getProfessionals().pipe(
                 catchError((e) => { warn('Profesionales', e); return of([]); })
@@ -106,8 +105,15 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         this.error = null;
 
         this.resourcesApi
-            .getResources({ categoryId: this.selectedCategoryId ?? undefined })
-            .pipe(finalize(() => (this.loading = false)))
+            .getResources()
+            .pipe(
+                map((items) =>
+                    this.selectedCategoryId != null
+                        ? items.filter((r) => r.resourceCategoryID === this.selectedCategoryId)
+                        : items
+                ),
+                finalize(() => (this.loading = false))
+            )
             .subscribe({
                 next: (items) => {
                     this.resources = items;
@@ -172,14 +178,14 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         }
 
         const match = (this.categories ?? []).find((c) => {
-            const current = (c?.categoryName ?? '').trim().toLowerCase();
+            const current = (c?.name ?? '').trim().toLowerCase();
             return !!current && normalized.includes(current);
         });
 
-        this.selectCategory(match?.resourceCategoryId ?? null);
+        this.selectCategory(match?.resourceCategoryID ?? null);
     }
 
-    openResource(resource: { wellnessResourceId: number; contentUrl: string }): void {
+    openResource(resource: { wellnessResourceID: number; contentUrl: string }): void {
         const url = (resource?.contentUrl ?? '').trim();
         if (url) {
             try {
@@ -189,10 +195,10 @@ export class ResourcesComponent implements OnInit, OnDestroy {
             }
         }
 
-        // Tracking de acceso (no bloqueante)
+        // Registra acceso (no bloqueante)
         this.resourcesApi
-            .trackAccess(resource.wellnessResourceId, { durationSeconds: 0, completedPercentage: 0 })
-            .pipe(catchError(() => of(null)))
+            .registerAccess({ wellnessResourceID: resource.wellnessResourceID, timeSpentSeconds: 0, completed: false })
+            .pipe(catchError(() => of(void 0)))
             .subscribe();
     }
 

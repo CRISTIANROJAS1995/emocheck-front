@@ -43,14 +43,38 @@ interface SwaggerQuestionOptionDto {
     optionValue?: number;       // legacy fallback
     displayOrder?: number;      // V5
     orderIndex?: number;        // legacy fallback
+    endsTest?: boolean;         // Schema v2: si true, esta opción finaliza la evaluación
 }
+
+type QuestionType = 'LIKERT' | 'TIME' | 'INTEGER' | 'ROUTING';
 
 interface SwaggerQuestionDto {
     questionID: number;
     questionText?: string | null;
-    questionNumber?: number;    // V5
-    orderIndex?: number;        // legacy fallback
+    questionNumber?: number;        // V5 (antes: questionOrder)
+    orderIndex?: number;            // legacy fallback
     options?: SwaggerQuestionOptionDto[] | null;
+    // Schema v2
+    questionType?: QuestionType;    // LIKERT | TIME | INTEGER | ROUTING
+    parentQuestionID?: number | null;
+    subItemLabel?: string | null;   // ej. "a", "b", "c"
+    enableTextIfValue?: number | null; // activa campo de texto si selectedValue == este número
+    subItems?: SwaggerQuestionDto[]; // preguntas hijas (ej. P5a-P5j en ICSP-VC)
+}
+
+interface SwaggerInstrumentScoreRangeDto {
+    scoreRangeID?: number;              // Schema v2 (antes: instrumentScoreRangeID)
+    instrumentScoreRangeID?: number;    // legacy fallback
+    instrumentID?: number;
+    dimensionCode?: string | null;      // Schema v2: subescala (ej. "ESTRES", "PERCEPCION")
+    gender?: 'M' | 'F' | null;         // Schema v2: género (solo TMMS-24). null = aplica a todos
+    rangeLevel?: string | null;
+    label?: string | null;
+    colorHex?: string | null;
+    minScore?: number;
+    maxScore?: number;
+    description?: string | null;
+    displayOrder?: number;              // Schema v2
 }
 
 interface SwaggerInstrumentDto {
@@ -111,6 +135,29 @@ interface SwaggerEvaluationWithResultDto {
     assessmentModuleName?: string | null;
     completedAt: string;
     result: SwaggerEvaluationResultDto;
+}
+
+// ── Schema v2 DTOs ──────────────────────────────────────────────────────────
+
+/** Request para enviar una respuesta individual (Schema v2). */
+interface SubmitResponseDto {
+    evaluationID: number;
+    questionID: number;
+    selectedValue: number | null; // null para preguntas TIME/ROUTING de texto libre
+    textValue: string | null;     // texto libre para preguntas TIME/ROUTING
+}
+
+/** Respuesta de evaluación ya registrada (Schema v2). */
+interface EvaluationResponseDto {
+    evaluationResponseID: number;
+    evaluationID: number;
+    questionID: number;
+    questionText?: string | null;
+    questionType?: QuestionType;
+    selectedValue?: number | null;   // nullable desde Schema v2
+    calculatedValue?: number | null; // nullable desde Schema v2
+    textValue?: string | null;       // texto libre ingresado
+    respondedAt: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -309,16 +356,36 @@ export class AssessmentService {
     }
 
     private submitAllResponses(evaluationId: number, questions: SwaggerQuestionDto[], answers: number[]): Observable<unknown> {
-        const responses = questions.map((q, index) => {
-            const options = this.sortOptions(q.options ?? []);
+        const responses: SubmitResponseDto[] = questions.map((q, index) => {
+            const questionType: QuestionType = q.questionType ?? 'LIKERT';
             const rawAnswer = answers[index];
-            const asNumber = Number(rawAnswer);
 
-            // answers are 0-based option indices from the questionnaire component
+            // TIME: respuesta es texto libre (ej. "23:00") — selectedValue null
+            if (questionType === 'TIME') {
+                return {
+                    evaluationID: evaluationId,
+                    questionID: q.questionID,
+                    selectedValue: null,
+                    textValue: String(rawAnswer ?? ''),
+                };
+            }
+
+            // INTEGER: valor numérico entero directo
+            if (questionType === 'INTEGER') {
+                return {
+                    evaluationID: evaluationId,
+                    questionID: q.questionID,
+                    selectedValue: Number.isFinite(Number(rawAnswer)) ? Number(rawAnswer) : 0,
+                    textValue: null,
+                };
+            }
+
+            // LIKERT / ROUTING: resolver por índice de opción
+            const options = this.sortOptions(q.options ?? []);
+            const asNumber = Number(rawAnswer);
             let optionIndex = Number.isFinite(asNumber) ? asNumber : 0;
 
             if (optionIndex < 0 || optionIndex > options.length - 1) {
-                // try matching by numericValue (legacy optionValue fallback)
                 const byValue = options.findIndex((o) => Number(o?.numericValue ?? o?.optionValue) === asNumber);
                 optionIndex = byValue >= 0 ? byValue : 0;
             }
@@ -327,35 +394,46 @@ export class AssessmentService {
             const selected = options[optionIndex] ?? options[0];
             const selectedValue = Number(selected?.numericValue ?? selected?.optionValue ?? optionIndex);
 
-            return { questionID: q.questionID, selectedValue };
+            return {
+                evaluationID: evaluationId,
+                questionID: q.questionID,
+                selectedValue,
+                textValue: null,
+            };
         });
 
-        // V5 API: use respond-multiple for a single atomic call
+        // Schema v2: respond-multiple con soporte a textValue para preguntas TIME/ROUTING
         return this.http.post<unknown>(`${this.apiUrl}/evaluation/respond-multiple`, {
             evaluationID: evaluationId,
             responses,
         });
     }
 
-    /** Extract questions from V5 (instruments â†’ questions) or legacy (direct questions). */
+    /**
+     * Extrae preguntas desde V5 (instruments -> questions) o legacy (direct questions).
+     * Schema v2: devuelve solo preguntas raiz (parentQuestionID === null).
+     * Los sub-items (P5a-P5j del ICSP-VC) viajan dentro de `subItems` en cada pregunta raiz.
+     */
     private extractQuestions(moduleData: SwaggerModuleFullDto): SwaggerQuestionDto[] {
+        let all: SwaggerQuestionDto[] = [];
+
         if (moduleData?.instruments?.length) {
-            const all: SwaggerQuestionDto[] = [];
             for (const instrument of moduleData.instruments) {
                 for (const q of instrument.questions ?? []) {
                     all.push(q);
                 }
             }
-            return all.slice().sort((a, b) =>
-                (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0)
-            );
+        } else {
+            all = moduleData?.questions ?? [];
         }
-        return (moduleData?.questions ?? []).slice().sort((a, b) =>
+
+        // Schema v2: filtrar solo raices (parentQuestionID === null | undefined)
+        const roots = all.filter((q) => q.parentQuestionID == null);
+
+        return roots.slice().sort((a, b) =>
             (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0)
         );
     }
-
-    /** Sort options by displayOrder (V5) or orderIndex (legacy). */
     private sortOptions(options: SwaggerQuestionOptionDto[]): SwaggerQuestionOptionDto[] {
         return options.slice().sort((a, b) =>
             (a.displayOrder ?? a.orderIndex ?? 0) - (b.displayOrder ?? b.orderIndex ?? 0)

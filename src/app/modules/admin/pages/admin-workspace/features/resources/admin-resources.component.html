@@ -17,46 +17,71 @@
             <div class="kpi-card__icon">
                 <mat-icon>folder</mat-icon>
             </div>
-            <div class="kpi-card__body"><span class="kpi-card__value">{{ resources.length }}</span><span class="kpi-card__label">Total Recursos</span></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ resources.length }}</span>
+                <span class="kpi-card__label">Total Recursos</span>
+            </div>
         </div>
         <div class="kpi-card kpi-card--sky">
             <div class="kpi-card__icon">
                 <mat-icon>category</mat-icon>
             </div>
-            <div class="kpi-card__body"><span class="kpi-card__value">{{ categories.length }}</span><span class="kpi-card__label">Categorías</span></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ categories.length }}</span>
+                <span class="kpi-card__label">Categorías</span>
+            </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
             <div class="kpi-card__icon">
                 <mat-icon>check_circle</mat-icon>
             </div>
-            <div class="kpi-card__body"><span class="kpi-card__value">{{ resources.length }}</span><span class="kpi-card__label">Activos</span></div>
+            <div class="kpi-card__body">
+                <span class="kpi-card__value">{{ resources.length }}</span>
+                <span class="kpi-card__label">Activos</span>
+            </div>
         </div>
     </div>
 
-    <!-- Create Form -->
-    @if (showCreateForm) {
+    <!-- ── Formulario: CREAR ───────────────────────────────────────────────── -->
+    @if (showCreateForm && canWrite) {
     <div class="editor-panel">
         <h3>
             <mat-icon>add_circle</mat-icon> Nuevo Recurso</h3>
+
         <div class="editor-panel__grid">
-            <label class="editor-panel__field"><span>Título *</span><input [(ngModel)]="resourceForm.title" placeholder="Ej: Meditación guiada anti-estrés" /></label>
+
+            <!-- Título -->
+            <label class="editor-panel__field">
+                <span>Título *</span>
+                <input [(ngModel)]="resourceForm.title" placeholder="Ej: Meditación guiada anti-estrés" />
+            </label>
+
+            <!-- Categoría -->
             <label class="editor-panel__field">
                 <span>Categoría *</span>
                 <select [(ngModel)]="resourceForm.resourceCategoryID">
                     <option [value]="0">— Seleccionar —</option>
                     @for (c of categories; track c.resourceCategoryID) {
-                    <option [value]="c.resourceCategoryID">{{ c.categoryName ?? c.name }}</option>
+                        <option [value]="c.resourceCategoryID">{{ c.name ?? c.categoryName }}</option>
                     }
                 </select>
             </label>
-            <label class="editor-panel__field editor-panel__field--full"><span>Descripción</span><textarea [(ngModel)]="resourceForm.description" rows="2"></textarea></label>
+
+            <!-- Descripción -->
+            <label class="editor-panel__field editor-panel__field--full">
+                <span>Descripción</span>
+                <textarea [(ngModel)]="resourceForm.description" rows="2"></textarea>
+            </label>
+
+            <!-- Tipo de contenido -->
             <label class="editor-panel__field">
                 <span>Tipo de Contenido *</span>
                 <select [(ngModel)]="resourceForm.contentType">
                     @for (ct of contentTypes; track ct) { <option [value]="ct">{{ ct }}</option> }
                 </select>
             </label>
-            <label class="editor-panel__field editor-panel__field--full"><span>URL del Contenido *</span><input [(ngModel)]="resourceForm.contentUrl" placeholder="https://..." /></label>
+
+            <!-- Nivel de riesgo -->
             <label class="editor-panel__field">
                 <span>Nivel de Riesgo</span>
                 <select [(ngModel)]="resourceForm.targetRiskLevel">
@@ -64,18 +89,69 @@
                     @for (rl of riskLevels; track rl) { <option [value]="rl">{{ rl }}</option> }
                 </select>
             </label>
-            <label class="editor-panel__field"><span>Duración (min)</span><input type="number" [(ngModel)]="resourceForm.durationMinutes" /></label>
-            <label class="editor-panel__field"><span>Tags</span><input [(ngModel)]="resourceForm.tags" placeholder="meditacion,estres,mindfulness" /></label>
-            <label class="editor-panel__field"><span>Orden</span><input type="number" [(ngModel)]="resourceForm.displayOrder" /></label>
+
+            <!-- Archivo de contenido (S3) -->
+            <div class="editor-panel__field editor-panel__field--full">
+                <span class="editor-panel__label">
+                    Archivo de Contenido
+                    <span class="editor-panel__hint">(se sube a S3 automáticamente)</span>
+                </span>
+                <div class="s3-upload-row">
+                    <input #createFileInput type="file" class="s3-upload-row__input" (change)="onCreateFileChange($event)" accept="video/*,audio/*,image/*,.pdf,.mp3,.mp4,.mov,.avi" /> @if (createFile) {
+                    <span class="s3-upload-row__name">{{ createFile.name }}</span> }
+                </div>
+                <span class="editor-panel__hint">— o ingresa la URL directamente —</span>
+                <input [(ngModel)]="resourceForm.contentUrl" placeholder="https://..." [disabled]="!!createFile" class="mt-1" />
+            </div>
+
+            <!-- Thumbnail (S3) -->
+            <div class="editor-panel__field editor-panel__field--full">
+                <span class="editor-panel__label">
+                    Imagen Miniatura
+                    <span class="editor-panel__hint">(se sube a S3 automáticamente)</span>
+                </span>
+                <div class="s3-upload-row">
+                    <input #createThumbInput type="file" class="s3-upload-row__input" (change)="onCreateThumbChange($event)" accept="image/jpeg,image/png,image/webp" /> @if (createThumb) {
+                    <span class="s3-upload-row__name">{{ createThumb.name }}</span> }
+                </div>
+                <span class="editor-panel__hint">— o ingresa la URL directamente —</span>
+                <input [(ngModel)]="resourceForm.thumbnailUrl" placeholder="https://..." [disabled]="!!createThumb" class="mt-1" />
+            </div>
+
+            <!-- Duración / Tags / Orden -->
+            <label class="editor-panel__field">
+                <span>Duración (min)</span>
+                <input type="number" [(ngModel)]="resourceForm.durationMinutes" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Tags</span>
+                <input [(ngModel)]="resourceForm.tags" placeholder="meditacion,estres,mindfulness" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Orden</span>
+                <input type="number" [(ngModel)]="resourceForm.displayOrder" />
+            </label>
+
         </div>
+
+        <!-- Barra de progreso S3 -->
+        @if (saving && createUploadState !== 'idle') {
+        <div class="s3-progress">
+            <mat-spinner diameter="18"></mat-spinner>
+            <span>{{ uploadLabel(createUploadState) }}</span>
+        </div>
+        }
+
         <div class="editor-panel__actions">
-            <button class="btn btn--ghost" (click)="showCreateForm = false">Cancelar</button>
-            <button class="btn btn--primary" (click)="createResource()" [disabled]="saving"><mat-icon>save</mat-icon> Crear Recurso</button>
+            <button class="btn btn--ghost" (click)="showCreateForm = false" [disabled]="saving">Cancelar</button>
+            <button class="btn btn--primary" (click)="createResource()" [disabled]="saving">
+                <mat-icon>save</mat-icon> {{ saving ? 'Guardando...' : 'Crear Recurso' }}
+            </button>
         </div>
     </div>
     }
 
-    <!-- Filters -->
+    <!-- Filtros -->
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
@@ -85,22 +161,25 @@
             <select [(ngModel)]="filterCategory" class="admin-filters__select">
                 <option [value]="0">Todas las categorías</option>
                 @for (c of categories; track c.resourceCategoryID) {
-                <option [value]="c.resourceCategoryID">{{ c.categoryName ?? c.name }}</option>
+                    <option [value]="c.resourceCategoryID">{{ c.name ?? c.categoryName }}</option>
                 }
             </select>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-            <span class="admin-filters__count">{{ filtered.length }} recursos</span>
+            <span class="admin-filters__count">{{ filtered.length }} recursos</span> @if (canWrite) {
             <button class="btn btn--primary btn--sm" (click)="showCreateForm = !showCreateForm">
                 <mat-icon>{{ showCreateForm ? 'close' : 'add' }}</mat-icon>
                 {{ showCreateForm ? 'Cerrar' : 'Nuevo Recurso' }}
-            </button>
+            </button> }
         </div>
     </div>
 
+    <!-- Tabla -->
     @if (loading) {
     <div class="loading-state">
-        <mat-spinner diameter="40"></mat-spinner><span>Cargando recursos...</span></div>
+        <mat-spinner diameter="40"></mat-spinner>
+        <span>Cargando recursos...</span>
+    </div>
     } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
@@ -117,31 +196,43 @@
             </thead>
             <tbody>
                 @for (r of filtered; track idOf(r)) {
-                <!-- Edit row -->
+
+                <!-- ── Fila edición inline ──────────────────────────────── -->
                 @if (editingId === idOf(r)) {
                 <tr>
                     <td colspan="7">
                         <div class="editor-panel" style="margin:8px">
                             <h3>
                                 <mat-icon>edit</mat-icon> Editar Recurso #{{ editingId }}</h3>
+
                             <div class="editor-panel__grid">
-                                <label class="editor-panel__field"><span>Título *</span><input [(ngModel)]="editForm.title" /></label>
+
+                                <label class="editor-panel__field">
+                                    <span>Título *</span>
+                                    <input [(ngModel)]="editForm.title" />
+                                </label>
+
                                 <label class="editor-panel__field">
                                     <span>Categoría</span>
                                     <select [(ngModel)]="editForm.resourceCategoryID">
                                         @for (c of categories; track c.resourceCategoryID) {
-                                        <option [value]="c.resourceCategoryID">{{ c.categoryName ?? c.name }}</option>
+                                            <option [value]="c.resourceCategoryID">{{ c.name ?? c.categoryName }}</option>
                                         }
                                     </select>
                                 </label>
-                                <label class="editor-panel__field editor-panel__field--full"><span>Descripción</span><textarea [(ngModel)]="editForm.description" rows="2"></textarea></label>
+
+                                <label class="editor-panel__field editor-panel__field--full">
+                                    <span>Descripción</span>
+                                    <textarea [(ngModel)]="editForm.description" rows="2"></textarea>
+                                </label>
+
                                 <label class="editor-panel__field">
                                     <span>Tipo</span>
                                     <select [(ngModel)]="editForm.contentType">
                                         @for (ct of contentTypes; track ct) { <option [value]="ct">{{ ct }}</option> }
                                     </select>
                                 </label>
-                                <label class="editor-panel__field editor-panel__field--full"><span>URL</span><input [(ngModel)]="editForm.contentUrl" /></label>
+
                                 <label class="editor-panel__field">
                                     <span>Nivel Riesgo</span>
                                     <select [(ngModel)]="editForm.targetRiskLevel">
@@ -149,37 +240,94 @@
                                         @for (rl of riskLevels; track rl) { <option [value]="rl">{{ rl }}</option> }
                                     </select>
                                 </label>
-                                <label class="editor-panel__field"><span>Duración (min)</span><input type="number" [(ngModel)]="editForm.durationMinutes" /></label>
-                                <label class="editor-panel__field"><span>Tags</span><input [(ngModel)]="editForm.tags" /></label>
+
+                                <!-- Reemplazar archivo de contenido -->
+                                <div class="editor-panel__field editor-panel__field--full">
+                                    <span class="editor-panel__label">
+                                        Reemplazar Archivo
+                                        <span class="editor-panel__hint">(deja vacío para mantener la URL actual)</span>
+                                    </span>
+                                    <div class="s3-upload-row">
+                                        <input #editFileInput type="file" class="s3-upload-row__input" (change)="onEditFileChange($event)" accept="video/*,audio/*,image/*,.pdf,.mp3,.mp4,.mov,.avi" /> @if (editFile) {
+                                        <span class="s3-upload-row__name">{{ editFile.name }}</span> }
+                                    </div>
+                                    <input [(ngModel)]="editForm.contentUrl" placeholder="URL actual del contenido" [disabled]="!!editFile" class="mt-1" />
+                                </div>
+
+                                <!-- Reemplazar thumbnail -->
+                                <div class="editor-panel__field editor-panel__field--full">
+                                    <span class="editor-panel__label">
+                                        Reemplazar Thumbnail
+                                        <span class="editor-panel__hint">(deja vacío para mantener el actual)</span>
+                                    </span>
+                                    <div class="s3-upload-row">
+                                        <input #editThumbInput type="file" class="s3-upload-row__input" (change)="onEditThumbChange($event)" accept="image/jpeg,image/png,image/webp" /> @if (editThumb) {
+                                        <span class="s3-upload-row__name">{{ editThumb.name }}</span> }
+                                    </div>
+                                    @if (editForm.thumbnailUrl && !editThumb) {
+                                    <img [src]="editForm.thumbnailUrl" class="thumb-preview" alt="thumbnail actual" /> }
+                                </div>
+
+                                <label class="editor-panel__field">
+                                    <span>Duración (min)</span>
+                                    <input type="number" [(ngModel)]="editForm.durationMinutes" />
+                                </label>
+
+                                <label class="editor-panel__field">
+                                    <span>Tags</span>
+                                    <input [(ngModel)]="editForm.tags" />
+                                </label>
+
                             </div>
+
+                            @if (saving && editUploadState !== 'idle') {
+                            <div class="s3-progress">
+                                <mat-spinner diameter="18"></mat-spinner>
+                                <span>{{ uploadLabel(editUploadState) }}</span>
+                            </div>
+                            }
+
                             <div class="editor-panel__actions">
-                                <button class="btn btn--ghost" (click)="cancelEdit()">Cancelar</button>
-                                <button class="btn btn--primary" (click)="saveEdit()" [disabled]="saving"><mat-icon>save</mat-icon> Guardar</button>
+                                <button class="btn btn--ghost" (click)="cancelEdit()" [disabled]="saving">Cancelar</button>
+                                <button class="btn btn--primary" (click)="saveEdit()" [disabled]="saving">
+                                    <mat-icon>save</mat-icon> {{ saving ? 'Guardando...' : 'Guardar Cambios' }}
+                                </button>
                             </div>
                         </div>
                     </td>
                 </tr>
                 }
-                <!-- Read row -->
+
+                <!-- ── Fila lectura ─────────────────────────────────────── -->
                 @if (editingId !== idOf(r)) {
                 <tr>
                     <td><strong>#{{ idOf(r) }}</strong></td>
-                    <td class="truncate-cell">{{ r.title }}</td>
-                    <td>{{ categoryName(r.resourceCategoryID) }}</td>
-                    <td><span class="badge badge--info">{{ r.contentType ?? r.resourceType ?? '-' }}</span></td>
+                    <td class="truncate-cell">
+                        @if (r.thumbnailUrl) {
+                        <img [src]="r.thumbnailUrl" class="thumb-mini" alt="" /> } {{ r.title }}
+                    </td>
+                    <td>{{ categoryLabel(r.resourceCategoryID) }}</td>
+                    <td><span class="badge badge--info">{{ r.contentType ?? '-' }}</span></td>
                     <td>
-                        @if (r.targetRiskLevel ?? r.targetAudience) {
-                        <span class="badge badge--amber">{{ r.targetRiskLevel ?? r.targetAudience }}</span> } @else { <span>-</span> }
+                        @if (r.targetRiskLevel) {
+                        <span class="badge badge--amber">{{ r.targetRiskLevel }}</span> } @else { <span>-</span> }
                     </td>
                     <td>{{ r.durationMinutes ? r.durationMinutes + ' min' : '-' }}</td>
                     <td class="actions-cell">
-                        <button class="btn btn--primary btn--xs" (click)="startEdit(r)" title="Editar"><mat-icon>edit</mat-icon></button>
-                        <button class="btn btn--danger btn--xs" (click)="deleteResource(r)" [disabled]="saving" title="Eliminar"><mat-icon>delete</mat-icon></button>
+                        @if (canWrite) {
+                        <button class="btn btn--primary btn--xs" (click)="startEdit(r)" title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button> } @if (canDelete) {
+                        <button class="btn btn--danger btn--xs" (click)="deleteResource(r)" [disabled]="saving" title="Eliminar">
+                            <mat-icon>delete</mat-icon>
+                        </button> } @if (!canWrite && !canDelete) {
+                        <span class="text-muted" style="font-size:12px">Solo lectura</span> }
                     </td>
                 </tr>
                 } }
             </tbody>
         </table>
+
         @if (filtered.length === 0) {
         <div class="empty-state">
             <mat-icon>folder_open</mat-icon>

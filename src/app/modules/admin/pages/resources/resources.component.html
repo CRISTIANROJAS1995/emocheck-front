@@ -104,8 +104,8 @@
                         Todas
                     </button>
 
-                    <button mat-button class="resources-chip" type="button" *ngFor="let c of categories" [class.is-active]="selectedCategoryId === c.resourceCategoryId" (click)="selectCategory(c.resourceCategoryId)">
-                        {{ c.categoryName }}
+                    <button mat-button class="resources-chip" type="button" *ngFor="let c of categories" [class.is-active]="selectedCategoryId === c.resourceCategoryID" (click)="selectCategory(c.resourceCategoryID)">
+                        {{ c.name }}
                         <span class="resources-chip__count" *ngIf="c.resourceCount != null">({{ c.resourceCount }})</span>
                     </button>
                 </div>
@@ -118,25 +118,22 @@
             <!-- Recomendados -->
             <section class="resources-section">
                 <div class="resources-section__title">Recomendados para ti</div>
-                <div class="resources-section__subtitle" *ngIf="recommended?.recommendationReason">
-                    {{ recommended?.recommendationReason }}
-                </div>
 
-                <div class="resources-empty" *ngIf="!loading && !error && !(recommended?.resources?.length)">
+                <div class="resources-empty" *ngIf="!loading && !error && !(recommended?.length)">
                     No hay recomendados disponibles por ahora.
                 </div>
 
-                <div class="resources-grid" *ngIf="recommended?.resources?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)" *ngFor="let r of recommended!.resources">
+                <div class="resources-grid" *ngIf="recommended?.length">
+                    <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of recommended">
                         <div class="resource-card__top">
                             <div class="resource-card__title">{{ r.title }}</div>
-                            <button mat-button class="resource-card__open" type="button" (click)="openResource({ wellnessResourceId: r.wellnessResourceId, contentUrl: r.contentUrl })">
+                            <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">
                                 Abrir
                             </button>
                         </div>
                         <div class="resource-card__meta">
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
-                            <span class="resource-badge">{{ r.resourceType }}</span>
+                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
+                            <span class="resource-badge">{{ r.contentType }}</span>
                             <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
                         </div>
@@ -155,14 +152,14 @@
                 </div>
 
                 <div class="resources-grid" *ngIf="featured?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)" *ngFor="let r of featured">
+                    <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of featured">
                         <div class="resource-card__top">
                             <div class="resource-card__title">{{ r.title }}</div>
                             <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
                         </div>
                         <div class="resource-card__meta">
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
-                            <span class="resource-badge">{{ r.resourceType }}</span>
+                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
+                            <span class="resource-badge">{{ r.contentType }}</span>
                             <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
                         </div>
@@ -183,7 +180,7 @@
                 </div>
 
                 <div class="resources-grid" *ngIf="resources?.length">
-                    <div class="resource-card" [ngClass]="resourceToneClass(r.resourceType)" *ngFor="let r of resources">
+                    <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of resources">
                         <div class="resource-card__top">
                             <div class="resource-card__title">{{ r.title }}</div>
                             <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
@@ -191,8 +188,8 @@
                         <div class="resource-card__meta">
                             <span class="resource-category" *ngIf="r.categoryName">{{ r.categoryName }}</span>
                             <span class="resource-dot" *ngIf="r.categoryName">•</span>
-                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.resourceType)"></mat-icon>
-                            <span class="resource-badge">{{ r.resourceType }}</span>
+                            <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
+                            <span class="resource-badge">{{ r.contentType }}</span>
                             <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
                             <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
                         </div>

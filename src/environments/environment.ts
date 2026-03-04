@@ -27,4 +27,12 @@ export const environment = {
     // 📞 Soporte WhatsApp (número en formato internacional sin + ni espacios)
     whatsappNumber: '573244563035',
     whatsappMessage: '¡Hola! Necesito ayuda con EmoCheck.',
+
+    // ☁️ AWS S3 — almacenamiento de recursos de bienestar
+    // ⚠️ Las credenciales reales se inyectan desde el archivo .env.local (NO subir al repo)
+    awsBucket: 'emocheck-storage',
+    awsRegion: 'us-east-2',
+    awsS3BaseUrl: 'https://emocheck-storage.s3.us-east-2.amazonaws.com',
+    awsAccessKeyId: '',       // definir en .env.local → NG_APP_AWS_KEY_ID
+    awsSecretAccessKey: '',   // definir en .env.local → NG_APP_AWS_SECRET
 };

@@ -1,52 +1,75 @@
-import { HttpClient } from '@angular/common/http';
+﻿import { HttpClient } from '@angular/common/http';
+
 import { Injectable } from '@angular/core';
-import { ApiResponse } from 'app/core/models/auth.model';
 import { environment } from '../../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-export type ResourceType = 'Video' | 'Article' | 'Audio' | 'Exercise' | 'PDF' | string;
-export type TargetAudience = 'Green' | 'Yellow' | 'Red' | 'All' | string;
+// ── Enums ────────────────────────────────────────────────────────────────────
+
+export type ContentType = 'ARTICLE' | 'VIDEO' | 'AUDIO' | 'EXERCISE' | 'EXTERNAL_LINK';
+export type RiskLevel   = 'LOW' | 'MODERATE' | 'HIGH' | 'SEVERE';
+
+// ── DTOs públicos (usados por los componentes) ───────────────────────────────
 
 export interface ResourceCategoryDto {
-    resourceCategoryId: number;
-    categoryName: string;
-    description?: string;
-    iconUrl?: string;
-    resourceCount?: number;
-    isActive?: boolean;
+    resourceCategoryID: number;
+    name: string;
+    description: string | null;
+    iconName: string;
+    displayOrder: number;
+    resourceCount: number;
 }
 
 export interface WellnessResourceDto {
-    wellnessResourceId: number;
-    resourceCategoryId: number;
-    categoryName?: string;
+    wellnessResourceID: number;
+    resourceCategoryID: number;
+    categoryName: string;
     title: string;
-    description?: string;
-    resourceType: ResourceType;
+    description: string;
+    contentType: ContentType;
+    contentUrl: string;
+    thumbnailUrl: string | null;
+    moduleID: number | null;
+    moduleName: string | null;
+    targetRiskLevel: RiskLevel | null;
+    durationMinutes: number;
+    tags: string | null;
+    displayOrder: number;
+}
+
+export interface CreateWellnessResourceDto {
+    resourceCategoryID: number;
+    title: string;
+    description: string;
+    contentType: ContentType;
     contentUrl: string;
     thumbnailUrl?: string;
-    author?: string;
+    moduleID?: number;
+    targetRiskLevel?: RiskLevel;
     durationMinutes?: number;
-    tags?: string;
-    targetAudience?: TargetAudience;
-    viewCount?: number;
-    rating?: number;
-    isFeatured?: boolean;
-    createdAt?: string;
+    displayOrder?: number;
 }
 
-export interface RecommendedResourcesDto {
-    userRiskLevel: TargetAudience;
-    recommendationReason?: string;
-    resources: Array<Pick<WellnessResourceDto, 'wellnessResourceId' | 'title' | 'description' | 'resourceType' | 'contentUrl' | 'durationMinutes' | 'targetAudience'>>;
+export interface UpdateWellnessResourceDto {
+    resourceCategoryID?: number;
+    title?: string;
+    description?: string;
+    contentType?: ContentType;
+    contentUrl?: string;
+    thumbnailUrl?: string;
+    moduleID?: number;
+    targetRiskLevel?: RiskLevel;
+    durationMinutes?: number;
+    displayOrder?: number;
+    isActive?: boolean;
 }
 
-export interface TrackAccessDto {
-    durationSeconds: number;
-    completedPercentage: number;
+export interface RegisterResourceAccessDto {
+    wellnessResourceID: number;
+    timeSpentSeconds: number;
+    completed: boolean;
     rating?: number;
-    feedback?: string;
 }
 
 export interface ProfessionalSupportDto {
@@ -64,239 +87,194 @@ export interface ProfessionalSupportDto {
     languages?: string | null;
 }
 
-// Swagger DTOs (casing differs from UI-facing DTOs)
-interface SwaggerResourceCategoryDto {
-    resourceCategoryID: number;
-    name?: string | null;
-    description?: string | null;
-    iconUrl?: string | null;
-    displayOrder?: number;
-    resourceCount?: number;
-}
-
-interface SwaggerWellnessResourceDto {
-    wellnessResourceID: number;
-    resourceCategoryID: number;
-    categoryName?: string | null;
-    title?: string | null;
-    description?: string | null;
-    resourceType?: string | null;
-    contentUrl?: string | null;
-    thumbnailUrl?: string | null;
-    author?: string | null;
-    durationMinutes?: number | null;
-    tags?: string | null;
-    targetAudience?: string | null;
-    viewCount?: number;
-    rating?: number | null;
-    isFeatured?: boolean;
-}
-
-interface SwaggerEvaluationWithResultDto {
-    completedAt: string;
-    result?: {
-        evaluationResultID?: number;
-        evaluationResultId?: number;
-        riskLevel?: string | null;
-    } | null;
-}
-
-interface SwaggerRecommendationDto {
-    recommendationID: number;
-    title?: string | null;
-    recommendationText?: string | null;
-    resourceUrl?: string | null;
-}
+// ── Servicio ─────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
 export class ResourcesService {
+
     private readonly apiUrl = environment.apiUrl;
 
     constructor(private readonly http: HttpClient) { }
 
-    private normalizeResponse(res: unknown): unknown {
-        if (typeof res !== 'string') return res;
-        const trimmed = res.trim();
-        if (!trimmed) return res;
-        try {
-            return JSON.parse(trimmed);
-        } catch {
-            return res;
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    /** Desenvuelve el envelope { success, data } del backend o devuelve el valor directamente. */
+    private unwrap<T>(res: unknown): T {
+        const any = res as any;
+        if (any && typeof any === 'object' && 'success' in any) {
+            return (any.data as T) ?? (undefined as any);
         }
+        return any as T;
     }
 
-    private unwrapApiResponse<T>(res: unknown, fallbackErrorMessage: string): T {
-        const anyRes = this.normalizeResponse(res) as any;
-
-        if (anyRes && typeof anyRes === 'object' && 'success' in anyRes) {
-            const api = anyRes as Partial<ApiResponse<T>>;
-            if (!api.success) throw new Error((api as any)?.message || fallbackErrorMessage);
-            return (api.data as T) ?? (undefined as any);
-        }
-
-        return anyRes as T;
-    }
-
-    private toCategoryDto(dto: SwaggerResourceCategoryDto): ResourceCategoryDto {
-        return {
-            resourceCategoryId: dto.resourceCategoryID,
-            categoryName: (dto.name ?? '').toString(),
-            description: dto.description ?? undefined,
-            iconUrl: dto.iconUrl ?? undefined,
-            resourceCount: dto.resourceCount ?? undefined,
-        };
-    }
-
-    private toResourceDto(dto: SwaggerWellnessResourceDto): WellnessResourceDto {
-        return {
-            wellnessResourceId: dto.wellnessResourceID,
-            resourceCategoryId: dto.resourceCategoryID,
-            categoryName: dto.categoryName ?? undefined,
-            title: (dto.title ?? '').toString(),
-            description: dto.description ?? undefined,
-            resourceType: (dto.resourceType ?? '').toString(),
-            contentUrl: (dto.contentUrl ?? '').toString(),
-            thumbnailUrl: dto.thumbnailUrl ?? undefined,
-            author: dto.author ?? undefined,
-            durationMinutes: dto.durationMinutes ?? undefined,
-            tags: dto.tags ?? undefined,
-            targetAudience: (dto.targetAudience ?? undefined) as any,
-            viewCount: dto.viewCount ?? undefined,
-            rating: dto.rating ?? undefined,
-            isFeatured: dto.isFeatured ?? undefined,
-        };
-    }
-
-    getCategories(): Observable<ResourceCategoryDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/resource/categories`).pipe(
-            map((res) => {
-                const items = this.unwrapApiResponse<SwaggerResourceCategoryDto[]>(res, 'No fue posible obtener categorías') ?? [];
-                return (items ?? []).map((c) => this.toCategoryDto(c));
-            })
-        );
-    }
-
-    getResources(filters?: {
-        categoryId?: number;
-        resourceType?: string;
-        targetAudience?: string;
-        isFeatured?: boolean;
-    }): Observable<WellnessResourceDto[]> {
-        const onlyCategoryFilter =
-            filters?.categoryId != null && !filters?.resourceType && !filters?.targetAudience && filters?.isFeatured == null;
-
-        const url = onlyCategoryFilter
-            ? `${this.apiUrl}/resource/by-category/${filters!.categoryId}`
-            : `${this.apiUrl}/resource`;
-
-        const params: Record<string, string> = {};
-        if (!onlyCategoryFilter) {
-            if (filters?.categoryId != null) params['categoryId'] = String(filters.categoryId);
-            if (filters?.resourceType) params['resourceType'] = String(filters.resourceType);
-            if (filters?.targetAudience) params['targetAudience'] = String(filters.targetAudience);
-            if (filters?.isFeatured != null) params['isFeatured'] = String(!!filters.isFeatured);
-        }
-
-        return this.http.get<unknown>(url, { params }).pipe(
-            map((res) => {
-                const items = this.unwrapApiResponse<SwaggerWellnessResourceDto[]>(res, 'No fue posible obtener recursos') ?? [];
-                return (items ?? []).map((r) => this.toResourceDto(r));
-            })
-        );
-    }
-
-    getFeatured(): Observable<WellnessResourceDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/resource`).pipe(
-            map((res) => {
-                const items = this.unwrapApiResponse<SwaggerWellnessResourceDto[]>(res, 'No fue posible obtener recursos destacados') ?? [];
-                return (items ?? []).filter((r) => r.isFeatured).map((r) => this.toResourceDto(r));
-            })
-        );
-    }
-
-    getRecommended(): Observable<RecommendedResourcesDto> {
-        // Use the native V5 endpoint: GET /api/resource/recommended
-        return this.http.get<unknown>(`${this.apiUrl}/resource/recommended`).pipe(
-            map((res) => {
-                const data = this.unwrapApiResponse<any>(res, 'No fue posible obtener recomendaciones');
-                // API may return an array of resources or a wrapper object
-                if (Array.isArray(data)) {
-                    return {
-                        userRiskLevel: 'All' as TargetAudience,
-                        recommendationReason: 'Recomendaciones para ti',
-                        resources: (data as SwaggerWellnessResourceDto[]).slice(0, 6).map((r) => ({
-                            wellnessResourceId: r.wellnessResourceID,
-                            title: r.title ?? '',
-                            description: r.description ?? undefined,
-                            resourceType: r.resourceType ?? '',
-                            contentUrl: r.contentUrl ?? '',
-                            durationMinutes: r.durationMinutes ?? undefined,
-                            targetAudience: (r.targetAudience ?? 'All') as TargetAudience,
-                        })),
-                    } as RecommendedResourcesDto;
-                }
-                // Already a RecommendedResourcesDto shape
-                return data as RecommendedResourcesDto;
-            }),
-            catchError(() => this.getRecommendedFallback('All'))
-        );
-    }
-
-    private getRecommendedFallback(risk: TargetAudience): Observable<RecommendedResourcesDto> {
-        return this.getResources().pipe(
-            map((resources) => {
-                const filtered = (resources ?? []).filter((r) => {
-                    const audience = (r.targetAudience ?? 'All').toString();
-                    return audience === 'All' || audience.toLowerCase() === String(risk ?? 'All').toLowerCase();
-                });
-
-                return {
-                    userRiskLevel: (risk ?? 'All') as TargetAudience,
-                    recommendationReason: 'Recomendaciones generales',
-                    resources: filtered
-                        .slice(0, 6)
-                        .map((r) => ({
-                            wellnessResourceId: r.wellnessResourceId,
-                            title: r.title,
-                            description: r.description,
-                            resourceType: r.resourceType,
-                            contentUrl: r.contentUrl,
-                            durationMinutes: r.durationMinutes,
-                            targetAudience: r.targetAudience,
-                        })),
-                } as RecommendedResourcesDto;
-            }),
-            catchError(() =>
-                of({
-                    userRiskLevel: (risk ?? 'All') as TargetAudience,
-                    recommendationReason: 'Recomendaciones generales',
-                    resources: [],
-                } as RecommendedResourcesDto)
-            )
-        );
-    }
-
+    /** Devuelve siempre un array, compatible con respuesta directa o envelope. */
     private unwrapArray<T>(res: unknown): T[] {
-        const anyRes = this.normalizeResponse(res) as any;
-        if (Array.isArray(anyRes)) return anyRes as T[];
-        if (anyRes?.success === true) return (anyRes.data ?? []) as T[];
+        const any = res as any;
+        if (Array.isArray(any)) return any as T[];
+        if (any && typeof any === 'object' && 'success' in any) {
+            return Array.isArray(any.data) ? (any.data as T[]) : [];
+        }
         return [];
     }
 
-    trackAccess(_resourceId: number, _payload: TrackAccessDto): Observable<string | null> {
-        // V5 API does not expose a resource access tracking endpoint.
-        return of(null);
+    private mapResource(r: any): WellnessResourceDto {
+        return {
+            wellnessResourceID: r.wellnessResourceID ?? r.wellnessResourceId ?? 0,
+            resourceCategoryID: r.resourceCategoryID ?? r.resourceCategoryId ?? 0,
+            categoryName:       r.categoryName ?? '',
+            title:              r.title ?? '',
+            description:        r.description ?? '',
+            contentType:        (r.contentType ?? 'ARTICLE') as ContentType,
+            contentUrl:         r.contentUrl ?? '',
+            thumbnailUrl:       r.thumbnailUrl ?? null,
+            moduleID:           r.moduleID ?? r.moduleId ?? null,
+            moduleName:         r.moduleName ?? null,
+            targetRiskLevel:    (r.targetRiskLevel ?? null) as RiskLevel | null,
+            durationMinutes:    r.durationMinutes ?? 0,
+            tags:               null,
+            displayOrder:       r.displayOrder ?? 0,
+        };
     }
 
+    private mapCategory(c: any): ResourceCategoryDto {
+        return {
+            resourceCategoryID: c.resourceCategoryID ?? c.resourceCategoryId ?? 0,
+            name:               c.name ?? c.categoryName ?? '',
+            description:        c.description ?? null,
+            iconName:           c.iconName ?? c.iconUrl ?? '',
+            displayOrder:       c.displayOrder ?? 0,
+            resourceCount:      c.resourceCount ?? 0,
+        };
+    }
+
+    // ── Categorías ───────────────────────────────────────────────────────────
+
+    /** Lista todas las categorías activas. */
+    getCategories(): Observable<ResourceCategoryDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/resource/categories`).pipe(
+            map((res) => this.unwrapArray<any>(res).map((c) => this.mapCategory(c)))
+        );
+    }
+
+    // ── Recursos ─────────────────────────────────────────────────────────────
+
+    /** Lista todos los recursos activos. */
+    getResources(): Observable<WellnessResourceDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/resource`).pipe(
+            map((res) => this.unwrapArray<any>(res).map((r) => this.mapResource(r)))
+        );
+    }
+
+    /** Lista recursos filtrados por categoría. */
+    getByCategory(categoryId: number): Observable<WellnessResourceDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/resource/by-category/${categoryId}`).pipe(
+            map((res) => this.unwrapArray<any>(res).map((r) => this.mapResource(r)))
+        );
+    }
+
+    /**
+     * Recursos recomendados automáticamente para el usuario autenticado.
+     * El backend lee el último EvaluationResult y filtra por RiskLevel.
+     * Si no hay evaluaciones devuelve recursos LOW.
+     */
+    getRecommended(): Observable<WellnessResourceDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/resource/recommended`).pipe(
+            map((res) => this.unwrapArray<any>(res).map((r) => this.mapResource(r))),
+            catchError(() => of([]))
+        );
+    }
+
+    /** Obtiene un recurso por ID. */
+    getById(id: number): Observable<WellnessResourceDto> {
+        return this.http.get<unknown>(`${this.apiUrl}/resource/${id}`).pipe(
+            map((res) => this.mapResource(this.unwrap<any>(res)))
+        );
+    }
+
+    // ── CRUD (SuperAdmin / Psychologist) ─────────────────────────────────────
+
+    /** Crea un nuevo recurso. Requiere rol SuperAdmin o Psychologist. */
+    create(dto: CreateWellnessResourceDto): Observable<WellnessResourceDto> {
+        return this.http.post<unknown>(`${this.apiUrl}/resource`, dto).pipe(
+            map((res) => this.mapResource(this.unwrap<any>(res)))
+        );
+    }
+
+    /** Actualiza un recurso. Solo los campos enviados se modifican (PATCH semántico). */
+    update(id: number, dto: UpdateWellnessResourceDto): Observable<WellnessResourceDto> {
+        return this.http.put<unknown>(`${this.apiUrl}/resource/${id}`, dto).pipe(
+            map((res) => this.mapResource(this.unwrap<any>(res)))
+        );
+    }
+
+    /** Desactiva un recurso sin eliminarlo físicamente. */
+    deactivate(id: number): Observable<WellnessResourceDto> {
+        return this.update(id, { isActive: false });
+    }
+
+    /** Reactiva un recurso previamente desactivado. */
+    reactivate(id: number): Observable<WellnessResourceDto> {
+        return this.update(id, { isActive: true });
+    }
+
+    /**
+     * Elimina un recurso (borrado lógico — IsActive = false en BD).
+     * Solo SuperAdmin.
+     */
+    delete(id: number): Observable<void> {
+        return this.http.delete<unknown>(`${this.apiUrl}/resource/${id}`).pipe(
+            map(() => void 0)
+        );
+    }
+
+    // ── Registro de acceso ───────────────────────────────────────────────────
+
+    /**
+     * Registra que el usuario consumió un recurso.
+     *
+     * Cuándo llamarlo:
+     *   - Al abrir el recurso:  { timeSpentSeconds: 0, completed: false }
+     *   - Al terminar:          { timeSpentSeconds: <tiempo>, completed: true, rating?: <1-5> }
+     *
+     * Cada llamada crea un registro nuevo (historial acumulativo).
+     */
+    registerAccess(dto: RegisterResourceAccessDto): Observable<void> {
+        return this.http.post<unknown>(`${this.apiUrl}/resource/access`, dto).pipe(
+            map(() => void 0)
+        );
+    }
+
+    // ── Profesionales (sin endpoint en V5 — devuelve vacío) ─────────────────
+
     getProfessionals(): Observable<ProfessionalSupportDto[]> {
-        // V5 API does not expose a professionals directory endpoint.
-        // Return empty array to avoid 404 errors on the resources page.
         return of([]);
     }
 
     getEmergencyProfessionals(): Observable<ProfessionalSupportDto[]> {
-        // V5 API does not expose an emergency professionals endpoint.
-        // Return empty array to avoid 404 errors on the resources page.
         return of([]);
+    }
+
+    // ── Helpers para la UI ───────────────────────────────────────────────────
+
+    contentTypeIcon(contentType: ContentType | string | null | undefined): string {
+        switch ((contentType ?? '').toUpperCase()) {
+            case 'VIDEO':         return 'heroicons_outline:video-camera';
+            case 'AUDIO':         return 'heroicons_outline:musical-note';
+            case 'EXERCISE':      return 'heroicons_outline:bolt';
+            case 'EXTERNAL_LINK': return 'heroicons_outline:arrow-top-right-on-square';
+            case 'ARTICLE':
+            default:              return 'heroicons_outline:document-text';
+        }
+    }
+
+    contentTypeToneClass(contentType: ContentType | string | null | undefined): string {
+        switch ((contentType ?? '').toUpperCase()) {
+            case 'VIDEO':         return 'resource-card--blue';
+            case 'AUDIO':         return 'resource-card--purple';
+            case 'EXERCISE':      return 'resource-card--lime';
+            case 'EXTERNAL_LINK': return 'resource-card--teal';
+            case 'ARTICLE':
+            default:              return 'resource-card--indigo';
+        }
     }
 }

@@ -556,6 +556,106 @@ Este repositorio corresponde únicamente al **frontend**. El backend está desar
 
 ---
 
+## 🔄 Historial de cambios de API
+
+### Schema v2 — 3 de marzo de 2026
+
+El backend actualizó el schema de instrumentos psicométricos para soportar nuevos tipos de preguntas, sub-ítems y rangos por género/dimensión. Todos los cambios están reflejados en `assessment.service.ts`.
+
+#### Campos nuevos en los DTOs
+
+**`QuestionDto`**
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `questionType` | `'LIKERT' \| 'TIME' \| 'INTEGER' \| 'ROUTING'` | Tipo de pregunta |
+| `parentQuestionID` | `number \| null` | ID del padre si es sub-ítem |
+| `subItemLabel` | `string \| null` | Etiqueta corta del sub-ítem (`"a"`, `"b"`, …) |
+| `enableTextIfValue` | `number \| null` | Activa campo de texto si `selectedValue` == este número |
+| `subItems` | `QuestionDto[]` | Lista de preguntas hijas |
+
+> ⚠️ **Campo renombrado:** `questionOrder` → `questionNumber`
+
+**`QuestionOptionDto`**
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `endsTest` | `boolean` | Si `true`, esta opción finaliza la evaluación al seleccionarse |
+
+**`InstrumentScoreRangeDto`**
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `scoreRangeID` | `number` | ⚠️ Renombrado desde `instrumentScoreRangeID` |
+| `dimensionCode` | `string \| null` | Subescala a la que aplica (`"ESTRES"`, `"PERCEPCION"`, …) |
+| `gender` | `'M' \| 'F' \| null` | Género al que aplica. `null` = aplica a todos |
+| `displayOrder` | `number` | Orden de visualización |
+
+**`SubmitResponseDto` (request)**
+
+| Campo | Antes | Ahora |
+|-------|-------|-------|
+| `selectedValue` | `number` (requerido) | `number \| null` (null para TIME/ROUTING) |
+| `textValue` | — | `string \| null` **NUEVO** — texto libre para TIME/ROUTING |
+
+---
+
+#### Reglas por `questionType` al enviar respuestas
+
+| `questionType` | `selectedValue` | `textValue` |
+|----------------|-----------------|-------------|
+| `LIKERT` | ✅ Requerido (ej. `0`–`3`) | `null` |
+| `INTEGER` | ✅ Requerido (número entero) | `null` |
+| `TIME` | `null` | ✅ Requerido (ej. `"02:30"`) |
+| `ROUTING` | `null` o valor numérico | ✅ Si aplica |
+
+---
+
+#### Instrumentos disponibles y sus particularidades
+
+| Instrumento | Tipos de pregunta usados | Notas |
+|-------------|--------------------------|-------|
+| `DASS-21` | `LIKERT` | Rangos por `dimensionCode`: `DEPRESION`, `ANSIEDAD`, `ESTRES` |
+| `BAI` | `LIKERT` | Sin subescalas ni género |
+| `BDI` | `LIKERT` | Sin subescalas ni género |
+| `ICSP-VC` | `LIKERT`, `TIME`, `INTEGER`, `ROUTING` | Sub-ítems en P5 y P10. P5a–P5j son hijos de P5 |
+| `TMMS-24` | `LIKERT` | Rangos por `gender` + `dimensionCode`: `ATENCION`, `CLARIDAD`, `REPARACION` |
+| `MFI-20` | `LIKERT` | Rangos por `dimensionCode`: `FATIGA_GENERAL`, `FATIGA_FISICA`, `FATIGA_MENTAL`, `MOTIVACION_REDUCIDA`, `ACTIVIDAD_REDUCIDA` |
+
+---
+
+#### Guía especial: ICSP-VC (Calidad del Sueño de Pittsburgh)
+
+```
+P1  (hora acostarse)   → TIME     → textValue: "23:00"
+P2  (mins en dormir)   → INTEGER  → selectedValue: 20
+P3  (hora levantarse)  → TIME     → textValue: "07:00"
+P4  (horas de sueño)   → INTEGER  → selectedValue: 7
+P5  (perturbaciones)   → ROUTING  → tiene sub-ítems P5a-P5j (LIKERT)
+P6  (calidad subjetiva)→ LIKERT   → selectedValue: 0-3
+P7  (medicamentos)     → LIKERT   → selectedValue: 0-3  [endsTest en "No"]
+P8  (somnolencia)      → LIKERT   → selectedValue: 0-3
+P9  (entusiasmo)       → LIKERT   → selectedValue: 0-3
+P10 (compañero cama)   → ROUTING  → sub-ítems con enableTextIfValue
+```
+
+**`endsTest: true`** — Cuando el usuario selecciona una opción con este flag (ej. "No" en P7/P10), el frontend debe llamar a `POST /api/evaluation/{id}/complete` **inmediatamente**, sin esperar al final del cuestionario.
+
+---
+
+#### Nuevos query params en endpoints de preguntas y rangos
+
+```
+GET /api/assessment/questions/by-instrument/{id}?rootOnly=true&questionType=LIKERT
+GET /api/assessment/score-ranges/by-instrument/{id}?gender=F&dimensionCode=PERCEPCION
+```
+
+> Para **TMMS-24** siempre enviar `?gender=M` o `?gender=F`. La API retorna los rangos del género especificado **más** los rangos con `gender = null`.
+
+---
+
+
+
 <div align="center">
 
 © 2026 EmoCheck — Todos los derechos reservados.  

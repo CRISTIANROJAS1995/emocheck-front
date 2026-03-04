@@ -11,6 +11,7 @@ import { AdminResourcesComponent } from './features/resources/admin-resources.co
 import { AdminCatalogsComponent } from './features/catalogs/admin-catalogs.component';
 import { AdminRecommendationsComponent } from './features/recommendations/admin-recommendations.component';
 import { AdminEvaluationsComponent } from './features/evaluations/admin-evaluations.component';
+import { RoleGuard } from 'app/core/auth/guards/role.guard';
 
 export default [
     { path: '', component: AdminWorkspaceComponent },
@@ -21,7 +22,14 @@ export default [
     { path: 'users', component: AdminPanelComponent },
     { path: 'audit', component: AdminAuditComponent },
     { path: 'config', component: AdminConfigComponent },
-    { path: 'resources', component: AdminResourcesComponent },
+    {
+        path: 'resources',
+        component: AdminResourcesComponent,
+        canActivate: [RoleGuard],
+        // SystemAdmin (SuperAdmin) puede hacer todo; Psychologist puede crear/editar
+        // Admin y CompanyAdmin pueden acceder en modo solo lectura (backend filtra)
+        data: { roles: ['SuperAdmin', 'SystemAdmin', 'Psychologist', 'Admin', 'CompanyAdmin'] },
+    },
     { path: 'catalogs', component: AdminCatalogsComponent },
     { path: 'recommendations', component: AdminRecommendationsComponent },
     { path: 'evaluations', component: AdminEvaluationsComponent },

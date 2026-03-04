@@ -44,3 +44,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Variables de entorno — credenciales locales (NUNCA subir al repo)
+.env
+.env.local
+.env.*.local
