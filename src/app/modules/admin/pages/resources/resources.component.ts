@@ -133,10 +133,24 @@ export class ResourcesComponent implements OnInit, OnDestroy {
                 this.router.navigate(['/support']);
                 return;
             case 'mindfulness':
-                this.selectCategoryByAnyName(['Mindfulness']);
+                this.selectCategoryByAnyName([
+                    'Mindfulness',
+                    'mindfulness',
+                    'Atención Plena',
+                    'Atencion Plena',
+                    'Meditación',
+                    'Meditacion',
+                ]);
                 return;
             case 'neuropauses':
-                this.selectCategoryByAnyName(['Neuropausas', 'Pausas activas', 'Pausas Activas']);
+                this.selectCategoryByAnyName([
+                    'Neuropausas',
+                    'Neuro Pausas',
+                    'Neuro-Pausas',
+                    'Pausas activas',
+                    'Pausas Activas',
+                    'Pausas Neurales',
+                ]);
                 return;
         }
     }

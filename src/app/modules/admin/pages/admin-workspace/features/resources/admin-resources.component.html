@@ -14,32 +14,100 @@
     <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon">
-                <mat-icon>folder</mat-icon>
-            </div>
+            <div class="kpi-card__icon"><mat-icon>folder</mat-icon></div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ resources.length }}</span>
                 <span class="kpi-card__label">Total Recursos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--sky">
-            <div class="kpi-card__icon">
-                <mat-icon>category</mat-icon>
-            </div>
+            <div class="kpi-card__icon"><mat-icon>category</mat-icon></div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ categories.length }}</span>
                 <span class="kpi-card__label">Categorías</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon">
-                <mat-icon>check_circle</mat-icon>
-            </div>
+            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ resources.length }}</span>
                 <span class="kpi-card__label">Activos</span>
             </div>
         </div>
+    </div>
+
+    <!-- ── Gestión de CATEGORÍAS ─────────────────────────────────────────── -->
+    <div class="section-header">
+        <div class="section-header__left">
+            <h2 class="section-header__title">Categorías</h2>
+            <p class="section-header__desc">Las categorías agrupan los recursos: Mindfulness, Neuropausas, Calibración Emocional, etc.</p>
+        </div>
+        @if (canWrite) {
+        <button class="btn btn--outline btn--sm" (click)="showCategoryPanel = !showCategoryPanel">
+            <mat-icon>{{ showCategoryPanel ? 'close' : 'add' }}</mat-icon>
+            {{ showCategoryPanel ? 'Cerrar' : 'Nueva Categoría' }}
+        </button>
+        }
+    </div>
+
+    <!-- Formulario crear categoría -->
+    @if (showCategoryPanel && canWrite) {
+    <div class="editor-panel editor-panel--compact">
+        <h3><mat-icon>label</mat-icon> Nueva Categoría</h3>
+        <div class="editor-panel__grid">
+            <label class="editor-panel__field">
+                <span>Nombre * <em style="font-weight:400;color:#64748b">(ej: Mindfulness, Neuropausas, Calibración Emocional)</em></span>
+                <input [(ngModel)]="categoryForm.name" placeholder="Ej: Mindfulness" />
+            </label>
+            <label class="editor-panel__field">
+                <span>Descripción</span>
+                <input [(ngModel)]="categoryForm.description" placeholder="Descripción opcional" />
+            </label>
+        </div>
+        <div class="editor-panel__actions">
+            <button class="btn btn--ghost" (click)="showCategoryPanel = false" [disabled]="savingCategory">Cancelar</button>
+            <button class="btn btn--primary" (click)="createCategory()" [disabled]="savingCategory">
+                <mat-icon>save</mat-icon> {{ savingCategory ? 'Guardando...' : 'Crear Categoría' }}
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- Lista de categorías existentes -->
+    <div class="category-chips-row">
+        @for (c of categories; track c.resourceCategoryID) {
+        <div class="category-chip">
+            @if (editingCategoryId === c.resourceCategoryID) {
+            <!-- Edición inline -->
+            <div class="category-chip__edit">
+                <input class="category-chip__input" [(ngModel)]="editCategoryForm.name" placeholder="Nombre" />
+                <input class="category-chip__input" [(ngModel)]="editCategoryForm.description" placeholder="Descripción" />
+                <button class="btn btn--primary btn--xs" (click)="saveEditCategory()" [disabled]="savingCategory" title="Guardar">
+                    <mat-icon>check</mat-icon>
+                </button>
+                <button class="btn btn--ghost btn--xs" (click)="cancelEditCategory()" title="Cancelar">
+                    <mat-icon>close</mat-icon>
+                </button>
+            </div>
+            } @else {
+            <span class="category-chip__name">{{ c.name ?? c.categoryName }}</span>
+            <span class="category-chip__count" *ngIf="c.resourceCount != null">{{ c.resourceCount }} recursos</span>
+            @if (canWrite) {
+            <button class="category-chip__btn" (click)="startEditCategory(c)" title="Editar">
+                <mat-icon>edit</mat-icon>
+            </button>
+            }
+            @if (canDelete) {
+            <button class="category-chip__btn category-chip__btn--danger" (click)="deleteCategory(c)" [disabled]="deletingCategoryId === c.resourceCategoryID" title="Eliminar">
+                <mat-icon>delete</mat-icon>
+            </button>
+            }
+            }
+        </div>
+        }
+        @if (!categories.length) {
+        <p class="text-muted" style="font-size:13px;padding:8px 0;">No hay categorías creadas. Crea la primera arriba.</p>
+        }
     </div>
 
     <!-- ── Formulario: CREAR ───────────────────────────────────────────────── -->

@@ -117,6 +117,14 @@ export class AdminResourcesComponent implements OnInit {
     readonly contentTypes = ['VIDEO', 'AUDIO', 'ARTICLE', 'EXERCISE', 'EXTERNAL_LINK'];
     readonly riskLevels   = ['LOW', 'MODERATE', 'HIGH', 'SEVERE'];
 
+    // ── Gestión de categorías ────────────────────────────────────────────────
+    showCategoryPanel    = false;
+    savingCategory       = false;
+    deletingCategoryId: number | null = null;
+    categoryForm         = { name: '', description: '' };
+    editingCategoryId: number | null = null;
+    editCategoryForm     = { name: '', description: '' };
+
     constructor(
         private readonly http: HttpClient,
         private readonly notify: AlertService,
@@ -358,6 +366,64 @@ export class AdminResourcesComponent implements OnInit {
             case 'saving':            return 'Guardando en servidor...';
             default:                  return '';
         }
+    }
+
+    // ── Categorías CRUD ──────────────────────────────────────────────────────
+
+    createCategory(): void {
+        const name = this.categoryForm.name.trim();
+        if (!name) { this.notify.error('El nombre de la categoría es requerido'); return; }
+        this.savingCategory = true;
+        this.http.post<unknown>(`${this.apiUrl}/resource/categories`, this.categoryForm).pipe(
+            finalize(() => (this.savingCategory = false))
+        ).subscribe({
+            next: () => {
+                this.notify.success('Categoría creada correctamente');
+                this.categoryForm = { name: '', description: '' };
+                this.showCategoryPanel = false;
+                this.loadCategories();
+            },
+            error: (e) => this.notify.error(e?.error?.message || e?.message || 'Error al crear categoría'),
+        });
+    }
+
+    startEditCategory(c: AdminResourceCategoryDto): void {
+        this.editingCategoryId = c.resourceCategoryID;
+        this.editCategoryForm  = { name: c.name ?? c.categoryName ?? '', description: c.description ?? '' };
+    }
+
+    cancelEditCategory(): void {
+        this.editingCategoryId = null;
+        this.editCategoryForm  = { name: '', description: '' };
+    }
+
+    saveEditCategory(): void {
+        if (!this.editingCategoryId) return;
+        const name = this.editCategoryForm.name.trim();
+        if (!name) { this.notify.error('El nombre es requerido'); return; }
+        this.savingCategory = true;
+        this.http.put<unknown>(`${this.apiUrl}/resource/categories/${this.editingCategoryId}`, this.editCategoryForm).pipe(
+            finalize(() => (this.savingCategory = false))
+        ).subscribe({
+            next: () => {
+                this.notify.success('Categoría actualizada');
+                this.editingCategoryId = null;
+                this.loadCategories();
+            },
+            error: (e) => this.notify.error(e?.error?.message || e?.message || 'Error al actualizar categoría'),
+        });
+    }
+
+    async deleteCategory(c: AdminResourceCategoryDto): Promise<void> {
+        const ok = await this.notify.confirm(`¿Eliminar la categoría "${c.name ?? c.categoryName}"?`);
+        if (!ok) return;
+        this.deletingCategoryId = c.resourceCategoryID;
+        this.http.delete<void>(`${this.apiUrl}/resource/categories/${c.resourceCategoryID}`).pipe(
+            finalize(() => (this.deletingCategoryId = null))
+        ).subscribe({
+            next: () => { this.notify.success('Categoría eliminada'); this.loadCategories(); },
+            error: (e) => this.notify.error(e?.error?.message || e?.message || 'Error al eliminar categoría'),
+        });
     }
 
     private emptyForm(): Partial<CreateResourcePayload> {
