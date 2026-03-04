@@ -249,4 +249,20 @@ export class AdminUsersService {
         }
         return [];
     }
+
+    /**
+     * SuperAdmin restablece la contraseña de un usuario.
+     * El usuario tendrá mustChangePassword = true y deberá cambiarla en el próximo login.
+     */
+    adminResetPassword(userId: number, newPassword: string): Observable<void> {
+        return this.http
+            .post<any>(`${this.apiUrl}/auth/admin-reset-password/${userId}`, { newPassword })
+            .pipe(
+                map((res) => {
+                    if (res?.success === false) {
+                        throw new Error(res?.message ?? 'No fue posible restablecer la contraseña');
+                    }
+                })
+            );
+    }
 }

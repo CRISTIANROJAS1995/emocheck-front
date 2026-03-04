@@ -29,19 +29,22 @@
                 <div class="avatar-subtitle">Sube una imagen para personalizar tu cuenta</div>
 
                 <div class="avatar-row">
-                    <div class="avatar" [class.avatar--has-photo]="!!photoPreviewUrl">
-                        <img *ngIf="photoPreviewUrl" class="avatar__img" [src]="photoPreviewUrl" alt="" />
-                        <span *ngIf="!photoPreviewUrl" class="avatar__initials">{{ initials }}</span>
+                    <div class="avatar" [class.avatar--has-photo]="!!avatarUrl">
+                        <img *ngIf="avatarUrl" class="avatar__img" [src]="avatarUrl" alt="Foto de perfil" />
+                        <span *ngIf="!avatarUrl" class="avatar__initials">{{ initials }}</span>
+                        <!-- Overlay de carga -->
+                        <div class="avatar__uploading" *ngIf="uploadingPhoto">
+                            <mat-spinner diameter="32"></mat-spinner>
+                        </div>
                     </div>
 
                     <div class="avatar-actions">
-                        <input #photoInput class="sr-only" type="file" accept="image/*" (change)="onPhotoSelected($event)" />
-                        <button class="avatar-btn" mat-button type="button" (click)="triggerPhotoInput(photoInput)">
+                        <input #photoInput class="sr-only" type="file" accept="image/jpeg,image/png,image/webp" (change)="onPhotoSelected($event)" />
+                        <button class="avatar-btn" mat-button type="button" (click)="triggerPhotoInput(photoInput)" [disabled]="uploadingPhoto">
                             <mat-icon svgIcon="heroicons_outline:camera"></mat-icon>
-                            <span>{{ photoPreviewUrl ? 'Actualizar foto' : 'Cargar foto' }}</span>
+                            <span>{{ uploadingPhoto ? 'Subiendo...' : (avatarUrl ? 'Cambiar foto' : 'Cargar foto') }}</span>
                         </button>
-
-                        <div class="avatar-hint" *ngIf="photoFile">Archivo: {{ photoFile.name }}</div>
+                        <div class="avatar-hint">JPG, PNG o WebP · Máx. 5 MB</div>
                     </div>
                 </div>
             </div>
@@ -81,7 +84,7 @@
 
         <form class="profile-card profile-card--password" [formGroup]="passwordForm" (ngSubmit)="changePassword()" *ngIf="!loading">
             <div class="card-title">Cambiar contraseña</div>
-            <div class="card-subtitle">Usa una contraseña segura y fácil de recordar</div>
+            <div class="card-subtitle">Usa una contraseña segura de mínimo 8 caracteres</div>
 
             <div class="form-grid form-grid--password">
                 <div class="profile-field">
@@ -91,6 +94,9 @@
                 <div class="profile-field">
                     <label class="profile-label">Nueva contraseña</label>
                     <input class="profile-input" type="password" formControlName="newPassword" />
+                    <span class="profile-hint" *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">
+                        Mínimo 8 caracteres
+                    </span>
                 </div>
                 <div class="profile-field">
                     <label class="profile-label">Confirmar nueva contraseña</label>
@@ -101,9 +107,13 @@
             <div class="profile-error" *ngIf="passwordForm.errors?.['passwordsMismatch']">
                 Las contraseñas no coinciden.
             </div>
+            <div class="profile-error" *ngIf="passwordError">{{ passwordError }}</div>
+            <div class="profile-success" *ngIf="passwordSuccess">Contraseña actualizada correctamente.</div>
 
             <div class="profile-actions">
-                <button class="primary-btn" mat-button type="submit">Actualizar contraseña</button>
+                <button class="primary-btn" mat-button type="submit" [disabled]="savingPassword">
+                    {{ savingPassword ? 'Guardando...' : 'Actualizar contraseña' }}
+                </button>
             </div>
         </form>
 

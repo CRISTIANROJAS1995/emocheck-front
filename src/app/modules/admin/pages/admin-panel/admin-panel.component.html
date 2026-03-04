@@ -299,6 +299,11 @@
                         <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()" [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
                         </button>
+                        @if (isSuperAdmin) {
+                        <button class="btn btn--warning btn--xs" (click)="resetPassword(u);$event.stopPropagation()" [disabled]="saving" title="Restablecer contraseña">
+                            <mat-icon>lock_reset</mat-icon>
+                        </button>
+                        }
                         <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()" [disabled]="saving" title="Eliminar">
                             <mat-icon>delete</mat-icon>
                         </button>

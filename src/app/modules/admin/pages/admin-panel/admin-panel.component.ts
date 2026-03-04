@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
 import { AdminUserListItemDto, AdminUsersService, AdminUpdateUserRequestDto } from 'app/core/services/admin-users.service';
+import { AuthService } from 'app/core/services/auth.service';
 import {
     AdminOrganizationService,
     CompanyDto, SiteDto, AreaDto, JobTypeDto, RoleDto,
@@ -72,7 +73,8 @@ export class AdminPanelComponent implements OnInit {
         private readonly fb: UntypedFormBuilder,
         private readonly adminUsers: AdminUsersService,
         private readonly orgService: AdminOrganizationService,
-        private readonly alert: AlertService
+        private readonly alert: AlertService,
+        private readonly auth: AuthService,
     ) { }
 
     ngOnInit(): void {
@@ -389,6 +391,39 @@ export class AdminPanelComponent implements OnInit {
 
     get filteredEditAreas(): AreaDto[] {
         return this.areas;
+    }
+
+    // ── Reset Password (SuperAdmin) ──
+
+    get isSuperAdmin(): boolean {
+        const roles = this.auth.getCurrentUser()?.roles ?? [];
+        return roles.some(r => ['superadmin', 'systemadmin'].includes(r.toLowerCase()));
+    }
+
+    /** Genera una contraseña temporal aleatoria de 10 caracteres */
+    private generateTempPassword(): string {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$';
+        return Array.from({ length: 10 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+
+    async resetPassword(user: AdminUserListItemDto): Promise<void> {
+        const tempPassword = this.generateTempPassword();
+        const ok = await this.alert.confirm(
+            `¿Restablecer la contraseña de "${user.fullName}"?\n\nContraseña temporal generada:\n${tempPassword}\n\nEl usuario deberá cambiarla en el próximo login.`
+        );
+        if (!ok) return;
+
+        this.saving = true;
+        this.adminUsers.adminResetPassword(user.userId, tempPassword)
+            .pipe(finalize(() => (this.saving = false)))
+            .subscribe({
+                next: () => {
+                    this.alert.success(
+                        `Contraseña restablecida.\n\nComunica esta contraseña temporal al usuario:\n${tempPassword}`
+                    );
+                },
+                error: (e) => this.alert.error(this.extractErrorMessage(e, 'No fue posible restablecer la contraseña')),
+            });
     }
 
     // ── Error helpers ──

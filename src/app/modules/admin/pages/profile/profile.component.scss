@@ -194,6 +194,19 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     font-family: 'Montserrat', sans-serif;
 }
 
+.profile-success {
+    color: #15803d;
+    padding: 8px 0 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+}
+
+.profile-hint {
+    font-size: 0.75rem;
+    color: #b91c1c;
+    margin-top: 2px;
+}
+
 .profile-grid {
     margin-top: 16px;
     display: grid;
@@ -325,6 +338,16 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     font-size: 20px;
     font-weight: 700;
     color: #155DFC;
+}
+
+.avatar__uploading {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
 }
 
 .avatar-actions {

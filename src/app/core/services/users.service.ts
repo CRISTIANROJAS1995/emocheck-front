@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ApiResponse } from 'app/core/models/auth.model';
 import { AuthService } from 'app/core/services/auth.service';
 import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';
@@ -11,6 +10,7 @@ export interface UserProfileDto {
     fullName: string;
     documentNumber?: string;
     email: string;
+    profilePhotoUrl?: string | null;   // ← nuevo campo v2
     companyId?: number;
     companyName?: string;
     siteId?: number;
@@ -33,15 +33,18 @@ export interface UpdateUserProfileDto {
     jobTypeId?: number;
 }
 
+export interface ChangePasswordDto {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsersService {
     private readonly apiUrl = environment.apiUrl;
 
     constructor(private readonly http: HttpClient, private readonly auth: AuthService) { }
 
-    /**
-     * Extract user ID from JWT token payload.
-     */
     private getUserIdFromToken(): number | null {
         const token = this.auth.getToken();
         if (!token) return null;
@@ -55,6 +58,26 @@ export class UsersService {
         }
     }
 
+    private mapProfile(data: any): UserProfileDto {
+        return {
+            userId: Number(data.userID ?? data.userId ?? 0),
+            fullName: String(data.fullName ?? `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim()),
+            documentNumber: data.documentNumber ?? undefined,
+            email: String(data.email ?? ''),
+            profilePhotoUrl: data.profilePhotoUrl ?? null,
+            companyId: data.companyID ?? data.company?.id ?? data.companyId ?? undefined,
+            companyName: data.companyName ?? data.company?.name ?? undefined,
+            siteId: data.siteID ?? data.site?.id ?? data.siteId ?? undefined,
+            siteName: data.siteName ?? data.site?.name ?? undefined,
+            areaId: data.areaID ?? data.area?.id ?? data.areaId ?? undefined,
+            areaName: data.areaName ?? data.area?.name ?? undefined,
+            jobTypeId: data.jobTypeID ?? data.jobType?.id ?? data.jobTypeId ?? undefined,
+            jobTypeName: data.jobTypeName ?? data.jobType?.name ?? undefined,
+            stateName: data.stateName ?? undefined,
+            creationDate: data.createdAt ?? data.creationDate ?? undefined,
+        };
+    }
+
     getMyProfile(): Observable<UserProfileDto> {
         return this.http
             .get<any>(`${this.apiUrl}/users/me`)
@@ -63,23 +86,7 @@ export class UsersService {
                     if (typeof res?.success === 'boolean' && !res.success) {
                         throw { status: 400, message: res?.message || 'No fue posible obtener el perfil' };
                     }
-                    const data = res?.data ?? res ?? {};
-                    return {
-                        userId: Number(data.userID ?? data.userId ?? 0),
-                        fullName: String(data.fullName ?? `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim()),
-                        documentNumber: data.documentNumber ?? undefined,
-                        email: String(data.email ?? ''),
-                        companyId: data.companyID ?? data.company?.id ?? data.companyId ?? undefined,
-                        companyName: data.companyName ?? data.company?.name ?? undefined,
-                        siteId: data.siteID ?? data.site?.id ?? data.siteId ?? undefined,
-                        siteName: data.siteName ?? data.site?.name ?? undefined,
-                        areaId: data.areaID ?? data.area?.id ?? data.areaId ?? undefined,
-                        areaName: data.areaName ?? data.area?.name ?? undefined,
-                        jobTypeId: data.jobTypeID ?? data.jobType?.id ?? data.jobTypeId ?? undefined,
-                        jobTypeName: data.jobTypeName ?? data.jobType?.name ?? undefined,
-                        stateName: data.stateName ?? undefined,
-                        creationDate: data.createdAt ?? data.creationDate ?? undefined,
-                    } as UserProfileDto;
+                    return this.mapProfile(res?.data ?? res ?? {});
                 })
             );
     }
@@ -90,7 +97,6 @@ export class UsersService {
             return throwError(() => ({ status: 401, message: 'No se pudo obtener el ID del usuario' }));
         }
 
-        // API PUT /users/{id} accepts: firstName, lastName (split from fullName), phone, areaID, jobTypeID
         const nameParts = (payload.fullName ?? '').trim().split(/\s+/).filter(Boolean);
         const firstName = nameParts[0] ?? undefined;
         const lastName = nameParts.slice(1).join(' ') || undefined;
@@ -108,24 +114,42 @@ export class UsersService {
                     if (typeof res?.success === 'boolean' && !res.success) {
                         throw { status: 400, message: res?.message || 'No fue posible actualizar el perfil' };
                     }
-                    const data = res?.data ?? res ?? {};
-                    return {
-                        userId: Number(data.userID ?? data.userId ?? userId),
-                        fullName: String(data.fullName ?? payload.fullName ?? ''),
-                        documentNumber: data.documentNumber ?? payload.documentNumber ?? undefined,
-                        email: String(data.email ?? ''),
-                        companyId: data.companyID ?? data.company?.id ?? undefined,
-                        companyName: data.companyName ?? data.company?.name ?? undefined,
-                        siteId: data.siteID ?? data.site?.id ?? payload.siteId ?? undefined,
-                        siteName: data.siteName ?? data.site?.name ?? undefined,
-                        areaId: data.areaID ?? data.area?.id ?? payload.areaId ?? undefined,
-                        areaName: data.areaName ?? data.area?.name ?? undefined,
-                        jobTypeId: data.jobTypeID ?? data.jobType?.id ?? payload.jobTypeId ?? undefined,
-                        jobTypeName: data.jobTypeName ?? data.jobType?.name ?? undefined,
-                        stateName: data.stateName ?? undefined,
-                        creationDate: data.creationDate ?? undefined,
-                    } as UserProfileDto;
+                    return this.mapProfile(res?.data ?? res ?? {});
+                })
+            );
+    }
+
+    /**
+     * Actualiza la foto de perfil: llama a PATCH /api/users/me/photo con la URL pública de S3.
+     */
+    updateProfilePhoto(photoUrl: string): Observable<UserProfileDto> {
+        return this.http
+            .patch<any>(`${this.apiUrl}/users/me/photo`, { photoUrl })
+            .pipe(
+                map((res) => {
+                    if (typeof res?.success === 'boolean' && !res.success) {
+                        throw { status: 400, message: res?.message || 'No fue posible actualizar la foto' };
+                    }
+                    return this.mapProfile(res?.data ?? res ?? {});
+                })
+            );
+    }
+
+    /**
+     * Cambia la contraseña del usuario autenticado.
+     * El backend devuelve HTTP 200 con success:false si la contraseña actual es incorrecta.
+     */
+    changePassword(dto: ChangePasswordDto): Observable<boolean> {
+        return this.http
+            .post<any>(`${this.apiUrl}/auth/change-password`, dto)
+            .pipe(
+                map((res) => {
+                    // Backend devuelve 200 con success:false si la clave actual es incorrecta
+                    return res?.success !== false;
                 })
             );
     }
 }
+
+export interface UserProfileDto {
+

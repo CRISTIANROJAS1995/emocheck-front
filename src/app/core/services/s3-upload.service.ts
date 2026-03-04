@@ -4,7 +4,7 @@ import { Observable, from, throwError } from 'rxjs';
 import { switchMap, map, catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
-export type S3Folder = 'recursos/videos' | 'recursos/audios' | 'recursos/articles' | 'recursos/images' | 'thumbs';
+export type S3Folder = 'recursos/videos' | 'recursos/audios' | 'recursos/articles' | 'recursos/images' | 'thumbs' | 'avatars';
 
 export interface S3UploadResult {
     /** URL pública del archivo subido */
