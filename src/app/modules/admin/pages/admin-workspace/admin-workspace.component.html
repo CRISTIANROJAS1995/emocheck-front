@@ -45,51 +45,6 @@
 
     @if (!loading) {
 
-    <!-- ── KPI Row ──────────────────────────────────────────────────────── -->
-    <div class="admin-hub__kpis">
-
-        <div class="kpi-card kpi-card--teal">
-            <div class="kpi-card__icon-wrap">
-                <mat-icon>people</mat-icon>
-            </div>
-            <div class="kpi-card__body">
-                <span class="kpi-card__value">{{ indicators?.totalUsers ?? 0 }}</span>
-                <span class="kpi-card__label">Usuarios Totales</span>
-            </div>
-        </div>
-
-        <div class="kpi-card kpi-card--blue">
-            <div class="kpi-card__icon-wrap">
-                <mat-icon>assignment_turned_in</mat-icon>
-            </div>
-            <div class="kpi-card__body">
-                <span class="kpi-card__value">{{ indicators?.totalEvaluationsCompleted ?? 0 }}</span>
-                <span class="kpi-card__label">Evaluaciones</span>
-            </div>
-        </div>
-
-        <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon-wrap">
-                <mat-icon>trending_up</mat-icon>
-            </div>
-            <div class="kpi-card__body">
-                <span class="kpi-card__value">{{ (indicators?.participationRate ?? 0) | number:'1.0-1' }}%</span>
-                <span class="kpi-card__label">Participación</span>
-            </div>
-        </div>
-
-        <div class="kpi-card kpi-card--rose">
-            <div class="kpi-card__icon-wrap">
-                <mat-icon>notifications_active</mat-icon>
-            </div>
-            <div class="kpi-card__body">
-                <span class="kpi-card__value">{{ alertStats?.totalAlerts ?? 0 }}</span>
-                <span class="kpi-card__label">Alertas Activas</span>
-            </div>
-        </div>
-
-    </div>
-
     <!-- ── Section heading ─────────────────────────────────────────────── -->
     <div class="admin-hub__section-head">
         <span class="admin-hub__section-title">Módulos del sistema</span>
@@ -106,7 +61,7 @@
                     <div class="feature-card__icon-wrap">
                         <mat-icon [svgIcon]="card.icon"></mat-icon>
                     </div>
-                    <span class="feature-card__metric">{{ card.metric }}</span>
+                    <span class="feature-card__badge">{{ card.metric }}</span>
                 </div>
                 <h3 class="feature-card__title">{{ card.title }}</h3>
                 <p class="feature-card__desc">{{ card.description }}</p>
