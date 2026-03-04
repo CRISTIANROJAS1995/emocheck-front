@@ -1,5 +1,4 @@
 // Sign In Page Styles
-
 // Page background with gradient
 .page-gradient-bg {
     background: linear-gradient(135deg, #EFF6FF 0%, #FFF 50%, #F0FDFA 100%);
@@ -80,10 +79,15 @@
     justify-content: center;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
-
-    mat-icon { font-size: 18px; width: 18px; height: 18px; }
-
-    &:hover { background: #E2E8F0; color: #1E293B; }
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+    &:hover {
+        background: #E2E8F0;
+        color: #1E293B;
+    }
 }
 
 .forgot-modal__icon {
@@ -95,8 +99,12 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 16px;
-
-    mat-icon { font-size: 28px; width: 28px; height: 28px; color: #009689; }
+    mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+        color: #009689;
+    }
 }
 
 .forgot-modal__title {
@@ -130,7 +138,6 @@
     background: #F8FAFC;
     text-decoration: none;
     transition: background 0.14s, transform 0.14s, border-color 0.14s;
-
     &:hover {
         background: #F0FDF9;
         border-color: rgba(0, 150, 137, 0.30);
@@ -146,16 +153,30 @@
     align-items: center;
     justify-content: center;
     flex: 0 0 40px;
-
-    mat-icon  { font-size: 20px; width: 20px; height: 20px; color: #fff; }
-    svg       { width: 22px; height: 22px; }
-
-    &--phone    { background: #009689; }
-    &--whatsapp { background: #25D366; }
-    &--email    { background: #155DFC; }
+    mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #fff;
+    }
+    svg {
+        width: 22px;
+        height: 22px;
+    }
+    &--phone {
+        background: #009689;
+    }
+    &--whatsapp {
+        background: #25D366;
+    }
+    &--email {
+        background: #155DFC;
+    }
 }
 
-.forgot-contact__info { min-width: 0; }
+.forgot-contact__info {
+    min-width: 0;
+}
 
 .forgot-contact__label {
     font-size: 11px;
@@ -184,16 +205,28 @@
     font-weight: 700;
     cursor: pointer;
     transition: opacity 0.15s, transform 0.15s;
-
-    &:hover { opacity: 0.92; transform: translateY(-1px); }
+    &:hover {
+        opacity: 0.92;
+        transform: translateY(-1px);
+    }
 }
 
 @keyframes fo-fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes fo-scale {
-    from { transform: scale(0.85); opacity: 0; }
-    to   { transform: scale(1);    opacity: 1; }
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
