@@ -1,76 +1,140 @@
 <section class="admin-hub">
-    <!-- Hero Header -->
+
+    <!-- ── Hero Header ─────────────────────────────────────────────────── -->
     <header class="admin-hub__header">
-        <div class="admin-hub__header-left">
+        <!-- Decorative blobs -->
+        <div class="admin-hub__header-blob admin-hub__header-blob--1"></div>
+        <div class="admin-hub__header-blob admin-hub__header-blob--2"></div>
+        <div class="admin-hub__header-blob admin-hub__header-blob--3"></div>
+
+        <div class="admin-hub__header-content">
             <div class="admin-hub__badge">PANEL DE ADMINISTRACIÓN</div>
             <h1 class="admin-hub__title">Centro de Control</h1>
-            <p class="admin-hub__subtitle">Gestiona alertas, casos, módulos, usuarios, reportes y auditoría desde un único espacio centralizado.</p>
+            <p class="admin-hub__subtitle">
+                Gestiona alertas, casos, módulos, usuarios, reportes y auditoría
+                desde un único espacio centralizado.
+            </p>
         </div>
 
+        <!-- Quick stats strip inside header -->
+        <div class="admin-hub__header-stats">
+            <div class="admin-hub__hstat">
+                <mat-icon svgIcon="heroicons_outline:users"></mat-icon>
+                <span class="admin-hub__hstat-val">{{ indicators?.totalUsers ?? '—' }}</span>
+                <span class="admin-hub__hstat-lbl">usuarios</span>
+            </div>
+            <div class="admin-hub__hstat-divider"></div>
+            <div class="admin-hub__hstat">
+                <mat-icon svgIcon="heroicons_outline:clipboard-document-check"></mat-icon>
+                <span class="admin-hub__hstat-val">{{ indicators?.totalEvaluationsCompleted ?? '—' }}</span>
+                <span class="admin-hub__hstat-lbl">evaluaciones</span>
+            </div>
+            <div class="admin-hub__hstat-divider"></div>
+            <div class="admin-hub__hstat">
+                <mat-icon svgIcon="heroicons_outline:bell-alert"></mat-icon>
+                <span class="admin-hub__hstat-val">{{ alertStats?.totalAlerts ?? '—' }}</span>
+                <span class="admin-hub__hstat-lbl">alertas</span>
+            </div>
+            <div class="admin-hub__hstat-divider"></div>
+            <div class="admin-hub__hstat">
+                <mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon>
+                <span class="admin-hub__hstat-val">{{ (indicators?.participationRate ?? 0) | number:'1.0-1' }}%</span>
+                <span class="admin-hub__hstat-lbl">participación</span>
+            </div>
+        </div>
     </header>
 
     @if (!loading) {
-    <!-- KPI Cards -->
+
+    <!-- ── KPI Row ──────────────────────────────────────────────────────── -->
     <div class="admin-hub__kpis">
+
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon">
+            <div class="kpi-card__icon-wrap">
                 <mat-icon>people</mat-icon>
             </div>
-            <div class="kpi-card__info">
+            <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ indicators?.totalUsers ?? 0 }}</span>
                 <span class="kpi-card__label">Usuarios Totales</span>
             </div>
+            <div class="kpi-card__bar"></div>
         </div>
+
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon">
+            <div class="kpi-card__icon-wrap">
                 <mat-icon>assignment_turned_in</mat-icon>
             </div>
-            <div class="kpi-card__info">
+            <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ indicators?.totalEvaluationsCompleted ?? 0 }}</span>
                 <span class="kpi-card__label">Evaluaciones</span>
             </div>
+            <div class="kpi-card__bar"></div>
         </div>
+
         <div class="kpi-card kpi-card--amber">
-            <div class="kpi-card__icon">
+            <div class="kpi-card__icon-wrap">
                 <mat-icon>trending_up</mat-icon>
             </div>
-            <div class="kpi-card__info">
+            <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ (indicators?.participationRate ?? 0) | number:'1.0-1' }}%</span>
                 <span class="kpi-card__label">Participación</span>
             </div>
+            <div class="kpi-card__bar"></div>
         </div>
+
         <div class="kpi-card kpi-card--rose">
-            <div class="kpi-card__icon">
+            <div class="kpi-card__icon-wrap">
                 <mat-icon>notifications_active</mat-icon>
             </div>
-            <div class="kpi-card__info">
+            <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ alertStats?.totalAlerts ?? 0 }}</span>
                 <span class="kpi-card__label">Alertas Activas</span>
             </div>
+            <div class="kpi-card__bar"></div>
         </div>
+
     </div>
 
-    <!-- Feature Cards Grid -->
+    <!-- ── Section heading ─────────────────────────────────────────────── -->
+    <div class="admin-hub__section-head">
+        <span class="admin-hub__section-title">Módulos del sistema</span>
+        <span class="admin-hub__section-count">{{ cards.length }} módulos disponibles</span>
+    </div>
+
+    <!-- ── Feature Cards Grid ───────────────────────────────────────────── -->
     <div class="admin-hub__grid">
         @for (card of cards; track card.route) {
         <a class="feature-card feature-card--{{ card.color }}" [routerLink]="card.route">
+            <!-- Gradient accent stripe at top -->
+            <div class="feature-card__stripe"></div>
+
             <div class="feature-card__top">
                 <div class="feature-card__icon-wrap">
                     <mat-icon [svgIcon]="card.icon"></mat-icon>
                 </div>
-                <span class="feature-card__metric">{{ card.metric }}</span>
+                <div class="feature-card__metric-pill">
+                    <span class="feature-card__metric">{{ card.metric }}</span>
+                </div>
             </div>
+
             <h3 class="feature-card__title">{{ card.title }}</h3>
             <p class="feature-card__desc">{{ card.description }}</p>
-            <hr class="feature-card__divider" />
-            <span class="feature-card__link">Gestionar <mat-icon>arrow_forward</mat-icon></span>
+
+            <div class="feature-card__footer">
+                <span class="feature-card__link">
+                    Gestionar
+                    <mat-icon svgIcon="heroicons_mini:arrow-right"></mat-icon>
+                </span>
+            </div>
         </a>
         }
     </div>
+
     } @else {
     <div class="admin-hub__loading">
         <mat-spinner diameter="36"></mat-spinner>
-        <span>Cargando centro de administración...</span>
+        <span>Cargando centro de administración…</span>
     </div>
     }
+
 </section>
