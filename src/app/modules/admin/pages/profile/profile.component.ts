@@ -35,6 +35,9 @@ export class ProfileComponent implements OnInit {
     savingPassword = false;
     passwordError: string | null = null;
     passwordSuccess = false;
+    showCurrentPassword  = false;
+    showNewPassword      = false;
+    showConfirmPassword  = false;
 
     form = this.fb.group({
         firstName: ['', [Validators.required]],

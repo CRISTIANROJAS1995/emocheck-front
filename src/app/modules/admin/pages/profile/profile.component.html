@@ -89,18 +89,33 @@
             <div class="form-grid form-grid--password">
                 <div class="profile-field">
                     <label class="profile-label">Contraseña actual</label>
-                    <input class="profile-input" type="password" formControlName="currentPassword" />
+                    <div class="profile-input-wrap">
+                        <input class="profile-input" [type]="showCurrentPassword ? 'text' : 'password'" formControlName="currentPassword" />
+                        <button type="button" class="profile-eye-btn" (click)="showCurrentPassword = !showCurrentPassword" [attr.aria-label]="showCurrentPassword ? 'Ocultar contraseña' : 'Ver contraseña'">
+                            <mat-icon>{{ showCurrentPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                        </button>
+                    </div>
                 </div>
                 <div class="profile-field">
                     <label class="profile-label">Nueva contraseña</label>
-                    <input class="profile-input" type="password" formControlName="newPassword" />
+                    <div class="profile-input-wrap">
+                        <input class="profile-input" [type]="showNewPassword ? 'text' : 'password'" formControlName="newPassword" />
+                        <button type="button" class="profile-eye-btn" (click)="showNewPassword = !showNewPassword" [attr.aria-label]="showNewPassword ? 'Ocultar contraseña' : 'Ver contraseña'">
+                            <mat-icon>{{ showNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                        </button>
+                    </div>
                     <span class="profile-hint" *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">
                         Mínimo 8 caracteres
                     </span>
                 </div>
                 <div class="profile-field">
                     <label class="profile-label">Confirmar nueva contraseña</label>
-                    <input class="profile-input" type="password" formControlName="confirmPassword" />
+                    <div class="profile-input-wrap">
+                        <input class="profile-input" [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword" />
+                        <button type="button" class="profile-eye-btn" (click)="showConfirmPassword = !showConfirmPassword" [attr.aria-label]="showConfirmPassword ? 'Ocultar contraseña' : 'Ver contraseña'">
+                            <mat-icon>{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                        </button>
+                    </div>
                 </div>
             </div>
 

@@ -299,6 +299,42 @@ a.profile-hero__back mat-icon.profile-hero__back-icon {
     border-color: rgba(0, 150, 137, 0.6);
 }
 
+.profile-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .profile-input {
+        width: 100%;
+        padding-right: 42px;
+    }
+}
+
+.profile-eye-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94A3B8;
+    transition: color 0.15s;
+
+    mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    &:hover { color: #009689; }
+    &:focus { outline: none; }
+}
+
 .profile-actions {
     display: flex;
     justify-content: flex-end;
