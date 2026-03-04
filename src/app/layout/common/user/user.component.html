@@ -5,10 +5,10 @@
         <span *ngIf="jobTitle" style="color: #6A7282; font-size: 12px; font-weight: 400; line-height: 16px;">{{ jobTitle }}</span>
     </div>
     <span class="relative">
-        <!-- Avatar con iniciales -->
-        <div
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-teal-500 text-white font-semibold text-sm">
-            {{ getInitials() }}
+        <!-- Avatar: foto si existe, iniciales si no -->
+        <div class="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden bg-teal-500 text-white font-semibold text-sm">
+            <img *ngIf="user?.avatar" [src]="user.avatar" class="h-full w-full object-cover" alt="Avatar" (error)="onAvatarError($event)" />
+            <span *ngIf="!user?.avatar">{{ getInitials() }}</span>
         </div>
         <span class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-500"></span>
     </span>

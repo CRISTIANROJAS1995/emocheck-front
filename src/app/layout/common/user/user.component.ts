@@ -136,4 +136,15 @@ export class UserComponent implements OnInit, OnDestroy {
         }
         return this.user.name.substring(0, 2).toUpperCase();
     }
+
+    /** Si la foto de perfil da error (URL rota), ocultarla y mostrar iniciales */
+    onAvatarError(event: Event): void {
+        const img = event.target as HTMLImageElement;
+        img.style.display = 'none';
+        // Forzar que el user.avatar quede vacío para mostrar las iniciales
+        if (this.user) {
+            this.user = { ...this.user, avatar: undefined };
+            this._changeDetectorRef.markForCheck();
+        }
+    }
 }

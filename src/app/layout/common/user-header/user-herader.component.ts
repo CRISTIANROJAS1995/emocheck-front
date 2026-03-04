@@ -45,4 +45,19 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
     }
+
+    getInitials(): string {
+        if (!this.user?.name) return '?';
+        const parts = this.user.name.trim().split(/\s+/).filter(Boolean);
+        return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || '??';
+    }
+
+    onAvatarError(event: Event): void {
+        const img = event.target as HTMLImageElement;
+        img.style.display = 'none';
+        if (this.user) {
+            this.user = { ...this.user, avatar: undefined };
+            this._changeDetectorRef.markForCheck();
+        }
+    }
 }

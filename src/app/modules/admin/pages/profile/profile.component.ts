@@ -123,6 +123,10 @@ export class ProfileComponent implements OnInit {
         ).subscribe({
             next: (updated) => {
                 this.profile = updated;
+                // Propagar el nuevo avatar al menú de navegación
+                if (updated.profilePhotoUrl) {
+                    this.auth.updateAvatar(updated.profilePhotoUrl);
+                }
                 // Liberar preview local — ahora usamos la URL del servidor
                 if (this.photoPreviewUrl) URL.revokeObjectURL(this.photoPreviewUrl);
                 this.photoPreviewUrl = null;

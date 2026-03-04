@@ -65,6 +65,7 @@ export class AuthService {
             roles,
             companyId: data?.companyID ?? data?.company?.id ?? undefined,
             companyName: data?.companyName ?? data?.company?.name ?? undefined,
+            avatar: data?.profilePhotoUrl ?? data?.avatarUrl ?? data?.avatar ?? undefined,
         };
     }
 
@@ -145,6 +146,15 @@ export class AuthService {
     reloadCurrentUser(): Observable<User> {
         this.currentUserSubject.next(null);
         return this.ensureCurrentUserLoaded();
+    }
+
+    /** Actualiza sólo el avatar del usuario en memoria y en localStorage */
+    updateAvatar(avatarUrl: string): void {
+        const current = this.currentUserSubject.value;
+        if (!current) return;
+        const updated: User = { ...current, avatar: avatarUrl };
+        localStorage.setItem(environment.userStorageKey, JSON.stringify(updated));
+        this.currentUserSubject.next(updated);
     }
 
     constructor(
