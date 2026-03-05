@@ -156,11 +156,11 @@ export class AdminEvaluationsComponent implements OnInit {
         this.http.get<unknown>(`${this.apiUrl}/evaluation/user/${this.selectedUserId}`).pipe(
             map(r => this.unwrap<EvaluationDto>(r)),
             catchError(() => of([])),
-            finalize(() => { this.loadingEvals = false; this.loadingResults = false; })
+            finalize(() => this.loadingEvals = false)
         ).subscribe(evals => {
             this.evaluations = evals;
             // Derive results from completed evaluations that have an embedded result
-            this.results = evals
+            const derived: EvaluationResultDto[] = evals
                 .filter(e => e.result?.evaluationResultID)
                 .map(e => ({
                     evaluationResultID: e.result!.evaluationResultID,
@@ -176,6 +176,18 @@ export class AdminEvaluationsComponent implements OnInit {
                         riskLevel: d.riskLevel,
                     })),
                 } as EvaluationResultDto));
+
+            if (derived.length > 0) {
+                this.results = derived;
+                this.loadingResults = false;
+            } else {
+                // Fallback: fetch results from dedicated endpoint
+                this.http.get<unknown>(`${this.apiUrl}/evaluation/results/user/${this.selectedUserId}`).pipe(
+                    map(r => this.unwrap<EvaluationResultDto>(r)),
+                    catchError(() => of([])),
+                    finalize(() => this.loadingResults = false)
+                ).subscribe(results => this.results = results);
+            }
         });
     }
 
