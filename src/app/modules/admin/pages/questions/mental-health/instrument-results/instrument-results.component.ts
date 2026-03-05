@@ -3,7 +3,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AssessmentModuleId } from 'app/core/models/assessment.model';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
-import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
 import { AssessmentService, InstrumentDescriptor } from 'app/core/services/assessment.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
@@ -53,7 +52,6 @@ export class InstrumentResultsComponent implements OnInit {
 
     constructor(
         private readonly router: Router,
-        private readonly state: AssessmentStateService,
         private readonly hydration: AssessmentHydrationService,
         private readonly assessmentService: AssessmentService,
     ) {}
@@ -61,34 +59,31 @@ export class InstrumentResultsComponent implements OnInit {
     ngOnInit(): void {
         this.isLoading = true;
 
-        // Hydrate latest results first, then load the real instrument list from the backend
+        // Load the real instrument list AND the completed codes from the backend in parallel.
+        // Using getCompletedInstrumentCodes (same as the selector) is more reliable than
+        // reading local state, because state may only contain the last-completed instrument
+        // when the user just finished one and navigated here.
         forkJoin({
             _hydrate: this.hydration.hydrateModuleResultFromCompletedEvaluations(MODULE_ID).pipe(catchError(() => of(undefined))),
             descriptors: this.assessmentService.getModuleInstruments(MODULE_ID),
+            completedCodes: this.hydration.getCompletedInstrumentCodes(MODULE_ID).pipe(catchError(() => of(new Set<string>()))),
         })
         .pipe(finalize(() => { this.isLoading = false; }))
         .subscribe({
-            next: ({ descriptors }) => this._buildCards(descriptors),
+            next: ({ descriptors, completedCodes }) => this._buildCards(descriptors, completedCodes),
             error: () => {
                 this.hasError = true;
             },
         });
     }
 
-    private _buildCards(descriptors: InstrumentDescriptor[]): void {
-        // Build the set of completed instrument codes from local state.
-        // The backend may return sub-scale codes (e.g. DASS21_ANXIETY) instead of
-        // the top-level code (DASS21), so we keep the full list for prefix matching.
-        const completedResult = this.state.getResult(MODULE_ID);
-        const allDimensionCodes: string[] = (completedResult?.dimensions ?? [])
-            .map(d => (d.instrumentCode ?? '').toUpperCase().trim())
-            .filter(Boolean);
-
-        // A descriptor is "completed" if any dimension code exactly matches OR
+    private _buildCards(descriptors: InstrumentDescriptor[], completedCodes: Set<string>): void {
+        // A descriptor is "completed" if any completed code exactly matches OR
         // starts with the descriptor code (covers DASS21_ANXIETY → DASS21).
         const isCompleted = (code: string): boolean => {
             const upper = code.toUpperCase();
-            return allDimensionCodes.some(dc => dc === upper || dc.startsWith(upper + '_'));
+            return completedCodes.has(upper) ||
+                [...completedCodes].some(dc => dc.startsWith(upper + '_'));
         };
 
         this.cards = descriptors.map((d, i) => {

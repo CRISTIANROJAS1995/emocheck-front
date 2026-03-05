@@ -324,24 +324,28 @@
     align-self: flex-start;
 }
 
-.ir-card__arrow {
+.ir-card__view-btn {
     position: absolute;
-    right: 18px;
-    bottom: 18px;
-    display: flex;
+    right: 16px;
+    bottom: 16px;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: #f1f5f9;
-    color: #94a3b8;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background: #EFF6FF;
+    color: #2563eb;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
     transition: background 0.15s, color 0.15s;
+    pointer-events: none; // el click lo maneja el ir-card padre
 }
 
-.ir-card:hover:not(:disabled) .ir-card__arrow {
-    background: #eff6ff;
-    color: #2563eb;
+.ir-card:hover:not(:disabled) .ir-card__view-btn {
+    background: #DBEAFE;
+    color: #1d4ed8;
 }
 
 @keyframes ir-spin {

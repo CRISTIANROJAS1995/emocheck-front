@@ -155,173 +155,41 @@
     border-color: rgba(201, 31, 37, 0.25);
 }
 
-.score-ring {
-    width: 160px;
-    height: 160px;
-    position: relative;
+// ── Ícono de estado (reemplaza el ring de puntos) ───────────────────────────
+.outcome-icon-block {
+    width: 72px;
+    height: 72px;
+    min-width: 72px;
+    border-radius: 9999px;
     display: flex;
     align-items: center;
     justify-content: center;
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-.score-ring *,
-.score-ring *::before,
-.score-ring *::after {
-    outline: none !important;
-    box-shadow: none !important;
-    border-color: transparent;
-}
-
-.ring {
-    transform: rotate(-90deg);
-    width: 160px;
-    height: 160px;
-    display: block;
-    outline: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    pointer-events: none;
-}
-
-.ring:focus,
-.ring:focus-visible,
-.score-ring:focus,
-.score-ring:focus-visible {
-    outline: none;
-    box-shadow: none;
-}
-
-.ring-track {
-    fill: none;
-    stroke: #E5E7EB;
-    stroke-width: 12;
-}
-
-.ring-progress {
-    fill: none;
-    stroke: #0A0A0A;
-    stroke-width: 12;
-    stroke-linecap: round;
-}
-
-.ring-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.ring-score {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    color: #008236;
-}
-
-.ring-points {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 16px;
-    color: #6A7282;
+    flex-shrink: 0;
+    svg {
+        width: 40px;
+        height: 40px;
+        display: block;
+    }
+    &.outcome-icon-block--adequate {
+        background: rgba(0, 201, 80, 0.12);
+        color: #16a34a;
+    }
+    &.outcome-icon-block--mild {
+        background: rgba(240, 177, 0, 0.12);
+        color: #a16207;
+    }
+    &.outcome-icon-block--high-risk {
+        background: rgba(251, 44, 54, 0.10);
+        color: #C91F25;
+    }
 }
 
 .summary-content {
     min-width: 0;
+    flex: 1 1 0;
 }
 
-.outcome-pill {
-    display: flex;
-    height: 41.333px;
-    padding: 8.667px 16.667px;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-    border-radius: 9999px;
-    border: 0.667px solid #B9F8CF;
-    background: #F0FDF4;
-    width: fit-content;
-}
-
-.outcome-icon {
-    width: 20px;
-    height: 20px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.outcome-icon svg {
-    width: 20px;
-    height: 20px;
-    display: block;
-}
-
-.outcome-figma-icon {
-    width: 20px;
-    height: 20px;
-    display: block;
-}
-
-.outcome-icon.check {
-    color: #16A34A;
-}
-
-.outcome-icon.warn {
-    color: #B0711B;
-}
-
-.outcome-icon.alert {
-    color: #C91F25;
-}
-
-.outcome-text {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    color: #008236;
-}
-
-
-/* Paleta por resultado (Adecuado usa los defaults verdes) */
-
-.summary-card.outcome-mild {
-    .ring-score {
-        color: #B0711B;
-    }
-    .outcome-pill {
-        border-color: #FDE68A;
-        background: #FFFBEB;
-    }
-    .outcome-text {
-        color: #B0711B;
-    }
-}
-
-.summary-card.outcome-high-risk {
-    .ring-score {
-        color: #C91F25;
-    }
-    .outcome-pill {
-        border-color: rgba(201, 31, 37, 0.25);
-        background: transparent;
-    }
-    .outcome-text {
-        color: #C91F25;
-    }
-}
-
+// ── Paleta por resultado ────────────────────────────────────────────────────
 .help-card {
     display: flex;
     width: 974px;
@@ -612,9 +480,50 @@
 }
 
 .dim-card__percent {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     color: #64748b;
+    &.dim-percent--good {
+        color: #16a34a;
+    }
+    &.dim-percent--warn {
+        color: #a16207;
+    }
+    &.dim-percent--bad {
+        color: #dc2626;
+    }
+}
+
+.dim-card__score-fraction {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    margin-top: 2px;
+}
+
+.dim-card__score-val {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    color: #0f172a;
+    &.dim-percent--good {
+        color: #16a34a;
+    }
+    &.dim-percent--warn {
+        color: #a16207;
+    }
+    &.dim-percent--bad {
+        color: #dc2626;
+    }
+}
+
+.dim-card__score-max {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #94a3b8;
+    line-height: 1;
 }
 
 .dim-card__bar {
@@ -782,6 +691,105 @@
     color: #6A7282;
 }
 
+// ── Interpretación de dimensiones ──────────────────────────────────────────
+.card--dim-interpretations {
+    display: flex;
+    width: 974px;
+    max-width: 100%;
+    margin-top: 14px;
+    padding: 32.667px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    flex-shrink: 0;
+    border-radius: 24px;
+    border: 0.667px solid #E5E7EB;
+    background: #FFFFFF;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.06);
+}
+
+.card--dim-interpretations .card-title {
+    margin-bottom: 4px;
+}
+
+.dim-interp-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    &.dim-interp--good {
+        background: rgba(0, 201, 80, 0.06);
+    }
+    &.dim-interp--warn {
+        background: rgba(240, 177, 0, 0.07);
+    }
+    &.dim-interp--bad {
+        background: rgba(251, 44, 54, 0.06);
+    }
+}
+
+.dim-interp__dot {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    border-radius: 9999px;
+    margin-top: 6px;
+    flex-shrink: 0;
+    &.dim-interp-dot--good {
+        background: #00C950;
+    }
+    &.dim-interp-dot--warn {
+        background: #F0B100;
+    }
+    &.dim-interp-dot--bad {
+        background: #FB2C36;
+    }
+}
+
+.dim-interp__body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px;
+    flex: 1 1 0;
+}
+
+.dim-interp__label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    &.dim-interp-label--good {
+        color: #16a34a;
+    }
+    &.dim-interp-label--warn {
+        color: #a16207;
+    }
+    &.dim-interp-label--bad {
+        color: #dc2626;
+    }
+}
+
+.dim-interp__sep {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+.dim-interp__text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    color: #364153;
+    line-height: 1.5;
+}
+
+// ───────────────────────────────────────────────────────────────────────────
 .card--recommendations {
     display: flex;
     width: 974px;
@@ -1058,29 +1066,20 @@
         gap: 18px;
         text-align: center;
     }
-    .score-ring {
-        width: 120px;
-        height: 120px;
-    }
-    .ring {
-        width: 120px;
-        height: 120px;
-    }
-    .ring svg {
-        width: 120px;
-        height: 120px;
+    .outcome-icon-block {
+        width: 56px;
+        height: 56px;
+        min-width: 56px;
+        svg {
+            width: 30px;
+            height: 30px;
+        }
     }
     .summary-content {
         width: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-    }
-    .outcome-pill {
-        height: auto;
-        padding: 6px 14px;
-        flex-wrap: wrap;
-        justify-content: center;
     }
     .summary-message {
         font-size: 14px;

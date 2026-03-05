@@ -517,7 +517,12 @@ export class InstrumentSelectorComponent implements OnInit {
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
-        this.assessmentService.submitRich(this.moduleId, richAnswers).pipe(
+        // Pass instrument code AND id so the backend can create a per-instrument
+        // evaluation (avoids 409 when the module already has a completed evaluation).
+        const instrumentCode = this.selectedInstrument?.code;
+        const instrumentId   = this.selectedInstrument?.instrumentId;
+
+        this.assessmentService.submitRich(this.moduleId, richAnswers, instrumentCode, instrumentId).pipe(
             finalize(() => { this.isSubmitting = false; })
         ).subscribe({
             next: (result) => {

@@ -282,21 +282,46 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     /** Effective message: uses backend interpretation directly, falls back to derived text. */
     get effectiveMessage(): string {
         if (!this.result) return '';
-        // Backend interpretation always wins
-        if (this.result.message && this.result.message.trim()) {
-            return this.result.message.trim();
-        }
-        // Fallback derived text
+        // Backend interpretation always wins — only skip if it's the generic placeholder
+        const backendMsg = this.result.message?.trim() ?? '';
+        const isGenericBackend = !backendMsg ||
+            backendMsg.toLowerCase().includes("módulo 'salud mental'") ||
+            backendMsg.toLowerCase().includes("módulo 'work") ||
+            backendMsg.toLowerCase().includes("módulo 'psico") ||
+            backendMsg.toLowerCase().includes("módulo 'organ");
+        if (backendMsg && !isGenericBackend) return backendMsg;
+
+        // Build a contextual message from dimension data
+        const dims = this.result.dimensions ?? [];
+        const higherIsWorse = this.moduleDef?.higherIsWorse ?? false;
+
+        // Find worst-performing dimensions to name them explicitly
+        const flagged = dims
+            .filter(d => {
+                const tone = this.getBarTone(d.percent);
+                return tone === 'bad' || tone === 'warn';
+            })
+            .map(d => this.getDimensionLabel(d, dims.indexOf(d)))
+            .filter(Boolean);
+
+        const dimText = flagged.length
+            ? `Se identificaron niveles elevados en: ${flagged.join(', ')}.`
+            : '';
+
         const outcome = this.effectiveOutcome;
-        const score = this.result.score;
-        switch (outcome) {
-            case 'adequate':
-                return `Tu puntaje es ${score}/100. Los indicadores se encuentran dentro de rangos saludables. Continúa con tus hábitos de bienestar.`;
-            case 'mild':
-                return `Tu puntaje es ${score}/100. Se detectaron algunas señales que vale la pena atender. Te recomendamos revisar las sugerencias personalizadas.`;
-            case 'high-risk':
-                return `Tu puntaje es ${score}/100. Los resultados indican niveles elevados que requieren atención. Te recomendamos buscar orientación profesional.`;
-        }
+        const closing = higherIsWorse
+            ? (outcome === 'adequate'
+                ? 'Los indicadores se encuentran dentro del rango normal.'
+                : outcome === 'mild'
+                    ? 'Te recomendamos revisar las sugerencias y dar seguimiento a estas áreas.'
+                    : 'Te recomendamos buscar orientación o apoyo profesional para estas áreas.')
+            : (outcome === 'adequate'
+                ? 'Los indicadores se encuentran en un rango saludable.'
+                : outcome === 'mild'
+                    ? 'Hay oportunidades de mejora en algunas áreas.'
+                    : 'Se recomienda intervención en las áreas indicadas.');
+
+        return [dimText, closing].filter(Boolean).join(' ');
     }
 
     private deriveOutcomeFromDimensions(): AssessmentOutcome {

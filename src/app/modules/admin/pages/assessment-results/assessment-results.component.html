@@ -27,42 +27,25 @@
     <main class="results-shell" *ngIf="result as r">
         <section class="summary-card" [ngClass]="outcomeClass">
             <div class="summary-row">
-                <div class="score-ring" aria-hidden="true">
-                    <svg width="160" height="160" viewBox="0 0 160 160" class="ring" focusable="false" tabindex="-1" aria-hidden="true">
-                        <circle cx="80" cy="80" r="68" class="ring-track"></circle>
-                        <circle cx="80" cy="80" r="68" class="ring-progress" [attr.stroke-dasharray]="ringDasharray">
-                        </circle>
+                <!-- Estado visual: ícono grande con color según resultado -->
+                <div class="outcome-icon-block" [ngClass]="'outcome-icon-block--' + effectiveOutcome" aria-hidden="true">
+                    <svg *ngIf="effectiveOutcome === 'adequate'" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+                        <path d="M7 12.5l3.5 3.5 6.5-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <div class="ring-center">
-                        <div class="ring-score">{{ r.totalScore != null ? (r.totalScore | number:'1.0-0') : r.score }}</div>
-                        <div class="ring-points">puntos</div>
-                    </div>
+                    <svg *ngIf="effectiveOutcome === 'mild'" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+                        <path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                        <circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>
+                    </svg>
+                    <svg *ngIf="effectiveOutcome === 'high-risk'" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+                        <path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                        <circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>
+                    </svg>
                 </div>
 
                 <div class="summary-content">
-                    <div class="outcome-pill">
-                        <span class="outcome-icon" [ngClass]="outcomeIcon" aria-hidden="true">
-                            <img *ngIf="outcomeIcon === 'check'" class="outcome-figma-icon" src="icons/Icon (6).svg"
-                                alt="" />
-                            <svg *ngIf="outcomeIcon === 'warn'" viewBox="0 0 24 24" class="outcome-warn-icon"
-                                aria-hidden="true">
-                                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" />
-                                <path d="M12 7v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    fill="none" />
-                                <circle cx="12" cy="17" r="1.25" fill="currentColor" />
-                            </svg>
-                            <svg *ngIf="outcomeIcon === 'alert'" viewBox="0 0 24 24" class="outcome-alert-icon"
-                                aria-hidden="true">
-                                <path d="M12 3L22 21H2L12 3Z" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linejoin="round" />
-                                <path d="M12 9v5" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" />
-                                <circle cx="12" cy="17" r="1.25" fill="currentColor" />
-                            </svg>
-                        </span>
-                        <span class="outcome-text">{{ effectiveHeadline }}</span>
-                    </div>
-
                     <p class="summary-message">{{ effectiveMessage }}</p>
 
                     <div class="summary-date">
@@ -86,25 +69,18 @@
 
             <div class="dim-cards">
                 <div class="dim-card" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-card--' + getBarTone(d.percent)" [style.border-left-color]="d.scoreRangeColor || null">
-                    <div class="dim-card__header">
-                        <span class="dim-card__risk-badge" [style.background]="d.scoreRangeColor ? (d.scoreRangeColor + '22') : null" [style.color]="d.scoreRangeColor || null" [style.border-color]="d.scoreRangeColor ? (d.scoreRangeColor + '66') : null">
-                            {{ d.riskLevel || getRiskLabel(d.riskLevel, d.percent) }}
-                        </span>
-                    </div>
                     <div class="dim-card__name-row">
                         <span class="dim-card__name">{{ getDimensionLabel(d, idx) }}</span>
-                        <div class="dim-card__name-row-right">
-                            <span class="dim-card__range-badge" *ngIf="d.scoreRangeLabel" [style.background]="d.scoreRangeColor ? (d.scoreRangeColor + '15') : null" [style.color]="d.scoreRangeColor || null" [style.border-color]="d.scoreRangeColor ? (d.scoreRangeColor + '55') : null">
-                                {{ d.scoreRangeLabel }}
-                            </span>
-                            <span class="dim-card__percent">{{ d.percent }}%</span>
-                        </div>
+                        <span class="dim-card__percent" [ngClass]="'dim-percent--' + getBarTone(d.percent)">{{ d.percent }}%</span>
+                    </div>
+                    <div class="dim-card__score-fraction" *ngIf="d.score != null && d.maxScore != null">
+                        <span class="dim-card__score-val" [ngClass]="'dim-percent--' + getBarTone(d.percent)">{{ d.score | number:'1.0-0' }}</span>
+                        <span class="dim-card__score-max">/ {{ d.maxScore }}</span>
                     </div>
                     <div class="dim-card__bar">
                         <div class="dim-card__bar-fill" [style.width.%]="d.percent" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-bar--' + getBarTone(d.percent)">
                         </div>
                     </div>
-                    <div class="dim-card__description" *ngIf="d.scoreRangeDescription">{{ d.scoreRangeDescription }}</div>
                 </div>
             </div>
 
@@ -112,6 +88,24 @@
                 <ng-container *ngIf="isHydrating">Cargando desglose por dimensiones...</ng-container>
                 <ng-container *ngIf="!isHydrating && hydrationAttempted">No hay desglose por dimensiones disponible para este resultado.</ng-container>
             </p>
+        </section>
+
+        <section class="card card--dim-interpretations" *ngIf="(r.dimensions ?? []).length > 0">
+            <div class="card-title">
+                <span class="card-title-icon" aria-hidden="true">
+                    <img class="card-title-icon-img" src="icons/Icon (31).svg" alt="" />
+                </span>
+                <span>Interpretación de dimensiones</span>
+            </div>
+
+            <div class="dim-interp-item" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-interp--' + getBarTone(d.percent)">
+                <div class="dim-interp__dot" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-dot--' + getBarTone(d.percent)"></div>
+                <div class="dim-interp__body">
+                    <span class="dim-interp__label" [style.color]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-label--' + getBarTone(d.percent)">{{ getDimensionLabel(d, idx) }}</span>
+                    <span class="dim-interp__sep">:</span>
+                    <span class="dim-interp__text">{{ d.scoreRangeDescription || getDimensionInterpretation(d, idx) }}</span>
+                </div>
+            </div>
         </section>
 
         <section class="card card--recommendations">

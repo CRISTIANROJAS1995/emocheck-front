@@ -31,6 +31,8 @@
 | 2 | `GET /api/casetracking/status/{status}` | `assignedToUserName` viene `""` | 🔴 Alta |
 | 3 | `GET /api/casetracking/{id}/follow-ups` | **Siempre devuelve `[]`** aunque existan follow-ups creados | 🔴 Alta |
 | 4 | `POST /api/casetracking/{id}/follow-ups` | El campo `caseFollowUpID` viene `0` en la respuesta | 🟡 Media |
+| 5 | `POST /api/evaluation/start` | Devuelve **HTTP 409** cuando ya existe una evaluación completada del mismo módulo — bloquea presentar el 2do, 3er instrumento en módulos multi-instrumento (salud mental, etc.) | 🔴 Alta |
+| 6 | `GET /api/evaluation/my-completed` | El campo `instrumentCode` viene `null` en los items — impide identificar qué instrumento corresponde a cada evaluación | 🔴 Alta |
 
 ---
 
@@ -630,6 +632,78 @@ Una vez aplicados los ajustes, el equipo frontend verificará los siguientes flu
 ### `/emotional-analysis`
 - [ ] El análisis facial completa sin error 405
 - [ ] Los scores de atención, concentración, equilibrio, positividad y calma son reales
+
+---
+
+## 🔴 Nuevos ajustes requeridos — Lote V3 (05/03/2026)
+
+### Problema 5 — `POST /api/evaluation/start` devuelve 409 para el 2do instrumento (multi-instrumento)
+
+**Endpoint:** `POST /api/evaluation/start`
+
+**Contexto:** El módulo de Salud Mental tiene múltiples instrumentos independientes (BAI, BDI, DASS21, etc.). El usuario completa BAI → evaluación completada. Luego vuelve al módulo y selecciona BDI. Al llamar `evaluation/start` con el mismo `moduleID`, el backend responde:
+
+**Respuesta actual (incorrecta):**
+```
+HTTP 409 Conflict
+{ "error": { "code": "EVALUATION_ALREADY_COMPLETED" } }
+```
+
+**Comportamiento esperado:**
+```
+HTTP 200 OK
+{ "evaluationID": <nuevo_id>, "moduleID": <id>, "isCompleted": false, ... }
+```
+
+El backend debe **permitir crear múltiples evaluaciones del mismo módulo** cuando el módulo tiene más de un instrumento. Cada instrumento es una evaluación independiente.
+
+**Solución requerida en backend:**
+- Eliminar (o hacer configurable) la validación que impide crear una nueva evaluación cuando ya existe una completada del mismo módulo.
+- El módulo tiene la propiedad `allowMultipleEvaluations` (o similar) — si el módulo tiene múltiples instrumentos, no debe bloquearse.
+
+**Impacto:** El usuario solo puede presentar el primer instrumento del módulo. Al intentar presentar el segundo, recibe el error "Instrumento ya completado".
+
+---
+
+### Problema 6 — `GET /api/evaluation/my-completed` no incluye `instrumentCode`
+
+**Endpoint:** `GET /api/evaluation/my-completed`
+
+**Respuesta actual (problemática):**
+```json
+[
+  {
+    "evaluationID": 15,
+    "moduleID": 3,
+    "instrumentCode": null,
+    "assessmentModuleName": "Salud Mental",
+    "completedAt": "2026-03-05T10:00:00Z",
+    "result": { ... }
+  }
+]
+```
+
+**Respuesta esperada:**
+```json
+[
+  {
+    "evaluationID": 15,
+    "moduleID": 3,
+    "instrumentCode": "BAI",
+    "assessmentModuleName": "Salud Mental",
+    "completedAt": "2026-03-05T10:00:00Z",
+    "result": {
+      "dimensionScores": [
+        { "dimensionName": "Ansiedad", "instrumentCode": "BAI", "score": 12, ... }
+      ]
+    }
+  }
+]
+```
+
+El campo `instrumentCode` en la raíz del item Y en cada `dimensionScores[]` permite al frontend identificar qué instrumento corresponde a cada evaluación. Sin este campo, es imposible marcar correctamente cuáles instrumentos ya fueron completados en la pantalla de selección de instrumentos.
+
+**Impacto:** En `/mental-health` y `/mental-health/instrument-results`, el frontend no puede determinar qué instrumentos ya fueron respondidos, por lo que todos aparecen como "disponibles" o todos como "completados" dependiendo del fallback usado.
 
 ---
 

@@ -101,6 +101,8 @@ interface SwaggerInstrumentDto {
 export interface InstrumentDescriptor {
     /** Índice posicional dentro del array `module.instruments` (usado para filtrar preguntas). */
     index: number;
+    /** ID numérico del instrumento tal como lo devuelve el backend (usado en evaluation/start). */
+    instrumentId?: number;
     /** Código del instrumento, ej. "GAD7", "PHQ9", "ISI", "PSS4". */
     code: string;
     /** Etiqueta amigable — viene de dimensionLabels si hay match, si no del backend. */
@@ -278,10 +280,10 @@ export class AssessmentService {
                     ).toUpperCase().trim() || `INST_${i}`;
                     const backendName = String((inst as any).name ?? (inst as any).instrumentName ?? '').trim();
                     const backendDescription = String((inst as any).description ?? '').trim();
-                    // Use dimensionLabels label only if backend name is empty
                     const label = backendName || dim?.label || code;
+                    const instrumentId = Number((inst as any).instrumentID ?? (inst as any).instrumentId ?? 0) || undefined;
                     const rootQuestions = (inst.questions ?? []).filter(q => q.parentQuestionID == null);
-                    return { index: i, code, label, backendName, backendDescription, questionCount: rootQuestions.length };
+                    return { index: i, instrumentId, code, label, backendName, backendDescription, questionCount: rootQuestions.length };
                 });
             })
         );
@@ -438,8 +440,12 @@ export class AssessmentService {
     /**
      * Submits an assessment using rich answers (supports TIME, INTEGER, ROUTING, sub-items).
      * Use this instead of submit() when the questionnaire has non-LIKERT questions.
+     * @param instrumentCode  Optional: the specific instrument code being submitted (e.g. "BAI").
+     *   When provided, the already-completed check is scoped to THAT instrument only.
+     *   This is required for multi-instrument modules (e.g. mental-health) so that completing
+     *   BAI does not block the user from later completing BDI in the same module.
      */
-    submitRich(moduleId: AssessmentModuleId, richAnswers: RichAnswer[]): Observable<AssessmentResult> {
+    submitRich(moduleId: AssessmentModuleId, richAnswers: RichAnswer[], instrumentCode?: string, instrumentId?: number): Observable<AssessmentResult> {
         return this.consentService.hasAccepted().pipe(
             switchMap((hasAccepted) =>
                 hasAccepted
@@ -451,8 +457,7 @@ export class AssessmentService {
             ),
             switchMap(() => this.getModuleDetail(moduleId)),
             switchMap((detail) =>
-                // Pre-flight: block re-submission if this module is already completed.
-                this.isModuleAlreadyCompleted(detail.apiModuleId).pipe(
+                this.isInstrumentAlreadyCompleted(detail.apiModuleId, instrumentCode).pipe(
                     switchMap((alreadyDone) =>
                         alreadyDone
                             ? throwError(() => ({
@@ -463,8 +468,14 @@ export class AssessmentService {
                     ),
                     switchMap((existing) => {
                         if ((existing as SwaggerEvaluationDto)?.evaluationID) return of(existing as SwaggerEvaluationDto);
+
+                        // Build the start body — include instrumentID when available so the
+                        // backend can create a per-instrument evaluation (avoids 409).
+                        const startBody: Record<string, unknown> = { moduleID: detail.apiModuleId };
+                        if (instrumentId && instrumentId > 0) startBody['instrumentID'] = instrumentId;
+
                         return this.http
-                            .post<unknown>(`${this.apiUrl}/evaluation/start`, { moduleID: detail.apiModuleId })
+                            .post<unknown>(`${this.apiUrl}/evaluation/start`, startBody)
                             .pipe(
                                 map((res) => {
                                     const evaluation = this.unwrapObject<SwaggerEvaluationDto>(res);
@@ -472,8 +483,6 @@ export class AssessmentService {
                                     return evaluation;
                                 }),
                                 catchError((err) => {
-                                    // Backend returns HTTP 409 when the module is already completed.
-                                    // Normalise to the same ALREADY_COMPLETED error code the UI handles.
                                     if (err?.status === 409 || err?.error?.error?.code === 'EVALUATION_ALREADY_COMPLETED') {
                                         return throwError(() => ({
                                             code: 'ALREADY_COMPLETED',
@@ -556,6 +565,53 @@ export class AssessmentService {
                     return this._apiModuleIdMatchesName(apiModuleId, i?.assessmentModuleName ?? '');
                 })
             ),
+            catchError(() => of(false))
+        );
+    }
+
+    /**
+     * Returns true if the user already completed a specific instrument within a module.
+     * When `instrumentCode` is provided, matches against the `instrumentCode` field on the
+     * completed-evaluation DTO (backend v5.2+) and against sub-scale codes in dimensionScores.
+     * When `instrumentCode` is NOT provided, falls back to module-level check.
+     *
+     * This is the correct guard for multi-instrument modules (e.g. mental-health) where
+     * multiple instruments share the same numeric moduleID.
+     */
+    private isInstrumentAlreadyCompleted(apiModuleId: number, instrumentCode?: string): Observable<boolean> {
+        if (!apiModuleId) return of(false);
+
+        // No instrumentCode → fall back to module-level check (single-instrument modules)
+        if (!instrumentCode) return this.isModuleAlreadyCompleted(apiModuleId);
+
+        const upperCode = instrumentCode.toUpperCase().trim();
+
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
+            map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res) ?? []),
+            map((items) => {
+                // Only look at evaluations belonging to this module
+                const moduleItems = items.filter((i) => {
+                    const mid = Number((i as any)?.moduleID ?? 0);
+                    if (mid > 0) return mid === apiModuleId;
+                    return this._apiModuleIdMatchesName(apiModuleId, i?.assessmentModuleName ?? '');
+                });
+
+                return moduleItems.some((i) => {
+                    // Direct instrumentCode match (simple instruments)
+                    const direct = String(i?.instrumentCode ?? '').toUpperCase().trim();
+                    if (direct && (direct === upperCode || upperCode.startsWith(direct + '_') || direct.startsWith(upperCode + '_'))) {
+                        return true;
+                    }
+                    // Sub-scale dimensionScores match (e.g. DASS21_ANXIETY → DASS21)
+                    for (const dim of i?.result?.dimensionScores ?? []) {
+                        const dc = String((dim as any)?.instrumentCode ?? '').toUpperCase().trim();
+                        if (dc && (dc === upperCode || dc.startsWith(upperCode + '_') || upperCode.startsWith(dc + '_'))) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }),
             catchError(() => of(false))
         );
     }
