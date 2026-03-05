@@ -25,7 +25,15 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     isAnalyzing: boolean = true;
     showResults: boolean = false;
     cameraError: string = '';
+    cameraErrorType: 'permission-denied' | 'in-use' | 'not-found' | 'not-supported' | 'https-required' | 'generic' | null = null;
     analysisError: string = '';
+
+    // Estados de permiso de cámara
+    // 'prompt'     → todavía no se ha pedido permiso (mostrar pantalla previa)
+    // 'requesting' → esperando que el usuario acepte/rechace el diálogo del navegador
+    // 'granted'    → cámara activa
+    // 'denied'     → usuario rechazó o error irrecuperable
+    cameraPermission: 'prompt' | 'requesting' | 'granted' | 'denied' = 'prompt';
 
     steps = [
         { id: 1, name: 'Atención', status: 'pending', percentage: 0 },
@@ -38,85 +46,325 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     // Propiedades dinámicas para los resultados
     resultType: 'alert' | 'emotional-load' | 'normal' = 'emotional-load';
 
-    // Configuración dinámica según el tipo de resultado
-    get resultConfig() {
-        if (this.resultType === 'alert') {
-            return {
-                iconGradient: 'linear-gradient(135deg, #FF6467 0%, #E7000B 10%)',
-                iconShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
-                title: 'Tu cuerpo está en alerta',
-                titleSize: '20px',
-                titleLineHeight: '30px',
-                messageText: 'Vamos a bajarle el ritmo juntos. 🧘 Haz una pausa guiada de 2 minutos para estabilizar tu mente.',
-                messageColor: '#364153',
-                messageSize: '14px',
-                messageLineHeight: '20px',
-                containerBorder: '#FFA2A2',
-                containerBorderWidth: '2px',
-                containerBackground: 'linear-gradient(135deg, #FEF2F2 0%, #FEF2F2 50%)',
-                containerPadding: '18px',
-                containerGap: '19.862px',
-                buttonGradient: 'linear-gradient(90deg, #FF6467 0%, #E7000B 100%)',
-                buttonShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
-                buttonText: 'Iniciar pausa guiada de 2 min',
-                buttonIcon: 'icons/Icon.svg',
-                buttonEmoji: '🧘',
-                buttonFontSize: '14px',
-                buttonFontWeight: '600',
-                buttonLineHeight: '20px',
-                buttonPadding: '8.333px 152.882px 7.667px 152.882px'
-            };
-        } else if (this.resultType === 'normal') {
+    // Contenido dinámico calculado al finalizar el análisis (emoción + estado)
+    dynamicContent: {
+        title: string;
+        iconGradient: string;
+        containerBorder: string;
+        containerBackground: string;
+        messageText: string;
+        steps: Array<{ text: string; emoji?: string }>;
+        finalMessage: string;
+        buttonText: string;
+        buttonEmoji: string;
+        buttonGradient: string;
+    } | null = null;
+
+    // ─── Biblioteca de contenido por emoción × estado ───────────────────────
+    private readonly CONTENT_LIBRARY: Record<string, Record<string, Array<{
+        title: string;
+        messageText: string;
+        steps: Array<{ text: string; emoji?: string }>;
+        finalMessage: string;
+        buttonText: string;
+        buttonEmoji: string;
+    }>>> = {
+
+        // ── VERDE (normal ≥70%) ─────────────────────────────────────────────
+        normal: {
+            happiness: [
+                {
+                    title: '¡Excelente! Tu estado emocional es saludable',
+                    messageText: 'Tu estado emocional es saludable. Aprovechemos este momento para fortalecerlo.',
+                    steps: [
+                        { text: 'Respira profundo 4 segundos.' },
+                        { text: 'Exhala lento 6 segundos. Repite 5 veces.' },
+                        { text: '¿Qué estoy haciendo bien hoy? ¿Qué quiero repetir mañana?' },
+                    ],
+                    finalMessage: 'Sostener el bienestar también es autocuidado.',
+                    buttonText: 'Continuar mi día',
+                    buttonEmoji: '🌟',
+                },
+                {
+                    title: '¡Excelente! Tu estado emocional es saludable',
+                    messageText: 'Estás en un estado emocional saludable. Vamos a sostenerlo sin sobre-exigirte.',
+                    steps: [
+                        { text: 'Estira tus brazos hacia arriba.' },
+                        { text: 'Sonríe conscientemente durante 10 segundos.' },
+                    ],
+                    finalMessage: 'Siente cómo tu cuerpo guarda esta emoción positiva.',
+                    buttonText: 'Guardar bienestar',
+                    buttonEmoji: '🎉',
+                },
+                {
+                    title: '¡Excelente! Tu estado emocional es saludable',
+                    messageText: 'Para cuidar este estado, elige una cosa y comprométete contigo.',
+                    steps: [
+                        { text: 'Repite hoy la misma acción que te hizo sentir bien.' },
+                    ],
+                    finalMessage: 'Consolida hábito emocional.',
+                    buttonText: 'Definir límite',
+                    buttonEmoji: '✔️',
+                },
+                {
+                    title: '¡Excelente! Tu estado emocional es saludable',
+                    messageText: 'Este es un buen momento para fortalecer tu estado emocional.',
+                    steps: [
+                        { text: 'Presiona tu pulgar con tu dedo índice durante 10 segundos.' },
+                        { text: 'Mientras lo haces, piensa: "Puedo volver a este estado cuando lo necesite."' },
+                    ],
+                    finalMessage: 'Este gesto será tu ancla emocional.',
+                    buttonText: 'Crea un ancla somática',
+                    buttonEmoji: '⚓',
+                },
+            ],
+            default: [
+                {
+                    title: '¡Excelente! Tu estado emocional es saludable',
+                    messageText: '¡Vas muy bien! 🌟 Tu bienestar emocional está en un gran nivel.',
+                    steps: [
+                        { text: 'Respira profundo y disfruta este momento.' },
+                    ],
+                    finalMessage: 'Sigue así y mantén tus buenos hábitos.',
+                    buttonText: 'Seguir con mis evaluaciones',
+                    buttonEmoji: '🌟',
+                },
+            ],
+        },
+
+        // ── NARANJA (emotional-load 50–69%) ────────────────────────────────
+        'emotional-load': {
+            neutral: [
+                {
+                    title: 'Estás en piloto automático',
+                    messageText: 'Hagamos un ajuste pequeño. Activación consciente (2 minutos).',
+                    steps: [
+                        { text: 'Endereza tu postura.' },
+                        { text: 'Inhala 3 segundos – exhala 5 segundos (5 veces).' },
+                        { text: 'Elige una sola tarea y enfócate solo en esa por 2 minutos.' },
+                    ],
+                    finalMessage: 'Pequeños ajustes cambian tu energía.',
+                    buttonText: 'Regular ahora',
+                    buttonEmoji: '🔄',
+                },
+                {
+                    title: 'Tu energía está estable, pero en modo automático',
+                    messageText: 'Cambio de postura (1 minuto). Tu cuerpo influye en tu mente.',
+                    steps: [
+                        { text: 'Endereza la espalda.' },
+                        { text: 'Apoya ambos pies firmes en el suelo.' },
+                        { text: 'Lleva hombros ligeramente hacia atrás.' },
+                        { text: 'Respira lento durante 60 segundos.' },
+                    ],
+                    finalMessage: 'Siente cómo cambia tu energía.',
+                    buttonText: 'Sentí el cambio',
+                    buttonEmoji: '✔️',
+                },
+                {
+                    title: 'Micro-reto de foco (2 minutos)',
+                    messageText: 'Vamos a recuperar claridad.',
+                    steps: [
+                        { text: 'Elige una sola tarea pequeña.' },
+                        { text: 'Activa un cronómetro de 2 minutos.' },
+                        { text: 'Haz únicamente esa tarea. Sin interrupciones.' },
+                    ],
+                    finalMessage: 'Cuando suene el tiempo, detente.',
+                    buttonText: 'Iniciar 2 minutos',
+                    buttonEmoji: '▶️',
+                },
+                {
+                    title: 'La dirección cambia la energía',
+                    messageText: 'Pregunta de intención (1 minuto).',
+                    steps: [
+                        { text: '¿Qué intención quiero ponerle a la próxima hora?' },
+                        { text: 'Elige una palabra: Enfoque. Calma. Claridad. Productividad. Presencia.' },
+                        { text: 'Repítela mentalmente 3 veces.' },
+                    ],
+                    finalMessage: '',
+                    buttonText: 'Definir intención',
+                    buttonEmoji: '🎯',
+                },
+                {
+                    title: 'Sal del piloto automático',
+                    messageText: 'Escaneo corporal rápido (1 minuto).',
+                    steps: [
+                        { text: 'Cierra los ojos si puedes.' },
+                        { text: 'Recorre mentalmente tu cuerpo: Frente — Mandíbula — Hombros — Pecho — Abdomen.' },
+                        { text: 'Si detectas tensión, suéltala.' },
+                    ],
+                    finalMessage: '',
+                    buttonText: 'Más consciente',
+                    buttonEmoji: '🧠',
+                },
+            ],
+            surprise: [
+                {
+                    title: 'Tu sistema está activado por algo inesperado',
+                    messageText: 'Exhalación prolongada para estabilizar (1–2 minutos).',
+                    steps: [
+                        { text: 'Inhala durante 4 segundos.' },
+                        { text: 'Exhala lentamente durante 8 segundos.' },
+                        { text: 'Repite 5 veces. La exhalación más larga que la inhalación.' },
+                    ],
+                    finalMessage: 'Este ejercicio baja activación simpática.',
+                    buttonText: 'Más estable',
+                    buttonEmoji: '✔️',
+                },
+                {
+                    title: 'Reorganiza tu ritmo interno',
+                    messageText: 'Movimiento lento (1 minuto).',
+                    steps: [
+                        { text: 'Ponte de pie.' },
+                        { text: 'Camina lentamente y más consciente durante 1 minuto.' },
+                        { text: 'Siente cada paso apoyarse en el suelo. No te apresures.' },
+                    ],
+                    finalMessage: 'Reorganiza ritmo fisiológico.',
+                    buttonText: 'Regulé mi ritmo',
+                    buttonEmoji: '✔️',
+                },
+                {
+                    title: 'Nombrar la emoción reduce su intensidad',
+                    messageText: 'Nombrar la emoción (30 segundos).',
+                    steps: [
+                        { text: 'Di internamente: "Estoy sorprendido, no en peligro."' },
+                        { text: 'Repite 3 veces.' },
+                    ],
+                    finalMessage: 'Disminuye reactividad límbica.',
+                    buttonText: 'Entendido',
+                    buttonEmoji: '✔️',
+                },
+                {
+                    title: 'Activa tu claridad mental',
+                    messageText: 'Chequeo de evidencia (1 minuto).',
+                    steps: [
+                        { text: '¿Qué datos reales tengo?' },
+                        { text: '¿Estoy interpretando o observando hechos?' },
+                        { text: '¿Necesito más información antes de actuar?' },
+                    ],
+                    finalMessage: 'Este ejercicio activa la corteza prefrontal.',
+                    buttonText: 'Más claridad',
+                    buttonEmoji: '💡',
+                },
+                {
+                    title: 'Antes de reaccionar, haz una pausa',
+                    messageText: 'Autoinstrucción breve (30 segundos).',
+                    steps: [
+                        { text: 'Repite: "Primero observo, luego reacciono."' },
+                        { text: 'Siente la pausa antes de cualquier respuesta.' },
+                    ],
+                    finalMessage: 'Este ejercicio reduce impulsividad.',
+                    buttonText: 'Pausa aplicada',
+                    buttonEmoji: '✔️',
+                },
+            ],
+            default: [
+                {
+                    title: 'Parece que hay algo de carga emocional',
+                    messageText: 'Está bien no estar al 100%. Te propongo una respiración 4-7-8 para soltar tensión.',
+                    steps: [
+                        { text: 'Inhala 4 segundos.' },
+                        { text: 'Sostén 7 segundos.' },
+                        { text: 'Exhala 8 segundos. Repite 3 veces.' },
+                    ],
+                    finalMessage: 'Tu cuerpo agradece este momento de pausa.',
+                    buttonText: 'Comenzar respiración',
+                    buttonEmoji: '�️',
+                },
+            ],
+        },
+
+        // ── ROJO (alert <50%) ───────────────────────────────────────────────
+        alert: {
+            anger: [
+                {
+                    title: 'Tu cuerpo está en alerta',
+                    messageText: 'Vamos a bajarle el ritmo juntos. Pausa guiada de 2 minutos para estabilizar tu mente.',
+                    steps: [
+                        { text: 'Respira profundo 4 segundos.' },
+                        { text: 'Exhala lento 6 segundos. Repite 5 veces.' },
+                        { text: 'Apoya ambos pies en el suelo y siente tu peso.' },
+                    ],
+                    finalMessage: 'Tu cuerpo empieza a calmarse con cada exhalación.',
+                    buttonText: 'Iniciar pausa guiada de 2 min',
+                    buttonEmoji: '🧘',
+                },
+            ],
+            sadness: [
+                {
+                    title: 'Tu cuerpo está en alerta',
+                    messageText: 'Tus emociones tienen sentido. Vamos a acompañarlas con un ejercicio suave.',
+                    steps: [
+                        { text: 'Pon una mano en tu pecho.' },
+                        { text: 'Respira lento: inhala 4s, exhala 6s. Repite 5 veces.' },
+                        { text: 'Di internamente: "Esta emoción pasará. Me cuido."' },
+                    ],
+                    finalMessage: 'Reconocer lo que sientes es el primer paso para cuidarte.',
+                    buttonText: 'Iniciar pausa guiada de 2 min',
+                    buttonEmoji: '🧘',
+                },
+            ],
+            fear: [
+                {
+                    title: 'Tu cuerpo está en alerta',
+                    messageText: 'Vamos a activar tu sistema de calma. Grounding rápido (2 minutos).',
+                    steps: [
+                        { text: 'Nombra 5 cosas que puedes VER ahora.' },
+                        { text: 'Nombra 4 cosas que puedes TOCAR.' },
+                        { text: 'Nombra 3 cosas que puedes OÍR.' },
+                        { text: 'Respira profundo 3 veces.' },
+                    ],
+                    finalMessage: 'Este ejercicio ancla tu mente al presente.',
+                    buttonText: 'Iniciar pausa guiada de 2 min',
+                    buttonEmoji: '🧘',
+                },
+            ],
+            default: [
+                {
+                    title: 'Tu cuerpo está en alerta',
+                    messageText: 'Vamos a bajarle el ritmo juntos. Haz una pausa guiada de 2 minutos para estabilizar tu mente.',
+                    steps: [
+                        { text: 'Respira profundo 4 segundos.' },
+                        { text: 'Exhala lento 6 segundos. Repite 5 veces.' },
+                    ],
+                    finalMessage: 'Tu bienestar es la prioridad.',
+                    buttonText: 'Iniciar pausa guiada de 2 min',
+                    buttonEmoji: '🧘',
+                },
+            ],
+        },
+    };
+
+    // ─── Estilos visuales por resultType ────────────────────────────────────
+    get resultVisual(): {
+        iconGradient: string;
+        containerBorder: string;
+        containerBackground: string;
+        buttonGradient: string;
+        titleColor: string;
+    } {
+        if (this.resultType === 'normal') {
             return {
                 iconGradient: 'linear-gradient(135deg, #34D399 0%, #10B981 100%)',
-                iconShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
-                title: '¡Excelente! Tu estado emocional es saludable',
-                titleSize: '20px',
-                titleLineHeight: '30px',
-                messageText: '¡Vas muy bien! 🌟 Tu bienestar emocional está en un gran nivel. Sigue así y mantén tus buenos hábitos.',
-                messageColor: '#364153',
-                messageSize: '14px',
-                messageLineHeight: '20px',
                 containerBorder: '#6EE7B7',
-                containerBorderWidth: '2px',
                 containerBackground: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 50%)',
-                containerPadding: '18px',
-                containerGap: '19.862px',
                 buttonGradient: 'linear-gradient(90deg, #34D399 0%, #10B981 100%)',
-                buttonShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
-                buttonText: 'Seguir con mis evaluaciones',
-                buttonIcon: 'icons/Icon.svg',
-                buttonEmoji: '🌟',
-                buttonFontSize: '14px',
-                buttonFontWeight: '600',
-                buttonLineHeight: '20px',
-                buttonPadding: '8.333px 20px 7.667px 20px'
+                titleColor: '#059669',
+            };
+        } else if (this.resultType === 'alert') {
+            return {
+                iconGradient: 'linear-gradient(135deg, #FF6467 0%, #E7000B 100%)',
+                containerBorder: '#FFA2A2',
+                containerBackground: 'linear-gradient(135deg, #FEF2F2 0%, #FEF2F2 50%)',
+                buttonGradient: 'linear-gradient(90deg, #FF6467 0%, #E7000B 100%)',
+                titleColor: '#DC2626',
             };
         } else {
             return {
                 iconGradient: 'linear-gradient(135deg, #FF8A00 0%, #FF6B00 100%)',
-                iconShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
-                title: 'Parece que hay algo de carga emocional',
-                titleSize: '18px',
-                titleLineHeight: '24px',
-                messageText: 'Está bien no estar al 100%. 🌬️ Te propongo una respiración 4-7-8 para soltar tensión.',
-                messageColor: '#364153',
-                messageSize: '14px',
-                messageLineHeight: '20px',
                 containerBorder: '#FFB366',
-                containerBorderWidth: '2px',
                 containerBackground: 'rgba(255, 228, 204, 0.35)',
-                containerPadding: '18px',
-                containerGap: '19.862px',
                 buttonGradient: 'linear-gradient(90deg, #FF8A00 0%, #FF6B00 100%)',
-                buttonShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -4px rgba(0, 0, 0, 0.10)',
-                buttonText: 'Comenzar respiración 4-7-8',
-                buttonIcon: 'icons/Icon.svg',
-                buttonEmoji: '🌬️',
-                buttonFontSize: '14px',
-                buttonFontWeight: '600',
-                buttonLineHeight: '20px',
-                buttonPadding: '8.333px 20px 7.667px 20px'
+                titleColor: '#D97706',
             };
         }
     }
@@ -165,29 +413,50 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
 
         // Verificar soporte de cámara
         if (!this._cameraService.isCameraSupported()) {
-            this.cameraError = 'Tu navegador no soporta acceso a la cámara';
+            this.cameraPermission = 'denied';
+            this.cameraErrorType = 'not-supported';
+            this.cameraError = 'Tu navegador no soporta acceso a la cámara. Usa Chrome, Firefox o Safari actualizado.';
             this.isAnalyzing = false;
             return;
         }
 
-        // Inicializar Face++ API (valida credenciales y prepara el canvas de captura)
-        this._faceDetector.loadModels().then(() => {
-        }).catch(() => {
+        // Consultar si ya hay permiso concedido previamente (solo en navegadores que soporten Permissions API)
+        // IMPORTANTE: esta promesa resuelve de forma asíncrona, DESPUÉS de ngAfterViewInit.
+        // Por eso, si el permiso ya estaba concedido, arrancamos la cámara directamente desde aquí.
+        if (typeof navigator !== 'undefined' && navigator.permissions) {
+            navigator.permissions.query({ name: 'camera' as PermissionName }).then((status) => {
+                if (status.state === 'granted') {
+                    // Ya tiene permiso — arrancar directo sin mostrar pantalla de solicitud.
+                    // ngAfterViewInit ya pasó, así que iniciamos aquí mismo.
+                    this.cameraPermission = 'granted';
+                    this._faceDetector.loadModels()
+                        .catch(() => {
+                            this.modelLoadError = 'No se pudieron cargar los modelos de análisis facial.';
+                        })
+                        .finally(() => {
+                            this.initializeCamera();
+                        });
+                } else if (status.state === 'denied') {
+                    this.cameraPermission = 'denied';
+                    this.cameraErrorType = 'permission-denied';
+                    this.cameraError = 'El permiso de cámara fue denegado anteriormente.';
+                    this.isAnalyzing = false;
+                }
+                // Si 'prompt' → se queda en 'prompt' y espera el botón del usuario
+            }).catch(() => {
+                // Permissions API no disponible (p.ej. Safari antiguo) — quedarse en 'prompt'
+            });
+        }
+
+        // Pre-cargar modelos en background (sin bloquear) para que estén listos cuando el usuario pulse el botón
+        this._faceDetector.loadModels().catch(() => {
             this.modelLoadError = 'No se pudieron cargar los modelos de análisis facial.';
         });
     }
 
     ngAfterViewInit(): void {
-        // Esperar a que loadModels() termine antes de arrancar la cámara
-        if (this._cameraService.isCameraSupported() && this.videoElement) {
-            this._faceDetector.loadModels()
-                .catch(() => {
-                    this.modelLoadError = 'No se pudieron cargar los modelos de análisis facial.';
-                })
-                .finally(() => {
-                    this.initializeCamera();
-                });
-        }
+        // No arrancar cámara automáticamente — la lógica de arranque está en ngOnInit
+        // para evitar la carrera entre la promesa de permissions y este hook.
     }
 
     ngOnDestroy(): void {
@@ -198,32 +467,48 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         const name: string | undefined = typeof anyErr?.name === 'string' ? anyErr.name : undefined;
         const message: string | undefined = typeof anyErr?.message === 'string' ? anyErr.message : undefined;
 
-        // Errores estándar de getUserMedia / MediaDevices
         if (name === 'NotFoundError' || name === 'OverconstrainedError') {
-            return 'No se encontró ninguna cámara en tu dispositivo.';
+            this.cameraErrorType = 'not-found';
+            return 'No encontramos una cámara en tu dispositivo. Verifica que esté conectada y que no esté desactivada.';
         }
         if (name === 'NotAllowedError' || name === 'SecurityError') {
-            return 'Permiso de cámara denegado. Por favor, permite el acceso a la cámara.';
+            this.cameraErrorType = 'permission-denied';
+            return 'Permiso de cámara denegado. Toca el ícono de cámara en la barra de dirección de tu navegador y selecciona "Permitir".';
         }
-        if (name === 'NotReadableError') {
-            return 'La cámara está siendo utilizada por otra aplicación.';
+        if (name === 'NotReadableError' || name === 'TrackStartError') {
+            this.cameraErrorType = 'in-use';
+            return 'La cámara está siendo usada por otra aplicación. Cierra videollamadas, Zoom, Teams u otras apps y vuelve a intentarlo.';
         }
-
-        // Mensajes lanzados manualmente (HTTPS/localhost, soporte, etc.)
+        if (message?.toLowerCase().includes('https') || message?.toLowerCase().includes('secure')) {
+            this.cameraErrorType = 'https-required';
+            return 'Para usar la cámara se requiere una conexión segura (HTTPS). Accede a la app por HTTPS.';
+        }
         if (message && message.trim().length > 0) {
+            this.cameraErrorType = 'generic';
             return message;
         }
 
-        return 'No se pudo acceder a la cámara.';
+        this.cameraErrorType = 'generic';
+        return 'No pudimos acceder a la cámara. Verifica los permisos e inténtalo de nuevo.';
     }
 
     /**
-     * Inicializa la cámara y comienza el análisis
+     * Pide permiso de cámara al usuario y arranca el análisis.
+     * Llamado desde el botón "Permitir acceso a cámara" o automáticamente si ya hay permiso.
      */
     async initializeCamera(): Promise<void> {
+        this.cameraPermission = 'requesting';
+        this.cameraError = '';
+        this.cameraErrorType = null;
+
         try {
-            const videoEl = this.videoElement.nativeElement;
+            const videoEl = this.videoElement?.nativeElement;
+            if (!videoEl) {
+                throw new Error('El elemento de video no está disponible.');
+            }
             await this._cameraService.startCamera(videoEl);
+
+            this.cameraPermission = 'granted';
 
             if (!this.analysisStarted) {
                 this.analysisStarted = true;
@@ -232,8 +517,26 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
 
         } catch (error) {
             this.cameraError = this.getCameraErrorMessage(error);
+            this.cameraPermission = 'denied';
             this.isAnalyzing = false;
         }
+    }
+
+    /**
+     * Botón "Permitir acceso a cámara" — lanza el flujo completo desde cero.
+     * CRÍTICO para iOS/Safari: getUserMedia DEBE ser llamado de forma síncrona
+     * dentro del mismo event handler del gesto del usuario (click).
+     * Por eso llamamos initializeCamera() PRIMERO sin await, y los modelos
+     * se pre-cargan en parallel. Si los modelos aún no están listos cuando
+     * el análisis arranca, startAnalysis() ya tiene el retry de hasta 10 veces.
+     */
+    requestCameraPermission(): void {
+        // Arrancar cámara INMEDIATAMENTE (en el mismo tick del click — iOS/Safari requirement)
+        this.initializeCamera();
+        // Modelos: ya se pre-cargaron en ngOnInit en background, esto es seguro en parallel
+        this._faceDetector.loadModels().catch(() => {
+            this.modelLoadError = 'No se pudieron cargar los modelos de análisis facial.';
+        });
     }
 
     /**
@@ -461,16 +764,30 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                 next: (result) => {
                     this.analysisResult = result;
 
-                    const fatigueThreshold = 0.75;
+                    // El backend ya aplica scores correctos por emoción (ajustes verificados 05-mar-2026).
+                    // Confiamos directamente en el estado calculado por evaluateEmotionalState()
+                    // sin ninguna mitigación especial por emoción positiva.
                     const state = this._emotionalAnalysisService.evaluateEmotionalState(result);
+                    const fatigueThreshold = 0.75;
+
                     const isRed =
                         result.alertCreated === true ||
                         (typeof result.fatigueScore === 'number' && result.fatigueScore >= fatigueThreshold) ||
                         state === 'critical';
-                    this.resultType = isRed ? 'alert' : (state === 'normal' ? 'normal' : 'emotional-load');
 
-                    // Si el backend no creó la alerta pero el estado es crítico o de alerta,
-                    // la creamos manualmente desde el frontend.
+                    let resolvedType: 'normal' | 'emotional-load' | 'alert';
+                    if (isRed) {
+                        resolvedType = 'alert';
+                    } else if (state === 'normal') {
+                        resolvedType = 'normal';
+                    } else {
+                        resolvedType = 'emotional-load';
+                    }
+
+                    this.resultType = resolvedType;
+                    this.dynamicContent = this.buildDynamicContent(this.resultType, result.dominantEmotion ?? '');
+
+                    // Crear alerta manual solo si el backend no la creó y el estado es crítico/alerta.
                     if (!result.alertCreated && (state === 'critical' || state === 'alert')) {
                         const severity = state === 'critical' ? 'HIGH' : 'MEDIUM';
                         const avg = Math.round(
@@ -564,6 +881,7 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
      */
     retryCamera(): void {
         this.cameraError = '';
+        this.cameraErrorType = null;
         this.analysisError = '';
         this.detections = [];
         this.analysisStarted = false;
@@ -576,8 +894,13 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         });
         // Liberar stream previo antes de reintentar
         this._cameraService.stopCamera();
+        // Si el error fue permiso denegado, volver a pantalla de solicitud
+        if (this.cameraPermission === 'denied') {
+            this.cameraPermission = 'prompt';
+            return;
+        }
         if (this.videoElement?.nativeElement) {
-            this.initializeCamera();
+            this.requestCameraPermission();
         }
     }
 
@@ -594,6 +917,49 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     startGuidedPause(): void {
         this.cleanup();
         this._router.navigate(['/resources']);
+    }
+
+    /**
+     * Selecciona el contenido dinámico según resultType + dominantEmotion.
+     * Elige aleatoriamente una variante de la lista disponible.
+     */
+    buildDynamicContent(
+        resultType: 'normal' | 'emotional-load' | 'alert',
+        dominantEmotion: string
+    ): typeof this.dynamicContent {
+        const typeKey = resultType === 'emotional-load' ? 'emotional-load' : resultType;
+        const bank = this.CONTENT_LIBRARY[typeKey];
+        if (!bank) return null;
+
+        // Normalizar nombre de emoción del backend → clave interna
+        const emotionMap: Record<string, string> = {
+            happiness: 'happiness', happy: 'happiness',
+            neutral: 'neutral',
+            surprise: 'surprise', surprised: 'surprise',
+            anger: 'anger', angry: 'anger',
+            sadness: 'sadness', sad: 'sadness',
+            fear: 'fear', fearful: 'fear',
+            contempt: 'default', disgust: 'default', disgusted: 'default',
+        };
+        const key = emotionMap[dominantEmotion?.toLowerCase()] ?? 'default';
+        const variants = bank[key] ?? bank['default'] ?? [];
+        if (variants.length === 0) return null;
+
+        const variant = variants[Math.floor(Math.random() * variants.length)];
+        const visual = this.resultVisual;
+
+        return {
+            title: variant.title,
+            iconGradient: visual.iconGradient,
+            containerBorder: visual.containerBorder,
+            containerBackground: visual.containerBackground,
+            buttonGradient: visual.buttonGradient,
+            messageText: variant.messageText,
+            steps: variant.steps,
+            finalMessage: variant.finalMessage,
+            buttonText: variant.buttonText,
+            buttonEmoji: variant.buttonEmoji,
+        };
     }
 
     /**

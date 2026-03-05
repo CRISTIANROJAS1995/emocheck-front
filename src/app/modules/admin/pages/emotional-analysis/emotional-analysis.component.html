@@ -11,8 +11,169 @@
     <div class="blur-circle-green pointer-events-none absolute left-[100px] top-[120px] h-[128px] w-[128px] rounded-full">
     </div>
 
-    <!-- Analysis Screen -->
-    <div *ngIf="!showResults" class="w-full max-w-[768px]">
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 0-A: Solicitud de permiso de cámara (antes de pedir)    -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="!showResults && cameraPermission === 'prompt'" class="w-full max-w-[480px]">
+        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#CBFBF1] px-8 py-10 text-center">
+
+            <!-- Icono cámara -->
+            <div class="flex h-[72px] w-[72px] items-center justify-center rounded-[20px]" style="background: linear-gradient(135deg, #00BBA7 0%, #155DFC 100%); box-shadow: 0 10px 20px -4px rgba(0,187,167,.35);">
+                <svg class="h-9 w-9 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <h2 class="text-[20px] font-bold leading-[28px] text-[#155DFC]" style="font-family: Montserrat;">
+                    Necesitamos acceso a tu cámara
+                </h2>
+                <p class="text-[14px] leading-[21px] text-[#475569]" style="font-family: Montserrat;">
+                    El análisis emocional usa tu cámara <strong>únicamente durante la sesión</strong>. No guardamos ni enviamos tus imágenes — solo los datos de expresión.
+                </p>
+            </div>
+
+            <!-- Lista de garantías -->
+            <ul class="w-full flex flex-col gap-3 text-left">
+                <li class="flex items-start gap-3">
+                    <span class="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#ECFDF5] text-[13px]">🔒</span>
+                    <span class="text-[13px] leading-[19px] text-[#334155]" style="font-family: Montserrat;"><strong>Privado:</strong> Tu video nunca sale del dispositivo. Solo enviamos datos numéricos al servidor.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#ECFDF5] text-[13px]">⏱️</span>
+                    <span class="text-[13px] leading-[19px] text-[#334155]" style="font-family: Montserrat;"><strong>Temporal:</strong> La cámara se apaga automáticamente al terminar el análisis (≈20 segundos).</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#ECFDF5] text-[13px]">🚫</span>
+                    <span class="text-[13px] leading-[19px] text-[#334155]" style="font-family: Montserrat;"><strong>Sin grabación:</strong> No tomamos fotos ni videos. Solo analizamos expresiones en tiempo real.</span>
+                </li>
+            </ul>
+
+            <!-- Botón principal -->
+            <button type="button" (click)="requestCameraPermission()" class="mt-2 w-full rounded-[10px] py-3 px-6 text-[15px] font-bold text-white transition-all hover:brightness-90" style="background: linear-gradient(90deg, #00BBA7 0%, #155DFC 100%); font-family: Montserrat;">
+                📷 &nbsp; Permitir acceso a cámara
+            </button>
+
+            <!-- Saltar -->
+            <button type="button" (click)="skipAnalysis()" class="w-full rounded-[8px] border border-[#D1D5DC] bg-white py-2.5 px-6 text-[13px] font-medium text-[#64748b] transition hover:border-[#94a3b8] hover:text-[#334155]" style="font-family: Montserrat;">
+                Saltar análisis
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 0-B: Esperando que el usuario acepte el diálogo         -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="!showResults && cameraPermission === 'requesting'" class="w-full max-w-[480px]">
+        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#CBFBF1] px-8 py-10 text-center">
+            <div class="flex h-[72px] w-[72px] items-center justify-center rounded-[20px]" style="background: linear-gradient(135deg, #00BBA7 0%, #155DFC 100%);">
+                <!-- Spinner animado -->
+                <svg class="h-9 w-9 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+            </div>
+            <h2 class="text-[18px] font-bold text-[#155DFC]" style="font-family: Montserrat;">Esperando permiso...</h2>
+            <p class="text-[13px] leading-[20px] text-[#64748b]" style="font-family: Montserrat;">
+                Tu navegador mostrará un <strong>diálogo de permiso</strong>.<br/> Toca <strong>"Permitir"</strong> o <strong>"Allow"</strong> para continuar.
+            </p>
+            <!-- Guía visual por plataforma -->
+            <div class="w-full rounded-[12px] border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-left">
+                <p class="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#94A3B8]">¿No aparece el diálogo?</p>
+                <ul class="flex flex-col gap-1.5">
+                    <li class="flex items-start gap-2 text-[12px] text-[#475569]"><span>📱</span><span><strong>iPhone/Safari:</strong> Ve a Ajustes → Safari → Cámara → Permitir</span></li>
+                    <li class="flex items-start gap-2 text-[12px] text-[#475569]"><span>🤖</span><span><strong>Android/Chrome:</strong> Toca el ícono 🔒 en la barra de dirección → Permisos → Cámara</span></li>
+                    <li class="flex items-start gap-2 text-[12px] text-[#475569]"><span>💻</span><span><strong>Escritorio:</strong> Toca el ícono 🎥 junto a la URL → Permitir siempre</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- PANTALLA 0-C: Permiso denegado / error de cámara                 -->
+    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <div *ngIf="!showResults && cameraPermission === 'denied'" class="w-full max-w-[480px]">
+        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#FCA5A5] bg-[#FFF8F8] px-8 py-10 text-center">
+
+            <!-- Icono de error -->
+            <div class="flex h-[72px] w-[72px] items-center justify-center rounded-[20px] bg-[#FEE2E2]">
+                <svg class="h-9 w-9 text-[#EF4444]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                    <line x1="3" y1="3" x2="21" y2="21" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+
+            <!-- Título y mensaje según tipo de error -->
+            <div class="flex flex-col gap-2">
+                <h2 class="text-[18px] font-bold text-[#DC2626]" style="font-family: Montserrat;">
+                    <ng-container [ngSwitch]="cameraErrorType">
+                        <span *ngSwitchCase="'permission-denied'">Permiso denegado</span>
+                        <span *ngSwitchCase="'in-use'">Cámara ocupada</span>
+                        <span *ngSwitchCase="'not-found'">Cámara no encontrada</span>
+                        <span *ngSwitchCase="'not-supported'">Navegador no compatible</span>
+                        <span *ngSwitchCase="'https-required'">Conexión no segura</span>
+                        <span *ngSwitchDefault>Error de cámara</span>
+                    </ng-container>
+                </h2>
+                <p class="text-[14px] leading-[21px] text-[#7F1D1D]" style="font-family: Montserrat;">{{ cameraError }}</p>
+            </div>
+
+            <!-- Instrucciones específicas por tipo -->
+            <div class="w-full rounded-[12px] border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-left">
+                <ng-container [ngSwitch]="cameraErrorType">
+
+                    <ng-container *ngSwitchCase="'permission-denied'">
+                        <p class="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#EF4444]">Cómo volver a habilitarla</p>
+                        <ul class="flex flex-col gap-2">
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>📱</span><span><strong>iPhone/Safari:</strong> Ajustes del iPhone → Safari → Cámara → Permitir</span></li>
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>🤖</span><span><strong>Android/Chrome:</strong> Toca 🔒 junto a la URL → Permisos del sitio → Cámara → Permitir</span></li>
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>💻</span><span><strong>Escritorio:</strong> Toca 🎥 junto a la URL → Permitir siempre → Recarga la página</span></li>
+                        </ul>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'in-use'">
+                        <p class="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#EF4444]">Qué hacer</p>
+                        <ul class="flex flex-col gap-2">
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>📵</span><span>Cierra <strong>videollamadas activas</strong> (Zoom, Meet, Teams, FaceTime)</span></li>
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>🔄</span><span>Cierra <strong>otras pestañas</strong> del navegador que usen cámara</span></li>
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>⏳</span><span>Espera unos segundos y vuelve a intentarlo</span></li>
+                        </ul>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'not-found'">
+                        <p class="mb-2 text-[11px] font-bold uppercase tracking-wide text-[#EF4444]">Posibles causas</p>
+                        <ul class="flex flex-col gap-2">
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>🔌</span><span>Si usas cámara externa, verifica que esté <strong>conectada y encendida</strong></span></li>
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>🔒</span><span>En algunos dispositivos la cámara puede estar <strong>desactivada por política de empresa</strong></span></li>
+                            <li class="flex items-start gap-2 text-[12px] text-[#7F1D1D]"><span>📱</span><span>En móvil, prueba con <strong>Chrome o Safari actualizado</strong></span></li>
+                        </ul>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'https-required'">
+                        <p class="text-[12px] text-[#7F1D1D]">Los navegadores modernos solo permiten acceso a la cámara en sitios con <strong>HTTPS</strong>. Contacta al administrador de la plataforma.</p>
+                    </ng-container>
+
+                    <ng-container *ngSwitchDefault>
+                        <p class="text-[12px] text-[#7F1D1D]">Recarga la página e inténtalo de nuevo. Si el problema persiste, prueba con otro navegador.</p>
+                    </ng-container>
+
+                </ng-container>
+            </div>
+
+            <!-- Botones -->
+            <button *ngIf="cameraErrorType !== 'not-supported' && cameraErrorType !== 'https-required'" type="button" (click)="retryCamera()" class="w-full rounded-[10px] py-3 px-6 text-[14px] font-bold text-white transition hover:brightness-90" style="background: linear-gradient(90deg, #EF4444 0%, #DC2626 100%); font-family: Montserrat;">
+                🔄 &nbsp; Intentar de nuevo
+            </button>
+            <button type="button" (click)="skipAnalysis()" class="w-full rounded-[8px] border border-[#FCA5A5] bg-white py-2.5 px-6 text-[13px] font-medium text-[#DC2626] transition hover:bg-[#FEF2F2]" style="font-family: Montserrat;">
+                Saltar análisis y continuar
+            </button>
+        </div>
+    </div>
+
+    <!-- Analysis Screen (cámara activa) -->
+    <!-- Usamos [hidden] en lugar de *ngIf para que el <video> siempre esté en el DOM
+         y el ViewChild sea accesible antes de que la cámara arranque. -->
+    <div [hidden]="showResults || (cameraPermission !== 'granted' && cameraPermission !== 'requesting')" class="w-full max-w-[768px]">
         <div class="analysis-card flex flex-col items-start gap-4 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
 
             <div class="flex w-full flex-col items-center text-center">
@@ -23,12 +184,12 @@
 
                 <!-- Title -->
                 <h2 class="text-montserrat-bold mt-6 text-center text-[16px] leading-[24px] text-[#155DFC]">
-                    {{ cameraError ? 'Cámara no encontrada' : 'Registro emocional en progreso' }}
+                    Registro emocional en progreso
                 </h2>
 
                 <!-- Subtitle -->
                 <p class="text-montserrat-semibold mt-2 text-center text-[14px] leading-[20px] text-[#009689]">
-                    {{ cameraError ? 'Cierra otras apps que usen la cámara e inténtalo de nuevo.' : 'Sigue las instrucciones en pantalla' }}
+                    Sigue las instrucciones en pantalla
                 </p>
 
                 <!-- Progress -->
@@ -46,25 +207,8 @@
 
                 <!-- Camera Preview -->
                 <div class="mt-6 w-full flex justify-center">
-                    <div class="video-container relative w-full max-w-[560px] overflow-hidden rounded-[16px] border-4 border-[#00BBA7] flex items-center justify-center" [style.min-height]="cameraError ? '220px' : '0'">
-                        <video #videoElement autoplay playsinline class="video-flipped" [class.hidden]="cameraError"></video>
-
-                        <!-- Overlay solo para errores de cámara (hardware/permisos) -->
-                        <div *ngIf="cameraError" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900 px-4">
-                            <svg class="h-10 w-10 text-[#00BBA7]" viewBox="0 0 24 24" fill="none" stroke="#00BBA7" stroke-width="1.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-                                <line x1="3" y1="3" x2="21" y2="21" stroke="#00BBA7" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                            <p class="text-montserrat text-center text-sm text-white px-4">
-                                {{ cameraError }}
-                            </p>
-                            <button type="button" (click)="retryCamera()" class="mt-1 flex items-center gap-2 rounded-[8px] bg-[#00BBA7] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#00a393]">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                                </svg>
-                                Reintentar
-                            </button>
-                        </div>
+                    <div class="video-container relative w-full max-w-[560px] overflow-hidden rounded-[16px] border-4 border-[#00BBA7]">
+                        <video #videoElement autoplay playsinline class="video-flipped"></video>
                     </div>
                 </div>
 
@@ -156,48 +300,58 @@
     </div>
 
     <!-- Results Screen -->
-    <div *ngIf="showResults" class="w-full max-w-[672px]">
+    <div *ngIf="showResults && dynamicContent" class="w-full max-w-[672px]">
         <div class="analysis-card flex flex-col gap-6 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
 
             <div class="flex flex-col items-center text-center">
-                <!-- Heart Icon (Dynamic) -->
-                <div class="flex h-[64px] w-[64px] items-center justify-center rounded-[16px]" [style.background]="resultConfig.iconGradient" [style.box-shadow]="resultConfig.iconShadow">
+                <!-- Icon (Dynamic) -->
+                <div class="flex h-[64px] w-[64px] items-center justify-center rounded-[16px]" [style.background]="dynamicContent.iconGradient" style="box-shadow: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10);">
                     <img src="icons/instrucciones-emocional.svg" alt="Heart" class="h-[36px] w-[36px]" />
                 </div>
 
                 <!-- Title (Dynamic) -->
-                <h2 class="mt-6 text-center font-bold text-[#155DFC]" [style.font-size]="resultConfig.titleSize" [style.line-height]="resultConfig.titleLineHeight" style="font-family: Montserrat; font-weight: 700;">{{ resultConfig.title }}</h2>
+                <h2 class="mt-6 text-center font-bold text-[20px] leading-[30px]" [style.color]="resultVisual.titleColor" style="font-family: Montserrat; font-weight: 700;">
+                    {{ dynamicContent.title }}
+                </h2>
 
-                <!-- Breathing Container (Dynamic) -->
-                <div class="mt-6 w-full rounded-[16px] flex flex-col items-center" [style.border]="resultConfig.containerBorderWidth + ' solid ' + resultConfig.containerBorder" [style.background]="resultConfig.containerBackground" [style.padding]="resultConfig.containerPadding"
-                    [style.gap]="resultConfig.containerGap">
-                    <p class="w-full text-center" [style.color]="resultConfig.messageColor" [style.font-size]="resultConfig.messageSize" [style.line-height]="resultConfig.messageLineHeight" style="font-family: Montserrat; font-weight: 400;">
-                        {{ resultConfig.messageText }}
+                <!-- Exercise Container (Dynamic) -->
+                <div class="mt-6 w-full rounded-[16px] flex flex-col items-start text-left gap-3" [style.border]="'2px solid ' + dynamicContent.containerBorder" [style.background]="dynamicContent.containerBackground" style="padding: 18px;">
+
+                    <!-- Message -->
+                    <p class="w-full text-[14px] leading-[20px] text-[#364153] font-semibold" style="font-family: Montserrat;">
+                        {{ dynamicContent.messageText }}
                     </p>
 
-                    <!-- Button (Dynamic) -->
-                    <button type="button" (click)="startGuidedPause()" class="w-full rounded-[8px] text-white transition-all hover:brightness-90 flex items-center justify-center gap-2 whitespace-nowrap" [style.background]="resultConfig.buttonGradient" [style.box-shadow]="resultConfig.buttonShadow"
-                        [style.font-size]="resultConfig.buttonFontSize" [style.font-weight]="resultConfig.buttonFontWeight" [style.line-height]="resultConfig.buttonLineHeight" [style.padding]="resultConfig.buttonPadding" style="font-family: Montserrat;">
-                        <span>{{ resultConfig.buttonEmoji }}</span>
-                        <span>{{ resultConfig.buttonText }}</span>
-                        <img [src]="resultConfig.buttonIcon" alt="" class="h-4 w-4"
-                            style="filter: brightness(0) invert(1);" />
+                    <!-- Steps list -->
+                    <ul class="w-full flex flex-col gap-2 pl-1">
+                        <li *ngFor="let step of dynamicContent.steps" class="flex items-start gap-2 text-[13px] leading-[19px] text-[#364153]" style="font-family: Montserrat;">
+                            <span class="mt-0.5 flex-shrink-0 text-[15px]">{{ step.emoji ?? '•' }}</span>
+                            <span>{{ step.text }}</span>
+                        </li>
+                    </ul>
+
+                    <!-- Final message -->
+                    <p *ngIf="dynamicContent.finalMessage" class="w-full text-[12px] leading-[17px] text-[#475569] italic" style="font-family: Montserrat;">
+                        {{ dynamicContent.finalMessage }}
+                    </p>
+
+                    <!-- Action Button (Dynamic) -->
+                    <button type="button" (click)="startGuidedPause()" class="mt-1 w-full rounded-[8px] text-white transition-all hover:brightness-90 flex items-center justify-center gap-2" [style.background]="dynamicContent.buttonGradient" style="box-shadow: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10); font-family: Montserrat; font-size: 14px; font-weight: 600; line-height: 20px; padding: 10px 20px;">
+                        <span>{{ dynamicContent.buttonEmoji }}</span>
+                        <span>{{ dynamicContent.buttonText }}</span>
                     </button>
                 </div>
 
                 <!-- Summary -->
                 <div class="mt-3 w-full rounded-[16px] flex flex-col" style="border: 0.667px solid #D8F999; background: linear-gradient(135deg, #F7FEE7 0%, #F0FDFA 10%); padding: 16px 40px 12px 40px; gap: 8px;">
                     <h3 class="text-center text-[#00786F]" style="font-family: Montserrat; font-size: 12px; font-weight: 700; line-height: 16px;">Resumen de Análisis Emocional</h3>
-
-                    <div class="flex items-center justify-between ">
+                    <div class="flex items-center justify-between">
                         <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center gap-2">
-                            <div class="flex h-[32px] w-[32px]  items-center justify-center" [style.background]="getStepColor(i)" style="border-radius: 10px;">
+                            <div class="flex h-[32px] w-[32px] items-center justify-center" [style.background]="getStepColor(i)" style="border-radius: 10px;">
                                 <img [src]="getStepIcon(step.id)" [alt]="step.name" class="h-4 w-4" />
                             </div>
-                            <span class="text-center" style="font-family: Montserrat; font-size: 9px; font-weight: 400; line-height: 13.5px; color: #4A5565;">{{
-                                step.name }}</span>
-                            <span class="text-center" style="font-family: Montserrat; font-size: 9px; font-weight: 700; line-height: 13.5px; color: #00786F;">{{
-                                step.percentage }}%</span>
+                            <span class="text-center" style="font-family: Montserrat; font-size: 9px; font-weight: 400; line-height: 13.5px; color: #4A5565;">{{ step.name }}</span>
+                            <span class="text-center" style="font-family: Montserrat; font-size: 9px; font-weight: 700; line-height: 13.5px; color: #00786F;">{{ step.percentage }}%</span>
                         </div>
                     </div>
                 </div>
@@ -214,8 +368,7 @@
 
                 <!-- Go to Evaluations Button -->
                 <button type="button" (click)="goToEvaluations()" class="mt-6 h-[38px] w-full rounded-[8px] px-5 text-[15px] font-bold leading-[22px] text-white shadow-lg transition-all hover:brightness-90" style="background: linear-gradient(90deg, #00BBA7 0%, #155DFC 100%); font-family: Montserrat; font-weight: 700;">
-                    Ir a mis evaluaciones
-                    <span class="ml-2">→</span>
+                    Ir a mis evaluaciones <span class="ml-2">→</span>
                 </button>
 
                 <!-- Privacy Notice -->
