@@ -5,13 +5,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AssessmentService, InstrumentDescriptor, RichAnswer } from 'app/core/services/assessment.service';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
+import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
 import { AssessmentModuleId } from 'app/core/models/assessment.model';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
 import { AuthService } from 'app/core/services/auth.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { EmoQuestionnaireComponent, QuestionnaireConfig } from 'app/shared/components/questionnaire';
-import { finalize, take } from 'rxjs';
+import { finalize, forkJoin, take } from 'rxjs';
 
 // ── Paleta de colores para instrumentos sin metadato explícito ───────────────
 const FALLBACK_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444'];
@@ -340,6 +341,7 @@ export class InstrumentSelectorComponent implements OnInit {
         private readonly router: Router,
         private readonly assessmentService: AssessmentService,
         private readonly assessmentState: AssessmentStateService,
+        private readonly hydration: AssessmentHydrationService,
         private readonly alert: AlertService,
         private readonly authService: AuthService,
     ) {}
@@ -361,15 +363,24 @@ export class InstrumentSelectorComponent implements OnInit {
         // Show welcome modal every time the module page loads
         this.showWelcomeModal = true;
 
-        this.assessmentService.getModuleInstruments(this.moduleId).subscribe({
-            next: (descriptors) => {
-                // Códigos de instrumentos ya presentados (del estado local)
-                const completedResult = this.assessmentState.getResult(this.moduleId);
-                const completedCodes = new Set(
-                    (completedResult?.dimensions ?? [])
-                        .map(d => (d.instrumentCode ?? '').toUpperCase().trim())
-                        .filter(Boolean)
-                );
+        // Always hydrate from the backend first so that completed instruments are
+        // correctly disabled even on a fresh session (state not yet in memory).
+        // getCompletedInstrumentCodes() uses both the direct `instrumentCode` field
+        // (for simple instruments like BAI, BDI) and dimensionScores (for sub-scale
+        // instruments like DASS-21) so no instrument is ever missed.
+        forkJoin({
+            completedCodes: this.hydration.getCompletedInstrumentCodes(this.moduleId),
+            descriptors: this.assessmentService.getModuleInstruments(this.moduleId),
+        }).subscribe({
+            next: ({ completedCodes, descriptors }) => {
+                // completedCodes contains both exact codes (e.g. "BAI") and sub-scale
+                // codes (e.g. "DASS21_ANXIETY"). Match by exact code OR by prefix so
+                // that DASS21 is marked completed when DASS21_* dimensions exist.
+                const isCompleted = (code: string): boolean => {
+                    const upper = code.toUpperCase();
+                    return completedCodes.has(upper) ||
+                        [...completedCodes].some(dc => dc.startsWith(upper + '_'));
+                };
 
                 this.instruments = descriptors.map((d, i) => {
                     const meta = INSTRUMENT_META[d.code];
@@ -379,7 +390,7 @@ export class InstrumentSelectorComponent implements OnInit {
                         description: d.backendDescription || meta?.description || '',
                         icon:  meta?.icon  ?? this.moduleDef.icon,
                         color: meta?.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
-                        completed: completedCodes.has(d.code.toUpperCase()),
+                        completed: isCompleted(d.code),
                     };
                 });
             },
@@ -511,7 +522,15 @@ export class InstrumentSelectorComponent implements OnInit {
         ).subscribe({
             next: (result) => {
                 this.assessmentState.mergeResult(result);
-                this.router.navigate([`/${this.moduleId}/results`]);
+                // Multi-instrument modules go to the instrument picker page so the
+                // user can select which individual result to review.
+                // Single-instrument modules go straight to the results page.
+                const multiInstrumentModules: string[] = ['mental-health'];
+                if (multiInstrumentModules.includes(this.moduleId)) {
+                    this.router.navigate([`/${this.moduleId}/instrument-results`]);
+                } else {
+                    this.router.navigate([`/${this.moduleId}/results`]);
+                }
             },
             error: (e) => {
                 if (e?.code === 'CONSENT_REQUIRED') {
@@ -523,6 +542,20 @@ export class InstrumentSelectorComponent implements OnInit {
                     ).then((go) => {
                         if (go) this.router.navigate(['/informed-consent']);
                     });
+                    return;
+                }
+                if (e?.code === 'ALREADY_COMPLETED') {
+                    this.alert.info(
+                        'Este instrumento ya fue completado. Cada instrumento solo puede presentarse una vez.',
+                        'Instrumento ya completado',
+                    );
+                    // Redirect to results so the user can review their outcome
+                    const multiInstrumentModules: string[] = ['mental-health'];
+                    if (multiInstrumentModules.includes(this.moduleId)) {
+                        this.router.navigate([`/${this.moduleId}/instrument-results`]);
+                    } else {
+                        this.router.navigate([`/${this.moduleId}/results`]);
+                    }
                     return;
                 }
                 const msg = e?.error?.detail || e?.error?.title || e?.message || 'No fue posible completar la evaluación';

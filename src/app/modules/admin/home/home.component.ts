@@ -192,9 +192,14 @@ export class HomeComponent implements OnInit {
     }
 
     viewPlan(moduleId: string): void {
-        // Navigate to the results page of the completed module.
-        // The results page (/{moduleId}/results) will hydrate the last result from the backend.
-        this.router.navigate([`/${moduleId}/results`]);
+        // Multi-instrument modules show the instrument picker first so the user
+        // can choose which individual result to review.
+        const multiInstrumentModules = ['mental-health'];
+        if (multiInstrumentModules.includes(moduleId)) {
+            this.router.navigate([`/${moduleId}/instrument-results`]);
+        } else {
+            this.router.navigate([`/${moduleId}/results`]);
+        }
     }
 
     navigateToResource(resourceId: string): void {

@@ -1,0 +1,351 @@
+// ─── Host ────────────────────────────────────────────────────────────────────
+:host {
+    display: block;
+    width: 100%;
+}
+
+// ─── Page wrapper ────────────────────────────────────────────────────────────
+.ir-page {
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+:host ::ng-deep app-background-circles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+// ─── Contenedor centrado ─────────────────────────────────────────────────────
+.ir-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 32px 56px;
+    position: relative;
+    z-index: 1;
+    @media (max-width: 560px) {
+        padding: 20px 16px 40px;
+    }
+}
+
+// ─── Hero banner ─────────────────────────────────────────────────────────────
+.ir-hero {
+    width: 100%;
+    max-width: 1170px;
+    margin: 0 auto 32px;
+    border-radius: 16px;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, .10), 0 8px 10px -6px rgba(0, 0, 0, .10);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    box-sizing: border-box;
+    &::before {
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: -12px;
+        width: 200px;
+        height: 160px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .06);
+        pointer-events: none;
+    }
+    @media (max-width: 560px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        padding: 16px 18px;
+    }
+}
+
+.ir-hero__left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ir-hero__title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ir-hero__icon {
+    width: 22px;
+    height: 22px;
+}
+
+.ir-hero__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
+    @media (max-width: 560px) {
+        font-size: 18px;
+    }
+}
+
+.ir-hero__subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, .82);
+    margin: 0;
+    padding-left: 32px;
+    @media (max-width: 560px) {
+        padding-left: 0;
+        font-size: 12px;
+    }
+}
+
+.ir-hero__back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, .35);
+    border-radius: 10px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    background: transparent;
+    &:hover {
+        background: rgba(255, 255, 255, .12);
+    }
+    @media (max-width: 560px) {
+        align-self: flex-start;
+    }
+}
+
+.ir-hero__back-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+// ─── Título de sección ────────────────────────────────────────────────────────
+.ir-section-title {
+    max-width: 1170px;
+    margin: 0 auto 24px;
+    h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 4px;
+    }
+    p {
+        font-size: 13.5px;
+        color: #64748b;
+        margin: 0;
+    }
+}
+
+// ─── Loading / Error ──────────────────────────────────────────────────────────
+.ir-loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 1170px;
+    margin: 0 auto;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.ir-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: ir-spin 0.75s linear infinite;
+    flex-shrink: 0;
+    display: block;
+}
+
+.ir-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 1170px;
+    margin: 0 auto;
+    padding: 14px 18px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    color: #dc2626;
+    font-size: 13px;
+}
+
+// ─── Grid ─────────────────────────────────────────────────────────────────────
+.ir-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1170px;
+    margin: 0 auto;
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    @media (max-width: 560px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+.ir-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: #fff;
+    border: 1.5px solid #e8edf4;
+    border-radius: 16px;
+    padding: 0 0 24px;
+    overflow: hidden;
+    cursor: pointer;
+    text-align: left;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+    &:hover:not(:disabled) {
+        border-color: #c7d2fe;
+        box-shadow: 0 10px 32px rgba(37, 99, 235, .10);
+        transform: translateY(-3px);
+    }
+    &:focus-visible {
+        outline: 2px solid #2563eb;
+        outline-offset: 2px;
+    }
+    // Not completed: muted, not interactive
+    &--locked {
+        opacity: 0.45;
+        cursor: not-allowed !important;
+        &:hover {
+            transform: none !important;
+            box-shadow: none !important;
+            border-color: #e8edf4 !important;
+        }
+    }
+}
+
+.ir-card__bar {
+    display: block;
+    width: 100%;
+    height: 4px;
+    flex-shrink: 0;
+}
+
+.ir-card__done-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #16a34a;
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.ir-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    margin: 22px 22px 0;
+    flex-shrink: 0;
+}
+
+.ir-card__body {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 22px 0;
+    flex: 1;
+    gap: 2px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.ir-card__code {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.ir-card__label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+    margin-top: 3px;
+}
+
+.ir-card__description {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-top: 5px;
+}
+
+.ir-card__count {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 3px 10px;
+    border-radius: 20px;
+    align-self: flex-start;
+}
+
+.ir-card__arrow {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #94a3b8;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ir-card:hover:not(:disabled) .ir-card__arrow {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+@keyframes ir-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

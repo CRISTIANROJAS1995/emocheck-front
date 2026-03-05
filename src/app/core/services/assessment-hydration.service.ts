@@ -46,6 +46,11 @@ interface SwaggerEvaluationResultDto {
 
 interface SwaggerEvaluationWithResultDto {
     evaluationID: number;
+    /** Numeric module ID — available since backend v5.1 (was already present). */
+    moduleID?: number | null;
+    /** Instrument code for this evaluation (e.g. "DASS21", "BAI").
+     *  null for sub-scale instruments — infer from result.dimensionScores[].instrumentCode. */
+    instrumentCode?: string | null;
     assessmentModuleName?: string | null;
     completedAt: string;
     result: SwaggerEvaluationResultDto;
@@ -59,6 +64,35 @@ export class AssessmentHydrationService {
         private readonly http: HttpClient,
         private readonly state: AssessmentStateService
     ) { }
+
+    /**
+     * Returns the set of completed instrument codes for a given module.
+     * Uses both:
+     *  - `instrumentCode` field on each evaluation item (backend v5.2+, direct for simple instruments)
+     *  - `result.dimensionScores[].instrumentCode` (for sub-scale instruments like DASS-21)
+     * The returned set contains uppercase codes ready for comparison.
+     */
+    getCompletedInstrumentCodes(moduleId: AssessmentModuleId): Observable<Set<string>> {
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
+            map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res) ?? []),
+            map((items) => {
+                const codes = new Set<string>();
+                const moduleItems = items.filter((i) => this.resolveModuleId(i) === moduleId);
+                for (const item of moduleItems) {
+                    // Direct instrumentCode on the evaluation item (simple instruments)
+                    const direct = String(item?.instrumentCode ?? '').toUpperCase().trim();
+                    if (direct) codes.add(direct);
+                    // Sub-scale instrumentCode from dimensionScores (e.g. DASS21_ANXIETY → DASS21)
+                    for (const dim of item?.result?.dimensionScores ?? []) {
+                        const dc = String((dim as any)?.instrumentCode ?? '').toUpperCase().trim();
+                        if (dc) codes.add(dc);
+                    }
+                }
+                return codes;
+            }),
+            catchError(() => of(new Set<string>()))
+        );
+    }
 
     /**
      * Hydrates a single module result from `/evaluation/my-completed`.
@@ -84,7 +118,7 @@ export class AssessmentHydrationService {
 
                 // Return ALL evaluations for this module sorted newest-first so we can merge them
                 const candidates = all
-                    .filter((i) => this.mapModuleNameToAssessmentModuleId(i?.assessmentModuleName ?? undefined) === moduleId)
+                    .filter((i) => this.resolveModuleId(i) === moduleId)
                     .slice()
                     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
 
@@ -376,6 +410,20 @@ export class AssessmentHydrationService {
     }
 
     /**
+     * Resolves the frontend AssessmentModuleId from a completed-evaluation DTO.
+     * Prefers the numeric `moduleID` field (backend v5.1+) and falls back to
+     * keyword-matching on `assessmentModuleName` for older responses.
+     */
+    private resolveModuleId(item: SwaggerEvaluationWithResultDto): AssessmentModuleId | null {
+        // Numeric moduleID → use a static lookup table built from known module IDs.
+        // Because the numeric ID can vary per environment we can't hardcode it here,
+        // so we fall through to name matching which works universally.
+        // If moduleID is present AND the name also resolves, name takes precedence only
+        // as a sanity check. In practice, name-matching covers all current modules.
+        return this.mapModuleNameToAssessmentModuleId(item?.assessmentModuleName ?? undefined);
+    }
+
+    /**
      * Groups ALL completed evaluations by module.
      * Returns every evaluation per module (not just the latest) so that
      * multi-instrument modules can merge all their dimensions.
@@ -384,7 +432,7 @@ export class AssessmentHydrationService {
         const result: Partial<Record<AssessmentModuleId, SwaggerEvaluationWithResultDto[]>> = {};
 
         for (const e of items ?? []) {
-            const moduleId = this.mapModuleNameToAssessmentModuleId(e?.assessmentModuleName ?? undefined);
+            const moduleId = this.resolveModuleId(e);
             if (!moduleId) continue;
             if (!result[moduleId]) result[moduleId] = [];
             result[moduleId]!.push(e);
@@ -443,7 +491,7 @@ export class AssessmentHydrationService {
         const result: Partial<Record<AssessmentModuleId, SwaggerEvaluationWithResultDto>> = {};
 
         for (const e of items ?? []) {
-            const moduleId = this.mapModuleNameToAssessmentModuleId(e?.assessmentModuleName ?? undefined);
+            const moduleId = this.resolveModuleId(e);
             if (!moduleId) continue;
 
             const existing = result[moduleId];

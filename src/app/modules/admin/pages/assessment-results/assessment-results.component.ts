@@ -22,6 +22,9 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
 
     result?: AssessmentResult;
 
+    /** When set, only this instrument's dimensions are shown (from ?instrumentCode=). */
+    instrumentCode?: string;
+
     hydrationAttempted = false;
     isHydrating = false;
 
@@ -44,13 +47,16 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         this.moduleId = moduleId;
         this.moduleDef = getAssessmentModuleDefinition(moduleId);
 
+        // Read optional instrumentCode filter from query params
+        const rawCode = this.route.snapshot.queryParamMap.get('instrumentCode');
+        this.instrumentCode = rawCode?.trim().toUpperCase() || undefined;
         // Always keep the view in sync with state changes triggered by hydration
         this.subscriptions.add(this.state.results$.subscribe(() => {
-            this.result = this.state.getResult(this.moduleId);
+            this.result = this._applyInstrumentFilter(this.state.getResult(this.moduleId));
         }));
 
         // Seed the view immediately from whatever is already in local state (avoids blank flash)
-        this.result = this.state.getResult(this.moduleId);
+        this.result = this._applyInstrumentFilter(this.state.getResult(this.moduleId));
 
         // Always re-hydrate from backend to ensure the latest completed instruments
         // are reflected (e.g. after submitting BDI, the local state only has the partial
@@ -73,10 +79,14 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
                 )
                 .subscribe({
                     next: () => {
-                        this.result = this.state.getResult(this.moduleId);
-                        // Only redirect away if we have absolutely no result after hydration
+                        this.result = this._applyInstrumentFilter(this.state.getResult(this.moduleId));
+                        // Redirect if no result at all, OR if instrumentCode was given but
+                        // doesn't match any dimension in the result (invalid / fabricated code).
                         if (!this.result) {
-                            this.router.navigate([this.moduleDef.route]);
+                            const destination = this.instrumentCode
+                                ? [`/${this.moduleId}/instrument-results`]
+                                : [this.moduleDef.route];
+                            this.router.navigate(destination);
                         }
                     },
                     error: () => {
@@ -95,7 +105,43 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     }
 
     goBack(): void {
-        this.router.navigate(['/home']);
+        if (this.instrumentCode) {
+            // Return to the instrument picker for this module
+            this.router.navigate([`/${this.moduleId}/instrument-results`]);
+        } else {
+            this.router.navigate(['/home']);
+        }
+    }
+
+    /** Page title: instrument-specific when filtered, otherwise the module results title. */
+    get pageTitle(): string {
+        if (!this.instrumentCode) return this.moduleDef?.resultsTitle ?? '';
+        const labels = this.moduleDef?.dimensionLabels ?? [];
+        const match = labels.find(l => l.instrumentCode.toUpperCase() === this.instrumentCode);
+        return match ? `Resultados: ${match.label}` : `Resultados: ${this.instrumentCode}`;
+    }
+
+    /**
+     * When an instrumentCode filter is active, returns a shallow copy of the result
+     * with only the dimensions belonging to that instrument.
+     * Returns undefined if the code doesn't match any dimension (invalid/fabricated code)
+     * so the caller can redirect. Returns the result as-is when no filter is active.
+     */
+    private _applyInstrumentFilter(result: AssessmentResult | undefined): AssessmentResult | undefined {
+        if (!result) return undefined;
+        if (!this.instrumentCode) return result;
+
+        const code = this.instrumentCode.toUpperCase();
+        const filtered = result.dimensions.filter(
+            d => (d.instrumentCode ?? '').toUpperCase() === code ||
+                 (d.instrumentCode ?? '').toUpperCase().startsWith(code + '_')
+        );
+
+        // No matching dimensions → code is invalid/fabricated → return undefined so
+        // the caller redirects instead of showing a page with wrong/empty content.
+        if (!filtered.length) return undefined;
+
+        return { ...result, dimensions: filtered };
     }
 
     scheduleFollowUp(): void {

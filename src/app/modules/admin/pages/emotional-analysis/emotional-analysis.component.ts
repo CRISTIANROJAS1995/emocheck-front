@@ -609,6 +609,20 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                     this.isAnalyzing = false;
                     return;
                 }
+                // Si la llamada fue bloqueada por CORS (producción sin proxy en backend)
+                if (this._faceDetector.isCorsBlocked) {
+                    if (this.captureInterval) {
+                        clearInterval(this.captureInterval);
+                        this.captureInterval = null;
+                    }
+                    if (this.analysisTimeoutId) {
+                        clearTimeout(this.analysisTimeoutId);
+                        this.analysisTimeoutId = null;
+                    }
+                    this.analysisError = 'El análisis facial no está disponible en este momento por una restricción de seguridad del navegador (CORS). Por favor, contacta al soporte técnico.';
+                    this.isAnalyzing = false;
+                    return;
+                }
                 return;
             }
 

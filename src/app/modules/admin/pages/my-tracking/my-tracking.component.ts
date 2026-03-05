@@ -465,8 +465,14 @@ export class MyTrackingComponent implements OnInit {
         const card = (this.moduleResults ?? []).find((c) => c.id === moduleId);
         if (!card?.isCompleted) return;
 
-        const queryParams = card.evaluationId ? { evaluationId: card.evaluationId } : undefined;
-        this.router.navigate([`/${moduleId}/results`], { queryParams });
+        // Multi-instrument modules show the instrument picker first.
+        const multiInstrumentModules: ModuleProgressId[] = ['mental-health'];
+        if (multiInstrumentModules.includes(moduleId)) {
+            this.router.navigate([`/${moduleId}/instrument-results`]);
+        } else {
+            const queryParams = card.evaluationId ? { evaluationId: card.evaluationId } : undefined;
+            this.router.navigate([`/${moduleId}/results`], { queryParams });
+        }
     }
 
     openPersonalizedAction(moduleId: ModuleProgressId): void {

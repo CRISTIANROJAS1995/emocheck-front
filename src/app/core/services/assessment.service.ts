@@ -163,6 +163,11 @@ interface SwaggerEvaluationResultDto {
 
 interface SwaggerEvaluationWithResultDto {
     evaluationID: number;
+    /** Numeric module ID — available since backend v5.1 (was already present). */
+    moduleID?: number | null;
+    /** Instrument code for the completed evaluation (e.g. "DASS21", "BAI").
+     *  null for sub-scale instruments — infer from result.dimensionScores[].instrumentCode. */
+    instrumentCode?: string | null;
     assessmentModuleName?: string | null;
     completedAt: string;
     result: SwaggerEvaluationResultDto;
@@ -353,10 +358,19 @@ export class AssessmentService {
             ),
             switchMap(() => this.getModuleDetail(moduleId)),
             switchMap((detail) =>
-                this.getInProgressEvaluation(detail.apiModuleId).pipe(
+                // Pre-flight: block re-submission if this module is already completed.
+                this.isModuleAlreadyCompleted(detail.apiModuleId).pipe(
+                    switchMap((alreadyDone) =>
+                        alreadyDone
+                            ? throwError(() => ({
+                                code: 'ALREADY_COMPLETED',
+                                message: 'Este instrumento ya fue completado y no puede volver a presentarse.',
+                            }))
+                            : this.getInProgressEvaluation(detail.apiModuleId)
+                    ),
                     switchMap((existing) => {
-                        if (existing?.evaluationID) {
-                            return of(existing);
+                        if ((existing as SwaggerEvaluationDto)?.evaluationID) {
+                            return of(existing as SwaggerEvaluationDto);
                         }
 
                         return this.http
@@ -370,6 +384,17 @@ export class AssessmentService {
                                         throw new Error('No fue posible iniciar la evaluación');
                                     }
                                     return evaluation;
+                                }),
+                                catchError((err) => {
+                                    // Backend returns HTTP 409 when the module is already completed.
+                                    // Normalise to the same ALREADY_COMPLETED error code the UI handles.
+                                    if (err?.status === 409 || err?.error?.error?.code === 'EVALUATION_ALREADY_COMPLETED') {
+                                        return throwError(() => ({
+                                            code: 'ALREADY_COMPLETED',
+                                            message: 'Este instrumento ya fue completado y no puede volver a presentarse.',
+                                        }));
+                                    }
+                                    return throwError(() => err);
                                 })
                             );
                     }),
@@ -426,9 +451,18 @@ export class AssessmentService {
             ),
             switchMap(() => this.getModuleDetail(moduleId)),
             switchMap((detail) =>
-                this.getInProgressEvaluation(detail.apiModuleId).pipe(
+                // Pre-flight: block re-submission if this module is already completed.
+                this.isModuleAlreadyCompleted(detail.apiModuleId).pipe(
+                    switchMap((alreadyDone) =>
+                        alreadyDone
+                            ? throwError(() => ({
+                                code: 'ALREADY_COMPLETED',
+                                message: 'Este instrumento ya fue completado y no puede volver a presentarse.',
+                            }))
+                            : this.getInProgressEvaluation(detail.apiModuleId)
+                    ),
                     switchMap((existing) => {
-                        if (existing?.evaluationID) return of(existing);
+                        if ((existing as SwaggerEvaluationDto)?.evaluationID) return of(existing as SwaggerEvaluationDto);
                         return this.http
                             .post<unknown>(`${this.apiUrl}/evaluation/start`, { moduleID: detail.apiModuleId })
                             .pipe(
@@ -436,6 +470,17 @@ export class AssessmentService {
                                     const evaluation = this.unwrapObject<SwaggerEvaluationDto>(res);
                                     if (!evaluation?.evaluationID) throw new Error('No fue posible iniciar la evaluación');
                                     return evaluation;
+                                }),
+                                catchError((err) => {
+                                    // Backend returns HTTP 409 when the module is already completed.
+                                    // Normalise to the same ALREADY_COMPLETED error code the UI handles.
+                                    if (err?.status === 409 || err?.error?.error?.code === 'EVALUATION_ALREADY_COMPLETED') {
+                                        return throwError(() => ({
+                                            code: 'ALREADY_COMPLETED',
+                                            message: 'Este instrumento ya fue completado y no puede volver a presentarse.',
+                                        }));
+                                    }
+                                    return throwError(() => err);
                                 })
                             );
                     }),
@@ -489,6 +534,64 @@ export class AssessmentService {
             catchError(() => of(null))
         );
     }
+
+    /**
+     * Returns true if the user already has a completed evaluation for the given module.
+     * Used as a pre-flight guard in submit() / submitRich() so each instrument can only
+     * be taken once, even when local state was cleared (fresh session / page reload).
+     *
+     * Matching uses the numeric `moduleID` field now present in the response.
+     * Falls back to keyword-matching on `assessmentModuleName` for older backend versions.
+     */
+    private isModuleAlreadyCompleted(apiModuleId: number): Observable<boolean> {
+        if (!apiModuleId) return of(false);
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-completed`).pipe(
+            map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res) ?? []),
+            map((items) =>
+                items.some((i) => {
+                    // Primary: direct numeric moduleID comparison (backend v5.1+)
+                    const mid = Number((i as any)?.moduleID ?? 0);
+                    if (mid > 0) return mid === apiModuleId;
+                    // Fallback: keyword-match on module name for older responses
+                    return this._apiModuleIdMatchesName(apiModuleId, i?.assessmentModuleName ?? '');
+                })
+            ),
+            catchError(() => of(false))
+        );
+    }
+
+    /**
+     * Fallback heuristic: resolves whether a completed-evaluation entry (identified only
+     * by its human-readable module name) corresponds to a given numeric apiModuleId.
+     * Used only when the backend response omits the numeric moduleID field.
+     */
+    private _apiModuleIdMatchesName(apiModuleId: number, moduleName: string): boolean {
+        // Resolve the matching frontend moduleId from the active-modules cache,
+        // then check by name keywords — same logic as AssessmentHydrationService.
+        // Because modules$ is async and this helper is called inside a sync map(),
+        // we cannot await it here. Instead we use the moduleRawCache which is already
+        // populated by the time submitRich/submit reaches this point.
+        for (const [frontendId, cached] of this.moduleRawCache.entries()) {
+            if (cached.apiModuleId === apiModuleId) {
+                return this._moduleNameMatchesId(moduleName, frontendId);
+            }
+        }
+        return false;
+    }
+
+    /** Returns true when the given backend module name corresponds to a frontend moduleId. */
+    private _moduleNameMatchesId(name: string, moduleId: AssessmentModuleId): boolean {
+        const n = (name ?? '').toLowerCase();
+        if (!n) return false;
+        switch (moduleId) {
+            case 'mental-health':          return n.includes('mental') || n.includes('salud');
+            case 'work-fatigue':           return n.includes('fatiga') || n.includes('fatigue');
+            case 'organizational-climate': return n.includes('clima') || n.includes('climate');
+            case 'psychosocial-risk':      return n.includes('psicosocial');
+            default:                       return false;
+        }
+    }
+
 
     private loadCompletedResultForEvaluation(evaluationId: number): Observable<SwaggerEvaluationResultDto | null> {
         if (!evaluationId) return of(null);

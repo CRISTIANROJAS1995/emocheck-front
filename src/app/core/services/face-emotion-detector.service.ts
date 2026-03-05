@@ -58,21 +58,21 @@ const EMOTION_MAP: Record<string, string> = {
  * Servicio de deteccion de emociones faciales usando Face++ API.
  *
  * Arquitectura:
- *   Webcam frame (JPEG base64) → Backend /api/evaluation/facepp/detect
- *   → Backend llama Face++ con API keys del servidor → devuelve JSON
+ *   Webcam frame (JPEG base64) → Face++ API directamente
+ *   (en desarrollo via proxy local /facepp → https://api-us.faceplusplus.com)
+ *   (en produccion directamente a https://api-us.faceplusplus.com/facepp/v3/detect)
  *
- * Al pasar por el backend se evitan problemas de CORS (Face++ no soporta
- * CORS desde el navegador), las API keys quedan en el servidor (no expuestas
- * en el bundle), y el backend genera logs de cada llamada.
- *
+ * Las credenciales estan en environment.ts / environment.prod.ts.
  * Free tier: 1000 API calls/dia (suficiente para ~16 sesiones diarias).
  */
 @Injectable({
     providedIn: 'root',
 })
 export class FaceEmotionDetectorService {
-    // -- Backend proxy URL --
-    private readonly backendDetectUrl = `${environment.apiUrl}/evaluation/facepp/detect`;
+    // -- Face++ API URL directa (dev: via proxy; prod: URL completa desde environment) --
+    private readonly facePlusPlusUrl = environment.facePlusPlusApiUrl;
+    private readonly apiKey = environment.facePlusPlusApiKey;
+    private readonly apiSecret = environment.facePlusPlusApiSecret;
 
     // -- Estado --
     private modelsLoaded = false;
@@ -80,6 +80,7 @@ export class FaceEmotionDetectorService {
     private loadPromise: Promise<void> | null = null;
     private pendingRequest = false; // Throttle: evita requests simultaneos
     private _dailyLimitExhausted = false; // Si Face++ devolvio FREE_CALL_COUNT_LIMIT
+    private _corsBlocked = false;        // Si el navegador bloqueó la llamada por CORS
 
     constructor(private readonly http: HttpClient) { }
 
@@ -131,6 +132,15 @@ export class FaceEmotionDetectorService {
     /** True si se agoto el limite diario de Face++ (1000 calls/dia free tier) */
     get isDailyLimitExhausted(): boolean {
         return this._dailyLimitExhausted;
+    }
+
+    /**
+     * True si el navegador bloqueó la llamada a Face++ por política CORS.
+     * Ocurre en producción cuando el hosting no tiene los headers CORS correctos.
+     * En ese caso se debe implementar el proxy en el backend.
+     */
+    get isCorsBlocked(): boolean {
+        return this._corsBlocked;
     }
 
     /**
@@ -219,15 +229,24 @@ export class FaceEmotionDetectorService {
     }
 
     /**
-     * Llama al backend proxy que a su vez llama a Face++ API.
-     * El backend maneja las API keys, CORS y rate-limiting del lado del servidor.
+     * Llama directamente a Face++ Detect API.
+     * En desarrollo: el proxy de Angular redirige /facepp/* → https://api-us.faceplusplus.com
+     * En produccion: la URL de environment.prod.ts apunta directamente a Face++.
+     *
+     * Usa FormData (multipart/form-data) tal como requiere la API de Face++.
      * Reintenta una vez si hay error transitorio.
      */
     private async callFacePlusPlusWithRetry(base64Image: string, maxRetries: number): Promise<any | null> {
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
             try {
+                const formData = new FormData();
+                formData.append('api_key', this.apiKey);
+                formData.append('api_secret', this.apiSecret);
+                formData.append('image_base64', base64Image);
+                formData.append('return_attributes', 'emotion,headpose,blur,facequality');
+
                 const data = await firstValueFrom(
-                    this.http.post<any>(this.backendDetectUrl, { imageBase64: base64Image })
+                    this.http.post<any>(this.facePlusPlusUrl, formData)
                 );
 
                 if (!data) return null;
@@ -250,7 +269,18 @@ export class FaceEmotionDetectorService {
             } catch (err: any) {
                 const status = err?.status;
                 const backendMsg = err?.error?.message ?? err?.error?.Message ?? err?.message ?? '';
-                console.error(`[FaceEmotionDetector] ❌ Error llamando backend proxy (attempt ${attempt + 1}/${maxRetries + 1}). Status: ${status}. ${backendMsg}`);
+
+                // Error CORS: el navegador bloquea la llamada a Face++ directamente.
+                // status=0 + error es un ProgressEvent (la red fue bloqueada antes de recibir respuesta).
+                // También puede ser status=0 con message vacío (OPTIONS preflight rechazado).
+                const isCors = status === 0 && (err?.error instanceof ProgressEvent || backendMsg === '');
+                if (isCors) {
+                    this._corsBlocked = true;
+                    console.error('[FaceEmotionDetector] 🚫 Llamada a Face++ bloqueada por CORS. El navegador impidió la petición. Se necesita proxy en el backend (POST /api/evaluation/facepp/detect).');
+                    return null; // No reintentar — cada intento fallará igual
+                }
+
+                console.error(`[FaceEmotionDetector] ❌ Error llamando Face++ (attempt ${attempt + 1}/${maxRetries + 1}). Status: ${status}. ${backendMsg}`);
 
                 if (attempt < maxRetries) {
                     await new Promise(resolve => setTimeout(resolve, 2000));
