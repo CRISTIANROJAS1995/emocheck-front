@@ -46,6 +46,239 @@ const INSTRUMENT_META: Record<string, { icon: string; description: string; color
     PSYCHO_REWARDS:  { icon: 'icons/Icon (43).svg', description: 'Recompensas y reconocimiento',               color: '#f59e0b' },
 };
 
+// ── Instrucciones por instrumento (modal pre-cuestionario) ──────────────────
+export interface InstrumentInstructions {
+    /** Texto del encabezado, p.e. "Estado anímico" */
+    heading: string;
+    /** Párrafo principal de qué evalúa y cómo responder */
+    body: string;
+    /** Texto de la instrucción de tiempo / contexto de las preguntas */
+    timeframe: string;
+}
+
+// ── Cierre por instrumento (modal post-cuestionario) ─────────────────────────
+export interface InstrumentClosing {
+    /** Mensaje de cierre afectivo */
+    message: string;
+    /** Texto secundario antes del CTA, p.e. "Antes de ver tu resultado..." */
+    preResultText?: string;
+    /** Tipo de elemento visual/interactivo a mostrar */
+    visual: 'breathe' | 'stars' | 'ripple' | 'mosaic' | 'wave' | 'default';
+    /** Texto del botón CTA */
+    cta: string;
+}
+
+const INSTRUMENT_CLOSING: Record<string, InstrumentClosing> = {
+    DASS21: {
+        message: 'Recuerda que cuidar tu salud mental no siempre implica grandes cambios, sino pequeños gestos de atención hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar cómo te sientes es también una forma de sanar. Permítete estar presente, sin exigencias, sin juicios.',
+        preResultText: 'Antes de ver tus resultados, tómate un momento para respirar y observar cómo te sientes ahora mismo.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    BAI: {
+        message: 'Cuidar tu salud mental no siempre implica grandes cambios, sino pequeños gestos de atención hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar cómo te sientes es también una forma de sanar. Permítete estar presente, sin exigencias, sin juicios.',
+        preResultText: 'Antes de ver tus resultados, haz una respiración profunda. Inhala lentamente, sostén el aire un momento y suéltalo despacio.',
+        visual: 'breathe',
+        cta: 'Ver mis resultados',
+    },
+    BDI: {
+        message: 'Atender tu salud mental no requiere hacerlo todo a la vez; comenzar por escucharte, respetar tus límites y permitirte apoyo es ya un acto de cuidado.',
+        preResultText: 'Antes de ver tus resultados, recuerda que lo que sientes es válido y que buscar comprensión es un paso valioso.',
+        visual: 'ripple',
+        cta: 'Ver mis resultados',
+    },
+    ICSP_VC: {
+        message: 'Cuidar tu salud mental no siempre implica grandes cambios, sino pequeños gestos de atención hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar cómo te sientes es también una forma de sanar. Permítete estar presente, sin exigencias, sin juicios.',
+        preResultText: 'Antes de ver tus resultados, cierra los ojos un instante e imagina que tu cuerpo se prepara para un descanso profundo y reparador.',
+        visual: 'wave',
+        cta: 'Ver mis resultados',
+    },
+    TMMS24: {
+        message: 'Identificar lo que sentimos, comprender por qué ocurre y responder de manera más consciente y equilibrada ante distintas situaciones hace que reforcemos nuestra inteligencia emocional. Este proceso permite reflexionar sobre la forma en que se gestionan las emociones y abre un espacio para reconocer fortalezas, así como aspectos que pueden seguir desarrollándose.',
+        preResultText: 'Estos son tus resultados. Recuerda que no hay perfiles buenos ni malos — cada dimensión es una oportunidad de crecimiento.',
+        visual: 'mosaic',
+        cta: 'Ver mis resultados',
+    },
+    FATIGUE_ENERGY: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        preResultText: 'Antes de ver tus resultados, recuerda que reconocer cómo te sientes es el primer paso para mejorar tu bienestar laboral.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    FATIGUE_COGNITIVE: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        preResultText: 'Antes de ver tus resultados, recuerda que reconocer cómo te sientes es el primer paso para mejorar tu bienestar laboral.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    FATIGUE_EMOTIONAL: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        preResultText: 'Antes de ver tus resultados, recuerda que reconocer cómo te sientes es el primer paso para mejorar tu bienestar laboral.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    FATIGUE_MOTIVATION: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        preResultText: 'Antes de ver tus resultados, recuerda que reconocer cómo te sientes es el primer paso para mejorar tu bienestar laboral.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    // Códigos alternativos del backend para instrumentos de fatiga (MFI-20)
+    MFI20: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    MFI20_FATIGA_GENERAL: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    MFI20_FATIGA_FISICA: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    MFI20_FATIGA_MENTAL: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    MFI20_FATIGA_EMOCIONAL: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    MFI20_DINAMISMO: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    MFI20_MOTIVACION: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+    MFI20_ACTIVIDAD_REDUCIDA: {
+        message: 'Reconocer la importancia de tu rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
+        visual: 'stars',
+        cta: 'Ver mis resultados',
+    },
+};
+
+const INSTRUMENT_INSTRUCTIONS: Record<string, InstrumentInstructions> = {
+    DASS21: {
+        heading: 'Estado anímico',
+        body: 'El DASS-21 es una prueba que busca comprender tu estado emocional y reconocer posibles síntomas relacionados con el estrés, la ansiedad o la depresión. Te invitamos a responder con sinceridad, ya que solo así nos permitirá entender cómo te sientes y orientarte de manera más efectiva.',
+        timeframe: 'Piensa en la última semana (incluido hoy) y marca la opción que mejor describa lo que has sentido.',
+    },
+    GAD7: {
+        heading: 'Ansiedad generalizada',
+        body: 'El GAD-7 es una escala breve que ayuda a identificar la presencia e intensidad de síntomas de ansiedad. Responde con honestidad; no hay respuestas correctas o incorrectas.',
+        timeframe: 'Considera las últimas dos semanas y selecciona con qué frecuencia has experimentado cada situación.',
+    },
+    PHQ9: {
+        heading: 'Estado de ánimo y depresión',
+        body: 'El PHQ-9 evalúa la presencia y severidad de síntomas depresivos. Tu bienestar emocional importa; responde con calma y sinceridad.',
+        timeframe: 'Piensa en las últimas dos semanas y elige la opción que mejor describe con qué frecuencia te has sentido así.',
+    },
+    ISI: {
+        heading: 'Calidad del sueño',
+        body: 'El ISI mide la severidad de los problemas de insomnio y el impacto que tienen en tu vida diaria. Un buen descanso es esencial para tu bienestar.',
+        timeframe: 'Reflexiona sobre el último mes y selecciona la opción que mejor describe tu experiencia.',
+    },
+    PSS4: {
+        heading: 'Estrés percibido',
+        body: 'El PSS-4 evalúa tu nivel de estrés percibido en el último mes. Responde según cómo te has sentido realmente.',
+        timeframe: 'Piensa en el último mes y elige la frecuencia con que has experimentado cada situación.',
+    },
+    BAI: {
+        heading: 'Inventario de Beck para Ansiedad',
+        body: 'El BAI (Beck Anxiety Inventory) es un instrumento diseñado para identificar la presencia e intensidad de síntomas asociados a la ansiedad. Te invitamos a responder con sinceridad, ya que la información proporcionada permitirá comprender cómo se manifiestan estos síntomas y orientar de manera adecuada las acciones de acompañamiento e intervención.',
+        timeframe: 'Piensa en la última semana (incluido hoy) y marca la opción que mejor describa lo que has sentido.',
+    },
+    BDI: {
+        heading: 'Inventario de Beck para Depresión',
+        body: 'El BDI (Beck Depression Inventory) es un instrumento que permite identificar la presencia e intensidad de síntomas asociados a la depresión, los cuales pueden influir en el bienestar personal, emocional y laboral. Te invitamos a responder con sinceridad, ya que la información proporcionada facilitará una mejor comprensión de tu estado actual y permitirá orientar de manera adecuada las acciones de acompañamiento e intervención.',
+        timeframe: 'Piensa en la última semana (incluido hoy) y marca la opción que mejor describa lo que has sentido.',
+    },
+    ICSP_VC: {
+        heading: 'Hábitos de sueño',
+        body: 'El ICSP-VC evalúa la calidad del sueño y sus posibles alteraciones. Recuerda responder con sinceridad, ya que la información proporcionada facilitará la comprensión de tus hábitos de descanso, orientando acciones de acompañamiento y mejora del bienestar.',
+        timeframe: 'Responde considerando cómo ha sido tu descanso durante el último mes y marca la opción que mejor describa lo que has sentido.',
+    },
+    TMMS24: {
+        heading: 'Inteligencia Emocional',
+        body: 'El TMMS-24 busca comprender tu estado emocional y reconocer posibles síntomas relacionados con el estrés, la ansiedad o la depresión. Te invitamos a responder con sinceridad, ya que solo así nos permitirá entender cómo te sientes y orientarte de manera más efectiva.',
+        timeframe: 'Piensa en la última semana (incluido hoy) y marca la opción que mejor describa lo que has sentido.',
+    },
+    PSS10: {
+        heading: 'Estrés percibido',
+        body: 'El PSS-10 mide tu nivel de estrés percibido con mayor detalle. Responde considerando cómo te has sentido realmente en el último mes.',
+        timeframe: 'Piensa en el último mes y elige la frecuencia con que has experimentado cada situación.',
+    },
+    FATIGUE_ENERGY: {
+        heading: 'MFI – Fatiga Multidimensional',
+        body: 'El MFI (Multidimensional Fatigue Inventory) es una herramienta de evaluación que permite identificar y analizar los niveles de fatiga laboral desde una perspectiva multidimensional. Tu participación honesta es fundamental, ya que permitirá reconocer posibles señales de desgaste y contribuir al diseño de estrategias orientadas a la promoción del bienestar y la salud en el trabajo.',
+        timeframe: 'Responde teniendo en cuenta la última semana (incluido hoy) y selecciona la opción que mejor describa tu estado en tu entorno laboral.',
+    },
+    FATIGUE_COGNITIVE: {
+        heading: 'MFI – Fatiga Multidimensional',
+        body: 'El MFI (Multidimensional Fatigue Inventory) es una herramienta de evaluación que permite identificar y analizar los niveles de fatiga laboral desde una perspectiva multidimensional. Tu participación honesta es fundamental, ya que permitirá reconocer posibles señales de desgaste y contribuir al diseño de estrategias orientadas a la promoción del bienestar y la salud en el trabajo.',
+        timeframe: 'Responde teniendo en cuenta la última semana (incluido hoy) y selecciona la opción que mejor describa tu estado en tu entorno laboral.',
+    },
+    FATIGUE_EMOTIONAL: {
+        heading: 'MFI – Fatiga Multidimensional',
+        body: 'El MFI (Multidimensional Fatigue Inventory) es una herramienta de evaluación que permite identificar y analizar los niveles de fatiga laboral desde una perspectiva multidimensional. Tu participación honesta es fundamental, ya que permitirá reconocer posibles señales de desgaste y contribuir al diseño de estrategias orientadas a la promoción del bienestar y la salud en el trabajo.',
+        timeframe: 'Responde teniendo en cuenta la última semana (incluido hoy) y selecciona la opción que mejor describa tu estado en tu entorno laboral.',
+    },
+    FATIGUE_MOTIVATION: {
+        heading: 'MFI – Fatiga Multidimensional',
+        body: 'El MFI (Multidimensional Fatigue Inventory) es una herramienta de evaluación que permite identificar y analizar los niveles de fatiga laboral desde una perspectiva multidimensional. Tu participación honesta es fundamental, ya que permitirá reconocer posibles señales de desgaste y contribuir al diseño de estrategias orientadas a la promoción del bienestar y la salud en el trabajo.',
+        timeframe: 'Responde teniendo en cuenta la última semana (incluido hoy) y selecciona la opción que mejor describa tu estado en tu entorno laboral.',
+    },
+    CLIMATE_LEADERSHIP: {
+        heading: 'Liderazgo y dirección',
+        body: 'Esta sección evalúa tu percepción sobre el liderazgo y la dirección dentro de tu equipo. No hay respuestas correctas o incorrectas — solo buscamos tu opinión sincera.',
+        timeframe: 'Responde según tu experiencia reciente en el trabajo.',
+    },
+    CLIMATE_TEAMWORK: {
+        heading: 'Trabajo en equipo',
+        body: 'Esta sección evalúa la calidad de la colaboración y el trabajo en equipo en tu organización.',
+        timeframe: 'Responde según tu experiencia reciente en el trabajo.',
+    },
+    CLIMATE_COMMUNICATION: {
+        heading: 'Comunicación',
+        body: 'Esta sección evalúa la calidad y efectividad de los canales de comunicación dentro de tu organización.',
+        timeframe: 'Responde según tu experiencia reciente en el trabajo.',
+    },
+    CLIMATE_RECOGNITION: {
+        heading: 'Reconocimiento',
+        body: 'Esta sección evalúa cómo se reconoce y valora el trabajo y los logros dentro de tu organización.',
+        timeframe: 'Responde según tu experiencia reciente en el trabajo.',
+    },
+    PSYCHO_DEMANDS: {
+        heading: 'Demandas del trabajo',
+        body: 'Esta sección evalúa las demandas y la carga de trabajo a la que estás expuesto/a.',
+        timeframe: 'Responde considerando tu situación laboral actual.',
+    },
+    PSYCHO_CONTROL: {
+        heading: 'Control sobre el trabajo',
+        body: 'Esta sección evalúa tu autonomía y control sobre las actividades y decisiones en tu trabajo.',
+        timeframe: 'Responde considerando tu situación laboral actual.',
+    },
+    PSYCHO_SUPPORT: {
+        heading: 'Apoyo social y liderazgo',
+        body: 'Esta sección evalúa el apoyo social que recibes de compañeros y superiores en tu entorno laboral.',
+        timeframe: 'Responde considerando tu situación laboral actual.',
+    },
+    PSYCHO_REWARDS: {
+        heading: 'Recompensas',
+        body: 'Esta sección evalúa las recompensas y el reconocimiento que recibes a cambio de tu esfuerzo y desempeño.',
+        timeframe: 'Responde considerando tu situación laboral actual.',
+    },
+};
+
 export interface InstrumentCard extends InstrumentDescriptor {
     icon: string;
     description: string;
@@ -81,8 +314,19 @@ export class InstrumentSelectorComponent implements OnInit {
     showWelcomeModal = false;
     /** Controls the consent modal visibility (shown when user picks an instrument) */
     showConsentModal = false;
+    /** Controls the instructions modal visibility (shown after consent accepted) */
+    showInstructionsModal = false;
+    /** Instructions for the pending instrument */
+    currentInstructions: InstrumentInstructions | null = null;
     /** Instrument pending confirmation — set when consent modal opens */
     pendingInstrument: InstrumentCard | null = null;
+
+    /** Controls the closing modal visibility (shown after questionnaire completes) */
+    showClosingModal = false;
+    /** Closing content for the current instrument */
+    currentClosing: InstrumentClosing | null = null;
+    /** Rich answers held until user dismisses closing modal */
+    private pendingRichAnswers: RichAnswer[] | null = null;
 
     /** First name of the current user for the welcome modal greeting */
     userName = '';
@@ -157,15 +401,37 @@ export class InstrumentSelectorComponent implements OnInit {
     /** Llamado cuando el usuario toca "Autorizo" en el modal de consentimiento */
     onConsentAccepted(): void {
         this.showConsentModal = false;
+        if (!this.pendingInstrument) return;
+        // Mostrar instrucciones específicas del instrumento antes de lanzar el cuestionario
+        this.currentInstructions =
+            INSTRUMENT_INSTRUCTIONS[this.pendingInstrument.code] ?? {
+                heading: this.pendingInstrument.label,
+                body: this.pendingInstrument.description || 'Responde con sinceridad cada pregunta.',
+                timeframe: 'Selecciona la opción que mejor describa cómo te has sentido.',
+            };
+        this.showInstructionsModal = true;
+    }
+
+    /** Llamado cuando el usuario toca "No autorizo" */
+    onConsentDenied(): void {
+        this.showConsentModal = false;
+        this.pendingInstrument = null;
+    }
+
+    /** Llamado cuando el usuario toca "Comenzar prueba" en el modal de instrucciones */
+    onInstructionsStart(): void {
+        this.showInstructionsModal = false;
+        this.currentInstructions = null;
         const card = this.pendingInstrument;
         this.pendingInstrument = null;
         if (!card) return;
         this._loadInstrumentQuestions(card);
     }
 
-    /** Llamado cuando el usuario toca "No autorizo" */
-    onConsentDenied(): void {
-        this.showConsentModal = false;
+    /** Llamado cuando el usuario cierra el modal de instrucciones sin comenzar */
+    onInstructionsDismiss(): void {
+        this.showInstructionsModal = false;
+        this.currentInstructions = null;
         this.pendingInstrument = null;
     }
 
@@ -206,6 +472,37 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     onCompletedRich(richAnswers: RichAnswer[]): void {
+        // Guardar respuestas y mostrar modal de cierre antes de enviar
+        this.pendingRichAnswers = richAnswers;
+        const code = (this.selectedInstrument?.code ?? '').toUpperCase();
+
+        // Busca coincidencia exacta primero, luego por prefijo conocido
+        const closing = INSTRUMENT_CLOSING[code]
+            ?? (code.startsWith('MFI')      ? INSTRUMENT_CLOSING['MFI20'] : null)
+            ?? (code.startsWith('FATIGUE')  ? INSTRUMENT_CLOSING['FATIGUE_ENERGY'] : null)
+            ?? (code.startsWith('CLIMATE')  ? INSTRUMENT_CLOSING['CLIMATE_DEFAULT'] : null)
+            ?? (code.startsWith('PSYCHO')   ? INSTRUMENT_CLOSING['PSYCHO_DEFAULT'] : null)
+            ?? null;
+
+        this.currentClosing = closing ?? {
+            message: 'Gracias por tu tiempo y sinceridad. Tu bienestar es lo más importante.',
+            visual: 'default',
+            cta: 'Ver mis resultados',
+        };
+        this.showClosingModal = true;
+    }
+
+    /** Llamado cuando el usuario toca "Ver mis resultados" en el modal de cierre */
+    onClosingContinue(): void {
+        this.showClosingModal = false;
+        this.currentClosing = null;
+        const richAnswers = this.pendingRichAnswers;
+        this.pendingRichAnswers = null;
+        if (!richAnswers) return;
+        this._submitRichAnswers(richAnswers);
+    }
+
+    private _submitRichAnswers(richAnswers: RichAnswer[]): void {
         if (this.isSubmitting) return;
         this.isSubmitting = true;
 
@@ -213,8 +510,6 @@ export class InstrumentSelectorComponent implements OnInit {
             finalize(() => { this.isSubmitting = false; })
         ).subscribe({
             next: (result) => {
-                // Use mergeResult so previously completed instrument dimensions are
-                // preserved (e.g. DASS-21 stays "completado" after submitting BAI).
                 this.assessmentState.mergeResult(result);
                 this.router.navigate([`/${this.moduleId}/results`]);
             },

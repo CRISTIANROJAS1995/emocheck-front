@@ -773,3 +773,568 @@
         filter: none;
     }
 }
+
+// ─── Instructions Modal ───────────────────────────────────────────────────────
+.wm-modal--instructions {
+    max-width: 460px;
+}
+
+.wm-header--instructions {
+    padding-bottom: 44px;
+}
+
+.wm-instr__icon {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0) invert(1);
+}
+
+.wm-instr__label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.wm-instr__code-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.3px;
+}
+
+.wm-instr__count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+.wm-instr__body {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: #334155;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 18px;
+}
+
+.wm-instr__timeframe {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left-width: 3px;
+    border-left-color: currentColor;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #475569;
+    font-family: 'Montserrat', sans-serif;
+    font-style: italic;
+}
+
+.wm-instr__timeframe-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #94a3b8;
+}
+
+.wm-instr__cta {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.18s, transform 0.15s;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    &:hover {
+        filter: brightness(1.08);
+        transform: translateY(-2px);
+    }
+    &:active {
+        transform: translateY(0);
+        filter: brightness(0.92);
+    }
+}
+
+.wm-instr__cancel {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.15s;
+    &:hover {
+        color: #475569;
+    }
+}
+
+// ─── Closing Modal (post-cuestionario) ────────────────────────────────────────
+.wm-modal--closing {
+    max-width: 420px;
+    overflow: hidden;
+}
+
+// Visual container
+.wcl-visual {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #f0f4ff 0%, #e8f5e9 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+// ── Breathe (BAI) ─────────────────────────────────────────────────────────────
+.wcl-breathe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.wcl-breathe__ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+    animation: breathe-expand 4s ease-in-out infinite;
+    &--1 {
+        width: 64px;
+        height: 64px;
+        animation-delay: 0s;
+    }
+    &--2 {
+        width: 96px;
+        height: 96px;
+        animation-delay: 0.6s;
+    }
+    &--3 {
+        width: 130px;
+        height: 130px;
+        animation-delay: 1.2s;
+    }
+}
+
+@keyframes breathe-expand {
+    0% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+    80% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.wcl-breathe__core {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    animation: breathe-pulse 4s ease-in-out infinite;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+@keyframes breathe-pulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.18);
+    }
+}
+
+.wcl-breathe__label {
+    position: relative;
+    z-index: 1;
+    font-size: 12px;
+    font-weight: 700;
+    color: #3b82f6;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 44px;
+    animation: breathe-label 4s ease-in-out infinite;
+}
+
+@keyframes breathe-label {
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+// ── Stars (DASS21 / FATIGUE) ──────────────────────────────────────────────────
+.wcl-stars {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wcl-stars__center {
+    color: #f59e0b;
+    animation: star-spin 6s linear infinite;
+    z-index: 1;
+}
+
+@keyframes star-spin {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.15);
+    }
+    to {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+.wcl-stars__particle {
+    position: absolute;
+    color: #f59e0b;
+    animation: star-float 3s ease-in-out infinite;
+    font-size: 18px;
+    &--1 {
+        top: 20%;
+        left: 15%;
+        animation-delay: 0s;
+        font-size: 14px;
+    }
+    &--2 {
+        top: 15%;
+        left: 70%;
+        animation-delay: 0.5s;
+        font-size: 20px;
+    }
+    &--3 {
+        top: 60%;
+        left: 10%;
+        animation-delay: 1s;
+        font-size: 12px;
+        color: #a78bfa;
+    }
+    &--4 {
+        top: 70%;
+        left: 75%;
+        animation-delay: 0.3s;
+        font-size: 16px;
+    }
+    &--5 {
+        top: 40%;
+        left: 85%;
+        animation-delay: 1.5s;
+        font-size: 10px;
+        color: #a78bfa;
+    }
+    &--6 {
+        top: 80%;
+        left: 45%;
+        animation-delay: 0.8s;
+        font-size: 14px;
+    }
+}
+
+@keyframes star-float {
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateY(-12px) scale(1.2);
+        opacity: 1;
+    }
+}
+
+// ── Ripple (BDI) ──────────────────────────────────────────────────────────────
+.wcl-ripple {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wcl-ripple__ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #8b5cf6;
+    animation: ripple-out 2.4s ease-out infinite;
+    &--1 {
+        width: 40px;
+        height: 40px;
+        animation-delay: 0s;
+    }
+    &--2 {
+        width: 80px;
+        height: 80px;
+        animation-delay: 0.8s;
+    }
+    &--3 {
+        width: 120px;
+        height: 120px;
+        animation-delay: 1.6s;
+    }
+}
+
+@keyframes ripple-out {
+    0% {
+        opacity: 0.8;
+        transform: scale(0.3);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+.wcl-ripple__dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    z-index: 1;
+    box-shadow: 0 2px 12px rgba(139, 92, 246, 0.5);
+}
+
+// ── Wave (ICSP_VC) ────────────────────────────────────────────────────────────
+.wcl-wave {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.wcl-wave__svg {
+    width: 200px;
+    height: 50px;
+    overflow: visible;
+    &--2 {
+        margin-top: -8px;
+    }
+}
+
+.wcl-wave__path--back {
+    stroke: #06b6d4;
+    opacity: 0.3;
+}
+
+.wcl-wave__path--front {
+    stroke: #06b6d4;
+    opacity: 0.85;
+}
+
+.wcl-wave__svg {
+    animation: wave-shift 3s ease-in-out infinite;
+}
+
+.wcl-wave__svg--2 {
+    animation: wave-shift 3s ease-in-out infinite reverse;
+    animation-delay: 0.4s;
+}
+
+@keyframes wave-shift {
+    0%,
+    100% {
+        transform: scaleY(1) translateX(0);
+    }
+    50% {
+        transform: scaleY(1.4) translateX(6px);
+    }
+}
+
+.wcl-wave__moon {
+    font-size: 32px;
+    animation: moon-glow 3s ease-in-out infinite;
+    margin-top: 8px;
+}
+
+@keyframes moon-glow {
+    0%,
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.15);
+        filter: brightness(1.3);
+    }
+}
+
+// ── Mosaic (TMMS24) ───────────────────────────────────────────────────────────
+.wcl-mosaic {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 12px;
+}
+
+.wcl-mosaic__tile {
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: mosaic-pop 0.5s ease backwards;
+    @for $i from 1 through 9 {
+        &--#{$i} {
+            animation-delay: #{($i - 1) * 0.12}s;
+        }
+    }
+}
+
+@keyframes mosaic-pop {
+    0% {
+        transform: scale(0) rotate(-20deg);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.2) rotate(5deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+// ── Default ───────────────────────────────────────────────────────────────────
+.wcl-default {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wcl-default__emoji {
+    font-size: 64px;
+    animation: default-bounce 1s ease infinite;
+}
+
+@keyframes default-bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+// ── Body del mensaje ──────────────────────────────────────────────────────────
+.wcl-body {
+    padding: 24px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+}
+
+.wcl-body__title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1e293b;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+}
+
+.wcl-body__message {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #475569;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+}
+
+.wcl-body__pre-result {
+    font-size: 13px;
+    line-height: 1.65;
+    color: #334155;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-style: italic;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-left: 3px solid currentColor;
+    border-radius: 0 8px 8px 0;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wcl-body__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 24px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: filter 0.18s, transform 0.15s;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    &:hover {
+        filter: brightness(1.08);
+        transform: translateY(-2px);
+    }
+    &:active {
+        transform: translateY(0);
+        filter: brightness(0.92);
+    }
+}

@@ -1,3 +1,103 @@
+<!-- ── Closing Modal (post-cuestionario) ─────────────────────────── -->
+@if (showClosingModal && currentClosing) {
+<div class="wm-overlay">
+    <div class="wm-modal wm-modal--closing" (click)="$event.stopPropagation()">
+
+        <!-- Visual animado según instrumento -->
+        <div class="wcl-visual">
+
+            @if (currentClosing.visual === 'breathe') {
+            <!-- Círculo de respiración pulsante -->
+            <div class="wcl-breathe">
+                <div class="wcl-breathe__ring wcl-breathe__ring--3"></div>
+                <div class="wcl-breathe__ring wcl-breathe__ring--2"></div>
+                <div class="wcl-breathe__ring wcl-breathe__ring--1"></div>
+                <div class="wcl-breathe__core">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a10 10 0 1 0 10 10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                </div>
+                <span class="wcl-breathe__label">Respira</span>
+            </div>
+            } @if (currentClosing.visual === 'stars') {
+            <!-- Estrellas flotantes con partículas -->
+            <div class="wcl-stars">
+                <div class="wcl-stars__particle wcl-stars__particle--1">✦</div>
+                <div class="wcl-stars__particle wcl-stars__particle--2">✦</div>
+                <div class="wcl-stars__particle wcl-stars__particle--3">✧</div>
+                <div class="wcl-stars__particle wcl-stars__particle--4">✦</div>
+                <div class="wcl-stars__particle wcl-stars__particle--5">✧</div>
+                <div class="wcl-stars__particle wcl-stars__particle--6">✦</div>
+                <div class="wcl-stars__center">
+                    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" fill="currentColor" opacity="0.15"/>
+                        <polygon points="12,4 14.47,9.13 20,9.93 16,13.82 16.94,19.33 12,16.77 7.06,19.33 8,13.82 4,9.93 9.53,9.13" stroke="currentColor" fill="currentColor" opacity="0.6"/>
+                    </svg>
+                </div>
+            </div>
+            } @if (currentClosing.visual === 'ripple') {
+            <!-- Ondas concéntricas tipo piedra en agua -->
+            <div class="wcl-ripple">
+                <div class="wcl-ripple__ring wcl-ripple__ring--1"></div>
+                <div class="wcl-ripple__ring wcl-ripple__ring--2"></div>
+                <div class="wcl-ripple__ring wcl-ripple__ring--3"></div>
+                <div class="wcl-ripple__dot"></div>
+            </div>
+            } @if (currentClosing.visual === 'wave') {
+            <!-- Onda sinusoidal animada (descanso / sueño) -->
+            <div class="wcl-wave">
+                <svg viewBox="0 0 200 60" class="wcl-wave__svg" preserveAspectRatio="none">
+                    <path class="wcl-wave__path wcl-wave__path--back" d="M0,30 C30,10 70,50 100,30 C130,10 170,50 200,30" fill="none" stroke-width="3" stroke-linecap="round"/>
+                    <path class="wcl-wave__path wcl-wave__path--front" d="M0,30 C30,10 70,50 100,30 C130,10 170,50 200,30" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <svg viewBox="0 0 200 60" class="wcl-wave__svg wcl-wave__svg--2" preserveAspectRatio="none">
+                    <path class="wcl-wave__path wcl-wave__path--back" d="M0,30 C30,50 70,10 100,30 C130,50 170,10 200,30" fill="none" stroke-width="3" stroke-linecap="round"/>
+                    <path class="wcl-wave__path wcl-wave__path--front" d="M0,30 C30,50 70,10 100,30 C130,50 170,10 200,30" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <div class="wcl-wave__moon">🌙</div>
+            </div>
+            } @if (currentClosing.visual === 'mosaic') {
+            <!-- Mosaico de emojis emocionales que aparecen secuencialmente -->
+            <div class="wcl-mosaic">
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--1">😊</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--2">😌</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--3">🥰</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--4">😤</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--5">😢</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--6">😮</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--7">😴</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--8">🤔</span>
+                <span class="wcl-mosaic__tile wcl-mosaic__tile--9">💪</span>
+            </div>
+            } @if (currentClosing.visual === 'default') {
+            <div class="wcl-default">
+                <span class="wcl-default__emoji">🎉</span>
+            </div>
+            }
+
+        </div>
+
+        <!-- Cuerpo del mensaje -->
+        <div class="wcl-body">
+            <h3 class="wcl-body__title">¡Has finalizado!</h3>
+            <p class="wcl-body__message">{{ currentClosing.message }}</p>
+            @if (currentClosing.preResultText) {
+            <p class="wcl-body__pre-result">{{ currentClosing.preResultText }}</p>
+            }
+            <button class="wcl-body__cta" (click)="onClosingContinue()" [style.background]="heroGradient" type="button">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+                {{ currentClosing.cta }}
+            </button>
+        </div>
+
+    </div>
+</div>
+}
+<!-- ── /Closing Modal ─────────────────────────────────────────────── -->
+
 @if (config) {
 <!-- Fase 2: Cuestionario -->
 <emo-questionnaire [config]="config" (back)="goBack()" (completed)="onCompleted($event)" (completedRich)="onCompletedRich($event)"></emo-questionnaire>
@@ -6,7 +106,7 @@
 
 <!-- ── Welcome Modal ────────────────────────────────────────────────── -->
 @if (showWelcomeModal) {
-<div class="wm-overlay" (click)="closeWelcomeModal()">
+<div class="wm-overlay">
     <div class="wm-modal" (click)="$event.stopPropagation()">
 
         <!-- Modal header with gradient -->
@@ -62,7 +162,7 @@
 
 <!-- ── Consent Modal ─────────────────────────────────────────────── -->
 @if (showConsentModal) {
-<div class="wm-overlay" (click)="onConsentDenied()">
+<div class="wm-overlay">
     <div class="wm-modal wm-modal--consent" (click)="$event.stopPropagation()">
 
         <!-- Header -->
@@ -121,6 +221,68 @@
 </div>
 }
 <!-- ── /Consent Modal ─────────────────────────────────────────────── -->
+
+<!-- ── Instructions Modal ────────────────────────────────────────── -->
+@if (showInstructionsModal && currentInstructions && pendingInstrument) {
+<div class="wm-overlay">
+    <div class="wm-modal wm-modal--instructions" (click)="$event.stopPropagation()">
+
+        <!-- Header con color del instrumento -->
+        <div class="wm-header wm-header--instructions" [style.background]="pendingInstrument.color">
+            <div class="wm-header__blur wm-header__blur--1"></div>
+            <div class="wm-header__blur wm-header__blur--2"></div>
+            <div class="wm-header__inner">
+                <div class="wm-header__icon-wrap">
+                    <img [src]="pendingInstrument.icon" alt="" class="wm-instr__icon" />
+                </div>
+                <span class="wm-header__module-tag">{{ pendingInstrument.code }}</span>
+                <h2 class="wm-header__title" style="font-size: 1.15rem;">{{ currentInstructions.heading }}</h2>
+            </div>
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
+            </svg>
+        </div>
+
+        <!-- Body -->
+        <div class="wm-body">
+
+            <!-- Nombre del instrumento + descripción breve -->
+            <div class="wm-instr__label-row">
+                <span class="wm-instr__code-pill" [style.background]="pendingInstrument.color + '18'" [style.color]="pendingInstrument.color">
+                    {{ pendingInstrument.label }}
+                </span>
+                <span class="wm-instr__count">{{ pendingInstrument.questionCount }} preguntas</span>
+            </div>
+
+            <!-- Qué evalúa y cómo responder -->
+            <p class="wm-instr__body">{{ currentInstructions.body }}</p>
+
+            <!-- Instrucción de contexto temporal -->
+            <div class="wm-instr__timeframe">
+                <svg class="wm-instr__timeframe-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>{{ currentInstructions.timeframe }}</span>
+            </div>
+
+            <!-- CTA -->
+            <button class="wm-instr__cta" (click)="onInstructionsStart()" [style.background]="pendingInstrument.color" type="button">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Comenzar prueba
+            </button>
+
+            <!-- Vínculo cancelar -->
+            <button class="wm-instr__cancel" (click)="onInstructionsDismiss()" type="button">Cancelar</button>
+
+        </div>
+
+    </div>
+</div>
+}
+<!-- ── /Instructions Modal ────────────────────────────────────────── -->
 
 <div class="is-page">
     <app-background-circles></app-background-circles>
