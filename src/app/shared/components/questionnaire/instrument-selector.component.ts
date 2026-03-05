@@ -79,6 +79,11 @@ export class InstrumentSelectorComponent implements OnInit {
 
     /** Controls the welcome modal visibility */
     showWelcomeModal = false;
+    /** Controls the consent modal visibility (shown when user picks an instrument) */
+    showConsentModal = false;
+    /** Instrument pending confirmation — set when consent modal opens */
+    pendingInstrument: InstrumentCard | null = null;
+
     /** First name of the current user for the welcome modal greeting */
     userName = '';
 
@@ -144,6 +149,27 @@ export class InstrumentSelectorComponent implements OnInit {
 
     selectInstrument(card: InstrumentCard): void {
         if (this.loadingQuestions || card.completed) return;
+        // Abrir modal de consentimiento primero — el usuario debe autorizar antes de continuar
+        this.pendingInstrument = card;
+        this.showConsentModal = true;
+    }
+
+    /** Llamado cuando el usuario toca "Autorizo" en el modal de consentimiento */
+    onConsentAccepted(): void {
+        this.showConsentModal = false;
+        const card = this.pendingInstrument;
+        this.pendingInstrument = null;
+        if (!card) return;
+        this._loadInstrumentQuestions(card);
+    }
+
+    /** Llamado cuando el usuario toca "No autorizo" */
+    onConsentDenied(): void {
+        this.showConsentModal = false;
+        this.pendingInstrument = null;
+    }
+
+    private _loadInstrumentQuestions(card: InstrumentCard): void {
         this.loadingQuestions = true;
         this.selectedInstrument = card;
 

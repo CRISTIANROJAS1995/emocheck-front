@@ -36,14 +36,14 @@
                 </p>
             </div>
 
-            <!-- Description paragraphs -->
-            <p class="wm-body__lead">
-                La salud mental no solo se trata de "estar bien", sino de aprender a escucharte, reconocer tus pensamientos y cuidar de tu bienestar emocional día a día.
-            </p>
-            <p class="wm-body__secondary">
-                Este espacio te invita a hacer una pausa para ti. Aquí podrás encontrar pequeñas acciones que te ayuden a recuperar tu equilibrio y serenidad interior. Antes de ello vamos a realizar unas pruebas para ayudarte a comprender qué está pasando en este momento
-                con tu yo interior:
-            </p>
+            <!-- Description paragraphs — dinámicos por módulo -->
+            @if (moduleDef.welcomeIntro.lead) {
+            <p class="wm-body__lead">{{ moduleDef.welcomeIntro.lead }}</p>
+            } @if (moduleDef.welcomeIntro.secondary) {
+            <p class="wm-body__secondary">{{ moduleDef.welcomeIntro.secondary }}</p>
+            } @if (!moduleDef.welcomeIntro.lead && !moduleDef.welcomeIntro.secondary) {
+            <p class="wm-body__secondary">El contenido de este módulo estará disponible próximamente.</p>
+            }
 
             <!-- CTA -->
             <button class="wm-cta" (click)="closeWelcomeModal()" [style.background]="heroGradient">
@@ -59,6 +59,68 @@
 </div>
 }
 <!-- ── /Welcome Modal ─────────────────────────────────────────────── -->
+
+<!-- ── Consent Modal ─────────────────────────────────────────────── -->
+@if (showConsentModal) {
+<div class="wm-overlay" (click)="onConsentDenied()">
+    <div class="wm-modal wm-modal--consent" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="wm-header wm-header--consent" [style.background]="heroGradient">
+            <div class="wm-header__blur wm-header__blur--1"></div>
+            <div class="wm-header__blur wm-header__blur--2"></div>
+            <div class="wm-header__inner">
+                <div class="wm-header__icon-wrap">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <span class="wm-header__module-tag">Privacidad y protección de datos</span>
+                <h2 class="wm-header__title" style="font-size: 1.1rem;">Consentimiento Informado</h2>
+            </div>
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
+            </svg>
+        </div>
+
+        <!-- Body -->
+        <div class="wm-body">
+            <p class="wm-consent__intro">
+                Antes de continuar, te invitamos a aceptar los acuerdos y condiciones relacionados con el manejo, protección y uso responsable de tu información personal. Tu privacidad y seguridad son una prioridad para nosotros:
+            </p>
+
+            <div class="wm-consent__box">
+                <svg class="wm-consent__box-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <p class="wm-consent__text">
+                    Autorizo de manera libre, previa e informada a <strong>Emocheck</strong> y a la empresa contratante el tratamiento de mis datos personales y de los resultados de la prueba que responderé, conforme a la <strong>Ley 1581 de 2012</strong>.
+                    La información será tratada con confidencialidad y utilizada únicamente para la elaboración de un plan de intervención orientado a mejorar los componentes evaluados, garantizando el ejercicio de mis derechos sobre los datos personales.
+                </p>
+            </div>
+
+            <!-- Botones de decisión -->
+            <div class="wm-consent__actions">
+                <button class="wm-consent__btn wm-consent__btn--accept" (click)="onConsentAccepted()" [style.background]="heroGradient" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Autorizo
+                </button>
+                <button class="wm-consent__btn wm-consent__btn--deny" (click)="onConsentDenied()" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    No autorizo
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+}
+<!-- ── /Consent Modal ─────────────────────────────────────────────── -->
 
 <div class="is-page">
     <app-background-circles></app-background-circles>

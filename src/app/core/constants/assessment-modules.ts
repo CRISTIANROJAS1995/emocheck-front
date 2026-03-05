@@ -12,6 +12,12 @@ export interface AssessmentModuleDefinition {
     questionnaireTitle: string;
     resultsTitle: string;
 
+    /** Texto de bienvenida que aparece en el modal inicial del módulo */
+    welcomeIntro: {
+        lead: string;
+        secondary: string;
+    };
+
     /** If true, higher option index indicates worse state (e.g., anxiety frequency). */
     higherIsWorse: boolean;
 
@@ -36,6 +42,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         route: '/mental-health',
         questionnaireTitle: 'Evaluación de Salud Mental',
         resultsTitle: 'Resultados de Salud Mental',
+        welcomeIntro: {
+            lead: 'La salud mental no solo se trata de "estar bien", sino de aprender a escucharte, reconocer tus pensamientos y cuidar de tu bienestar emocional día a día.',
+            secondary: 'Este espacio te invita a hacer una pausa para ti. Aquí podrás encontrar pequeñas acciones que te ayuden a recuperar tu equilibrio y serenidad interior. Antes de ello vamos a realizar unas pruebas para ayudarte a comprender qué está pasando en este momento con tu yo interior:',
+        },
         higherIsWorse: true,
         theme: {
             badgeGradient: 'linear-gradient(135deg, #2B7FFF 0%, #155DFC 100%)',
@@ -62,6 +72,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         route: '/work-fatigue',
         questionnaireTitle: 'Evaluación de Fatiga Laboral',
         resultsTitle: 'Resultados de Fatiga Laboral',
+        welcomeIntro: {
+            lead: 'La fatiga laboral aparece cuando el trabajo deja de ser solo una tarea y empieza a drenar nuestra energía, nuestras emociones y nuestra capacidad de disfrutar lo que hacemos y lo que somos.',
+            secondary: 'Te invitamos a hacer consciente tu rutina laboral. Aquí encontrarás pequeñas acciones que te ayudarán a reconocer el cansancio acumulado, recuperar energía y restablecer tu equilibrio físico y emocional. Antes de comenzar, realizaremos unas pruebas que te permitirán comprender cómo el trabajo está influyendo en tu bienestar en este momento.',
+        },
         higherIsWorse: true,
         theme: {
             badgeGradient: 'linear-gradient(135deg, #84CC16 0%, #65A30D 100%)',
@@ -88,6 +102,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         route: '/organizational-climate',
         questionnaireTitle: 'Evaluación de Clima Organizacional',
         resultsTitle: 'Resultados de Clima Organizacional',
+        welcomeIntro: {
+            lead: 'En nombre de la organización, valoramos profundamente tu opinión y tu experiencia dentro de nuestro equipo. El objetivo de esta consulta es conocer tu nivel de identificación y vínculo con la organización para seguir construyendo un mejor lugar para trabajar.',
+            secondary: 'Tu privacidad es prioridad: esta encuesta es 100% anónima. La información se usará exclusivamente para diagnóstico organizacional y planes de bienestar — nadie podrá identificar tus respuestas individuales. No hay respuestas correctas ni incorrectas: solo buscamos conocer tu percepción sincera. La escala va de 1 (Totalmente en desacuerdo) a 7 (Totalmente de acuerdo). El cuestionario tiene 18 preguntas y tomará aproximadamente 5 a 7 minutos.',
+        },
         higherIsWorse: false,
         theme: {
             badgeGradient: 'linear-gradient(135deg, #00BBA7 0%, #008F7F 100%)',
@@ -111,6 +129,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         route: '/psychosocial-risk',
         questionnaireTitle: 'Evaluación de Riesgo Psicosocial',
         resultsTitle: 'Resultados de Riesgo Psicosocial',
+        welcomeIntro: {
+            lead: '',
+            secondary: '',
+        },
         higherIsWorse: true,
         theme: {
             badgeGradient: 'linear-gradient(135deg, #FF6900 0%, #F54900 100%)',

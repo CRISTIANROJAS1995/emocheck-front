@@ -688,3 +688,88 @@
         gap: 8px;
     }
 }
+
+// ─── Consent Modal ────────────────────────────────────────────────────────────
+.wm-modal--consent {
+    max-width: 480px;
+}
+
+.wm-header--consent {
+    padding-bottom: 40px;
+}
+
+.wm-consent__intro {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #475569;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 16px;
+}
+
+.wm-consent__box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.wm-consent__box-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #64748b;
+}
+
+.wm-consent__text {
+    font-size: 13px;
+    line-height: 1.65;
+    color: #334155;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.wm-consent__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wm-consent__btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.15s, filter 0.15s;
+    border: none;
+    &:hover {
+        filter: brightness(0.92);
+    }
+    &:active {
+        filter: brightness(0.85);
+    }
+}
+
+.wm-consent__btn--accept {
+    color: #fff;
+    // background gradient applied via [style.background]="heroGradient" in the template
+}
+
+.wm-consent__btn--deny {
+    background: #fff;
+    color: #64748b;
+    border: 1.5px solid #cbd5e1;
+    &:hover {
+        border-color: #94a3b8;
+        color: #334155;
+        filter: none;
+    }
+}
