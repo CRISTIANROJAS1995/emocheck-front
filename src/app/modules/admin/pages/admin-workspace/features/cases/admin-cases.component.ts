@@ -117,7 +117,6 @@ export class AdminCasesComponent implements OnInit {
     load(): void {
         this.loading = true;
         const params = { status: this.statusFilter || undefined, priority: this.priorityFilter || undefined };
-        console.log('[Cases] load() params:', params);
         this.service.list(params)
             .pipe(
                 catchError((err) => {
@@ -128,7 +127,6 @@ export class AdminCasesComponent implements OnInit {
             )
             .subscribe({
                 next: (cases) => {
-                    console.log('[Cases] load() response:', cases);
                     this.cases = cases;
                     this.applyFilter();
                 },

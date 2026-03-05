@@ -153,10 +153,8 @@ export class DashboardService {
 
     getIndicators(query?: DashboardQuery): Observable<DashboardIndicatorsDto> {
         const params = this.buildParams(query);
-        console.log('[Dashboard] GET /dashboard/indicators', params.toString());
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/indicators`, { params }).pipe(
             map((res) => {
-                console.log('[Dashboard] /indicators raw:', res);
                 return this.mapIndicators(this.unwrapObject<any>(res));
             })
         );
@@ -164,10 +162,8 @@ export class DashboardService {
 
     getRiskDistribution(query?: DashboardQuery): Observable<RiskDistributionDto> {
         const params = this.buildParams(query);
-        console.log('[Dashboard] GET /dashboard/risk-distribution', params.toString());
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/risk-distribution`, { params }).pipe(
             map((res) => {
-                console.log('[Dashboard] /risk-distribution raw:', res);
                 return this.mapRiskDistribution(this.unwrapObject<any>(res));
             })
         );
@@ -175,10 +171,8 @@ export class DashboardService {
 
     getTrends(query: DashboardQuery): Observable<TrendDataDto[]> {
         const params = this.buildParams(query);
-        console.log('[Dashboard] GET /dashboard/trends', params.toString());
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/trends`, { params }).pipe(
             map((res) => {
-                console.log('[Dashboard] /trends raw:', res);
                 return this.unwrapArray<any>(res).map((t: any) => this.mapTrend(t));
             })
         );

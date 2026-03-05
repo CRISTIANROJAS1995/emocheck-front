@@ -116,8 +116,7 @@ export class TeamTrackingComponent implements OnInit {
     }
 
     exportReport(): void {
-        // UI only (no endpoint in backend doc yet)
-        console.log('Export report (stub)', { timeRange: this.selectedTimeRange, groupBy: this.selectedGroupBy });
+        // UI only (no endpoint disponible aún)
     }
 
     load(): void {
@@ -126,8 +125,6 @@ export class TeamTrackingComponent implements OnInit {
 
         const { startDate, endDate } = this.getPeriodIsoRange(this.selectedTimeRange);
         const periodType = this.mapGroupByToPeriodType(this.selectedGroupBy);
-
-        console.log('[TeamTracking] Cargando datos. Params:', { startDate, endDate, periodType });
 
         forkJoin({
             indicators: this.dashboard.getIndicators({ startDate, endDate }).pipe(
@@ -143,10 +140,6 @@ export class TeamTrackingComponent implements OnInit {
             .pipe(finalize(() => (this.loading = false)))
             .subscribe({
                 next: ({ indicators, risk, trends }) => {
-                    console.log('[TeamTracking] ✅ indicators RAW:', indicators);
-                    console.log('[TeamTracking] ✅ risk RAW:', risk);
-                    console.log('[TeamTracking] ✅ trends RAW:', trends);
-
                     this.indicators = indicators;
                     this.risk = risk;
                     this.trends = trends;

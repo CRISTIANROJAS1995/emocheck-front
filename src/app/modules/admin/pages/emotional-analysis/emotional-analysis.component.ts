@@ -794,7 +794,6 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                             (result.attention + result.concentration + result.balance + result.positivity + result.calm) / 5
                         );
                         const currentUser = this._authService.getCurrentUser();
-                        console.log('[EmotionalAnalysis] Creando alerta manual. Usuario:', currentUser?.id, 'Roles:', currentUser?.roles, 'Estado:', state);
                         this._alertsService.create({
                             userID: currentUser?.id ? Number(currentUser.id) : undefined,
                             severity,
@@ -805,10 +804,8 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
                             description: `Análisis emocional detectó estado ${state === 'critical' ? 'crítico' : 'de alerta'}. Emoción dominante: ${result.dominantEmotion ?? 'N/A'}. Promedio de bienestar: ${avg}%. Scores — Atención: ${result.attention}%, Concentración: ${result.concentration}%, Equilibrio: ${result.balance}%, Positividad: ${result.positivity}%, Calma: ${result.calm}%.`,
                         }).subscribe({
                             next: (alert) => {
-                                if (alert) {
-                                    console.log('[EmotionalAnalysis] ✅ Alerta creada en BD. ID:', alert.alertId);
-                                } else {
-                                    console.warn('[EmotionalAnalysis] ⚠️ POST /alert respondió null — posible 403 (rol insuficiente) o error de BD.');
+                                if (!alert) {
+                                    console.error('[EmotionalAnalysis] POST /alert respondió null — posible 403 o error de BD.');
                                 }
                             },
                             error: (e) => console.error('[EmotionalAnalysis] ❌ Error al crear alerta. Status:', e?.status, e?.error),

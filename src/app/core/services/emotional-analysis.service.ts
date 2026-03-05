@@ -89,13 +89,10 @@ export class EmotionalAnalysisService {
             createAlertOnFatigue: true,
         };
 
-        console.log('[EmotionalAnalysis] POST classify payload:', payload);
-
         return this.http
             .post<EmotionalAnalysisApiResponse>(`${this.apiUrl}/evaluation/emotional-analysis/classify`, payload)
             .pipe(
                 map((res) => {
-                    console.log('[EmotionalAnalysis] classify response RAW:', res);
                     return this.mapResponse(res);
                 })
             );

@@ -73,7 +73,6 @@ export class AssessmentHydrationService {
             map((res) => this.unwrapArray<SwaggerEvaluationWithResultDto>(res)),
             map((items) => {
                 const all = items ?? [];
-                console.log('[Hydration] my-completed items:', all.length, all);
 
                 if (Number.isFinite(targetEvaluationId) && targetEvaluationId > 0) {
                     // Deep-link to a specific evaluation — return just that one
@@ -89,21 +88,17 @@ export class AssessmentHydrationService {
                     .slice()
                     .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
 
-                console.log('[Hydration] candidates for module', moduleId, ':', candidates);
                 return candidates.length ? candidates : null;
             }),
             tap((matchOrList) => {
                 if (!matchOrList) return;
 
                 if (Array.isArray(matchOrList)) {
-                    // Merge all evaluations for this module into a single accumulated result
                     const merged = this.mergeEvaluationsForModule(moduleId, matchOrList);
-                    console.log('[Hydration] merged result from', matchOrList.length, 'evaluations:', merged);
-                    if (merged) this.state.setResult(merged); // backend siempre gana
+                    if (merged) this.state.setResult(merged);
                 } else {
                     const mapped = this.mapToAssessmentResult(moduleId, matchOrList);
-                    console.log('[Hydration] mapped result:', mapped);
-                    this.state.setResult(mapped); // backend siempre gana
+                    this.state.setResult(mapped);
                 }
             }),
             map(() => void 0),
@@ -188,23 +183,16 @@ export class AssessmentHydrationService {
         const current = this.state.getResult(moduleId);
         const evaluationResultId = current?.evaluationResultId;
 
-        console.log('[Hydration] hydrateRecommendationsIfMissing — current:', current);
-        console.log('[Hydration] evaluationResultId:', evaluationResultId);
-
         if (!current) return of(void 0);
         if (!evaluationResultId || evaluationResultId <= 0) {
-            console.warn('[Hydration] ⚠️ No evaluationResultId — no se puede llamar /recommendation/by-result');
             return of(void 0);
         }
         if ((current.recommendations ?? []).length > 0) {
-            console.log('[Hydration] Ya tiene recomendaciones, no se rehidrata.');
             return of(void 0);
         }
 
-        console.log('[Hydration] Llamando GET /recommendation/by-result/' + evaluationResultId);
         return this.http.get<unknown>(`${this.apiUrl}/recommendation/by-result/${evaluationResultId}`).pipe(
             map((res) => {
-                console.log('[Hydration] /recommendation/by-result raw:', res);
                 return this.unwrapArray<SwaggerRecommendationDto>(res);
             }),
             map((items) =>
@@ -213,7 +201,6 @@ export class AssessmentHydrationService {
                     .filter(Boolean)
             ),
             tap((recs) => {
-                console.log('[Hydration] recomendaciones mapeadas:', recs);
                 if (!recs.length) return;
                 const latest = this.state.getResult(moduleId);
                 if (!latest) return;

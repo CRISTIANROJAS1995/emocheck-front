@@ -181,7 +181,6 @@ export class AdminCaseTrackingService {
         // Si no hay filtro de status, traer todos los estados en paralelo (no existe endpoint "list all")
         if (!query?.status) {
             const ALL_STATUSES = ['OPEN', 'IN_PROGRESS', 'CLOSED', 'ESCALATED'];
-            console.log('[CaseTracking] list() — sin filtro, forkJoin de todos los estados');
             return forkJoin(
                 ALL_STATUSES.map(s =>
                     this.http.get<unknown>(`${this.apiUrl}/casetracking/status/${s}`).pipe(
@@ -192,7 +191,6 @@ export class AdminCaseTrackingService {
             ).pipe(
                 map(results => {
                     const all = results.flat();
-                    console.log('[CaseTracking] list() todos los estados:', all);
                     return this.applyClientFilters(all, query);
                 }),
             );
@@ -200,18 +198,14 @@ export class AdminCaseTrackingService {
 
         const status = query.status.toUpperCase();
         const url = `${this.apiUrl}/casetracking/status/${status}`;
-        console.log('[CaseTracking] list() GET', url);
         return this.http
             .get<unknown>(url)
             .pipe(
                 map((res) => {
-                    console.log('[CaseTracking] list() raw response:', res);
                     const rows = this.unwrapArray<BackendCaseTrackingDto>(res);
-                    console.log('[CaseTracking] list() unwrapped rows:', rows);
                     return rows.map((x) => this.mapCase(x));
                 }),
                 map((rows) => {
-                    console.log('[CaseTracking] list() mapped cases:', rows);
                     return this.applyClientFilters(rows, query);
                 }),
                 catchError((err) => { console.error('[CaseTracking] ERROR:', err); return of([]); }),

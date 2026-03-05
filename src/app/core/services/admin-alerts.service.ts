@@ -120,9 +120,7 @@ export class AdminAlertsService {
             .get<unknown>(`${this.apiUrl}/alert`)
             .pipe(
                 map((res) => {
-                    console.log('[AdminAlertsService] GET /alert RAW:', res);
                     const mapped = this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x));
-                    console.log('[AdminAlertsService] mapped alerts:', mapped);
                     return mapped;
                 }),
                 map((rows) => this.applyClientFilters(rows, query))
