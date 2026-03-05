@@ -26,9 +26,6 @@
 
             @if (module.status) {
             <div class="module-meta">
-                @if (module.points) {
-                <span class="module-meta__points">{{ module.points }} puntos</span>
-                <span class="module-meta__sep" aria-hidden="true">·</span> }
                 <span class="module-meta__label">{{ module.status.label }}</span>
             </div>
             } @else {

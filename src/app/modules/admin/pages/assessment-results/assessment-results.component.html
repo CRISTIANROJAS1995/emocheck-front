@@ -73,7 +73,7 @@
                         <span class="dim-card__name">{{ getDimensionLabel(d, idx) }}</span>
                         <span class="dim-card__percent" [ngClass]="'dim-percent--' + getBarTone(d.percent)">{{ d.percent }}%</span>
                     </div>
-                    <div class="dim-card__score-fraction" *ngIf="d.score != null && d.maxScore != null">
+                    <div class="dim-card__score-fraction" *ngIf="d.score != null && d.maxScore != null && d.score <= d.maxScore">
                         <span class="dim-card__score-val" [ngClass]="'dim-percent--' + getBarTone(d.percent)">{{ d.score | number:'1.0-0' }}</span>
                         <span class="dim-card__score-max">/ {{ d.maxScore }}</span>
                     </div>

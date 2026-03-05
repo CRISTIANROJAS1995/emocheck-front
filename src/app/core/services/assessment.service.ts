@@ -306,11 +306,38 @@ export class AssessmentService {
                     throw new Error(`Instrumento índice ${instrumentIndex} no encontrado en el módulo '${moduleId}'`);
                 }
 
-                const rootQuestions = (instrument.questions ?? [])
+                const allQuestions = instrument.questions ?? [];
+
+                // Build a map of children keyed by parentQuestionID so we can attach
+                // them to their root question as subItems (e.g. ICSP-VC P5a-P5j).
+                const childrenByParent = new Map<number, SwaggerQuestionDto[]>();
+                for (const q of allQuestions) {
+                    if (q.parentQuestionID != null) {
+                        const list = childrenByParent.get(q.parentQuestionID) ?? [];
+                        list.push(q);
+                        childrenByParent.set(q.parentQuestionID, list);
+                    }
+                }
+
+                const rootQuestions = allQuestions
                     .filter(q => q.parentQuestionID == null)
                     .sort((a, b) =>
                         (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0)
-                    );
+                    )
+                    .map(q => {
+                        // If backend sends children as separate rows (parentQuestionID),
+                        // attach them as subItems so the questionnaire can render the group.
+                        const children = childrenByParent.get(q.questionID);
+                        if (children?.length && !q.subItems?.length) {
+                            return {
+                                ...q,
+                                subItems: children.slice().sort((a, b) =>
+                                    (a.questionNumber ?? a.orderIndex ?? 0) - (b.questionNumber ?? b.orderIndex ?? 0)
+                                ),
+                            };
+                        }
+                        return q;
+                    });
 
                 // Guarda en moduleDetailCache SOLO las preguntas de este instrumento
                 // para que submit() las use correctamente al construir SubmitResponseDto[]
