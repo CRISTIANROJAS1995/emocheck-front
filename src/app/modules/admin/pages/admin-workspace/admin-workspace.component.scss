@@ -142,7 +142,7 @@
     border: 1px solid rgba(255, 255, 255, 0.20);
     border-radius: 18px;
     backdrop-filter: blur(12px);
-    padding: 20px 8px;
+    padding: 20px 0;
     flex-shrink: 0;
 }
 
@@ -153,6 +153,10 @@
     justify-content: center;
     padding: 0 24px;
     gap: 4px;
+    border-right: 1px solid rgba(255, 255, 255, 0.22);
+    &:last-child {
+        border-right: none;
+    }
 }
 
 .admin-hub__hstat-val {
@@ -171,10 +175,7 @@
 }
 
 .admin-hub__hstat-divider {
-    width: 1px;
-    background: rgba(255, 255, 255, 0.22);
-    align-self: stretch;
-    flex-shrink: 0;
+    display: none;
 }
 
 
@@ -579,37 +580,110 @@
     .admin-hub__header {
         flex-direction: column;
         align-items: flex-start;
-        padding: 28px 28px 24px;
+        padding: 24px 24px 20px;
     }
     .admin-hub__header-stats {
         width: 100%;
         justify-content: space-around;
+        padding: 14px 8px;
+    }
+    .admin-hub__hstat {
+        padding: 0 16px;
+    }
+    .admin-hub__grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 600px) {
     .admin-hub {
-        padding: 16px 16px 32px;
+        padding: 12px 10px 24px;
     }
+    /* ── Hero ── */
     .admin-hub__header {
-        padding: 24px 20px 20px;
+        padding: 16px 14px 14px;
         min-height: unset;
+        gap: 12px;
+        border-radius: 14px;
+    }
+    .admin-hub__badge {
+        font-size: 8.5px;
+        padding: 3px 9px;
+        margin-bottom: 6px;
+        letter-spacing: 0.10em;
     }
     .admin-hub__title {
-        font-size: 24px;
+        font-size: 17px;
+        letter-spacing: -0.2px;
+        margin-bottom: 4px;
+        line-height: 1.2;
+        white-space: nowrap;
     }
+    .admin-hub__subtitle {
+        font-size: 11px;
+        line-height: 1.5;
+        max-width: 100%;
+    }
+    /* ── Stats panel: 2×2 grid ── */
     .admin-hub__header-stats {
+        width: 100%;
         flex-wrap: wrap;
-        gap: 4px;
+        padding: 0;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        overflow: hidden;
+    }
+    .admin-hub__hstat {
+        flex: 0 0 50%;
+        padding: 10px 8px;
+        box-sizing: border-box;
+        border-right: 1px solid rgba(255, 255, 255, 0.16);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    }
+    /* 2nd and 4th items (right column): no right border */
+    .admin-hub__hstat:nth-child(2n) {
+        border-right: none;
+    }
+    /* 3rd and 4th items (bottom row): no bottom border */
+    .admin-hub__hstat:nth-child(n+3) {
+        border-bottom: none;
     }
     .admin-hub__hstat-divider {
         display: none;
     }
-    .admin-hub__hstat {
-        padding: 8px 14px;
+    .admin-hub__hstat-val {
+        font-size: 15px;
+        letter-spacing: -0.2px;
     }
+    .admin-hub__hstat-lbl {
+        font-size: 9px;
+        margin-top: 2px;
+        letter-spacing: 0.05em;
+    }
+    /* ── Section heading ── */
+    .admin-hub__section-head {
+        margin: 16px 0 10px;
+    }
+    /* ── Feature cards: 2 columns ── */
     .admin-hub__grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .feature-card__body {
+        padding: 10px 12px 8px;
+    }
+    .feature-card__title {
+        font-size: 12px;
+    }
+    .feature-card__desc {
+        font-size: 10.5px;
+    }
+    .feature-card__footer {
+        padding: 7px 12px;
+    }
+    .feature-card__link {
+        font-size: 11px;
     }
 }
 

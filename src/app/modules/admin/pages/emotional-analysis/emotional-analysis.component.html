@@ -1,4 +1,4 @@
-<div class="page-gradient-bg relative flex min-h-screen w-full items-center justify-center overflow-hidden px-6 py-10">
+<div class="page-gradient-bg relative flex min-h-screen w-full items-start justify-center overflow-x-hidden px-4 py-6 sm:px-6 sm:py-10">
 
     <!-- Decorative background circles -->
     <!-- Círculo azul superior derecho -->
@@ -15,7 +15,7 @@
     <!-- PANTALLA 0-A: Solicitud de permiso de cámara (antes de pedir)    -->
     <!-- ══════════════════════════════════════════════════════════════════ -->
     <div *ngIf="!showResults && cameraPermission === 'prompt'" class="w-full max-w-[480px]">
-        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#CBFBF1] px-8 py-10 text-center">
+        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#CBFBF1] px-5 py-8 text-center sm:px-8 sm:py-10">
 
             <!-- Icono cámara -->
             <div class="flex h-[72px] w-[72px] items-center justify-center rounded-[20px]" style="background: linear-gradient(135deg, #00BBA7 0%, #155DFC 100%); box-shadow: 0 10px 20px -4px rgba(0,187,167,.35);">
@@ -65,7 +65,7 @@
     <!-- PANTALLA 0-B: Esperando que el usuario acepte el diálogo         -->
     <!-- ══════════════════════════════════════════════════════════════════ -->
     <div *ngIf="!showResults && cameraPermission === 'requesting'" class="w-full max-w-[480px]">
-        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#CBFBF1] px-8 py-10 text-center">
+        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#CBFBF1] px-5 py-8 text-center sm:px-8 sm:py-10">
             <div class="flex h-[72px] w-[72px] items-center justify-center rounded-[20px]" style="background: linear-gradient(135deg, #00BBA7 0%, #155DFC 100%);">
                 <!-- Spinner animado -->
                 <svg class="h-9 w-9 animate-spin text-white" fill="none" viewBox="0 0 24 24">
@@ -93,7 +93,7 @@
     <!-- PANTALLA 0-C: Permiso denegado / error de cámara                 -->
     <!-- ══════════════════════════════════════════════════════════════════ -->
     <div *ngIf="!showResults && cameraPermission === 'denied'" class="w-full max-w-[480px]">
-        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#FCA5A5] bg-[#FFF8F8] px-8 py-10 text-center">
+        <div class="analysis-card flex flex-col items-center gap-5 rounded-[24px] border-[0.667px] border-[#FCA5A5] bg-[#FFF8F8] px-5 py-8 text-center sm:px-8 sm:py-10">
 
             <!-- Icono de error -->
             <div class="flex h-[72px] w-[72px] items-center justify-center rounded-[20px] bg-[#FEE2E2]">
@@ -174,7 +174,7 @@
     <!-- Usamos [hidden] en lugar de *ngIf para que el <video> siempre esté en el DOM
          y el ViewChild sea accesible antes de que la cámara arranque. -->
     <div [hidden]="showResults || (cameraPermission !== 'granted' && cameraPermission !== 'requesting')" class="w-full max-w-[768px]">
-        <div class="analysis-card flex flex-col items-start gap-4 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
+        <div class="analysis-card flex flex-col items-start gap-4 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-4 py-6 sm:px-8 sm:py-8">
 
             <div class="flex w-full flex-col items-center text-center">
                 <!-- Heart Icon -->
@@ -301,7 +301,7 @@
 
     <!-- Results Screen -->
     <div *ngIf="showResults && dynamicContent" class="w-full max-w-[672px]">
-        <div class="analysis-card flex flex-col gap-6 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-[32.667px] py-[32.667px]">
+        <div class="analysis-card flex flex-col gap-6 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-4 py-6 sm:px-8 sm:py-8">
 
             <div class="flex flex-col items-center text-center">
                 <!-- Icon (Dynamic) -->
@@ -343,7 +343,7 @@
                 </div>
 
                 <!-- Summary -->
-                <div class="mt-3 w-full rounded-[16px] flex flex-col" style="border: 0.667px solid #D8F999; background: linear-gradient(135deg, #F7FEE7 0%, #F0FDFA 10%); padding: 16px 40px 12px 40px; gap: 8px;">
+                <div class="mt-3 w-full rounded-[16px] flex flex-col" style="border: 0.667px solid #D8F999; background: linear-gradient(135deg, #F7FEE7 0%, #F0FDFA 10%); padding: 16px 12px 12px 12px; gap: 8px;">
                     <h3 class="text-center text-[#00786F]" style="font-family: Montserrat; font-size: 12px; font-weight: 700; line-height: 16px;">Resumen de Análisis Emocional</h3>
                     <div class="flex items-center justify-between">
                         <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center gap-2">

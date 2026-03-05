@@ -233,7 +233,7 @@
             <mat-icon class="admin-filters__icon">search</mat-icon>
             <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()" placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div class="admin-filters__actions">
             <span class="admin-filters__count">{{ filteredUsers.length }} de {{ users.length }}</span>
             <button class="btn btn--outline btn--sm" (click)="loadUsers()" [disabled]="loading">
                 <mat-icon>refresh</mat-icon> Actualizar

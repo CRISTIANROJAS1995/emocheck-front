@@ -79,6 +79,18 @@ export class EmotionalAnalysisService {
     }
 
     /**
+     * Proxy del backend para llamar Face++ API.
+     * El backend reenvía la imagen a Face++ con las API keys del servidor
+     * (evita CORS y no expone credenciales en el cliente).
+     */
+    detectFaceEmotion(imageBase64: string): Observable<any> {
+        return this.http.post<any>(
+            `${this.apiUrl}/evaluation/facepp/detect`,
+            { imageBase64 }
+        );
+    }
+
+    /**
      * Envía la emoción detectada por Face++ al backend para mapear a scores.
      * NO envía imágenes — la detección se hizo via Face++ API.
      */

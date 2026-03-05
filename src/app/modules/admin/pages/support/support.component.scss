@@ -123,23 +123,26 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    padding: 8.333px 11.865px 7.667px 12.667px !important;
-    border-radius: 8px !important;
+    padding: 8px 14px;
+    border-radius: 8px;
     border: 0.667px solid rgba(255, 255, 255, 0.30);
     background: rgba(255, 255, 255, 0.20);
-    color: #FFFFFF !important;
+    color: #FFFFFF;
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;
-    min-width: 0;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
     box-sizing: border-box;
-    overflow: hidden;
+    cursor: pointer;
     --mat-icon-size: 16px;
     --mdc-icon-size: 16px;
 }
 
 .support-hero__back:hover {
-    color: #000000 !important;
+    background: rgba(255, 255, 255, 0.32);
+    color: #FFFFFF;
 }
 
 .support-hero__back-content {
@@ -166,12 +169,6 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
     width: 100% !important;
     height: 100% !important;
     display: block;
-}
-
-.support-hero__back .mat-mdc-button-persistent-ripple,
-.support-hero__back .mdc-button__ripple,
-.support-hero__back .mat-mdc-focus-indicator::before {
-    border-radius: 8px !important;
 }
 
 .support-container {
@@ -281,7 +278,6 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
     padding: 16px;
     margin-bottom: 14px;
     box-shadow: 0 12px 22px rgba(15, 23, 42, 0.05);
-    overflow: hidden;
     isolation: isolate;
     --sc-accent-a: rgba(0, 187, 167, 0.58);
     --sc-accent-b: rgba(2, 132, 199, 0.66);
@@ -377,8 +373,9 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
     border: 1px dashed rgba(148, 163, 184, 0.34);
     background: radial-gradient(680px 220px at 15% 0%, rgba(2, 132, 199, 0.08) 0%, rgba(2, 132, 199, 0) 60%), rgba(255, 255, 255, 0.66);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
+    min-width: 0;
 }
 
 .support-card--emergency .support-empty {
@@ -449,10 +446,14 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
     border: 1px solid rgba(21, 93, 252, 0.18);
     transition: background 0.14s, transform 0.14s;
     white-space: nowrap;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    max-width: 100%;
     mat-icon {
         font-size: 14px;
         width: 14px;
         height: 14px;
+        flex-shrink: 0;
     }
     &:hover {
         background: rgba(21, 93, 252, 0.14);
@@ -649,6 +650,19 @@ a.support-hero__back mat-icon.support-hero__back-icon svg {
 @media (max-width: 520px) {
     .support-page {
         padding: 22px 16px 44px;
+    }
+    .support-empty {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .support-empty__meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .support-empty__link {
+        white-space: normal;
+        word-break: break-all;
+        border-radius: 10px;
     }
 }
 

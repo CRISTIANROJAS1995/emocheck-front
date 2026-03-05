@@ -99,6 +99,11 @@
     font-weight: 400;
     line-height: 24px;
     color: #1E2939;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1 1 0;
 }
 
 .results-shell {
@@ -800,18 +805,20 @@
 
 .rec-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     padding: 12px;
     background: rgba(255, 255, 255, 0.70);
     border-radius: 12px;
     margin-top: 0;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .rec-badge {
     width: 24px;
     height: 24px;
+    min-width: 24px;
     border-radius: 9999px;
     background: #00BBA7;
     color: #FFFFFF;
@@ -822,6 +829,8 @@
     font-size: 12px;
     font-weight: 700;
     line-height: 24px;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 
 .rec-text {
@@ -1031,5 +1040,98 @@
     }
     .card--recommendations {
         height: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .results-shell {
+        padding: 16px 12px 48px;
+        gap: 14px;
+    }
+    /* ── Summary card ── */
+    .summary-card {
+        padding: 20px 16px 20px;
+    }
+    .summary-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        text-align: center;
+    }
+    .score-ring {
+        width: 120px;
+        height: 120px;
+    }
+    .ring {
+        width: 120px;
+        height: 120px;
+    }
+    .ring svg {
+        width: 120px;
+        height: 120px;
+    }
+    .summary-content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .outcome-pill {
+        height: auto;
+        padding: 6px 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .summary-message {
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
+    }
+    .summary-date {
+        width: auto;
+        justify-content: center;
+    }
+    /* ── Dimensions card ── */
+    .card--dimensions {
+        padding: 18px 14px;
+        gap: 14px;
+    }
+    .dim-cards {
+        grid-template-columns: 1fr;
+    }
+    /* ── Recommendations card ── */
+    .card--recommendations {
+        padding: 18px 14px;
+        gap: 14px;
+    }
+    .rec-text {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    /* ── Actions ── */
+    .actions {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .action-card {
+        width: 100%;
+        height: auto;
+        padding: 16px;
+    }
+    .action-btn {
+        width: 100%;
+    }
+    /* ── Help card ── */
+    .help-card {
+        padding: 18px 14px 14px;
+    }
+    .help-desc,
+    .help-actions {
+        margin-left: 0;
+    }
+    /* ── Header title wrap ── */
+    .results-title {
+        font-size: 14px;
+        line-height: 20px;
     }
 }

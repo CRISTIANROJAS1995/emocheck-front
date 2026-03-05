@@ -1,23 +1,22 @@
-<div class="page-gradient-bg relative flex min-h-screen w-full items-center justify-center overflow-hidden px-4 py-10 sm:px-6">
+<div class="page-gradient-bg relative flex min-h-screen w-full items-start justify-center overflow-x-hidden px-5 py-8 sm:items-center sm:px-6 sm:py-10">
 
     <!-- Decorative background circles -->
     <app-background-circles></app-background-circles>
 
-    <div class="w-full max-w-[576px]">
-        <div class="signin-card overflow-hidden rounded-3xl border border-teal-100 bg-white/90 shadow-2xl sm:h-[600px]" style="font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
-            <div class="flex h-full flex-col items-center px-4 py-3 text-center sm:px-0">
-                <img class="mt-0 w-40 max-w-full" src="images/logo/emocheck-logo.png" alt="EmoCheck" />
+    <div class="relative z-10 w-full max-w-[480px]">
+        <div class="signin-card overflow-hidden rounded-3xl border border-teal-100 bg-white/90 shadow-2xl" style="font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+            <div class="flex flex-col items-center px-6 py-7 text-center sm:px-10 sm:py-8">
+                <img class="mt-0 w-32 max-w-full sm:w-40" src="images/logo/emocheck-logo.png" alt="EmoCheck" />
 
                 <div class="mt-2 text-lg font-bold text-blue-600">Iniciar Sesión</div>
 
-                <div class="mt-2 inline-flex items-center gap-2 whitespace-nowrap text-[13px] font-bold leading-[18.5714px] text-teal-600">
-                    <img class="h-4 w-4" src="icons/Icon.svg" alt="" aria-hidden="true" />
-                    <span>Tu bienestar también es parte de la productividad</span>
-                    <img class="h-4 w-4" src="icons/Icon.svg" alt="" aria-hidden="true" />
-                </div>
+                <p class="mt-2 text-center text-[13px] font-bold leading-snug text-teal-600">
+                    <img class="mr-1 inline-block h-3.5 w-3.5 align-middle" src="icons/Icon.svg" alt="" aria-hidden="true" /> Tu bienestar también es parte de la productividad
+                    <img class="ml-1 inline-block h-3.5 w-3.5 align-middle" src="icons/Icon.svg" alt="" aria-hidden="true" />
+                </p>
 
                 <!-- Sign in form -->
-                <form class="mt-10 w-[510.667px] max-w-full px-0 text-left" [formGroup]="signInForm" #signInNgForm="ngForm">
+                <form class="mt-8 w-full text-left" [formGroup]="signInForm" #signInNgForm="ngForm">
                     <!-- Email field -->
                     <div class="mb-4">
                         <label class="mb-2 block text-[14px] font-medium leading-[14px] text-[#2D3748]" style="font-family: Montserrat;">Correo electrónico</label>

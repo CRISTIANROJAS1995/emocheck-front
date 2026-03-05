@@ -600,48 +600,49 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
 }
 
 .tracking-state__cta {
-    display: inline-flex;
-    padding: 10.333px 15.24px 9.667px 16px !important;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 16px;
-    border-radius: 8px !important;
-    background: linear-gradient(90deg, #AD46FF 0%, #E60076 100%) !important;
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #AD46FF 0%, #E60076 100%);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.10), 0 2px 4px -2px rgba(0, 0, 0, 0.10);
-    color: #FFFFFF !important;
+    color: #FFFFFF;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
-    font-style: normal;
     font-weight: 500;
     line-height: 20px;
-    text-transform: none;
-    min-width: 0;
+    white-space: normal;
+    word-break: break-word;
+    cursor: pointer;
+    outline: none;
+    transition: filter 0.15s, transform 0.15s;
+    &:hover {
+        filter: brightness(0.92);
+        transform: translateY(-1px);
+    }
+    &:active {
+        transform: translateY(0);
+    }
 }
 
 .tracking-state__cta mat-icon {
-    --mat-icon-size: 12px;
-    --mdc-icon-size: 12px;
-    width: 12px !important;
-    height: 12px !important;
-    font-size: 12px !important;
-    line-height: 12px !important;
-    flex: 0 0 12px;
-    color: #FFFFFF !important;
+    width: 14px !important;
+    height: 14px !important;
+    font-size: 14px !important;
+    line-height: 14px !important;
+    flex: 0 0 14px;
+    color: #FFFFFF;
 }
 
 .tracking-state__cta mat-icon svg {
-    width: 100% !important;
-    height: 100% !important;
+    width: 100%;
+    height: 100%;
     display: block;
-}
-
-
-/* Make MDC ripple/focus layers follow the same radius */
-
-.tracking-state__cta .mat-mdc-button-persistent-ripple,
-.tracking-state__cta .mdc-button__ripple,
-.tracking-state__cta .mat-mdc-focus-indicator::before {
-    border-radius: 8px !important;
 }
 
 .tracking-state__chart-title {
@@ -2545,12 +2546,8 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
         line-height: 18px;
     }
     .tracking-state__cta {
-        width: 100%;
-        box-sizing: border-box;
-        white-space: normal;
-        text-align: left;
-        padding: 8px 12px !important;
-        font-size: 12px !important;
+        font-size: 13px !important;
+        padding: 9px 12px !important;
     }
     /* Filters */
     .tracking-filters__grid {

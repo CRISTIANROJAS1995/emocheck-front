@@ -24,17 +24,14 @@
                 <span class="admin-hub__hstat-val">{{ indicators?.totalUsers ?? '—' }}</span>
                 <span class="admin-hub__hstat-lbl">Usuarios</span>
             </div>
-            <div class="admin-hub__hstat-divider"></div>
             <div class="admin-hub__hstat">
                 <span class="admin-hub__hstat-val">{{ indicators?.totalEvaluationsCompleted ?? '—' }}</span>
                 <span class="admin-hub__hstat-lbl">Evaluaciones</span>
             </div>
-            <div class="admin-hub__hstat-divider"></div>
             <div class="admin-hub__hstat">
                 <span class="admin-hub__hstat-val">{{ alertStats?.totalAlerts ?? '—' }}</span>
                 <span class="admin-hub__hstat-lbl">Alertas</span>
             </div>
-            <div class="admin-hub__hstat-divider"></div>
             <div class="admin-hub__hstat">
                 <span class="admin-hub__hstat-val">{{ (indicators?.participationRate ?? 0) | number:'1.0-1' }}%</span>
                 <span class="admin-hub__hstat-lbl">Participación</span>

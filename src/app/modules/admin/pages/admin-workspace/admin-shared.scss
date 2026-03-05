@@ -378,6 +378,12 @@ $transition-slow: 0.35s cubic-bezier(.4, 0, .2, 1);
             font-weight: 400;
         }
     }
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
     &__count {
         font-size: 12px;
         color: $text-secondary;
@@ -1309,6 +1315,12 @@ table.admin-table {
         &__search {
             min-width: unset;
             width: 100%;
+        }
+        &__actions {
+            width: 100%;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 8px;
         }
     }
     .editor-panel__grid,
