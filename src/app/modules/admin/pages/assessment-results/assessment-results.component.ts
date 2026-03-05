@@ -175,7 +175,13 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     }
 
     get ringProgress(): number {
-        return Math.max(0, Math.min(100, this.result?.score ?? 0));
+        const raw = Math.max(0, Math.min(100, this.result?.score ?? 0));
+        // For modules where higher score = worse (e.g. anxiety, depression),
+        // invert the ring so a low score (healthy) shows as mostly full.
+        if (this.moduleDef?.higherIsWorse) {
+            return 100 - raw;
+        }
+        return raw;
     }
 
     get ringDasharray(): string {
@@ -227,9 +233,14 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         }
     }
 
-    /** Effective message updated to reflect the derived outcome. */
+    /** Effective message: uses backend interpretation directly, falls back to derived text. */
     get effectiveMessage(): string {
         if (!this.result) return '';
+        // Backend interpretation always wins
+        if (this.result.message && this.result.message.trim()) {
+            return this.result.message.trim();
+        }
+        // Fallback derived text
         const outcome = this.effectiveOutcome;
         const score = this.result.score;
         switch (outcome) {
@@ -318,5 +329,26 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
 
         // 3. Fallback posicional
         return labels[index]?.label ?? dimension.label?.trim() ?? '';
+    }
+
+    getDimensionDisplayLabel(dimension: { id: string; label: string; instrumentCode?: string }, index: number): string {
+        const rawCode = (dimension.instrumentCode ?? '').toUpperCase().trim();
+
+        // DASS-21 combinado
+        if (rawCode === 'DASS21') return 'DASS-21 (Depresión, Ansiedad y Estrés)';
+
+        // DASS-21 sub-escalas → solo el nombre limpio (sin sufijo de código)
+        if (['DASS21_ANXIETY', 'DASS21_DEPRESSION', 'DASS21_STRESS'].includes(rawCode)) {
+            return this.getDimensionLabel(dimension, index);
+        }
+
+        // Otros: "Ansiedad (GAD-7)", "Depresión (PHQ-9)", etc.
+        const friendlyLabel = this.getDimensionLabel(dimension, index);
+        if (!rawCode) return friendlyLabel;
+        const formattedCode = rawCode.replace(/([A-Z]+)(\d+)$/, '$1-$2');
+        if (friendlyLabel.toUpperCase().includes(rawCode) || friendlyLabel.toUpperCase().includes(formattedCode)) {
+            return friendlyLabel;
+        }
+        return `${friendlyLabel} (${formattedCode})`;
     }
 }

@@ -2113,8 +2113,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     border: 0.667px solid #D8F999;
     background: #FFF;
     display: flex;
-    height: 141.333px;
-    padding: 16.667px 16.667px 0.667px 16.667px;
+    height: auto;
+    min-height: 141.333px;
+    padding: 16px;
     flex-direction: column;
     align-items: flex-start;
     align-self: stretch;
@@ -2160,8 +2161,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
 
 /* Per-module card theming */
 
-.personal-card--mental-health {}
-
 .personal-card--mental-health .personal-card__icon {
     background: linear-gradient(135deg, #2B7FFF 0%, #155DFC 100%);
 }
@@ -2169,8 +2168,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
 .personal-card--mental-health .personal-card__title {
     color: #155DFC;
 }
-
-.personal-card--work-fatigue {}
 
 .personal-card--work-fatigue .personal-card__icon {
     background: linear-gradient(135deg, #7CCF00 0%, #5EA500 100%);
@@ -2180,8 +2177,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #497D00;
 }
 
-.personal-card--organizational-climate {}
-
 .personal-card--organizational-climate .personal-card__icon {
     background: linear-gradient(135deg, #00BBA7 0%, #009689 100%);
 }
@@ -2189,8 +2184,6 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
 .personal-card--organizational-climate .personal-card__title {
     color: #009689;
 }
-
-.personal-card--psychosocial-risk {}
 
 .personal-card--psychosocial-risk .personal-card__icon {
     background: linear-gradient(135deg, #FF6900 0%, #F54900 100%);
@@ -2267,15 +2260,11 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
 }
 
 .footer-btn {
-    display: flex !important;
-    height: 77.333px !important;
-    min-height: 77.333px !important;
-    --mdc-text-button-container-height: 77.333px;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    --mdc-text-button-container-height: auto;
     padding: 0 !important;
-    padding-bottom: 0 !important;
-    justify-content: stretch;
-    align-items: stretch;
-    justify-self: stretch;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
@@ -2285,11 +2274,9 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     color: #0A0A0A !important;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
-    font-style: normal;
     font-weight: 600;
     line-height: 20px;
     text-transform: none;
-    /* Remove default Material gray hover/focus layer */
     --mdc-text-button-hover-state-layer-color: transparent;
     --mdc-text-button-hover-state-layer-opacity: 0;
     --mdc-text-button-pressed-state-layer-color: transparent;
@@ -2305,25 +2292,40 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
 :host ::ng-deep .footer-btn .mdc-button__label {
     display: flex !important;
     width: 100% !important;
-    height: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
-    /* Ensure wrapper is centered even if sizing is affected by MDC internals */
     justify-content: center;
     align-items: center;
 }
 
+
+/* Force Material internal button to row layout with padding */
+
+:host ::ng-deep .footer-btn.mat-mdc-button .mat-mdc-button-touch-target,
+:host ::ng-deep .footer-btn .mat-mdc-button-base {
+    height: auto !important;
+}
+
+:host ::ng-deep .footer-btn .mat-mdc-button-base,
+:host ::ng-deep .footer-btn .mdc-button {
+    padding: 12px 20px !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    white-space: normal !important;
+}
+
 .footer-btn__content {
     display: flex;
-    width: 100%;
-    height: 100%;
-    flex: 1 1 auto;
-    box-sizing: border-box;
-    padding: 0 16px 8px;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    width: 100%;
+    padding: 0;
     text-align: center;
 }
 
@@ -2434,5 +2436,183 @@ button.tracking-hero__back mat-icon.tracking-hero__back-icon svg {
     .my-tracking-container {
         padding-left: 24px;
         padding-right: 24px;
+    }
+}
+
+
+/* ─── Mobile ≤ 640px ──────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    /* Container */
+    .my-tracking-container {
+        padding: 12px 12px 48px;
+    }
+    /* Hero banner */
+    .tracking-hero {
+        width: 100% !important;
+        height: auto !important;
+        min-height: unset;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px 18px;
+    }
+    .tracking-hero__title {
+        font-size: 18px;
+        line-height: 28px;
+    }
+    .tracking-hero__subtitle {
+        font-size: 12px;
+    }
+    .tracking-hero__back {
+        width: 100%;
+    }
+    /* Thank-you card */
+    .tracking-thanks {
+        width: 100% !important;
+        height: auto !important;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 16px;
+        gap: 12px;
+    }
+    .tracking-thanks__icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+    }
+    .tracking-thanks__icon-img {
+        width: 22px;
+        height: 22px;
+    }
+    .tracking-thanks__content {
+        flex: 1 1 200px;
+        min-width: 0;
+        margin-left: 0;
+        gap: 4px;
+    }
+    .tracking-thanks__text {
+        font-size: 13px;
+        line-height: 20px;
+        white-space: normal !important;
+    }
+    .tracking-thanks__sparkles {
+        display: none;
+    }
+    /* State card */
+    .tracking-state {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 16px;
+    }
+    .tracking-state__body {
+        grid-template-columns: 72px 1fr;
+        gap: 14px;
+    }
+    .tracking-state__bigicon {
+        width: 72px;
+        height: 72px;
+    }
+    .tracking-state__bigicon mat-icon {
+        --mat-icon-size: 36px;
+        --mdc-icon-size: 36px;
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 36px !important;
+        line-height: 36px !important;
+    }
+    .tracking-state__headline {
+        font-size: 18px;
+        line-height: 28px;
+        gap: 6px;
+    }
+    .tracking-state__headline-icon {
+        width: 18px;
+        height: 18px;
+    }
+    .tracking-state__score-main {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .tracking-state__score-value {
+        width: auto !important;
+        font-size: 28px !important;
+        line-height: 36px !important;
+    }
+    .tracking-state__desc {
+        font-size: 12px;
+        line-height: 18px;
+    }
+    .tracking-state__cta {
+        width: 100%;
+        box-sizing: border-box;
+        white-space: normal;
+        text-align: left;
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+    /* Filters */
+    .tracking-filters__grid {
+        grid-template-columns: 1fr;
+    }
+    /* Stats row */
+    .tracking-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+    .stat-card {
+        padding: 14px 12px;
+    }
+    .stat-card__value {
+        font-size: 22px;
+    }
+    .stat-card__label {
+        font-size: 11px;
+    }
+    /* Module rows */
+    .module-row__right {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+    /* Result cards */
+    .tracking-results__grid {
+        grid-template-columns: 1fr;
+    }
+    .result-card__head {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .result-card__actions {
+        margin-left: auto;
+    }
+    /* Charts */
+    .tracking-charts {
+        grid-template-columns: 1fr;
+    }
+    .chart-card {
+        padding: 14px;
+    }
+    /* Follow-up grid */
+    .tracking-followups__grid {
+        grid-template-columns: 1fr;
+    }
+    /* Personal recommendations */
+    .tracking-personal__footer,
+    .footer-btn-row {
+        flex-direction: column;
+        gap: 10px;
+        grid-template-columns: 1fr;
+    }
+    .footer-btn {
+        width: 100%;
+        box-sizing: border-box;
+        height: 52px !important;
+        min-height: 52px !important;
+        --mdc-text-button-container-height: 52px;
+    }
+    .footer-btn__content {
+        gap: 8px;
     }
 }

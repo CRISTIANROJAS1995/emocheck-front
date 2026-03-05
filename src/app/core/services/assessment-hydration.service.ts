@@ -99,11 +99,11 @@ export class AssessmentHydrationService {
                     // Merge all evaluations for this module into a single accumulated result
                     const merged = this.mergeEvaluationsForModule(moduleId, matchOrList);
                     console.log('[Hydration] merged result from', matchOrList.length, 'evaluations:', merged);
-                    if (merged) this.state.mergeResult(merged);
+                    if (merged) this.state.setResult(merged); // backend siempre gana
                 } else {
                     const mapped = this.mapToAssessmentResult(moduleId, matchOrList);
                     console.log('[Hydration] mapped result:', mapped);
-                    this.state.mergeResult(mapped);
+                    this.state.setResult(mapped); // backend siempre gana
                 }
             }),
             map(() => void 0),
@@ -135,16 +135,8 @@ export class AssessmentHydrationService {
                 for (const [moduleId, evaluations] of Object.entries(grouped) as Array<[AssessmentModuleId, SwaggerEvaluationWithResultDto[]]>) {
                     const merged = this.mergeEvaluationsForModule(moduleId, evaluations);
                     if (!merged) continue;
-
-                    const existingResult = this.state.getResult(moduleId);
-
-                    if (!existingResult) {
-                        this.state.setResult(merged);
-                        continue;
-                    }
-
-                    // Always merge so all instrument dimensions are preserved
-                    this.state.mergeResult(merged);
+                    // Backend siempre gana — reemplazar sin preservar caché
+                    this.state.setResult(merged);
                 }
             }),
             map(() => void 0),
@@ -177,21 +169,9 @@ export class AssessmentHydrationService {
             ),
             tap((match) => {
                 if (!match) return;
-
+                // Backend siempre gana — reemplazar directamente
                 const hydrated = this.mapToAssessmentResult(moduleId, match);
-                const latest = this.state.getResult(moduleId);
-                if (!latest) return;
-
-                // Enrich only the missing pieces (no mock data).
-                this.state.setResult({
-                    ...latest,
-                    evaluationId: latest.evaluationId ?? hydrated.evaluationId,
-                    evaluationResultId: latest.evaluationResultId ?? hydrated.evaluationResultId,
-                    dimensions: (latest.dimensions ?? []).length ? latest.dimensions : hydrated.dimensions,
-                    recommendations: (latest.recommendations ?? []).length ? latest.recommendations : hydrated.recommendations,
-                    headline: latest.headline || hydrated.headline,
-                    message: latest.message || hydrated.message,
-                });
+                this.state.setResult(hydrated);
             }),
             map(() => void 0),
             catchError(() => of(void 0))
@@ -282,12 +262,12 @@ export class AssessmentHydrationService {
                     id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
                     label: d?.dimensionName ?? '',
                     instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
-                    score: Number(d?.score ?? 0),
+                    score: Number(d?.score ?? d?.rawScore ?? 0),
                     maxScore: Number(d?.maxScore ?? 0),
                     riskLevel: d?.riskLevel ?? undefined,
-                    percent: d?.percentageScore != null
-                        ? Math.round(Math.max(0, Math.min(100, Number(d.percentageScore))))
-                        : this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
+                    scoreRangeLabel: d?.scoreRangeLabel ?? undefined,
+                    scoreRangeColor: d?.scoreRangeColor ?? undefined,
+                    percent: Math.round(Number(d?.percentageScore ?? 0)),
                 }));
                 const recs = ((result?.recommendations ?? []) as any[])
                     .map((r: any) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
@@ -295,9 +275,9 @@ export class AssessmentHydrationService {
 
                 this.state.setResult({
                     ...latest,
-                    evaluationResultId: latest.evaluationResultId ?? (evalResultId > 0 ? evalResultId : undefined),
-                    dimensions: (latest.dimensions ?? []).length ? latest.dimensions : dims,
-                    recommendations: (latest.recommendations ?? []).length ? latest.recommendations : recs,
+                    evaluationResultId: evalResultId > 0 ? evalResultId : latest.evaluationResultId,
+                    dimensions: dims,
+                    recommendations: recs.length ? recs : (latest.recommendations ?? []),
                     headline: latest.headline || String(result?.riskLevel ?? ''),
                     message: latest.message || String(result?.interpretation ?? ''),
                 });
@@ -322,20 +302,22 @@ export class AssessmentHydrationService {
             evaluationId: Number.isFinite(evalId) && evalId > 0 ? evalId : undefined,
             evaluationResultId: Number.isFinite(evalResultId) && evalResultId > 0 ? evalResultId : undefined,
             outcome,
+            totalScore: result?.totalScore != null ? Number(result.totalScore) : undefined,
             score,
             evaluatedAt: result?.calculatedAt ?? item.completedAt,
             headline: this.mapRiskLevelToSpanish(result?.riskLevel),
-            message: this.buildInterpretationMessage(outcome, score),
+            message: String(result?.interpretation ?? '').trim() || this.buildInterpretationMessage(outcome, score),
             dimensions: ((result?.dimensionScores ?? []) as any[]).map((d) => ({
                 id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
                 label: d?.dimensionName ?? '',
                 instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
-                score: Number(d?.score ?? 0),
+                score: Number(d?.score ?? d?.rawScore ?? 0),
                 maxScore: Number(d?.maxScore ?? 0),
                 riskLevel: d?.riskLevel ?? undefined,
-                percent: d?.percentageScore != null
-                    ? Math.round(Math.max(0, Math.min(100, Number(d.percentageScore))))
-                    : this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
+                scoreRangeLabel: d?.scoreRangeLabel ?? undefined,
+                scoreRangeColor: d?.scoreRangeColor ?? undefined,
+                scoreRangeDescription: d?.scoreRangeDescription ?? undefined,
+                percent: Math.round(Number(d?.percentageScore ?? 0)),
             })),
             recommendations: ((result?.recommendations ?? []) as any[])
                 .map((r) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())

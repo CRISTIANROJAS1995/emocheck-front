@@ -181,3 +181,27 @@
         justify-content: center;
     }
 }
+
+
+/* ─── Mobile: reduce button padding so two buttons fit side-by-side ── */
+
+@media (max-width: 540px) {
+    .emo-button {
+        &--blue,
+        &--green,
+        &--teal,
+        &--orange {
+            padding: 0 16px;
+            font-size: 13px;
+        }
+        &--secondary {
+            padding: 0 16px;
+            min-width: 0;
+            font-size: 13px;
+        }
+        &--medium {
+            padding: 0 14px;
+            font-size: 13px;
+        }
+    }
+}

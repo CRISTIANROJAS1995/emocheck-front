@@ -1270,15 +1270,24 @@ table.admin-table {
     }
     .admin-page-header {
         flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
         gap: 16px;
         padding: 24px 22px;
-        &__left h1 {
+    }
+    .admin-page-header__left {
+        width: 100%;
+        h1 {
             font-size: 22px;
         }
-        &__actions {
-            align-self: flex-start;
-            flex-wrap: wrap;
+        p {
+            max-width: 100%;
         }
+    }
+    .admin-page-header__actions {
+        align-self: flex-start;
+        flex-wrap: wrap;
+        justify-content: flex-start;
     }
     .kpi-row {
         grid-template-columns: repeat(2, 1fr);
@@ -1381,5 +1390,18 @@ table.admin-table {
     .btn {
         padding: 8px 14px;
         font-size: 12px;
+    }
+    // Detail tabs: scrollable on very small screens
+    .detail-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        gap: 0;
+    }
+    .detail-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+        flex-shrink: 0;
     }
 }

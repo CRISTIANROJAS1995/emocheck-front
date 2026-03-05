@@ -1,4 +1,23 @@
 /* ----------------------------------------------------------------------------------------------------- */
+
+
 /*  @ Import/write your custom styles here.
 /*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
 /* ----------------------------------------------------------------------------------------------------- */
+
+
+/* ─── Global responsive fixes ──────────────────────────── */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+@media (max-width: 767px) {
+    html,
+    body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+}

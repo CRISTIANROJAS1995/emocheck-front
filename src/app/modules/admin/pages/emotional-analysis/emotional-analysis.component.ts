@@ -124,11 +124,15 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     analysisResult: EmotionalAnalysisResult | null = null;
 
     private captureInterval: any;
+    private analysisTimeoutId: any;
     private readonly detectEveryMs = 4000;  // Face++ API: 1 llamada cada 4s (optimiza consumo: ~5 calls/sesión)
     private readonly minDetections = 3;    // Mínimo 3 detecciones antes de enviar (~12 seg)
     private readonly maxDetections = 5;    // Máximo 5 detecciones (~20 seg) — suficiente con quality weighting
+    private readonly analysisTimeoutMs = 60000; // 60s máximo — si no hay detecciones, mostrar error
     private detections: FaceExpressionResult[] = [];
     private analysisStarted = false;
+    private loadModelsRetryCount = 0;
+    private readonly maxLoadModelsRetries = 10; // máx 5 seg esperando que loadModels termine
     modelLoadError: string = '';
 
     constructor(
@@ -174,16 +178,21 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     }
 
     ngAfterViewInit(): void {
-        // Intentar iniciar cámara después de que la vista esté lista
+        // Esperar a que loadModels() termine antes de arrancar la cámara
         if (this._cameraService.isCameraSupported() && this.videoElement) {
-            this.initializeCamera();
+            this._faceDetector.loadModels()
+                .catch(() => {
+                    this.modelLoadError = 'No se pudieron cargar los modelos de análisis facial.';
+                })
+                .finally(() => {
+                    this.initializeCamera();
+                });
         }
     }
 
     ngOnDestroy(): void {
         this.cleanup();
     }
-
     private getCameraErrorMessage(error: unknown): string {
         const anyErr = error as any;
         const name: string | undefined = typeof anyErr?.name === 'string' ? anyErr.name : undefined;
@@ -237,10 +246,18 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         }
 
         if (!this._faceDetector.isReady) {
-            // Models still loading, retry in 500ms
+            // Models still loading — retry máx 10 veces (5 seg total) y luego mostrar error
+            if (this.loadModelsRetryCount >= this.maxLoadModelsRetries) {
+                this.analysisError = 'No se pudo inicializar el análisis facial. Por favor, recarga la página.';
+                this.isAnalyzing = false;
+                return;
+            }
+            this.loadModelsRetryCount++;
             setTimeout(() => this.startAnalysis(), 500);
             return;
         }
+
+        this.loadModelsRetryCount = 0;
 
         // Reset estado
         this.analysisError = '';
@@ -258,6 +275,21 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         // Detectar expresiones faciales cada 4s
         const videoEl = this.videoElement?.nativeElement;
         if (!videoEl) return;
+
+        // Timeout de seguridad: si tras 60s no hay detecciones suficientes, mostrar error claro
+        this.analysisTimeoutId = setTimeout(() => {
+            if (this.isAnalyzing && this.detections.length === 0) {
+                if (this.captureInterval) {
+                    clearInterval(this.captureInterval);
+                    this.captureInterval = null;
+                }
+                this.analysisError = 'No se detectó un rostro durante el análisis. Verifica que tu cara esté bien iluminada y visible, y que la conexión a internet funcione correctamente.';
+                this.isAnalyzing = false;
+            } else if (this.isAnalyzing && this.detections.length >= 1) {
+                // Hay algunas detecciones — finalizar con lo que tenemos
+                this.finishAnalysis();
+            }
+        }, this.analysisTimeoutMs);
 
         this.captureInterval = setInterval(async () => {
             if (!videoEl || videoEl.readyState < 2 || !videoEl.videoWidth) return;
@@ -301,6 +333,10 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         if (this.captureInterval) {
             clearInterval(this.captureInterval);
             this.captureInterval = null;
+        }
+        if (this.analysisTimeoutId) {
+            clearTimeout(this.analysisTimeoutId);
+            this.analysisTimeoutId = null;
         }
 
         // Estado visual: "analizando"
@@ -498,8 +534,12 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
     cleanup(): void {
         if (this.captureInterval) {
             clearInterval(this.captureInterval);
+            this.captureInterval = null;
         }
-
+        if (this.analysisTimeoutId) {
+            clearTimeout(this.analysisTimeoutId);
+            this.analysisTimeoutId = null;
+        }
         this._cameraService.stopCamera();
     }
 

@@ -34,8 +34,14 @@ export interface AssessmentDimensionBreakdown {
     score?: number;
     /** Max possible score for this instrument */
     maxScore?: number;
-    /** Risk level for this specific dimension (Green / Yellow / Red) */
+    /** Risk level for this specific dimension (Green / Yellow / Red / Bajo / Moderado / Alto) */
     riskLevel?: string;
+    /** Human-readable range label from backend (e.g. "Ansiedad moderada", "Sin estrés") */
+    scoreRangeLabel?: string;
+    /** Hex color for the bar from backend (e.g. "#FFC107", "#28A745") */
+    scoreRangeColor?: string;
+    /** Detailed description for this score range from backend */
+    scoreRangeDescription?: string;
 }
 
 export interface AssessmentResult {
@@ -48,11 +54,14 @@ export interface AssessmentResult {
     evaluationResultId?: number;
 
     outcome: AssessmentOutcome;
-    /** 0-100 */
+    /** Raw total score from backend (e.g. 2.67) */
+    totalScore?: number;
+    /** 0-100 percentage score */
     score: number;
     evaluatedAt: string; // ISO
 
     headline: string;
+    /** Interpretation text from backend (e.g. "Tu estado en el módulo...") */
     message: string;
 
     dimensions: AssessmentDimensionBreakdown[];

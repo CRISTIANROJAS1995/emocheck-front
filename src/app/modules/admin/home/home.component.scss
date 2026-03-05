@@ -11,7 +11,6 @@
     border-radius: 50%;
     pointer-events: none;
     z-index: 0;
-
     // Círculo verde pequeño 48x48
     &--green-small {
         /* Small green dot: left side above module heading */
@@ -22,7 +21,6 @@
         background: rgba(154, 230, 0, 0.30);
         filter: blur(12px);
     }
-
     // Círculo verde mediano 128x128
     &--green-medium {
         /* Medium green glow: supports the dot without spilling outside */
@@ -33,7 +31,6 @@
         background: rgba(154, 230, 0, 0.20);
         filter: blur(30px);
     }
-
     // Círculo blanco/gris grande 160x160
     &--white-large {
         right: 15%;
@@ -43,7 +40,6 @@
         background: rgba(255, 255, 255, 0.10);
         filter: blur(40px);
     }
-
     // Círculo azul pequeño 40x40
     &--blue-small {
         right: 7%;
@@ -53,7 +49,6 @@
         background: rgba(135, 206, 250, 0.45);
         filter: blur(30px);
     }
-
     // Círculo verde para sección de recursos (debajo de Riesgo Psicosocial)
     &--green-resources {
         right: 25%;
@@ -63,7 +58,6 @@
         background: rgba(187, 244, 81, 0.15);
         filter: blur(45px);
     }
-
     // Círculo verde grande en esquina superior derecha
     &--green-top-right {
         right: 60px;
@@ -73,7 +67,6 @@
         background: rgba(154, 230, 0, 0.12);
         filter: blur(60px);
     }
-
     // Círculo azul grande en esquina inferior izquierda
     &--blue-bottom-left {
         left: 10px;
@@ -90,12 +83,9 @@
     width: 100%;
     min-height: 177px;
     border-radius: 16px;
-    background:
-        /* Small accent dots */
-        radial-gradient(44px 44px at 74% 18%, rgba(154, 230, 0, 0.30) 0%, rgba(154, 230, 0, 0.00) 70%),
-        radial-gradient(36px 36px at 66% 74%, rgba(81, 162, 255, 0.30) 0%, rgba(81, 162, 255, 0.00) 70%),
-        /* Main gradient (horizontal feel) */
-        linear-gradient(90deg, #00BBA7 0%, #009689 45%, #155DFC 100%);
+    background: /* Small accent dots */
+    radial-gradient(44px 44px at 74% 18%, rgba(154, 230, 0, 0.30) 0%, rgba(154, 230, 0, 0.00) 70%), radial-gradient(36px 36px at 66% 74%, rgba(81, 162, 255, 0.30) 0%, rgba(81, 162, 255, 0.00) 70%), /* Main gradient (horizontal feel) */
+    linear-gradient(90deg, #00BBA7 0%, #009689 45%, #155DFC 100%);
     background-repeat: no-repeat;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.10), 0 8px 10px -6px rgba(0, 0, 0, 0.10);
     padding: 20px 28px;
@@ -125,7 +115,9 @@
     filter: blur(50px);
 }
 
+
 /* Soft blurred circles (closer to Figma look) */
+
 .welcome-banner::before,
 .welcome-banner::after {
     content: '';
@@ -220,30 +212,25 @@
     box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     cursor: pointer;
-
     &:hover {
         transform: translateY(-4px);
         box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.12);
     }
-
     // Salud Mental - Azul claro
     &--mental-health {
         background: linear-gradient(to bottom, #EBF5FF 0%, #F5F9FF 100%);
         border-left: 3px solid #3B82F6;
     }
-
     // Fatiga Laboral - Verde amarillento
     &--work-fatigue {
         background: linear-gradient(to bottom, #F7FCE8 0%, #FAFEF0 100%);
         border-left: 3px solid #84CC16;
     }
-
     // Clima Organizacional - Turquesa claro
     &--organizational-climate {
         background: linear-gradient(to bottom, #E6FAF7 0%, #F0FDF9 100%);
         border-left: 3px solid #00BBA7;
     }
-
     // Riesgo Psicosocial - Naranja claro
     &--psychosocial-risk {
         background: linear-gradient(to bottom, #FFF4ED 0%, #FFF7F0 100%);
@@ -259,26 +246,21 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-
     mat-icon {
         width: 24px;
         height: 24px;
         font-size: 24px;
         color: #FFFFFF;
     }
-
     &--blue {
         background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
     }
-
     &--green {
         background: linear-gradient(135deg, #84CC16 0%, #65A30D 100%);
     }
-
     &--teal {
         background: linear-gradient(135deg, #00BBA7 0%, #009688 100%);
     }
-
     &--orange {
         background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
     }
@@ -313,12 +295,10 @@
     color: #FFFFFF;
     cursor: pointer;
     transition: all 0.2s ease;
-
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
         transform: scale(1.02);
     }
-
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
@@ -337,7 +317,6 @@
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
-
     &:hover {
         color: #111827;
         border-color: #9CA3AF;
@@ -358,11 +337,9 @@
     height: 100%;
     position: relative;
     overflow: hidden;
-
     &:hover {
         box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08);
     }
-
     // Efecto hover para tarjetas específicas
     &--with-hover-effect {
         &::after {
@@ -379,7 +356,6 @@
             transition: opacity 0.3s ease;
             pointer-events: none;
         }
-
         &:hover::after {
             opacity: 1;
         }
@@ -394,26 +370,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
     mat-icon {
         width: 20px;
         height: 20px;
         font-size: 20px;
         color: #FFFFFF;
     }
-
     &--teal {
         background: linear-gradient(135deg, #00D5BE 0%, #009689 100%);
     }
-
     &--purple {
         background: linear-gradient(135deg, #C27AFF 0%, #AD46FF 100%);
     }
-
     &--pink {
         background: linear-gradient(135deg, #FB64B6 0%, #F6339A 100%);
     }
-
     &--cyan {
         background: linear-gradient(135deg, #00D3F2 0%, #00B8DB 100%);
     }
@@ -454,7 +425,6 @@
     transition: background 0.2s ease;
     width: auto;
     align-self: flex-start;
-
     &:hover {
         background: #E5E7EB;
     }
@@ -463,41 +433,42 @@
 // Responsive
 @media (max-width: 767px) {
     .welcome-banner {
-        padding: 24px !important;
+        padding: 16px 18px !important;
+        min-height: unset;
     }
-
     .welcome-banner-title {
-        font-size: 24px;
-    }
-
-    .welcome-banner-subtitle {
         font-size: 16px;
+        line-height: 24px;
     }
-
-    .module-card {
-        padding: 20px;
+    .welcome-banner-subtitle {
+        font-size: 11px;
     }
-
+    .welcome-banner-text {
+        font-size: 11px;
+        line-height: 15px;
+    }
+    .resource-card {
+        padding: 16px;
+    }
+    .resource-title {
+        font-size: 14px;
+    }
+    .resource-description {
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+    .resource-button {
+        font-size: 13px;
+        padding: 8px 14px;
+    }
     .blur-circle {
-        &--blue {
-            right: 20px;
-            top: 80px;
-            width: 64px;
-            height: 64px;
+        &--green-top-right {
+            width: 160px;
+            height: 280px;
         }
-
-        &--turquoise {
-            right: 10px;
-            bottom: 50px;
-            width: 100px;
-            height: 100px;
-        }
-
-        &--green {
-            left: 20px;
-            top: 60px;
-            width: 80px;
-            height: 80px;
+        &--blue-bottom-left {
+            width: 180px;
+            height: 180px;
         }
     }
 }

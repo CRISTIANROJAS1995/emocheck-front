@@ -394,3 +394,79 @@
         opacity: 1;
     }
 }
+
+// ─── Mobile responsive ──────────────────────────────────────────────────────
+@media (max-width: 640px) {
+    // Force left-align on the page header (overrides any inherited center)
+    .admin-page-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+    .admin-page-header__left {
+        align-items: flex-start !important;
+        text-align: left !important;
+        width: 100%;
+    }
+    .admin-page-header__badge {
+        display: inline-block;
+        text-align: left;
+    }
+    .admin-page-header__actions {
+        align-self: flex-start !important;
+        justify-content: flex-start !important;
+    }
+    .instrument-card__header {
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 10px 12px;
+    }
+    .instrument-card__title {
+        flex: 1 1 0;
+        min-width: 0;
+        flex-wrap: wrap;
+        gap: 5px;
+        strong {
+            font-size: 13px;
+            line-height: 1.35;
+            word-break: break-word;
+            white-space: normal;
+        }
+        span {
+            white-space: nowrap;
+        }
+    }
+    .instrument-card__actions {
+        flex-shrink: 0;
+        align-self: flex-start;
+        gap: 4px;
+    }
+    .score-chip {
+        font-size: 11px;
+        padding: 2px 7px;
+    }
+    // Question rows: stack main content + actions vertically
+    .question-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 10px 12px;
+        &__main {
+            width: 100%;
+        }
+        &__text {
+            white-space: normal;
+            word-break: break-word;
+        }
+        &__actions {
+            align-self: flex-end;
+        }
+    }
+    // Truncate cell: allow wrapping on mobile
+    .truncate-cell {
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-word;
+    }
+}

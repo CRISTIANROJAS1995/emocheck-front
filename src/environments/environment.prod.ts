@@ -15,7 +15,7 @@
     // Face++ Emotion Recognition API
     facePlusPlusApiKey: 'fQpCTQEhbqvNqQqahwQPLei9kH5SIEcs',      // <-- Pega tu API Key aquí
     facePlusPlusApiSecret: 'xAAxS5CiLPAmqNZ4Al2iuN8TVuSPyJ26',   // <-- Pega tu API Secret aquí
-    facePlusPlusApiUrl: '/facepp/v3/detect',
+    facePlusPlusApiUrl: 'https://api-us.faceplusplus.com/facepp/v3/detect',
 
     // Soporte WhatsApp (numero en formato internacional sin + ni espacios)
     whatsappNumber: '573175930202',

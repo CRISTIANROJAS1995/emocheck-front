@@ -34,7 +34,7 @@
                         </circle>
                     </svg>
                     <div class="ring-center">
-                        <div class="ring-score">{{ r.score }}</div>
+                        <div class="ring-score">{{ r.totalScore != null ? (r.totalScore | number:'1.0-0') : r.score }}</div>
                         <div class="ring-points">puntos</div>
                     </div>
                 </div>
@@ -81,27 +81,30 @@
                 <span class="card-title-icon" aria-hidden="true">
                     <img class="card-title-icon-img" src="icons/Icon (31).svg" alt="" />
                 </span>
-                <span>Desglose por instrumento</span>
+                <span>Desglose por dimensiones</span>
             </div>
 
             <div class="dim-cards">
-                <div class="dim-card" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-card--' + getBarTone(d.percent)">
+                <div class="dim-card" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-card--' + getBarTone(d.percent)" [style.border-left-color]="d.scoreRangeColor || null">
                     <div class="dim-card__header">
-                        <span class="dim-card__code">{{ d.instrumentCode || ('0' + (idx+1)) }}</span>
-                        <span class="dim-card__risk-badge" [ngClass]="'dim-risk--' + getBarTone(d.percent)">
-                            {{ getRiskLabel(d.riskLevel, d.percent) }}
+                        <span class="dim-card__risk-badge" [style.background]="d.scoreRangeColor ? (d.scoreRangeColor + '22') : null" [style.color]="d.scoreRangeColor || null" [style.border-color]="d.scoreRangeColor ? (d.scoreRangeColor + '66') : null">
+                            {{ d.riskLevel || getRiskLabel(d.riskLevel, d.percent) }}
                         </span>
                     </div>
-                    <div class="dim-card__name">{{ getDimensionLabel(d, idx) }}</div>
-                    <div class="dim-card__score-row">
-                        <span class="dim-card__score">{{ d.score ?? 0 }}</span>
-                        <span class="dim-card__max" *ngIf="d.maxScore">&nbsp;/ {{ d.maxScore }}</span>
-                        <span class="dim-card__percent">{{ d.percent }}%</span>
+                    <div class="dim-card__name-row">
+                        <span class="dim-card__name">{{ getDimensionLabel(d, idx) }}</span>
+                        <div class="dim-card__name-row-right">
+                            <span class="dim-card__range-badge" *ngIf="d.scoreRangeLabel" [style.background]="d.scoreRangeColor ? (d.scoreRangeColor + '15') : null" [style.color]="d.scoreRangeColor || null" [style.border-color]="d.scoreRangeColor ? (d.scoreRangeColor + '55') : null">
+                                {{ d.scoreRangeLabel }}
+                            </span>
+                            <span class="dim-card__percent">{{ d.percent }}%</span>
+                        </div>
                     </div>
                     <div class="dim-card__bar">
-                        <div class="dim-card__bar-fill" [ngClass]="'dim-bar--' + getBarTone(d.percent)" [style.width.%]="d.percent"></div>
+                        <div class="dim-card__bar-fill" [style.width.%]="d.percent" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-bar--' + getBarTone(d.percent)">
+                        </div>
                     </div>
-                    <div class="dim-card__interpretation">{{ getDimensionInterpretation(d, idx) }}</div>
+                    <div class="dim-card__description" *ngIf="d.scoreRangeDescription">{{ d.scoreRangeDescription }}</div>
                 </div>
             </div>
 
