@@ -597,7 +597,14 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         this.captureInterval = setInterval(async () => {
             if (!videoEl || videoEl.readyState < 2 || !videoEl.videoWidth) return;
 
-            const result = await this._faceDetector.detectExpression(videoEl);
+            let result: FaceExpressionResult | null = null;
+            try {
+                result = await this._faceDetector.detectExpression(videoEl);
+            } catch (e) {
+                console.warn('[EmotionalAnalysis] Error en detectExpression:', e);
+                return;
+            }
+
             if (!result) {
                 // Si se agotó el límite diario, parar inmediatamente
                 if (this._faceDetector.isDailyLimitExhausted) {

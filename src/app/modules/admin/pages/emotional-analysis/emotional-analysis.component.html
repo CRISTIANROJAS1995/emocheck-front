@@ -238,7 +238,7 @@
                            padding: 12.667px 12.667px 8.667px 12.667px; display: flex; flex-direction: column;
                            align-items: flex-start; flex-shrink: 0; align-self: stretch;">
                     <!-- Steps -->
-                    <div class="flex w-full items-center justify-center gap-0">
+                    <div class="flex w-full items-start justify-center gap-0">
                         <ng-container *ngFor="let step of steps; let i = index; let isLast = last">
                             <div class="status-item flex flex-col items-center">
                                 <!-- Círculo del indicador -->
@@ -250,24 +250,24 @@
                                 }">
 
                                     <!-- CÍRCULO 1: SIEMPRE Icon (17).svg - solo cambia opacidad -->
-                                    <img *ngIf="step.id === 1" src="icons/Icon (17).svg" alt="Atención" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 1" src="icons/Icon (17).svg" alt="Atención" class="h-3 w-3 xs:h-4 xs:w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
 
                                     <!-- CÍRCULO 2: Flecha pending, Icon 18 active/completed -->
-                                    <img *ngIf="step.id === 2 && step.status === 'pending'" src="icons/Icon (23).svg" alt="Concentración pendiente" class="status-icon-pending h-4 w-4" />
-                                    <img *ngIf="step.id === 2 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (18).svg" alt="Concentración" class="h-4 w-4" />
+                                    <img *ngIf="step.id === 2 && step.status === 'pending'" src="icons/Icon (23).svg" alt="Concentración pendiente" class="status-icon-pending h-3 w-3 xs:h-4 xs:w-4" />
+                                    <img *ngIf="step.id === 2 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (18).svg" alt="Concentración" class="h-3 w-3 xs:h-4 xs:w-4" />
 
                                     <!-- CÍRCULO 3: Flecha pending, Icon 19 active/completed -->
-                                    <img *ngIf="step.id === 3 && step.status === 'pending'" src="icons/Icon (24).svg" alt="Equilibrio pendiente" class="status-icon-pending h-4 w-4" />
-                                    <img *ngIf="step.id === 3 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (19).svg" alt="Equilibrio" class="h-4 w-4" />
+                                    <img *ngIf="step.id === 3 && step.status === 'pending'" src="icons/Icon (24).svg" alt="Equilibrio pendiente" class="status-icon-pending h-3 w-3 xs:h-4 xs:w-4" />
+                                    <img *ngIf="step.id === 3 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (19).svg" alt="Equilibrio" class="h-3 w-3 xs:h-4 xs:w-4" />
 
                                     <!-- CÍRCULO 4: SIEMPRE Icon (20).svg - solo cambia opacidad -->
-                                    <img *ngIf="step.id === 4" src="icons/Icon (20).svg" alt="Positividad" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 4" src="icons/Icon (20).svg" alt="Positividad" class="h-3 w-3 xs:h-4 xs:w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
 
                                     <!-- CÍRCULO 5: SIEMPRE Icon (21).svg - solo cambia opacidad -->
-                                    <img *ngIf="step.id === 5" src="icons/Icon (21).svg" alt="Calma" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 5" src="icons/Icon (21).svg" alt="Calma" class="h-3 w-3 xs:h-4 xs:w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
                                 </div>
                                 <!-- Nombre de la emoción -->
-                                <span class="step-name mt-2 text-[11px] font-semibold text-center leading-tight" [ngClass]="{
+                                <span class="step-name mt-1.5 text-[9px] xs:text-[11px] font-semibold text-center leading-tight" [ngClass]="{
                                     'text-[#00BBA7]': step.status === 'completed' || step.status === 'active',
                                     'text-[#9CA3AF]': step.status === 'pending'
                                 }">{{ step.name }}</span>
