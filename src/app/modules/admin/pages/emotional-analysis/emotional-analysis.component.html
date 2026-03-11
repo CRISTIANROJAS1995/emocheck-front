@@ -234,46 +234,31 @@
                 </p>
 
                 <!-- Steps Container -->
-                <div class="status-card mt-6 w-full rounded-[16px]" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.10), 0 2px 4px -2px rgba(0, 0, 0, 0.10);
-                           padding: 12.667px 12.667px 8.667px 12.667px; display: flex; flex-direction: column;
-                           align-items: flex-start; flex-shrink: 0; align-self: stretch;">
-                    <!-- Steps -->
-                    <div class="flex w-full items-start justify-center gap-0">
+                <div class="status-card mt-6 w-full rounded-[16px]" style="padding: 12px; display: flex; flex-direction: column; align-items: flex-start; flex-shrink: 0; align-self: stretch;">
+
+                    <!-- Desktop: 1 sola fila con los 5 pasos -->
+                    <div class="hidden sm:flex w-full items-start justify-center gap-0">
                         <ng-container *ngFor="let step of steps; let i = index; let isLast = last">
                             <div class="status-item flex flex-col items-center">
-                                <!-- Círculo del indicador -->
                                 <div class="status-icon flex items-center justify-center rounded-full transition-all duration-300" [ngStyle]="{
                                     'background': step.status === 'completed' ? 'linear-gradient(135deg, #00BBA7 0%, #00786F 100%)' :
                                                   step.status === 'active' ? 'linear-gradient(135deg, #9AE600 0%, #5EA500 100%)' : '#D1D5DC',
-                                    'box-shadow': step.status === 'completed' ? '0 0 0 4px #CBFBF1, 0 28px 25px -5px rgba(0, 0, 0, 0.10)' :
-                                                  step.status === 'active' ? '0 0 0 4px #D0F999, 0 28px 25px -5px rgba(0, 0, 0, 0.10)' : 'none'
+                                    'box-shadow': step.status === 'completed' ? '0 0 0 4px #CBFBF1' :
+                                                  step.status === 'active' ? '0 0 0 4px #D0F999' : 'none'
                                 }">
-
-                                    <!-- CÍRCULO 1: SIEMPRE Icon (17).svg - solo cambia opacidad -->
-                                    <img *ngIf="step.id === 1" src="icons/Icon (17).svg" alt="Atención" class="h-3 w-3 xs:h-4 xs:w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
-
-                                    <!-- CÍRCULO 2: Flecha pending, Icon 18 active/completed -->
-                                    <img *ngIf="step.id === 2 && step.status === 'pending'" src="icons/Icon (23).svg" alt="Concentración pendiente" class="status-icon-pending h-3 w-3 xs:h-4 xs:w-4" />
-                                    <img *ngIf="step.id === 2 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (18).svg" alt="Concentración" class="h-3 w-3 xs:h-4 xs:w-4" />
-
-                                    <!-- CÍRCULO 3: Flecha pending, Icon 19 active/completed -->
-                                    <img *ngIf="step.id === 3 && step.status === 'pending'" src="icons/Icon (24).svg" alt="Equilibrio pendiente" class="status-icon-pending h-3 w-3 xs:h-4 xs:w-4" />
-                                    <img *ngIf="step.id === 3 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (19).svg" alt="Equilibrio" class="h-3 w-3 xs:h-4 xs:w-4" />
-
-                                    <!-- CÍRCULO 4: SIEMPRE Icon (20).svg - solo cambia opacidad -->
-                                    <img *ngIf="step.id === 4" src="icons/Icon (20).svg" alt="Positividad" class="h-3 w-3 xs:h-4 xs:w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
-
-                                    <!-- CÍRCULO 5: SIEMPRE Icon (21).svg - solo cambia opacidad -->
-                                    <img *ngIf="step.id === 5" src="icons/Icon (21).svg" alt="Calma" class="h-3 w-3 xs:h-4 xs:w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 1" src="icons/Icon (17).svg" alt="Atención" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 2 && step.status === 'pending'" src="icons/Icon (23).svg" alt="Concentración pendiente" class="status-icon-pending h-4 w-4" />
+                                    <img *ngIf="step.id === 2 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (18).svg" alt="Concentración" class="h-4 w-4" />
+                                    <img *ngIf="step.id === 3 && step.status === 'pending'" src="icons/Icon (24).svg" alt="Equilibrio pendiente" class="status-icon-pending h-4 w-4" />
+                                    <img *ngIf="step.id === 3 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (19).svg" alt="Equilibrio" class="h-4 w-4" />
+                                    <img *ngIf="step.id === 4" src="icons/Icon (20).svg" alt="Positividad" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 5" src="icons/Icon (21).svg" alt="Calma" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
                                 </div>
-                                <!-- Nombre de la emoción -->
-                                <span class="step-name mt-1.5 text-[9px] xs:text-[11px] font-semibold text-center leading-tight" [ngClass]="{
+                                <span class="step-name mt-1.5 text-[10px] font-semibold text-center leading-tight" [ngClass]="{
                                     'text-[#00BBA7]': step.status === 'completed' || step.status === 'active',
                                     'text-[#9CA3AF]': step.status === 'pending'
                                 }">{{ step.name }}</span>
                             </div>
-
-                            <!-- Línea de progreso entre círculos -->
                             <div *ngIf="!isLast" class="step-connector flex items-center">
                                 <div class="step-connector-line">
                                     <div class="step-connector-progress h-full transition-all duration-500" [style.width.%]="step.status === 'completed' ? 100 : 0"></div>
@@ -281,8 +266,63 @@
                             </div>
                         </ng-container>
                     </div>
-                </div>
 
+                    <!-- Móvil: fila 1 (pasos 1-3) -->
+                    <div class="flex sm:hidden w-full items-start justify-center gap-0">
+                        <ng-container *ngFor="let step of steps.slice(0, 3); let i = index">
+                            <div class="status-item flex flex-col items-center">
+                                <div class="status-icon flex items-center justify-center rounded-full transition-all duration-300" [ngStyle]="{
+                                    'background': step.status === 'completed' ? 'linear-gradient(135deg, #00BBA7 0%, #00786F 100%)' :
+                                                  step.status === 'active' ? 'linear-gradient(135deg, #9AE600 0%, #5EA500 100%)' : '#D1D5DC',
+                                    'box-shadow': step.status === 'completed' ? '0 0 0 4px #CBFBF1' :
+                                                  step.status === 'active' ? '0 0 0 4px #D0F999' : 'none'
+                                }">
+                                    <img *ngIf="step.id === 1" src="icons/Icon (17).svg" alt="Atención" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 2 && step.status === 'pending'" src="icons/Icon (23).svg" alt="Concentración pendiente" class="status-icon-pending h-4 w-4" />
+                                    <img *ngIf="step.id === 2 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (18).svg" alt="Concentración" class="h-4 w-4" />
+                                    <img *ngIf="step.id === 3 && step.status === 'pending'" src="icons/Icon (24).svg" alt="Equilibrio pendiente" class="status-icon-pending h-4 w-4" />
+                                    <img *ngIf="step.id === 3 && (step.status === 'active' || step.status === 'completed')" src="icons/Icon (19).svg" alt="Equilibrio" class="h-4 w-4" />
+                                </div>
+                                <span class="step-name mt-1.5 text-[10px] font-semibold text-center leading-tight" [ngClass]="{
+                                    'text-[#00BBA7]': step.status === 'completed' || step.status === 'active',
+                                    'text-[#9CA3AF]': step.status === 'pending'
+                                }">{{ step.name }}</span>
+                            </div>
+                            <div *ngIf="i < 2" class="step-connector flex items-center">
+                                <div class="step-connector-line">
+                                    <div class="step-connector-progress h-full transition-all duration-500" [style.width.%]="step.status === 'completed' ? 100 : 0"></div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                    <!-- Móvil: fila 2 (pasos 4-5) -->
+                    <div class="flex sm:hidden w-full items-start justify-center gap-0 mt-2">
+                        <ng-container *ngFor="let step of steps.slice(3, 5); let i = index">
+                            <div class="status-item flex flex-col items-center">
+                                <div class="status-icon flex items-center justify-center rounded-full transition-all duration-300" [ngStyle]="{
+                                    'background': step.status === 'completed' ? 'linear-gradient(135deg, #00BBA7 0%, #00786F 100%)' :
+                                                  step.status === 'active' ? 'linear-gradient(135deg, #9AE600 0%, #5EA500 100%)' : '#D1D5DC',
+                                    'box-shadow': step.status === 'completed' ? '0 0 0 4px #CBFBF1' :
+                                                  step.status === 'active' ? '0 0 0 4px #D0F999' : 'none'
+                                }">
+                                    <img *ngIf="step.id === 4" src="icons/Icon (20).svg" alt="Positividad" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                    <img *ngIf="step.id === 5" src="icons/Icon (21).svg" alt="Calma" class="h-4 w-4" [style.opacity]="step.status === 'pending' ? '0.5' : '1'" />
+                                </div>
+                                <span class="step-name mt-1.5 text-[10px] font-semibold text-center leading-tight" [ngClass]="{
+                                    'text-[#00BBA7]': step.status === 'completed' || step.status === 'active',
+                                    'text-[#9CA3AF]': step.status === 'pending'
+                                }">{{ step.name }}</span>
+                            </div>
+                            <div *ngIf="i < 1" class="step-connector flex items-center">
+                                <div class="step-connector-line">
+                                    <div class="step-connector-progress h-full transition-all duration-500" [style.width.%]="step.status === 'completed' ? 100 : 0"></div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+
+                </div>
                 <!-- Privacy Notice -->
                 <div class="info-message-box mt-6 w-full rounded-[16px] flex items-center justify-center">
                     <div class="flex items-center justify-center gap-2">
@@ -300,32 +340,32 @@
     </div>
 
     <!-- Results Screen -->
-    <div *ngIf="showResults && dynamicContent" class="w-full max-w-[672px]">
-        <div class="analysis-card flex flex-col gap-6 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-4 py-6 sm:px-8 sm:py-8">
+    <div *ngIf="showResults && dynamicContent" class="w-full max-w-[576px]">
+        <div class="analysis-card flex flex-col gap-4 overflow-y-auto rounded-[24px] border-[0.667px] border-[#CBFBF1] px-4 py-5 sm:px-6 sm:py-6">
 
             <div class="flex flex-col items-center text-center">
                 <!-- Icon (Dynamic) -->
-                <div class="flex h-[64px] w-[64px] items-center justify-center rounded-[16px]" [style.background]="dynamicContent.iconGradient" style="box-shadow: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10);">
-                    <img src="icons/instrucciones-emocional.svg" alt="Heart" class="h-[36px] w-[36px]" />
+                <div class="flex h-[56px] w-[56px] items-center justify-center rounded-[16px]" [style.background]="dynamicContent.iconGradient" style="box-shadow: 0 10px 15px -3px rgba(0,0,0,.10), 0 4px 6px -4px rgba(0,0,0,.10);">
+                    <img src="icons/instrucciones-emocional.svg" alt="Heart" class="h-[32px] w-[32px]" />
                 </div>
 
                 <!-- Title (Dynamic) -->
-                <h2 class="mt-6 text-center font-bold text-[20px] leading-[30px]" [style.color]="resultVisual.titleColor" style="font-family: Montserrat; font-weight: 700;">
+                <h2 class="mt-4 text-center font-bold text-[18px] leading-[26px]" [style.color]="resultVisual.titleColor" style="font-family: Montserrat; font-weight: 700;">
                     {{ dynamicContent.title }}
                 </h2>
 
                 <!-- Exercise Container (Dynamic) -->
-                <div class="mt-6 w-full rounded-[16px] flex flex-col items-start text-left gap-3" [style.border]="'2px solid ' + dynamicContent.containerBorder" [style.background]="dynamicContent.containerBackground" style="padding: 18px;">
+                <div class="mt-4 w-full rounded-[16px] flex flex-col items-start text-left gap-2" [style.border]="'2px solid ' + dynamicContent.containerBorder" [style.background]="dynamicContent.containerBackground" style="padding: 14px;">
 
                     <!-- Message -->
-                    <p class="w-full text-[14px] leading-[20px] text-[#364153] font-semibold" style="font-family: Montserrat;">
+                    <p class="w-full text-[13px] leading-[19px] text-[#364153] font-semibold" style="font-family: Montserrat;">
                         {{ dynamicContent.messageText }}
                     </p>
 
                     <!-- Steps list -->
-                    <ul class="w-full flex flex-col gap-2 pl-1">
+                    <ul class="w-full flex flex-col gap-1.5 pl-1">
                         <li *ngFor="let step of dynamicContent.steps" class="flex items-start gap-2 text-[13px] leading-[19px] text-[#364153]" style="font-family: Montserrat;">
-                            <span class="mt-0.5 flex-shrink-0 text-[15px]">{{ step.emoji ?? '•' }}</span>
+                            <span class="mt-0.5 flex-shrink-0 text-[14px]">{{ step.emoji ?? '•' }}</span>
                             <span>{{ step.text }}</span>
                         </li>
                     </ul>
@@ -337,37 +377,61 @@
 
                 </div>
 
-                <!-- Summary -->
-                <div class="mt-3 w-full rounded-[16px] flex flex-col" style="border: 0.667px solid #D8F999; background: linear-gradient(135deg, #F7FEE7 0%, #F0FDFA 10%); padding: 16px 12px 12px 12px; gap: 8px;">
+                <!-- Summary: 1 fila en desktop, 2 filas (3+2) en móvil -->
+                <div class="mt-3 w-full rounded-[16px] flex flex-col" style="border: 0.667px solid #D8F999; background: linear-gradient(135deg, #F7FEE7 0%, #F0FDFA 10%); padding: 14px 10px 10px 10px; gap: 10px;">
                     <h3 class="text-center text-[#00786F]" style="font-family: Montserrat; font-size: 12px; font-weight: 700; line-height: 16px;">Resumen de Análisis Emocional</h3>
-                    <div class="flex items-center justify-between">
-                        <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center gap-2">
-                            <div class="flex h-[32px] w-[32px] items-center justify-center" [style.background]="getStepColor(i)" style="border-radius: 10px;">
-                                <img [src]="getStepIcon(step.id)" [alt]="step.name" class="h-4 w-4" />
+
+                    <!-- Desktop: 1 sola fila con los 5 -->
+                    <div class="hidden sm:flex justify-center gap-4">
+                        <div *ngFor="let step of steps; let i = index" class="flex flex-col items-center gap-1 w-[80px]">
+                            <div class="flex h-[44px] w-[44px] items-center justify-center mx-auto" [style.background]="getStepColor(i)" style="border-radius: 12px;">
+                                <img [src]="getStepIcon(step.id)" [alt]="step.name" class="h-5 w-5" />
                             </div>
-                            <span class="text-center" style="font-family: Montserrat; font-size: 9px; font-weight: 400; line-height: 13.5px; color: #4A5565;">{{ step.name }}</span>
-                            <span class="text-center" style="font-family: Montserrat; font-size: 9px; font-weight: 700; line-height: 13.5px; color: #00786F;">{{ step.percentage }}%</span>
+                            <span class="text-center w-full" style="font-family: Montserrat; font-size: 11px; font-weight: 400; line-height: 14px; color: #4A5565;">{{ step.name }}</span>
+                            <span class="text-center w-full" style="font-family: Montserrat; font-size: 12px; font-weight: 700; line-height: 14px; color: #00786F;">{{ step.percentage }}%</span>
+                        </div>
+                    </div>
+
+                    <!-- Móvil: fila 1 (3 ítems) -->
+                    <div class="flex sm:hidden justify-center gap-4">
+                        <div *ngFor="let step of steps.slice(0, 3); let i = index" class="flex flex-col items-center gap-1 w-[70px]">
+                            <div class="flex h-[44px] w-[44px] items-center justify-center mx-auto" [style.background]="getStepColor(i)" style="border-radius: 12px;">
+                                <img [src]="getStepIcon(step.id)" [alt]="step.name" class="h-5 w-5" />
+                            </div>
+                            <span class="text-center w-full" style="font-family: Montserrat; font-size: 11px; font-weight: 400; line-height: 14px; color: #4A5565;">{{ step.name }}</span>
+                            <span class="text-center w-full" style="font-family: Montserrat; font-size: 12px; font-weight: 700; line-height: 14px; color: #00786F;">{{ step.percentage }}%</span>
+                        </div>
+                    </div>
+
+                    <!-- Móvil: fila 2 (2 ítems) -->
+                    <div class="flex sm:hidden justify-center gap-4">
+                        <div *ngFor="let step of steps.slice(3, 5); let i = index" class="flex flex-col items-center gap-1 w-[70px]">
+                            <div class="flex h-[44px] w-[44px] items-center justify-center mx-auto" [style.background]="getStepColor(i + 3)" style="border-radius: 12px;">
+                                <img [src]="getStepIcon(step.id)" [alt]="step.name" class="h-5 w-5" />
+                            </div>
+                            <span class="text-center w-full" style="font-family: Montserrat; font-size: 11px; font-weight: 400; line-height: 14px; color: #4A5565;">{{ step.name }}</span>
+                            <span class="text-center w-full" style="font-family: Montserrat; font-size: 12px; font-weight: 700; line-height: 14px; color: #00786F;">{{ step.percentage }}%</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Message -->
-                <p class="mt-4 text-center text-[12px] text-[#009689]" style="font-family: Montserrat; font-weight: 600; line-height: 16px;">
+                <p class="mt-3 text-center text-[12px] text-[#009689]" style="font-family: Montserrat; font-weight: 600; line-height: 18px;">
                     ✓ Tu estado emocional fue registrado. Tus próximos contenidos se adaptarán a lo que necesitas hoy.
                 </p>
 
                 <!-- Reminder -->
-                <p class="mt-2 text-center" style="font-family: Montserrat; font-size: 12px; font-style: italic; font-weight: 400; line-height: 16px; color: #4A5565;">
+                <p class="mt-1 text-center" style="font-family: Montserrat; font-size: 12px; font-style: italic; font-weight: 400; line-height: 16px; color: #4A5565;">
                     Recuerda: conocerte es el primer paso para cuidarte.
                 </p>
 
                 <!-- Go to Evaluations Button -->
-                <button type="button" (click)="goToEvaluations()" class="mt-6 h-[38px] w-full rounded-[8px] px-5 text-[15px] font-bold leading-[22px] text-white shadow-lg transition-all hover:brightness-90" style="background: linear-gradient(90deg, #00BBA7 0%, #155DFC 100%); font-family: Montserrat; font-weight: 700;">
-                    Ir a mis evaluaciones <span class="ml-2">→</span>
+                <button type="button" (click)="goToEvaluations()" class="mt-5 h-[44px] w-full rounded-[10px] px-5 text-[15px] font-bold leading-[22px] text-white shadow-lg transition-all hover:brightness-90" style="background: linear-gradient(90deg, #00BBA7 0%, #155DFC 100%); font-family: Montserrat; font-weight: 700;">
+                    Ir a mis evaluaciones &nbsp;→
                 </button>
 
                 <!-- Privacy Notice -->
-                <div class="mt-4 flex items-center justify-center gap-2">
+                <div class="mt-3 mb-14 flex items-center justify-center gap-2">
                     <span class="text-[12px]">🔒</span>
                     <p class="text-montserrat-normal text-center text-[11px] text-[#4A5565]">Todas tus respuestas son confidenciales y están protegidas.</p>
                 </div>
