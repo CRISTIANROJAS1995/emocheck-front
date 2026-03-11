@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { WhatsappButtonComponent } from './shared/components/whatsapp-button/whatsapp-button.component';
+import { SeoService } from './core/services/seo.service';
 
 @Component({
     selector: 'app-root',
@@ -8,9 +9,13 @@ import { WhatsappButtonComponent } from './shared/components/whatsapp-button/wha
     styleUrls: ['./app.component.scss'],
     imports: [RouterOutlet, WhatsappButtonComponent],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     /**
      * Constructor
      */
-    constructor() {}
+    constructor(private seoService: SeoService) {}
+
+    ngOnInit(): void {
+        this.seoService.init();
+    }
 }

@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+Allow: /welcome
+
+# Rutas privadas — no indexar
+Disallow: /sign-in
+Disallow: /sign-out
+Disallow: /home
+Disallow: /my-tracking
+Disallow: /team-tracking
+Disallow: /support
+Disallow: /profile
+Disallow: /resources
+Disallow: /admin
+Disallow: /mental-health
+Disallow: /work-fatigue
+Disallow: /organizational-climate
+Disallow: /psychosocial-risk
+Disallow: /informed-consent
+Disallow: /complete-profile
+Disallow: /emotional-instructions
+Disallow: /emotional-analysis
+Disallow: /signed-in-redirect
+
+# Sitemap
+Sitemap: https://www.emocheck.app/sitemap.xml
