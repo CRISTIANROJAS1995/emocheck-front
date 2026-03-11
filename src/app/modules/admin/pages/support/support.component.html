@@ -141,6 +141,53 @@
 
                 </div>
 
+                <!-- Agendar sesión con psicólogo -->
+                <div class="support-surface__calendly">
+                    <section class="support-card support-card--calendly">
+                        <div class="support-card__header">
+                            <div class="support-card__title">
+                                <span class="support-card__glyph" aria-hidden="true">
+                                    <mat-icon svgIcon="heroicons_outline:calendar-days"></mat-icon>
+                                </span>
+                                <span>Agendar sesión con psicólogo</span>
+                            </div>
+                        </div>
+                        <div class="support-card__body">
+                            <div class="calendly-info">
+                                <div class="calendly-info__icon" aria-hidden="true">
+                                    <mat-icon svgIcon="heroicons_outline:calendar-days"></mat-icon>
+                                </div>
+                                <div class="calendly-info__content">
+                                    <div class="calendly-info__title">Reserva una sesión personalizada</div>
+                                    <div class="calendly-info__text text-black">
+                                        Agenda una videollamada de 30 minutos con uno de nuestros psicólogos. Elige el horario que mejor se adapte a ti.
+                                    </div>
+                                    <ul class="calendly-info__features">
+                                        <li class="text-black">
+                                            <mat-icon svgIcon="heroicons_outline:video-camera"></mat-icon>
+                                            Sesión por Google Meet
+                                        </li>
+                                        <li class="text-black">
+                                            <mat-icon svgIcon="heroicons_outline:clock"></mat-icon>
+                                            30 minutos · Días hábiles 9:00–17:00
+                                        </li>
+                                        <li class="text-black">
+                                            <mat-icon svgIcon="heroicons_outline:shield-check"></mat-icon>
+                                            100% confidencial
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="support-card__actions">
+                            <button class="support-btn support-btn--calendly" style="color:#fff !important;" (click)="openCalendly()">
+                                <mat-icon svgIcon="heroicons_outline:calendar-days" style="color:#fff !important;"></mat-icon>
+                                Agendar cita ahora
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
                 <div class="support-hint" *ngIf="evaluationResultId">
                     Resultado asociado: <strong>#{{ evaluationResultId }}</strong>
                 </div>

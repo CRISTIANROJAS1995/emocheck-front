@@ -65,6 +65,12 @@ export class SupportComponent implements OnInit {
         try { window.open('tel:123', '_self'); } catch { /* ignore */ }
     }
 
+    openCalendly(): void {
+        (window as any).Calendly?.initPopupWidget({
+            url: 'https://calendly.com/cristianjoseroj0410/30min',
+        });
+    }
+
     createEmergencyRequest(): void {
         this.submitting = true;
         this.support
