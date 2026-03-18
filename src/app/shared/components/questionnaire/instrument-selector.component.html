@@ -136,14 +136,32 @@
                 </p>
             </div>
 
-            <!-- Description paragraphs — dinámicos por módulo -->
+            <!-- Lead text -->
             @if (moduleDef.welcomeIntro.lead) {
             <p class="wm-body__lead">{{ moduleDef.welcomeIntro.lead }}</p>
-            } @if (moduleDef.welcomeIntro.secondary) {
-            <p class="wm-body__secondary">{{ moduleDef.welcomeIntro.secondary }}</p>
-            } @if (!moduleDef.welcomeIntro.lead && !moduleDef.welcomeIntro.secondary) {
-            <p class="wm-body__secondary">El contenido de este módulo estará disponible próximamente.</p>
             }
+
+            <!-- Info cards (modo visual) -->
+            @if (moduleDef.welcomeIntro.infoCards && moduleDef.welcomeIntro.infoCards.length) {
+            <div class="wm-info-cards">
+                @for (card of moduleDef.welcomeIntro.infoCards; track $index) {
+                <div class="wm-info-card">
+                    <span class="wm-info-card__emoji">{{ card.emoji }}</span>
+                    <div class="wm-info-card__content">
+                        <strong class="wm-info-card__title">{{ card.title }}</strong>
+                        <p class="wm-info-card__text">{{ card.text }}</p>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+
+            <!-- Texto plano (otros módulos) -->
+            @if (!moduleDef.welcomeIntro.infoCards || !moduleDef.welcomeIntro.infoCards.length) { @if (moduleDef.welcomeIntro.secondary) { @for (para of moduleDef.welcomeIntro.secondary.split('\n\n'); track $index) {
+            <p class="wm-body__secondary">{{ para }}</p>
+            } } @else {
+            <p class="wm-body__secondary">El contenido de este módulo estará disponible próximamente.</p>
+            } }
 
             <!-- CTA -->
             <button class="wm-cta" (click)="closeWelcomeModal()" [style.background]="heroGradient">
@@ -256,6 +274,41 @@
 
             <!-- Qué evalúa y cómo responder -->
             <p class="wm-instr__body">{{ currentInstructions.body }}</p>
+
+            <!-- ── Bloque visual interactivo ──────────────────────────── -->
+            @if (currentVibe) {
+            <div class="wm-instr__vibe" [style.--vibe-color]="pendingInstrument.color">
+                <!-- Emoji animado -->
+                <div class="wm-instr__vibe-emoji-wrap">
+                    <span class="wm-instr__vibe-emoji">{{ currentVibe.emoji }}</span>
+                    <span class="wm-instr__vibe-ring wm-instr__vibe-ring--1"></span>
+                    <span class="wm-instr__vibe-ring wm-instr__vibe-ring--2"></span>
+                </div>
+
+                <!-- Tagline + foco -->
+                <div class="wm-instr__vibe-text">
+                    <span class="wm-instr__vibe-focus">{{ currentVibe.focus }}</span>
+                    <p class="wm-instr__vibe-tagline">{{ currentVibe.tagline }}</p>
+                </div>
+
+                <!-- Pills de stats -->
+                <div class="wm-instr__vibe-stats">
+                    @for (stat of currentVibe.stats; track stat.label) {
+                    <div class="wm-instr__vibe-stat">
+                        <span class="wm-instr__vibe-stat-value">{{ stat.value }}</span>
+                        <span class="wm-instr__vibe-stat-label">{{ stat.label }}</span>
+                    </div>
+                    }
+                </div>
+
+                <!-- Barra de progreso animada que representa "listo para comenzar" -->
+                <div class="wm-instr__vibe-bar-wrap">
+                    <div class="wm-instr__vibe-bar"></div>
+                    <span class="wm-instr__vibe-bar-label">Listo cuando tú lo estés ✨</span>
+                </div>
+            </div>
+            }
+            <!-- ── /Bloque visual interactivo ─────────────────────────── -->
 
             <!-- Instrucción de contexto temporal -->
             <div class="wm-instr__timeframe">

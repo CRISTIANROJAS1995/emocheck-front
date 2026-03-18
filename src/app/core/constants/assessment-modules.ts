@@ -16,6 +16,12 @@ export interface AssessmentModuleDefinition {
     welcomeIntro: {
         lead: string;
         secondary: string;
+        /** Tarjetas visuales opcionales que reemplazan al texto secondary cuando están presentes */
+        infoCards?: Array<{
+            emoji: string;
+            title: string;
+            text: string;
+        }>;
     };
 
     /** If true, higher option index indicates worse state (e.g., anxiety frequency). */
@@ -128,8 +134,30 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         questionnaireTitle: 'Evaluación de Riesgo Psicosocial',
         resultsTitle: 'Resultados de Riesgo Psicosocial',
         welcomeIntro: {
-            lead: '',
+            lead: '¡Bienvenido/a al Módulo de Riesgo Psicosocial! Este espacio evalúa los factores del entorno laboral que pueden impactar tu salud y bienestar.',
             secondary: '',
+            infoCards: [
+                {
+                    emoji: '🤝',
+                    title: 'Tu participación importa',
+                    text: 'La información que aportes permite construir un diagnóstico confiable y diseñar acciones reales de mejora para toda la organización.',
+                },
+                {
+                    emoji: '🎯',
+                    title: 'Objetivo del módulo',
+                    text: 'Fortalecer una cultura de trabajo seguro y saludable, protegiendo tu equilibrio personal y laboral cada día.',
+                },
+                {
+                    emoji: '🔒',
+                    title: 'Confidencialidad garantizada',
+                    text: 'Toda la información es tratada bajo estricta reserva profesional. Nadie puede identificar tus respuestas individuales.',
+                },
+                {
+                    emoji: '📋',
+                    title: 'Batería oficial del Ministerio del Trabajo',
+                    text: 'Aplicarás una herramienta validada para identificar factores de riesgo psicosocial en tu entorno laboral.',
+                },
+            ],
         },
         higherIsWorse: true,
         theme: {

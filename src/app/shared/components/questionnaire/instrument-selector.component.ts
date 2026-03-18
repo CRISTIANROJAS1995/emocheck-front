@@ -36,11 +36,16 @@ const INSTRUMENT_META: Record<string, { icon: string; description: string; color
     FATIGUE_EMOTIONAL:  { icon: 'icons/Icon (34).svg', description: 'Reserva emocional y resiliencia',         color: '#06b6d4' },
     FATIGUE_MOTIVATION: { icon: 'icons/Icon (35).svg', description: 'Motivación e impulso laboral',            color: '#f59e0b' },
     // Clima Organizacional
+    ECO:                   { icon: 'icons/Icon (39).svg', description: 'Escala de Compromiso Organizacional',  color: '#3b82f6' },
     CLIMATE_LEADERSHIP:    { icon: 'icons/Icon (39).svg', description: 'Liderazgo y dirección del equipo',     color: '#00bba7' },
     CLIMATE_TEAMWORK:      { icon: 'icons/Icon (36).svg', description: 'Colaboración y trabajo en equipo',     color: '#3b82f6' },
     CLIMATE_COMMUNICATION: { icon: 'icons/Icon (25).svg', description: 'Canales y calidad de comunicación',    color: '#8b5cf6' },
     CLIMATE_RECOGNITION:   { icon: 'icons/Icon (26).svg', description: 'Reconocimiento y valoración',          color: '#f59e0b' },
     // Riesgo Psicosocial
+    INTRA_A:       { icon: 'icons/Icon (40).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma A',  color: '#f97316' },
+    INTRA_B:       { icon: 'icons/Icon (41).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma B',  color: '#ef4444' },
+    EXTRALABORAL:  { icon: 'icons/Icon (42).svg', description: 'Factores de Riesgo Psicosocial Extralaboral',            color: '#8b5cf6' },
+    ESTRES:        { icon: 'icons/Icon (43).svg', description: 'Síntomas de Estrés',                                     color: '#ec4899' },
     PSYCHO_DEMANDS:  { icon: 'icons/Icon (40).svg', description: 'Demandas y carga del trabajo',               color: '#f97316' },
     PSYCHO_CONTROL:  { icon: 'icons/Icon (41).svg', description: 'Autonomía y control sobre el trabajo',       color: '#ef4444' },
     PSYCHO_SUPPORT:  { icon: 'icons/Icon (42).svg', description: 'Apoyo social y liderazgo',                   color: '#8b5cf6' },
@@ -165,6 +170,38 @@ const INSTRUMENT_CLOSING: Record<string, InstrumentClosing> = {
         visual: 'stars',
         cta: 'Ver mis resultados',
     },
+    // Clima Organizacional – ECO
+    ECO: {
+        message: 'Tu vínculo con la organización es único. Cada respuesta que diste refleja una parte de tu experiencia real, y eso tiene un valor enorme para construir un mejor lugar donde trabajar.',
+        preResultText: 'Antes de ver tus resultados, recuerda: no hay respuestas correctas ni incorrectas. Solo tu percepción sincera.',
+        visual: 'ripple',
+        cta: 'Ver mis resultados',
+    },
+    // Riesgo Psicosocial
+    INTRA_A: {
+        message: 'Identificar los factores de riesgo en tu entorno laboral es un acto de valentía y autocuidado. Tu percepción honesta contribuye a construir ambientes de trabajo más saludables para todos.',
+        preResultText: 'Antes de ver tus resultados, respira profundo. Lo que compartiste hoy puede generar cambios importantes.',
+        visual: 'breathe',
+        cta: 'Ver mis resultados',
+    },
+    INTRA_B: {
+        message: 'Tu bienestar en el trabajo importa. Reconocer los factores que te afectan es el primer paso para mejorar tu experiencia laboral y la de quienes te rodean.',
+        preResultText: 'Antes de ver tus resultados, respira profundo. Lo que compartiste hoy puede generar cambios importantes.',
+        visual: 'breathe',
+        cta: 'Ver mis resultados',
+    },
+    EXTRALABORAL: {
+        message: 'Tu vida fuera del trabajo también forma parte de tu bienestar. Reconocer cómo el entorno extralaboral te afecta es clave para un equilibrio real.',
+        preResultText: 'Antes de ver tus resultados, tómate un momento para ti.',
+        visual: 'ripple',
+        cta: 'Ver mis resultados',
+    },
+    ESTRES: {
+        message: 'Nombrar el estrés es el primer paso para gestionarlo. Tu disposición a reflexionar sobre cómo te afecta habla de tu fortaleza y tu compromiso con tu bienestar.',
+        preResultText: 'Antes de ver tus resultados, haz una respiración lenta y consciente.',
+        visual: 'breathe',
+        cta: 'Ver mis resultados',
+    },
 };
 
 const INSTRUMENT_INSTRUCTIONS: Record<string, InstrumentInstructions> = {
@@ -278,6 +315,211 @@ const INSTRUMENT_INSTRUCTIONS: Record<string, InstrumentInstructions> = {
         body: 'Esta sección evalúa las recompensas y el reconocimiento que recibes a cambio de tu esfuerzo y desempeño.',
         timeframe: 'Responde considerando tu situación laboral actual.',
     },
+    // Clima Organizacional – ECO
+    ECO: {
+        heading: 'Compromiso Organizacional',
+        body: 'La ECO (Escala de Compromiso Organizacional) mide el grado de compromiso del trabajador con la organización en tres dimensiones: Afectivo (identificación emocional), de Continuidad (costo percibido de salida) y Normativo (sentido del deber). Basado en el modelo de Meyer y Allen.',
+        timeframe: 'Selecciona la opción que mejor describa cómo te has sentido.',
+    },
+    // Riesgo Psicosocial – Batería Ministerio del Trabajo
+    INTRA_A: {
+        heading: 'Riesgo Psicosocial Intralaboral – Forma A',
+        body: 'Este cuestionario evalúa los factores de riesgo psicosocial en el entorno intralaboral que pueden afectar tanto la salud del trabajador como su desempeño. Dirigido a trabajadores que ocupan cargos de jefatura y profesionales, analistas, técnicos o tecnólogos.',
+        timeframe: 'Selecciona la opción que mejor describa cómo te has sentido.',
+    },
+    INTRA_B: {
+        heading: 'Riesgo Psicosocial Intralaboral – Forma B',
+        body: 'Este cuestionario evalúa los factores de riesgo psicosocial en el entorno intralaboral. Dirigido a trabajadores auxiliares, operarios y personal de nivel operativo. Responde con base en tu experiencia real en el trabajo.',
+        timeframe: 'Selecciona la opción que mejor describa cómo te has sentido.',
+    },
+    EXTRALABORAL: {
+        heading: 'Factores de Riesgo Extralaboral',
+        body: 'Este cuestionario evalúa los factores externos al trabajo (familia, vivienda, economía, entorno social) que pueden influir en tu bienestar y desempeño laboral. Responde con sinceridad según tu situación actual.',
+        timeframe: 'Selecciona la opción que mejor describa tu situación fuera del trabajo.',
+    },
+    ESTRES: {
+        heading: 'Síntomas de Estrés',
+        body: 'Este cuestionario identifica síntomas físicos, emocionales y de comportamiento asociados al estrés. Reconocer cómo el estrés se manifiesta en tu cuerpo y mente es clave para poder gestionarlo.',
+        timeframe: 'Selecciona la opción que mejor describa cómo te has sentido en el último mes.',
+    },
+};
+
+// ── Datos visuales / "vibe" por instrumento (modal de instrucciones) ─────────
+export interface InstrumentVibeData {
+    /** Emoji grande y temático */
+    emoji: string;
+    /** Etiqueta corta que resume el foco del instrumento */
+    focus: string;
+    /** Frase motivadora de 1 línea */
+    tagline: string;
+    /** Estadísticas rápidas: [ { label, value } ] — máx. 3 */
+    stats: { label: string; value: string }[];
+}
+
+const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
+    DASS21:  {
+        emoji: '🧠',
+        focus: 'Estado anímico',
+        tagline: 'Conocerte es el primer paso para cuidarte.',
+        stats: [
+            { label: 'Duración', value: '~5 min' },
+            { label: 'Dimensiones', value: '3' },
+            { label: 'Preguntas', value: '21' },
+        ],
+    },
+    BAI:     {
+        emoji: '🌬️',
+        focus: 'Ansiedad',
+        tagline: 'Respirar es también un acto de valentía.',
+        stats: [
+            { label: 'Duración', value: '~4 min' },
+            { label: 'Área', value: 'Ansiedad' },
+            { label: 'Preguntas', value: '21' },
+        ],
+    },
+    BDI:     {
+        emoji: '🌱',
+        focus: 'Bienestar emocional',
+        tagline: 'Escucharte es el inicio del cambio.',
+        stats: [
+            { label: 'Duración', value: '~5 min' },
+            { label: 'Área', value: 'Depresión' },
+            { label: 'Preguntas', value: '21' },
+        ],
+    },
+    ICSP_VC: {
+        emoji: '🌙',
+        focus: 'Hábitos de sueño',
+        tagline: 'Un buen descanso transforma tu día.',
+        stats: [
+            { label: 'Duración', value: '~3 min' },
+            { label: 'Período', value: 'Último mes' },
+            { label: 'Preguntas', value: '10' },
+        ],
+    },
+    TMMS24:  {
+        emoji: '❤️',
+        focus: 'Inteligencia emocional',
+        tagline: 'Tus emociones son tu mayor fortaleza.',
+        stats: [
+            { label: 'Duración', value: '~6 min' },
+            { label: 'Subescalas', value: '3' },
+            { label: 'Preguntas', value: '24' },
+        ],
+    },
+    GAD7:    {
+        emoji: '🌿',
+        focus: 'Ansiedad generalizada',
+        tagline: 'Identificar es avanzar hacia el equilibrio.',
+        stats: [
+            { label: 'Duración', value: '~2 min' },
+            { label: 'Período', value: '2 semanas' },
+            { label: 'Preguntas', value: '7' },
+        ],
+    },
+    PHQ9:    {
+        emoji: '☀️',
+        focus: 'Estado de ánimo',
+        tagline: 'Tu bienestar merece atención y cuidado.',
+        stats: [
+            { label: 'Duración', value: '~3 min' },
+            { label: 'Período', value: '2 semanas' },
+            { label: 'Preguntas', value: '9' },
+        ],
+    },
+    ISI:     {
+        emoji: '😴',
+        focus: 'Calidad del sueño',
+        tagline: 'Descansar bien es un derecho, no un lujo.',
+        stats: [
+            { label: 'Duración', value: '~3 min' },
+            { label: 'Período', value: 'Último mes' },
+            { label: 'Preguntas', value: '7' },
+        ],
+    },
+    PSS4:    {
+        emoji: '🧘',
+        focus: 'Estrés percibido',
+        tagline: 'Medir el estrés es el primer paso para reducirlo.',
+        stats: [
+            { label: 'Duración', value: '~2 min' },
+            { label: 'Período', value: 'Último mes' },
+            { label: 'Preguntas', value: '4' },
+        ],
+    },
+    PSS10:   {
+        emoji: '🧘',
+        focus: 'Estrés percibido',
+        tagline: 'Conocer tu nivel de estrés te da el control.',
+        stats: [
+            { label: 'Duración', value: '~3 min' },
+            { label: 'Período', value: 'Último mes' },
+            { label: 'Preguntas', value: '10' },
+        ],
+    },
+    FATIGUE_ENERGY:     { emoji: '⚡', focus: 'Energía física',     tagline: 'Tu energía importa — escúchala.',                       stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    FATIGUE_COGNITIVE:  { emoji: '🔍', focus: 'Concentración',      tagline: 'Un foco claro lleva a mejores resultados.',             stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    FATIGUE_EMOTIONAL:  { emoji: '🫀', focus: 'Reserva emocional',  tagline: 'Cuidar tus emociones es también rendimiento.',          stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    FATIGUE_MOTIVATION: { emoji: '🚀', focus: 'Motivación',          tagline: 'La motivación se cultiva, no se fuerza.',              stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    CLIMATE_LEADERSHIP:    { emoji: '🏆', focus: 'Liderazgo',        tagline: 'Un buen líder cambia todo el ambiente.',               stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    CLIMATE_TEAMWORK:      { emoji: '🤝', focus: 'Trabajo en equipo', tagline: 'Juntos siempre llegan más lejos.',                    stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    CLIMATE_COMMUNICATION: { emoji: '💬', focus: 'Comunicación',     tagline: 'Comunicar bien es construir puentes.',                 stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    CLIMATE_RECOGNITION:   { emoji: '⭐', focus: 'Reconocimiento',   tagline: 'Ser valorado/a impulsa a dar lo mejor.',               stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    ECO: {
+        emoji: '🏢',
+        focus: 'Compromiso Organizacional',
+        tagline: 'Tu vínculo con la organización construye el futuro de todos.',
+        stats: [
+            { label: 'Duración', value: '~7 min' },
+            { label: 'Dimensiones', value: '3' },
+            { label: 'Preguntas', value: '18' },
+        ],
+    },
+    PSYCHO_DEMANDS:  { emoji: '⚖️', focus: 'Carga laboral',          tagline: 'Identificar la carga es empezar a equilibrarla.',      stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    PSYCHO_CONTROL:  { emoji: '🎛️', focus: 'Autonomía',              tagline: 'Tener control hace la diferencia.',                    stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    PSYCHO_SUPPORT:  { emoji: '🫂', focus: 'Apoyo social',           tagline: 'Apoyarse es fortaleza, no debilidad.',                 stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    PSYCHO_REWARDS:  { emoji: '🎁', focus: 'Recompensas',            tagline: 'Tu esfuerzo merece ser reconocido.',                   stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    // Riesgo Psicosocial – Batería real del backend
+    INTRA_A: {
+        emoji: '🏗️',
+        focus: 'Riesgo Intralaboral – Forma A',
+        tagline: 'Tu percepción transforma los entornos de trabajo.',
+        stats: [
+            { label: 'Duración', value: '~35 min' },
+            { label: 'Dominios', value: '4' },
+            { label: 'Preguntas', value: '123' },
+        ],
+    },
+    INTRA_B: {
+        emoji: '🔧',
+        focus: 'Riesgo Intralaboral – Forma B',
+        tagline: 'Tu opinión construye espacios de trabajo más sanos.',
+        stats: [
+            { label: 'Duración', value: '~25 min' },
+            { label: 'Dominios', value: '4' },
+            { label: 'Preguntas', value: '97' },
+        ],
+    },
+    EXTRALABORAL: {
+        emoji: '🏡',
+        focus: 'Factores Extralaborales',
+        tagline: 'El bienestar fuera del trabajo también cuenta.',
+        stats: [
+            { label: 'Duración', value: '~10 min' },
+            { label: 'Área', value: 'Extralaboral' },
+            { label: 'Preguntas', value: '31' },
+        ],
+    },
+    ESTRES: {
+        emoji: '🧘',
+        focus: 'Síntomas de Estrés',
+        tagline: 'Reconocer el estrés es el primer paso para gestionarlo.',
+        stats: [
+            { label: 'Duración', value: '~10 min' },
+            { label: 'Área', value: 'Estrés' },
+            { label: 'Preguntas', value: '31' },
+        ],
+    },
 };
 
 export interface InstrumentCard extends InstrumentDescriptor {
@@ -344,6 +586,12 @@ export class InstrumentSelectorComponent implements OnInit {
     heroGradient = '';
 
     private isSubmitting = false;
+
+    /** Devuelve los datos visuales ("vibe") del instrumento pendiente */
+    get currentVibe(): InstrumentVibeData | null {
+        if (!this.pendingInstrument) return null;
+        return INSTRUMENT_VIBE[this.pendingInstrument.code] ?? null;
+    }
 
     constructor(
         private readonly router: Router,
