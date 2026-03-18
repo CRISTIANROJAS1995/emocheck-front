@@ -16,11 +16,13 @@ const INSTRUMENT_META: Record<string, { icon: string; description: string; color
     PHQ9:    { icon: 'icons/Icon (28).svg', description: 'Cuestionario de Salud del Paciente',        color: '#8b5cf6' },
     ISI:     { icon: 'icons/Icon (29).svg', description: 'Índice de Severidad del Insomnio',          color: '#06b6d4' },
     PSS4:    { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido',                color: '#f59e0b' },
+    PSS10:   { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido (Completa)',     color: '#f59e0b' },
     DASS21:  { icon: 'icons/Icon (37).svg', description: 'Escala de Depresión, Ansiedad y Estrés',    color: '#3b82f6' },
     BAI:     { icon: 'icons/Icon (28).svg', description: 'Inventario de Ansiedad de Beck',            color: '#8b5cf6' },
     BDI:     { icon: 'icons/Icon (29).svg', description: 'Inventario de Depresión de Beck',           color: '#06b6d4' },
-    ICSP_VC: { icon: 'icons/Icon (30).svg', description: 'Índice de Calidad del Sueño de Pittsburgh', color: '#f59e0b' },
-    TMMS24:  { icon: 'icons/Icon (31).svg', description: 'Trait Meta-Mood Scale',                     color: '#10b981' },
+    ICSP_VC: { icon: 'icons/Icon (30).svg', description: 'Índice de Calidad del Sueño de Pittsburgh', color: '#4CAF50' },
+    TMMS24:  { icon: 'icons/Icon (31).svg', description: 'Escala de Inteligencia Emocional',          color: '#FF5722' },
+    MFI20:   { icon: 'icons/Icon (32).svg', description: 'Inventario de Fatiga Multidimensional',     color: '#9C27B0' },
 };
 
 const FALLBACK_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444'];

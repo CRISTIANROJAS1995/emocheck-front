@@ -353,6 +353,49 @@
         </div>
         }
 
+        <!-- Progress Info Section -->
+        @if (progressInfo && !progressInfo.allCoreCompleted) {
+        <div class="is-progress-info">
+            <div class="is-progress-info__header">
+                <h3>📋 Tu Progreso de Evaluación</h3>
+                <span class="is-progress-info__badge">
+                    {{ progressInfo.completedCoreCount }}/3 evaluaciones principales
+                </span>
+            </div>
+            <div class="is-progress-info__content">
+                @if (progressInfo.completedCoreCount === 0) {
+                <p>
+                    <strong>¡Comienza tu evaluación!</strong><br> Completa los 3 instrumentos principales para desbloquear evaluaciones adicionales de salud mental.
+                </p>
+                } @else if (progressInfo.completedCoreCount === 1) {
+                <p>
+                    <strong>¡Excelente progreso!</strong><br> Completa {{ 3 - progressInfo.completedCoreCount }} evaluación más para desbloquear:
+                    <em>{{ progressInfo.nextUnlockInstruments.join(', ') }}</em>
+                </p>
+                } @else if (progressInfo.completedCoreCount === 2) {
+                <p>
+                    <strong>¡Casi listo!</strong><br> Completa la última evaluación principal para desbloquear todas las evaluaciones adicionales.
+                </p>
+                }
+
+                <div class="is-progress-info__bar">
+                    <div class="is-progress-info__fill" [style.width.%]="(progressInfo.completedCoreCount / 3) * 100"></div>
+                </div>
+            </div>
+        </div>
+        }
+
+        <!-- Success message when all core completed -->
+        @if (progressInfo && progressInfo.allCoreCompleted) {
+        <div class="is-success-info">
+            <div class="is-success-info__icon">🎉</div>
+            <div class="is-success-info__content">
+                <h3>¡Evaluaciones principales completadas!</h3>
+                <p>Has desbloqueado acceso a todas las evaluaciones adicionales de salud mental.</p>
+            </div>
+        </div>
+        }
+
         <!-- Grid de instrumentos -->
         @if (instruments && instruments.length > 0) {
         <div class="is-grid">

@@ -71,9 +71,9 @@ export interface InstrumentClosing {
 
 const INSTRUMENT_CLOSING: Record<string, InstrumentClosing> = {
     DASS21: {
-        message: 'Recuerda que cuidar tu salud mental no siempre implica grandes cambios, sino pequeños gestos de atención hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar cómo te sientes es también una forma de sanar. Permítete estar presente, sin exigencias, sin juicios.',
-        preResultText: 'Antes de ver tus resultados, tómate un momento para respirar y observar cómo te sientes ahora mismo.',
-        visual: 'stars',
+        message: 'Atender tu salud mental no requiere hacerlo todo a la vez; comenzar por escucharte, respetar tus límites y permitirte apoyo es ya un acto de cuidado.',
+        preResultText: 'Antes de ver tus resultados, realicemos un ejercicio de atención y percepción visual. Encuentra las diferencias.',
+        visual: 'default',
         cta: 'Ver mis resultados',
     },
     BAI: {
@@ -89,14 +89,14 @@ const INSTRUMENT_CLOSING: Record<string, InstrumentClosing> = {
         cta: 'Ver mis resultados',
     },
     ICSP_VC: {
-        message: 'Cuidar tu salud mental no siempre implica grandes cambios, sino pequeños gestos de atención hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar cómo te sientes es también una forma de sanar. Permítete estar presente, sin exigencias, sin juicios.',
-        preResultText: 'Antes de ver tus resultados, cierra los ojos un instante e imagina que tu cuerpo se prepara para un descanso profundo y reparador.',
+        message: 'Recuerda que cuidar tu salud mental no siempre implica grandes cambios, sino pequeños gestos de atención hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar cómo te sientes es también una forma de sanar. Permítete estar presente, sin exigencias, sin juicios.',
+        preResultText: 'Antes de ver tu resultado realicemos un ejercicio de rapidez. A continuación, No dejes que el Extraterrestre se lleve al humano de su cama, ¡Sálvalo!',
         visual: 'wave',
         cta: 'Ver mis resultados',
     },
     TMMS24: {
-        message: 'Identificar lo que sentimos, comprender por qué ocurre y responder de manera más consciente y equilibrada ante distintas situaciones hace que reforcemos nuestra inteligencia emocional. Este proceso permite reflexionar sobre la forma en que se gestionan las emociones y abre un espacio para reconocer fortalezas, así como aspectos que pueden seguir desarrollándose.',
-        preResultText: 'Estos son tus resultados. Recuerda que no hay perfiles buenos ni malos — cada dimensión es una oportunidad de crecimiento.',
+        message: 'Identificar lo que sentimos, comprender por qué ocurre y responder de manera más consciente y equilibrada ante distintas situaciones hace que reforcemos nuestra inteligencia emocional. Este proceso permite reflexionar sobre la forma en que se gestionan las emociones en la vida diaria y abre un espacio para reconocer fortalezas, así como aspectos que pueden seguir desarrollándose.',
+        preResultText: 'Tus resultados son:',
         visual: 'mosaic',
         cta: 'Ver mis resultados',
     },
@@ -332,6 +332,14 @@ export class InstrumentSelectorComponent implements OnInit {
     /** First name of the current user for the welcome modal greeting */
     userName = '';
 
+    /** Progress info for displaying next available instruments */
+    progressInfo: {
+        completedCoreCount: number;
+        nextUnlockCount: number;
+        nextUnlockInstruments: string[];
+        allCoreCompleted: boolean;
+    } | null = null;
+
     moduleDef = getAssessmentModuleDefinition('mental-health'); // sobrescrito en ngOnInit
     heroGradient = '';
 
@@ -382,15 +390,23 @@ export class InstrumentSelectorComponent implements OnInit {
                         [...completedCodes].some(dc => dc.startsWith(upper + '_'));
                 };
 
-                this.instruments = descriptors.map((d, i) => {
+                // Calculate progress info for UI
+                this.progressInfo = this._calculateProgressInfo(completedCodes);
+
+                // Filter instruments based on progressive activation rules
+                const availableDescriptors = this._getProgressivelyAvailableInstruments(descriptors, completedCodes);
+
+                this.instruments = availableDescriptors.map((d, i) => {
                     const meta = INSTRUMENT_META[d.code];
+                    const isCurrentlyCompleted = isCompleted(d.code);
+                    
                     return {
                         ...d,
                         label: d.label || d.backendName || d.code,
                         description: d.backendDescription || meta?.description || '',
                         icon:  meta?.icon  ?? this.moduleDef.icon,
                         color: meta?.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
-                        completed: isCompleted(d.code),
+                        completed: isCurrentlyCompleted,
                     };
                 });
             },
@@ -447,6 +463,12 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     private _loadInstrumentQuestions(card: InstrumentCard): void {
+        // Check if this instrument needs special handling
+        if (this._shouldUseSpecializedQuestionnaire(card.code)) {
+            this._navigateToSpecializedQuestionnaire(card.code);
+            return;
+        }
+
         this.loadingQuestions = true;
         this.selectedInstrument = card;
 
@@ -571,6 +593,122 @@ export class InstrumentSelectorComponent implements OnInit {
 
     closeWelcomeModal(): void {
         this.showWelcomeModal = false;
+    }
+
+    /**
+     * Calculates progress information for displaying to the user
+     */
+    private _calculateProgressInfo(completedCodes: Set<string>) {
+        const coreInstruments = ['TMMS24', 'ICSP_VC', 'DASS21'];
+        
+        // Check how many core instruments have been completed
+        const completedCoreCount = coreInstruments.filter(code => {
+            const upper = code.toUpperCase();
+            return completedCodes.has(upper) || 
+                   [...completedCodes].some(dc => dc.startsWith(upper + '_'));
+        }).length;
+
+        const allCoreCompleted = completedCoreCount >= 3;
+        
+        // Determine next unlock information
+        let nextUnlockCount = 0;
+        let nextUnlockInstruments: string[] = [];
+        
+        if (completedCoreCount === 0) {
+            nextUnlockCount = 1;
+            nextUnlockInstruments = ['Escala de Estrés Percibido', 'Inventario de Fatiga Multidimensional'];
+        } else if (completedCoreCount === 1) {
+            nextUnlockCount = 1;
+            nextUnlockInstruments = ['Inventario de Ansiedad de Beck', 'Inventario de Depresión de Beck'];
+        } else if (completedCoreCount === 2) {
+            nextUnlockCount = 1;
+            nextUnlockInstruments = ['Evaluaciones adicionales de salud mental'];
+        }
+        
+        return {
+            completedCoreCount,
+            nextUnlockCount,
+            nextUnlockInstruments,
+            allCoreCompleted
+        };
+    }
+
+    /**
+     * Implements progressive instrument activation based on document specifications.
+     * Initially only 3 instruments are active: Inteligencia Emocional, Hábitos de sueño, Estado anímico.
+     * Additional instruments unlock as user completes the core assessments.
+     */
+    private _getProgressivelyAvailableInstruments(
+        allDescriptors: InstrumentDescriptor[], 
+        completedCodes: Set<string>
+    ): InstrumentDescriptor[] {
+        
+        // Core instruments available from the start (as per document specification)
+        const coreInstruments = ['TMMS24', 'ICSP_VC', 'DASS21'];
+        
+        // Secondary instruments that unlock after core completion
+        const secondaryInstruments = ['PSS10', 'MFI20', 'BAI', 'BDI', 'GAD7', 'PHQ9', 'ISI', 'PSS4'];
+        
+        // Check how many core instruments have been completed
+        const completedCoreCount = coreInstruments.filter(code => {
+            const upper = code.toUpperCase();
+            return completedCodes.has(upper) || 
+                   [...completedCodes].some(dc => dc.startsWith(upper + '_'));
+        }).length;
+        
+        // Filter descriptors based on progression rules
+        return allDescriptors.filter(descriptor => {
+            const code = descriptor.code.toUpperCase();
+            
+            // Always show core instruments
+            if (coreInstruments.some(coreCode => coreCode.toUpperCase() === code)) {
+                return true;
+            }
+            
+            // Show secondary instruments based on progression:
+            // - If 1+ core completed: unlock PSS10, MFI20
+            // - If 2+ core completed: unlock BAI, BDI
+            // - If all 3 core completed: unlock remaining instruments
+            if (secondaryInstruments.some(secCode => secCode.toUpperCase() === code)) {
+                if (completedCoreCount >= 3) return true;
+                if (completedCoreCount >= 2 && ['BAI', 'BDI'].some(unlockCode => unlockCode.toUpperCase() === code)) return true;
+                if (completedCoreCount >= 1 && ['PSS10', 'MFI20'].some(unlockCode => unlockCode.toUpperCase() === code)) return true;
+            }
+            
+            // For any other instruments not in our lists, show them if all core are complete
+            const isKnownInstrument = [...coreInstruments, ...secondaryInstruments]
+                .some(knownCode => knownCode.toUpperCase() === code);
+            
+            if (!isKnownInstrument && completedCoreCount >= 3) {
+                return true;
+            }
+            
+            return false;
+        });
+    }
+
+    private _shouldUseSpecializedQuestionnaire(instrumentCode: string): boolean {
+        // Based on the document specifications, these instruments need specialized questionnaires
+        const specializedInstruments = ['ICSP_VC', 'TMMS24'];
+        return specializedInstruments.includes(instrumentCode);
+    }
+
+    private _navigateToSpecializedQuestionnaire(instrumentCode: string): void {
+        let route = '';
+        
+        switch (instrumentCode) {
+            case 'ICSP_VC':
+                route = '/mental-health/sleep-habits';
+                break;
+            case 'TMMS24':
+                route = '/mental-health/emotional-intelligence';
+                break;
+            default:
+                console.warn(`No specialized route found for instrument: ${instrumentCode}`);
+                return;
+        }
+        
+        this.router.navigate([route]);
     }
 
     private _buildGradient(): string {

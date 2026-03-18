@@ -1354,3 +1354,154 @@
         filter: brightness(0.92);
     }
 }
+
+// ── Progress Info Section ──────────────────────────────────────────────────
+.is-progress-info {
+    max-width: 1170px;
+    margin: 0 auto 32px;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+    }
+    &__badge {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+    &__content {
+        p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #475569;
+            margin: 0 0 16px;
+            strong {
+                color: #1e293b;
+                font-weight: 600;
+            }
+            em {
+                color: #3b82f6;
+                font-style: normal;
+                font-weight: 500;
+            }
+        }
+    }
+    &__bar {
+        width: 100%;
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+    &__fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+        border-radius: 4px;
+        transition: width 0.6s ease-out;
+        position: relative;
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+// ── Success Info Section ───────────────────────────────────────────────────
+.is-success-info {
+    max-width: 1170px;
+    margin: 0 auto 32px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 2px solid #10b981;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+    &__icon {
+        font-size: 48px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    &__content {
+        flex: 1;
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #065f46;
+            margin: 0 0 8px;
+        }
+        p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #047857;
+            margin: 0;
+        }
+    }
+}
+
+// ── Responsive adjustments for progress sections ──────────────────────────
+@media (max-width: 560px) {
+    .is-progress-info,
+    .is-success-info {
+        margin-left: 16px;
+        margin-right: 16px;
+        padding: 20px;
+    }
+    .is-progress-info__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        h3 {
+            font-size: 16px;
+        }
+    }
+    .is-success-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+        &__icon {
+            font-size: 40px;
+        }
+        &__content h3 {
+            font-size: 18px;
+        }
+    }
+}
