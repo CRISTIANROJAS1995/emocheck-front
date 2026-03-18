@@ -23,6 +23,17 @@ interface SwaggerDimensionScoreDto {
     score: number;
     maxScore: number;
     riskLevel?: RiskLevel | null;
+    /** Código del instrumento al que pertenece esta dimensión (ej. "BAI", "DASS21").
+     *  Viene poblado desde backend V5 para módulos multi-instrumento. */
+    instrumentCode?: string | null;
+    /** Porcentaje de score para esta dimensión (0-100). */
+    percentageScore?: number | null;
+    /** Etiqueta descriptiva del rango (ej. "Ansiedad moderada"). */
+    scoreRangeLabel?: string | null;
+    /** Color hexadecimal del rango (ej. "#F59E0B"). */
+    scoreRangeColor?: string | null;
+    /** Descripción textual del rango. */
+    scoreRangeDescription?: string | null;
 }
 
 interface SwaggerRecommendationDto {
@@ -288,6 +299,7 @@ export class AssessmentHydrationService {
                     riskLevel: d?.riskLevel ?? undefined,
                     scoreRangeLabel: d?.scoreRangeLabel ?? undefined,
                     scoreRangeColor: d?.scoreRangeColor ?? undefined,
+                    scoreRangeDescription: d?.scoreRangeDescription ?? undefined,
                     percent: Math.round(Number(d?.percentageScore ?? 0)),
                 }));
                 const recs = ((result?.recommendations ?? []) as any[])
@@ -328,18 +340,29 @@ export class AssessmentHydrationService {
             evaluatedAt: result?.calculatedAt ?? item.completedAt,
             headline: this.mapRiskLevelToSpanish(result?.riskLevel),
             message: String(result?.interpretation ?? '').trim() || this.buildInterpretationMessage(outcome, score),
-            dimensions: ((result?.dimensionScores ?? []) as any[]).map((d) => ({
-                id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
-                label: d?.dimensionName ?? '',
-                instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
-                score: Number(d?.score ?? d?.rawScore ?? 0),
-                maxScore: Number(d?.maxScore ?? 0),
-                riskLevel: d?.riskLevel ?? undefined,
-                scoreRangeLabel: d?.scoreRangeLabel ?? undefined,
-                scoreRangeColor: d?.scoreRangeColor ?? undefined,
-                scoreRangeDescription: d?.scoreRangeDescription ?? undefined,
-                percent: Math.round(Number(d?.percentageScore ?? 0)),
-            })),
+            dimensions: ((result?.dimensionScores ?? []) as any[]).map((d) => {
+                const rawScore = Number(d?.score ?? d?.rawScore ?? 0);
+                const maxScore = Number(d?.maxScore ?? 0);
+                // Use backend percentageScore when valid (rawScore <= maxScore).
+                // When rawScore > maxScore the backend may have capped at 100% which is
+                // misleading — recompute from raw values so the bar width is meaningful.
+                const backendPct = Number(d?.percentageScore ?? 0);
+                const percent = (maxScore > 0 && rawScore > maxScore)
+                    ? this.safePercent(rawScore, rawScore) // instrument's own scale: treat rawScore as 100%
+                    : Math.round(Math.max(0, Math.min(100, backendPct)));
+                return {
+                    id: String(d?.dimensionScoreID ?? d?.dimensionScoreId ?? ''),
+                    label: d?.dimensionName ?? '',
+                    instrumentCode: String(d?.instrumentCode ?? '').toUpperCase().trim() || undefined,
+                    score: rawScore,
+                    maxScore,
+                    riskLevel: d?.riskLevel ?? undefined,
+                    scoreRangeLabel: d?.scoreRangeLabel ?? undefined,
+                    scoreRangeColor: d?.scoreRangeColor ?? undefined,
+                    scoreRangeDescription: d?.scoreRangeDescription ?? undefined,
+                    percent,
+                };
+            }),
             recommendations: ((result?.recommendations ?? []) as any[])
                 .map((r) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
                 .filter(Boolean),

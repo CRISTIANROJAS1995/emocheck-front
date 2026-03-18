@@ -494,6 +494,25 @@
     }
 }
 
+// Etiqueta textual del rango (scoreRangeLabel del backend), aparece debajo del nombre
+.dim-card__range-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 1px;
+    margin-bottom: 4px;
+    line-height: 1.3;
+    &.dim-range--good {
+        color: #16a34a;
+    }
+    &.dim-range--warn {
+        color: #a16207;
+    }
+    &.dim-range--bad {
+        color: #dc2626;
+    }
+}
+
 .dim-card__score-fraction {
     display: flex;
     align-items: baseline;
@@ -778,6 +797,14 @@
     font-size: 14px;
     font-weight: 700;
     color: #94a3b8;
+    line-height: 1.4;
+}
+
+.dim-interp__sublabel {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #64748b;
     line-height: 1.4;
 }
 

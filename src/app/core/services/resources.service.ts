@@ -1,16 +1,16 @@
-﻿import { HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
-// ── Enums ────────────────────────────────────────────────────────────────────
+// -- Enums --------------------------------------------------------------------
 
 export type ContentType = 'ARTICLE' | 'VIDEO' | 'AUDIO' | 'EXERCISE' | 'EXTERNAL_LINK';
 export type RiskLevel   = 'LOW' | 'MODERATE' | 'HIGH' | 'SEVERE';
 
-// ── DTOs públicos (usados por los componentes) ───────────────────────────────
+// -- DTOs p�blicos (usados por los componentes) -------------------------------
 
 export interface ResourceCategoryDto {
     resourceCategoryID: number;
@@ -87,7 +87,7 @@ export interface ProfessionalSupportDto {
     languages?: string | null;
 }
 
-// ── Servicio ─────────────────────────────────────────────────────────────────
+// -- Servicio -----------------------------------------------------------------
 
 @Injectable({ providedIn: 'root' })
 export class ResourcesService {
@@ -96,7 +96,7 @@ export class ResourcesService {
 
     constructor(private readonly http: HttpClient) { }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
+    // -- Helpers --------------------------------------------------------------
 
     /** Desenvuelve el envelope { success, data } del backend o devuelve el valor directamente. */
     private unwrap<T>(res: unknown): T {
@@ -147,25 +147,27 @@ export class ResourcesService {
         };
     }
 
-    // ── Categorías ───────────────────────────────────────────────────────────
+    // -- Categor�as -----------------------------------------------------------
 
-    /** Lista todas las categorías activas. */
+    /** Lista todas las categor�as activas. */
     getCategories(): Observable<ResourceCategoryDto[]> {
+        // Backend V5: GET /api/resource/categories
         return this.http.get<unknown>(`${this.apiUrl}/resource/categories`).pipe(
             map((res) => this.unwrapArray<any>(res).map((c) => this.mapCategory(c)))
         );
     }
 
-    // ── Recursos ─────────────────────────────────────────────────────────────
+    // -- Recursos -------------------------------------------------------------
 
     /** Lista todos los recursos activos. */
     getResources(): Observable<WellnessResourceDto[]> {
+        // Backend V5: GET /api/resource
         return this.http.get<unknown>(`${this.apiUrl}/resource`).pipe(
             map((res) => this.unwrapArray<any>(res).map((r) => this.mapResource(r)))
         );
     }
 
-    /** Lista recursos filtrados por categoría. */
+    /** Lista recursos filtrados por categor�a. */
     getByCategory(categoryId: number): Observable<WellnessResourceDto[]> {
         return this.http.get<unknown>(`${this.apiUrl}/resource/by-category/${categoryId}`).pipe(
             map((res) => this.unwrapArray<any>(res).map((r) => this.mapResource(r)))
@@ -173,12 +175,21 @@ export class ResourcesService {
     }
 
     /**
-     * Recursos recomendados automáticamente para el usuario autenticado.
-     * El backend lee el último EvaluationResult y filtra por RiskLevel.
+     * Recursos recomendados autom�ticamente para el usuario autenticado.
+     * El backend lee el �ltimo EvaluationResult y filtra por RiskLevel.
      * Si no hay evaluaciones devuelve recursos LOW.
      */
     getRecommended(): Observable<WellnessResourceDto[]> {
         return this.http.get<unknown>(`${this.apiUrl}/resource/recommended`).pipe(
+            map((res) => this.unwrapArray<any>(res).map((r) => this.mapResource(r))),
+            catchError(() => of([]))
+        );
+    }
+
+    /** Lista recursos filtrados por nivel de riesgo. */
+    getByRiskLevel(level: RiskLevel | string): Observable<WellnessResourceDto[]> {
+        // Backend V5: GET /api/resource/by-risk-level/{level}
+        return this.http.get<unknown>(`${this.apiUrl}/resource/by-risk-level/${level}`).pipe(
             map((res) => this.unwrapArray<any>(res).map((r) => this.mapResource(r))),
             catchError(() => of([]))
         );
@@ -191,23 +202,24 @@ export class ResourcesService {
         );
     }
 
-    // ── CRUD (SuperAdmin / Psychologist) ─────────────────────────────────────
+    // -- CRUD (SuperAdmin / Psychologist) -------------------------------------
 
     /** Crea un nuevo recurso. Requiere rol SuperAdmin o Psychologist. */
     create(dto: CreateWellnessResourceDto): Observable<WellnessResourceDto> {
+        // Backend V5: POST /api/resource
         return this.http.post<unknown>(`${this.apiUrl}/resource`, dto).pipe(
             map((res) => this.mapResource(this.unwrap<any>(res)))
         );
     }
 
-    /** Actualiza un recurso. Solo los campos enviados se modifican (PATCH semántico). */
+    /** Actualiza un recurso. Solo los campos enviados se modifican (PATCH sem�ntico). */
     update(id: number, dto: UpdateWellnessResourceDto): Observable<WellnessResourceDto> {
         return this.http.put<unknown>(`${this.apiUrl}/resource/${id}`, dto).pipe(
             map((res) => this.mapResource(this.unwrap<any>(res)))
         );
     }
 
-    /** Desactiva un recurso sin eliminarlo físicamente. */
+    /** Desactiva un recurso sin eliminarlo f�sicamente. */
     deactivate(id: number): Observable<WellnessResourceDto> {
         return this.update(id, { isActive: false });
     }
@@ -218,7 +230,7 @@ export class ResourcesService {
     }
 
     /**
-     * Elimina un recurso (borrado lógico — IsActive = false en BD).
+     * Elimina un recurso (borrado l�gico � IsActive = false en BD).
      * Solo SuperAdmin.
      */
     delete(id: number): Observable<void> {
@@ -227,16 +239,10 @@ export class ResourcesService {
         );
     }
 
-    // ── Registro de acceso ───────────────────────────────────────────────────
+    // -- Registro de acceso ---------------------------------------------------
 
     /**
-     * Registra que el usuario consumió un recurso.
-     *
-     * Cuándo llamarlo:
-     *   - Al abrir el recurso:  { timeSpentSeconds: 0, completed: false }
-     *   - Al terminar:          { timeSpentSeconds: <tiempo>, completed: true, rating?: <1-5> }
-     *
-     * Cada llamada crea un registro nuevo (historial acumulativo).
+     * Registra que el usuario consumi� un recurso.
      */
     registerAccess(dto: RegisterResourceAccessDto): Observable<void> {
         return this.http.post<unknown>(`${this.apiUrl}/resource/access`, dto).pipe(
@@ -244,7 +250,7 @@ export class ResourcesService {
         );
     }
 
-    // ── Profesionales (sin endpoint en V5 — devuelve vacío) ─────────────────
+    // -- Profesionales (sin endpoint en V5 � devuelve vac�o) -----------------
 
     getProfessionals(): Observable<ProfessionalSupportDto[]> {
         return of([]);
@@ -254,7 +260,7 @@ export class ResourcesService {
         return of([]);
     }
 
-    // ── Helpers para la UI ───────────────────────────────────────────────────
+    // -- Helpers para la UI ---------------------------------------------------
 
     contentTypeIcon(contentType: ContentType | string | null | undefined): string {
         switch ((contentType ?? '').toUpperCase()) {
@@ -278,3 +284,4 @@ export class ResourcesService {
         }
     }
 }
+

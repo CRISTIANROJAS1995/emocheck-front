@@ -68,17 +68,17 @@
             </div>
 
             <div class="dim-cards">
-                <div class="dim-card" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-card--' + getBarTone(d.percent)" [style.border-left-color]="d.scoreRangeColor || null">
+                <div class="dim-card" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-card--' + getBarTone(d.percent, d.riskLevel)" [style.border-left-color]="d.scoreRangeColor || null">
                     <div class="dim-card__name-row">
-                        <span class="dim-card__name">{{ getDimensionLabel(d, idx) }}</span>
-                        <span class="dim-card__percent" [ngClass]="'dim-percent--' + getBarTone(d.percent)">{{ d.percent }}%</span>
+                        <span class="dim-card__name" [style.color]="d.scoreRangeColor || null">{{ d.scoreRangeLabel || getDimensionLabel(d, idx) }}</span>
+                        <span class="dim-card__percent" [ngClass]="'dim-percent--' + getBarTone(d.percent, d.riskLevel)" [style.color]="d.scoreRangeColor || null">{{ d.percent }}%</span>
                     </div>
-                    <div class="dim-card__score-fraction" *ngIf="d.score != null && d.maxScore != null && d.score <= d.maxScore">
-                        <span class="dim-card__score-val" [ngClass]="'dim-percent--' + getBarTone(d.percent)">{{ d.score | number:'1.0-0' }}</span>
+                    <div class="dim-card__score-fraction" *ngIf="d.score != null && d.maxScore != null">
+                        <span class="dim-card__score-val" [ngClass]="'dim-percent--' + getBarTone(d.percent, d.riskLevel)">{{ d.score | number:'1.0-0' }}</span>
                         <span class="dim-card__score-max">/ {{ d.maxScore }}</span>
                     </div>
                     <div class="dim-card__bar">
-                        <div class="dim-card__bar-fill" [style.width.%]="d.percent" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-bar--' + getBarTone(d.percent)">
+                        <div class="dim-card__bar-fill" [style.width.%]="d.percent" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-bar--' + getBarTone(d.percent, d.riskLevel)">
                         </div>
                     </div>
                 </div>
@@ -98,12 +98,12 @@
                 <span>Interpretación de dimensiones</span>
             </div>
 
-            <div class="dim-interp-item" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-interp--' + getBarTone(d.percent)">
-                <div class="dim-interp__dot" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-dot--' + getBarTone(d.percent)"></div>
+            <div class="dim-interp-item" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-interp--' + getBarTone(d.percent, d.riskLevel)">
+                <div class="dim-interp__dot" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-dot--' + getBarTone(d.percent, d.riskLevel)"></div>
                 <div class="dim-interp__body">
-                    <span class="dim-interp__label" [style.color]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-label--' + getBarTone(d.percent)">{{ getDimensionLabel(d, idx) }}</span>
-                    <span class="dim-interp__sep">:</span>
-                    <span class="dim-interp__text">{{ d.scoreRangeDescription || getDimensionInterpretation(d, idx) }}</span>
+                    <span *ngIf="d.scoreRangeLabel" class="dim-interp__label" [style.color]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-label--' + getBarTone(d.percent, d.riskLevel)">{{ d.scoreRangeLabel }}</span>
+                    <span *ngIf="d.scoreRangeDescription" class="dim-interp__sep">:</span>
+                    <span class="dim-interp__text">{{ d.scoreRangeDescription || '' }}</span>
                 </div>
             </div>
         </section>

@@ -9,8 +9,12 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
+        "build:prod": "ng build --configuration production",
         "watch": "ng build --watch --configuration development",
-        "test": "ng test"
+        "test": "ng test",
+        "deploy:s3": "ng build --configuration production && npm run s3:upload",
+        "s3:upload": "aws s3 sync dist/fuse/browser s3://%S3_BUCKET% --delete --cache-control max-age=31536000,public && aws s3 cp dist/fuse/browser/index.html s3://%S3_BUCKET%/index.html --cache-control no-cache,no-store,must-revalidate --content-type text/html --metadata-directive REPLACE",
+        "cloudfront:invalidate": "aws cloudfront create-invalidation --distribution-id %CF_DISTRIBUTION_ID% --paths \"/*\""
     },
     "dependencies": {
         "@angular/animations": "19.0.5",
@@ -37,6 +41,8 @@
         "rxjs": "7.8.1",
         "sweetalert2": "^11.22.2",
         "tslib": "2.8.1",
+        "xlsx": "^0.18.5",
+        "xlsx-js-style": "^1.2.0",
         "zone.js": "0.15.0"
     },
     "devDependencies": {

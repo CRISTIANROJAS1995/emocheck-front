@@ -233,8 +233,9 @@ export class AdminAlertsService {
     }
 
     listPending(): Observable<AdminAlertDto[]> {
+        // No /alert/unattended in V5 — use /alert/status/OPEN as equivalent
         return this.http
-            .get<unknown>(`${this.apiUrl}/alert/unattended`)
+            .get<unknown>(`${this.apiUrl}/alert/status/OPEN`)
             .pipe(
                 map((res) => this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x))),
                 catchError(() => of([]))
@@ -242,8 +243,9 @@ export class AdminAlertsService {
     }
 
     listCritical(): Observable<AdminAlertDto[]> {
+        // No /alert/critical in V5 — use /alert/severity/CRITICAL
         return this.http
-            .get<unknown>(`${this.apiUrl}/alert/critical`)
+            .get<unknown>(`${this.apiUrl}/alert/severity/CRITICAL`)
             .pipe(
                 map((res) => this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x))),
                 catchError(() => of([]))

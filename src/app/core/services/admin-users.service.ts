@@ -40,6 +40,18 @@ export interface AdminUserListItemDto {
     lastRiskLevel?: RiskLevel;
 }
 
+export interface BulkUploadResult {
+    totalRows: number;
+    created: number;
+    errors: BulkUploadError[];
+}
+
+export interface BulkUploadError {
+    row: number;
+    field: string;
+    reason: string;
+}
+
 export interface AdminCreateUserRequestDto {
     firstName: string;
     lastName: string;
@@ -266,6 +278,34 @@ export class AdminUsersService {
                     if (res?.success === false) {
                         throw new Error(res?.message ?? 'No fue posible restablecer la contraseña');
                     }
+                })
+            );
+    }
+
+    /**
+     * Carga masiva de usuarios desde archivo Excel
+     * POST /api/users/bulk-upload
+     */
+    bulkUpload(file: File): Observable<BulkUploadResult> {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        return this.http
+            .post<unknown>(`${this.apiUrl}/users/bulk-upload`, formData)
+            .pipe(
+                map((res) => {
+                    const data = this.unwrapObject<any>(res);
+                    return {
+                        totalRows: Number(data?.totalRows ?? 0),
+                        created: Number(data?.created ?? 0),
+                        errors: Array.isArray(data?.errors) 
+                            ? data.errors.map((e: any) => ({
+                                row: Number(e?.row ?? 0),
+                                field: String(e?.field ?? ''),
+                                reason: String(e?.reason ?? '')
+                              }))
+                            : []
+                    } as BulkUploadResult;
                 })
             );
     }

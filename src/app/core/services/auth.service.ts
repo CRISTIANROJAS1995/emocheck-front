@@ -86,12 +86,8 @@ export class AuthService {
     }
 
     private fetchCurrentUserFromApi(): Observable<User> {
-        const userId = this.getUserIdFromToken();
-        if (!userId) {
-            return throwError(() => ({ status: 401, message: 'No se pudo obtener el ID del usuario desde el token' }));
-        }
-
-        return this.httpClient.get<any>(`${this.apiUrl}/users/${userId}`).pipe(
+        // Backend V5: GET /api/users/me devuelve el perfil del usuario autenticado.
+        return this.httpClient.get<any>(`${this.apiUrl}/users/me`).pipe(
             map((res: any) => {
                 // Handle both wrapped (ApiResponse with data) and flat response formats
                 const userData = res?.data ?? res;
@@ -103,7 +99,7 @@ export class AuthService {
 
                 const user = this.mapApiUserToAuthUser(userData ?? {});
                 if (!user?.id || user.id <= 0) {
-                    throw { status: 500, message: 'Respuesta inválida de /users (userID)' };
+                    throw { status: 500, message: 'Respuesta inválida de /users/me (userID)' };
                 }
                 return user;
             })

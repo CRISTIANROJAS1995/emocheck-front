@@ -135,13 +135,14 @@ export class EvaluationsService {
     getEvaluationResponsesCount(evaluationId: number): Observable<number> {
         if (!evaluationId || evaluationId <= 0) return of(0);
 
-        // V5 API: GET /api/evaluation/{id}/details → includes responses array
+        // Backend V5: GET /api/evaluation/{id}/details → evaluación con respuestas detalladas
         return this.http.get<unknown>(`${this.apiUrl}/evaluation/${evaluationId}/details`).pipe(
-            map((res) => {
-                const dto = this.unwrapObject<SwaggerEvaluationWithResponsesDto>(res);
-                const count = (dto?.responses ?? []).length;
-                return Number.isFinite(count) ? count : 0;
-            })
+            map((res: any) => {
+                const data = res?.data ?? res ?? {};
+                const responses = data?.responses ?? data?.answers ?? [];
+                return Array.isArray(responses) ? responses.length : 0;
+            }),
+            catchError(() => of(0))
         );
     }
 

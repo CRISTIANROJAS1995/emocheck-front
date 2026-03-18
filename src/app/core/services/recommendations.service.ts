@@ -76,7 +76,7 @@ export class RecommendationsService {
     }
 
     getByResult(evaluationResultId: number): Observable<RecommendationDto[]> {
-        // Swagger: GET /api/recommendation/by-result/{evaluationResultId} -> RecommendationDto[] (direct)
+        // Backend V5: GET /api/recommendation/by-result/{evaluationResultId}
         return this.http.get<unknown>(`${this.apiUrl}/recommendation/by-result/${evaluationResultId}`).pipe(
             map((res) => {
                 const items = this.unwrapArray<SwaggerRecommendationDto>(res);

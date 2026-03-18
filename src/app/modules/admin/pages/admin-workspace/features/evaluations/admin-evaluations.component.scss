@@ -8,8 +8,15 @@ $gray-200: #e5e7eb;
 $gray-600: #4b5563;
 $gray-700: #374151;
 $gray-900: #111827;
+// El elemento host debe ocupar todo el ancho disponible
+:host {
+    display: block;
+    width: 100%;
+}
+
 .evals-page {
     padding: 0;
+    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -72,10 +79,11 @@ $gray-900: #111827;
 // ── Layout ────────────────────────────────────────────────────────────────────
 .evals-layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 1.5rem;
+    grid-template-columns: 200px 1fr;
+    gap: 0.75rem;
     flex: 1;
     min-height: 0;
+    width: 100%;
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
@@ -87,6 +95,7 @@ $gray-900: #111827;
     flex-direction: column;
     overflow: hidden;
     height: calc(100vh - 210px);
+    min-width: 0;
 }
 
 .sidebar-header {
@@ -227,6 +236,8 @@ $gray-900: #111827;
     gap: 1rem;
     overflow-y: auto;
     height: calc(100vh - 210px);
+    min-width: 0; // permite que el grid 1fr se expanda correctamente
+    width: 100%;
 }
 
 .welcome-state {
@@ -497,6 +508,15 @@ $gray-900: #111827;
     border: 1px solid $gray-200;
     border-radius: .75rem;
     overflow: hidden;
+    width: 100%;
+    flex: 1;
+}
+
+// Wrapper que habilita scroll horizontal en la tabla sin romper el borde redondeado
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 // ── Data Table ────────────────────────────────────────────────────────────────
@@ -509,18 +529,51 @@ $gray-900: #111827;
         border-bottom: 1px solid $gray-200;
     }
     th {
-        padding: .75rem 1rem;
+        padding: .75rem .75rem;
         text-align: left;
         font-weight: 600;
         color: $gray-600;
         font-size: .8125rem;
         text-transform: uppercase;
         letter-spacing: .025em;
+        white-space: nowrap;
+        // Anchos específicos por columna
+        &:nth-child(1) {
+            width: 60px;
+        } // ID
+        &:nth-child(2) {
+            width: 120px;
+        } // Módulo  
+        &:nth-child(3) {
+            width: 200px;
+        } // Instrumento (más ancho)
+        &:nth-child(4) {
+            width: 100px;
+        } // Estado
+        &:nth-child(5) {
+            width: 90px;
+        } // Riesgo
+        &:nth-child(6) {
+            width: 70px;
+        } // Puntaje
+        &:nth-child(7) {
+            width: 80px;
+        } // Período
+        &:nth-child(8) {
+            width: 110px;
+        } // Iniciada
+        &:nth-child(9) {
+            width: 110px;
+        } // Completada
+        &:nth-child(10) {
+            width: 100px;
+        } // Acciones
     }
     td {
-        padding: .75rem 1rem;
+        padding: .75rem .75rem;
         border-bottom: 1px solid $gray-100;
         color: $gray-700;
+        vertical-align: top;
     }
     tbody tr:last-child td {
         border-bottom: none;
@@ -531,15 +584,41 @@ $gray-900: #111827;
     .td-id {
         color: $gray-600;
         font-size: .8rem;
+        text-align: center;
     }
     .td-name {
         font-weight: 500;
         color: $gray-900;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .td-instrument {
+        font-weight: 500;
+        color: $gray-900;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .td-score {
+        text-align: center;
+        font-weight: 600;
+    }
+    .td-date {
+        font-size: .8125rem;
+        color: $gray-600;
+        white-space: nowrap;
+    }
+    .td-muted {
+        color: $gray-600;
+        text-align: center;
     }
     .td-actions {
         display: flex;
         gap: .375rem;
-        justify-content: flex-end;
+        justify-content: center;
     }
 }
 
@@ -726,6 +805,34 @@ $gray-900: #111827;
         h4 {
             font-size: .875rem;
         }
+    }
+}
+
+@media (max-width: 768px) {
+    .evals-layout {
+        grid-template-columns: 1fr;
+        .user-sidebar {
+            height: auto;
+            max-height: 200px;
+        }
+    }
+    .evals-main {
+        height: auto;
+        overflow-y: visible;
+    }
+    .content-section {
+        .table-scroll {
+            overflow-x: auto;
+        }
+        .data-table {
+            min-width: 600px;
+        }
+    }
+}
+
+@media (min-width: 1200px) {
+    .evals-layout {
+        grid-template-columns: 180px 1fr;
     }
 }
 

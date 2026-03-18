@@ -161,6 +161,7 @@ export class AdminResourcesComponent implements OnInit {
     }
 
     loadCategories(): void {
+        // Backend V5: GET /api/resource/categories
         this.http.get<unknown>(`${this.apiUrl}/resource/categories`).pipe(
             map(r => this.unwrapArray<AdminResourceCategoryDto>(r)),
             catchError(() => of([] as AdminResourceCategoryDto[]))
@@ -169,6 +170,7 @@ export class AdminResourcesComponent implements OnInit {
 
     loadResources(): void {
         this.loading = true;
+        // Backend V5: GET /api/resources
         this.http.get<unknown>(`${this.apiUrl}/resource`).pipe(
             map(r => this.unwrapArray<AdminResourceDto>(r)),
             catchError(() => of([] as AdminResourceDto[])),
@@ -261,6 +263,7 @@ export class AdminResourcesComponent implements OnInit {
             switchMap(() => {
                 // Paso 3: llamar al backend
                 this.createUploadState = 'saving';
+                // Backend V5: POST /api/resources
                 return this.http.post<unknown>(`${this.apiUrl}/resource`, this.resourceForm);
             }),
             finalize(() => { this.saving = false; this.createUploadState = 'idle'; })
@@ -328,6 +331,7 @@ export class AdminResourcesComponent implements OnInit {
             }),
             switchMap(() => {
                 this.editUploadState = 'saving';
+                // Backend V5: PUT /api/resource/{id}
                 return this.http.put<unknown>(`${this.apiUrl}/resource/${this.editingId}`, this.editForm);
             }),
             finalize(() => { this.saving = false; this.editUploadState = 'idle'; })
@@ -349,6 +353,7 @@ export class AdminResourcesComponent implements OnInit {
         const ok = await this.notify.confirm(`¿Eliminar el recurso "${r.title}"?`);
         if (!ok) return;
         this.saving = true;
+        // Backend V5: DELETE /api/resource/{id}
         this.http.delete<void>(`${this.apiUrl}/resource/${this.idOf(r)}`).pipe(
             finalize(() => (this.saving = false))
         ).subscribe({
@@ -374,6 +379,7 @@ export class AdminResourcesComponent implements OnInit {
         const name = this.categoryForm.name.trim();
         if (!name) { this.notify.error('El nombre de la categoría es requerido'); return; }
         this.savingCategory = true;
+        // Backend V5: POST /api/resource/categories
         this.http.post<unknown>(`${this.apiUrl}/resource/categories`, this.categoryForm).pipe(
             finalize(() => (this.savingCategory = false))
         ).subscribe({
@@ -402,6 +408,7 @@ export class AdminResourcesComponent implements OnInit {
         const name = this.editCategoryForm.name.trim();
         if (!name) { this.notify.error('El nombre es requerido'); return; }
         this.savingCategory = true;
+        // Backend V5: PUT /api/resource/categories/{id}
         this.http.put<unknown>(`${this.apiUrl}/resource/categories/${this.editingCategoryId}`, this.editCategoryForm).pipe(
             finalize(() => (this.savingCategory = false))
         ).subscribe({
@@ -418,6 +425,7 @@ export class AdminResourcesComponent implements OnInit {
         const ok = await this.notify.confirm(`¿Eliminar la categoría "${c.name ?? c.categoryName}"?`);
         if (!ok) return;
         this.deletingCategoryId = c.resourceCategoryID;
+        // Backend V5: DELETE /api/resource/categories/{id}
         this.http.delete<void>(`${this.apiUrl}/resource/categories/${c.resourceCategoryID}`).pipe(
             finalize(() => (this.deletingCategoryId = null))
         ).subscribe({
@@ -430,3 +438,5 @@ export class AdminResourcesComponent implements OnInit {
         return { contentType: 'ARTICLE', displayOrder: 0, durationMinutes: 0 };
     }
 }
+
+

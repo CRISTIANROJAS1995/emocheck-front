@@ -170,6 +170,7 @@ export class SupportService {
             body['evaluationID'] = payload.evaluationID;
         }
 
+        // Backend V5: POST /api/support
         return this.http.post<unknown>(`${this.apiUrl}/support`, body).pipe(
             map((res) => {
                 const created = this.unwrapApiResponse<any>(res, 'No fue posible crear la solicitud') ?? {};
@@ -182,6 +183,7 @@ export class SupportService {
     }
 
     getMyRequests(): Observable<SupportRequestDto[]> {
+        // Backend V5: GET /api/support/my-requests
         return this.http.get<unknown>(`${this.apiUrl}/support/my-requests`).pipe(
             map((res) => {
                 const list = this.unwrapApiResponse<any[]>(res, 'No fue posible obtener solicitudes') ?? [];

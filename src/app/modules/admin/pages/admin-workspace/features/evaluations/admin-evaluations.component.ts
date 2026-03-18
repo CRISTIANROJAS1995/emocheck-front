@@ -16,23 +16,32 @@ import { AdminUsersService, AdminUserListItemDto } from '../../../../../../core/
 export interface EvaluationDto {
     evaluationID?: number;
     userID?: number;
+    userFullName?: string | null;
     userName?: string | null;
     moduleID?: number;
     moduleName?: string | null;
-    assessmentModuleName?: string | null;
+    instrumentID?: number;
+    instrumentCode?: string | null;
+    instrumentName?: string | null;
     status?: string | null;
     isAnonymous?: boolean;
     period?: string | null;
+    // Resultado plano (confirmado por backend V5)
+    totalScore?: number | null;
+    percentageScore?: number | null;
+    riskLevel?: string | null;
+    // Org
+    companyID?: number;
+    siteID?: number;
+    areaID?: number;
+    // Tiempos
     startedAt?: string | null;
     completedAt?: string | null;
-    result?: {
-        evaluationResultID?: number;
-        totalScore?: number;
-        scorePercentage?: number;
-        riskLevel?: string | null;
-        calculatedAt?: string | null;
-        dimensionScores?: { dimensionName?: string | null; score?: number; maxScore?: number; percentageScore?: number; riskLevel?: string | null }[];
-    } | null;
+    durationSeconds?: number | null;
+    totalQuestions?: number;
+    answeredQuestions?: number;
+    // Respuestas embebidas
+    responses?: ResponseDto[];
 }
 
 export interface EvaluationResultDto {
@@ -43,6 +52,7 @@ export interface EvaluationResultDto {
     userName?: string | null;
     moduleID?: number;
     moduleName?: string | null;
+    instrumentName?: string | null;
     totalScore?: number;
     scorePercentage?: number;
     riskLevel?: string | null;
@@ -64,9 +74,13 @@ export interface EvaluationDetailDto {
 }
 
 export interface ResponseDto {
+    evaluationResponseID?: number;
+    evaluationID?: number;
     questionID?: number;
     questionText?: string | null;
     selectedValue?: number;
+    calculatedValue?: number;
+    respondedAt?: string | null;
 }
 
 @Component({
@@ -81,7 +95,6 @@ export class AdminEvaluationsComponent implements OnInit {
 
     loadingUsers = false;
     loadingEvals = false;
-    loadingResults = false;
     loadingDetail = false;
 
     users: AdminUserListItemDto[] = [];
@@ -89,15 +102,9 @@ export class AdminEvaluationsComponent implements OnInit {
     userSearch = '';
 
     evaluations: EvaluationDto[] = [];
-    results: EvaluationResultDto[] = [];
 
     selectedEvaluationId: number | null = null;
     evaluationDetail: EvaluationDetailDto | null = null;
-
-    selectedResultId: number | null = null;
-    selectedResult: EvaluationResultDto | null = null;
-
-    activeView: 'evaluations' | 'results' = 'evaluations';
 
     constructor(
         private readonly http: HttpClient,
@@ -141,61 +148,30 @@ export class AdminEvaluationsComponent implements OnInit {
     selectUser(userId: number): void {
         this.selectedUserId = userId;
         this.evaluations = [];
-        this.results = [];
         this.evaluationDetail = null;
         this.selectedEvaluationId = null;
-        this.selectedResultId = null;
-        this.selectedResult = null;
         this.loadEvaluations();
     }
 
     loadEvaluations(): void {
         if (!this.selectedUserId) return;
         this.loadingEvals = true;
-        this.loadingResults = true;
         this.http.get<unknown>(`${this.apiUrl}/evaluation/user/${this.selectedUserId}`).pipe(
             map(r => this.unwrap<EvaluationDto>(r)),
             catchError(() => of([])),
             finalize(() => this.loadingEvals = false)
         ).subscribe(evals => {
             this.evaluations = evals;
-            // Derive results from completed evaluations that have an embedded result
-            const derived: EvaluationResultDto[] = evals
-                .filter(e => e.result?.evaluationResultID)
-                .map(e => ({
-                    evaluationResultID: e.result!.evaluationResultID,
-                    evaluationID: e.evaluationID,
-                    moduleName: e.moduleName || e.assessmentModuleName || null,
-                    totalScore: e.result!.totalScore,
-                    scorePercentage: e.result!.scorePercentage,
-                    riskLevel: e.result!.riskLevel,
-                    completedAt: e.result!.calculatedAt || e.completedAt,
-                    instrumentResults: (e.result!.dimensionScores ?? []).map(d => ({
-                        instrumentName: d.dimensionName ?? '-',
-                        score: d.percentageScore ?? (d.maxScore ? Math.round((d.score! / d.maxScore) * 100) : d.score),
-                        riskLevel: d.riskLevel,
-                    })),
-                } as EvaluationResultDto));
-
-            if (derived.length > 0) {
-                this.results = derived;
-                this.loadingResults = false;
-            } else {
-                // Fallback: fetch results from dedicated endpoint
-                this.http.get<unknown>(`${this.apiUrl}/evaluation/results/user/${this.selectedUserId}`).pipe(
-                    map(r => this.unwrap<EvaluationResultDto>(r)),
-                    catchError(() => of([])),
-                    finalize(() => this.loadingResults = false)
-                ).subscribe(results => this.results = results);
-            }
         });
     }
 
-    loadResults(): void {
-        // Results are now derived from evaluations in loadEvaluations()
-    }
-
     viewDetail(evaluationId: number): void {
+        const cached = this.evaluations.find(e => e.evaluationID === evaluationId);
+        if (cached?.responses && cached.responses.length > 0) {
+            this.selectedEvaluationId = evaluationId;
+            this.evaluationDetail = { evaluationID: evaluationId, status: cached.status ?? undefined, responses: cached.responses };
+            return;
+        }
         this.selectedEvaluationId = evaluationId;
         this.loadingDetail = true;
         this.http.get<unknown>(`${this.apiUrl}/evaluation/${evaluationId}/details`).pipe(
@@ -205,24 +181,9 @@ export class AdminEvaluationsComponent implements OnInit {
         ).subscribe(detail => this.evaluationDetail = detail);
     }
 
-    viewResult(r: EvaluationResultDto): void {
-        const resultId = r.evaluationResultID ?? r.resultID;
-        if (!resultId) return;
-        this.selectedResultId = resultId;
-        this.selectedResult = r;
-        this.loadingDetail = true;
-        this.http.get<unknown>(`${this.apiUrl}/evaluation/results/${resultId}`).pipe(
-            map(res => this.unwrapOne<EvaluationResultDto>(res)),
-            catchError(() => of(r)),
-            finalize(() => this.loadingDetail = false)
-        ).subscribe(result => this.selectedResult = result);
-    }
-
     closeDetail(): void {
         this.evaluationDetail = null;
         this.selectedEvaluationId = null;
-        this.selectedResult = null;
-        this.selectedResultId = null;
     }
 
     selectedUserName(): string {

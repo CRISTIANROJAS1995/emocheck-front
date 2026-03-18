@@ -275,3 +275,4 @@ export class AdminCatalogService {
         return this.http.delete<void>(`${this.apiUrl}/catalog/roles/${id}`);
     }
 }
+

@@ -108,7 +108,7 @@
             <span class="badge badge--blue">{{ lookupResults.length }}</span>
         </h4>
         <div class="results-grid">
-            @for (r of lookupResults; track (r.evaluationResultID ?? r.resultID)) {
+            @for (r of lookupResults; track $index) {
             <div class="result-card" (click)="loadRecommendationsByResult((r.evaluationResultID ?? r.resultID)!)">
                 <div class="result-card__module">{{ r.moduleName || 'Módulo' }}</div>
                 <div class="result-card__score">Puntaje: <strong>{{ r.totalScore ?? '-' }}</strong></div>
@@ -149,7 +149,7 @@
         </div>
         } @else {
         <div class="recs-list">
-            @for (rec of userRecommendations; track rec.recommendationID) {
+            @for (rec of userRecommendations; track (rec.recommendationID ?? $index)) {
             <div class="rec-card">
                 <div class="rec-card__header">
                     <span class="rec-card__title">{{ rec.title }}</span>

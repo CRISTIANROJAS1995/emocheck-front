@@ -45,14 +45,14 @@
             </div>
         </aside>
 
-        <!-- ── RIGHT: Evaluations / Results ── -->
+        <!-- ── RIGHT: Evaluations ── -->
         <main class="evals-main">
 
             @if (!selectedUserId) {
             <div class="welcome-state">
                 <mat-icon svgIcon="heroicons_outline:clipboard-document-list"></mat-icon>
                 <h3>Selecciona un usuario</h3>
-                <p>Elige un usuario de la lista para ver su historial de evaluaciones y resultados.</p>
+                <p>Elige un usuario de la lista para ver su historial de evaluaciones.</p>
             </div>
             } @else {
 
@@ -63,16 +63,11 @@
                     <div class="user-bar__name">{{ selectedUserName() }}</div>
                     <div class="user-bar__counts">
                         <span>📋 {{ evaluations.length }} evaluaciones</span>
-                        <span>📊 {{ results.length }} resultados</span>
                     </div>
-                </div>
-                <div class="view-tabs">
-                    <button class="view-tab" [class.active]="activeView === 'evaluations'" (click)="activeView = 'evaluations'">Evaluaciones</button>
-                    <button class="view-tab" [class.active]="activeView === 'results'" (click)="activeView = 'results'">Resultados</button>
                 </div>
             </div>
 
-            <!-- Detail Panel (if open) -->
+            <!-- Detail Panel — respuestas -->
             @if (evaluationDetail) {
             <div class="detail-panel">
                 <div class="detail-panel__header">
@@ -103,65 +98,9 @@
                     }
                 </div>
             </div>
-            } @if (selectedResult) {
-            <div class="detail-panel">
-                <div class="detail-panel__header">
-                    <h4>Resultado #{{ selectedResultId }} — {{ selectedResult.moduleName }}</h4>
-                    <button class="btn-close" (click)="closeDetail()">
-                        <mat-icon svgIcon="heroicons_mini:x-mark"></mat-icon>
-                    </button>
-                </div>
-                <div class="detail-panel__body">
-                    @if (loadingDetail) {
-                    <div class="loading-inline">
-                        <mat-progress-spinner mode="indeterminate" diameter="24"></mat-progress-spinner>
-                    </div>
-                    } @else {
-                    <div class="result-summary">
-                        <div class="result-kpi">
-                            <div class="result-kpi__label">Puntaje total</div>
-                            <div class="result-kpi__value">{{ selectedResult.totalScore ?? '-' }}</div>
-                        </div>
-                        <div class="result-kpi">
-                            <div class="result-kpi__label">Nivel de riesgo</div>
-                            <div class="result-kpi__value">
-                                <span class="badge" [class]="riskColor(selectedResult.riskLevel)">
-                                    {{ selectedResult.riskLevel || 'N/A' }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="result-kpi">
-                            <div class="result-kpi__label">Completado</div>
-                            <div class="result-kpi__value">{{ selectedResult.completedAt | date:'dd/MM/yyyy HH:mm' }}</div>
-                        </div>
-                    </div>
-                    @if (selectedResult.instrumentResults && selectedResult.instrumentResults.length > 0) {
-                    <h5 class="instruments-title">Por instrumento</h5>
-                    <table class="instruments-table">
-                        <thead>
-                            <tr>
-                                <th>Instrumento</th>
-                                <th>Puntaje</th>
-                                <th>Riesgo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (ir of selectedResult.instrumentResults; track ir.instrumentID) {
-                            <tr>
-                                <td>{{ ir.instrumentName }}</td>
-                                <td>{{ ir.score }}</td>
-                                <td><span class="badge" [class]="riskColor(ir.riskLevel)">{{ ir.riskLevel || '-' }}</span></td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                    } }
-                </div>
-            </div>
             }
 
-            <!-- Evaluations Tab -->
-            @if (activeView === 'evaluations') {
+            <!-- Tabla de evaluaciones -->
             <div class="content-section">
                 @if (loadingEvals) {
                 <div class="loading-inline">
@@ -174,84 +113,53 @@
                     <p>Este usuario no tiene evaluaciones registradas.</p>
                 </div>
                 } @else {
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Módulo</th>
-                            <th>Estado</th>
-                            <th>Período</th>
-                            <th>Iniciada</th>
-                            <th>Completada</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (e of evaluations; track e.evaluationID) {
-                        <tr>
-                            <td class="td-id">{{ e.evaluationID }}</td>
-                            <td class="td-name">{{ e.moduleName || '-' }}</td>
-                            <td><span class="badge" [class]="statusColor(e.status)">{{ e.status }}</span></td>
-                            <td>{{ e.period || '-' }}</td>
-                            <td>{{ e.startedAt | date:'dd/MM/yy HH:mm' }}</td>
-                            <td>{{ e.completedAt | date:'dd/MM/yy HH:mm' }}</td>
-                            <td class="td-actions">
-                                @if (e.status === 'COMPLETED') {
-                                <button class="btn-sm" (click)="viewDetail(e.evaluationID!)">
-                            <mat-icon svgIcon="heroicons_mini:eye"></mat-icon> Respuestas
-                          </button> }
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
-                }
-            </div>
-            }
-
-            <!-- Results Tab -->
-            @if (activeView === 'results') {
-            <div class="content-section">
-                @if (loadingResults) {
-                <div class="loading-inline">
-                    <mat-progress-spinner mode="indeterminate" diameter="28"></mat-progress-spinner>
-                    <span>Cargando resultados...</span>
-                </div>
-                } @else if (results.length === 0) {
-                <div class="empty-state">
-                    <mat-icon svgIcon="heroicons_outline:chart-bar"></mat-icon>
-                    <p>Este usuario no tiene resultados registrados.</p>
-                </div>
-                } @else {
-                <div class="results-grid">
-                    @for (r of results; track (r.evaluationResultID ?? r.resultID)) {
-                    <div class="result-card" (click)="viewResult(r)">
-                        <div class="result-card__header">
-                            <span class="result-card__module">{{ r.moduleName || 'Módulo' }}</span>
-                            <span class="badge" [class]="riskColor(r.riskLevel)">{{ riskLabel(r.riskLevel) }}</span>
-                        </div>
-                        <div class="result-card__score">
-                            <span class="score-value">{{ r.scorePercentage ?? r.totalScore ?? 0 }}</span>
-                            <span class="score-label">/100</span>
-                        </div>
-                        @if (r.instrumentResults && r.instrumentResults.length > 0) {
-                        <div class="result-card__dims">
-                            @for (d of r.instrumentResults; track d.instrumentID) {
-                            <div class="result-card__dim-row">
-                                <span class="dim-name">{{ d.instrumentName }}</span>
-                                <span class="dim-score">{{ d.score ?? '-' }}%</span>
-                            </div>
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Módulo</th>
+                                <th>Instrumento</th>
+                                <th>Estado</th>
+                                <th>Riesgo</th>
+                                <th>Puntaje</th>
+                                <th>Período</th>
+                                <th>Iniciada</th>
+                                <th>Completada</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (e of evaluations; track e.evaluationID) {
+                            <tr>
+                                <td class="td-id">{{ e.evaluationID }}</td>
+                                <td class="td-name">{{ e.moduleName || '-' }}</td>
+                                <td class="td-instrument">{{ e.instrumentName || '-' }}</td>
+                                <td><span class="badge" [class]="statusColor(e.status)">{{ e.status }}</span></td>
+                                <td class="td-risk">
+                                    @if (e.riskLevel) {
+                                    <span class="badge" [class]="riskColor(e.riskLevel)">{{ riskLabel(e.riskLevel) }}</span> } @else {
+                                    <span class="td-muted">-</span> }
+                                </td>
+                                <td class="td-score">{{ e.totalScore != null ? e.totalScore : '-' }}</td>
+                                <td>{{ e.period || '-' }}</td>
+                                <td class="td-date">{{ e.startedAt | date:'dd/MM/yy HH:mm' }}</td>
+                                <td class="td-date">{{ e.completedAt | date:'dd/MM/yy HH:mm' }}</td>
+                                <td class="td-actions">
+                                    @if (e.status === 'COMPLETED') {
+                                    <button class="btn-sm" (click)="viewDetail(e.evaluationID!)">
+                                        <mat-icon svgIcon="heroicons_mini:eye"></mat-icon> Respuestas
+                                    </button> }
+                                </td>
+                            </tr>
                             }
-                        </div>
-                        }
-                        <div class="result-card__date">{{ r.completedAt | date:'dd/MM/yyyy HH:mm' }}</div>
-                        <div class="result-card__cta">Ver detalle →</div>
-                    </div>
-                    }
+                        </tbody>
+                    </table>
                 </div>
                 }
             </div>
-            } }
+
+            }
         </main>
     </div>
 </div>

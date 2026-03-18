@@ -161,6 +161,153 @@
     </div>
     }
 
+    <!-- Bulk Upload Form -->
+    @if (showBulkUpload) {
+    <div class="editor-panel">
+        <h3>
+            <mat-icon>upload</mat-icon> Carga Masiva de Usuarios
+        </h3>
+
+        <!-- Instructions -->
+        <div class="bulk-upload-instructions">
+            <h4>📋 Instrucciones paso a paso:</h4>
+            <ol>
+                <li><strong>Descarga</strong> la plantilla Excel nativa (.xlsx) con formato profesional</li>
+                <li><strong>Abre</strong> el archivo en Excel (se abrirá automáticamente)</li>
+                <li><strong>Elimina</strong> las 3 filas de ejemplo (filas 2-4) con fondo gris</li>
+                <li><strong>Completa</strong> los datos de usuarios reales en las filas vacías</li>
+                <li><strong>Guarda</strong> el archivo (ya está en formato .xlsx)</li>
+                <li><strong>Sube</strong> el archivo .xlsx completado</li>
+                <li><strong>Revisa</strong> los resultados de la carga masiva</li>
+            </ol>
+            <div class="important-note">
+                <mat-icon>check_circle</mat-icon>
+                <span><strong>¡Excel nativo real!</strong> Headers azules, ejemplos grises, filas blancas para completar. Formato profesional garantizado.</span>
+            </div>
+        </div>
+
+        <!-- Field Reference -->
+        <div class="field-reference">
+            <h4>📋 Referencia de Campos:</h4>
+            <div class="reference-grid">
+                <div class="ref-item">
+                    <span class="ref-field">FirstName, LastName</span>
+                    <span class="ref-desc">Nombre y apellido del usuario</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">Email</span>
+                    <span class="ref-desc">Email único en el sistema</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">Password</span>
+                    <span class="ref-desc">Contraseña (mínimo 6 caracteres)</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">DocumentType</span>
+                    <span class="ref-desc">CC, CE, PA, TI o NIT</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">Gender</span>
+                    <span class="ref-desc">M (masculino) o F (femenino)</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">RoleIDs</span>
+                    <span class="ref-desc">6=Empleado, 4=HR, 5=Manager, 3=Psicólogo (separados por coma)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template Download -->
+        <div class="bulk-upload-section">
+            <h4>📥 1. Descargar Plantilla Excel Nativa</h4>
+            <button type="button" class="btn btn--outline btn--lg" (click)="downloadTemplate()">
+                <mat-icon>table_view</mat-icon> Descargar Plantilla Excel (.xlsx)
+            </button>
+            <p class="section-help">
+                <strong>✨ Excel nativo:</strong> Archivo .xlsx real con formato, colores, anchos de columna optimizados y 15 filas vacías listas para completar.
+            </p>
+        </div>
+        <!-- File Upload -->
+        <div class="bulk-upload-section">
+            <h4>📂 2. Subir Archivo Excel (.xlsx)</h4>
+            <div class="file-upload-area">
+                <input type="file" id="bulk-upload-file" accept=".xlsx" (change)="onFileSelected($event)" style="display: none;" />
+                <label for="bulk-upload-file" class="file-upload-button">
+                    <mat-icon>attach_file</mat-icon>
+                    {{ selectedFile ? selectedFile.name : 'Seleccionar archivo .xlsx' }}
+                </label> @if (selectedFile) {
+                <span class="file-size">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</span> }
+            </div>
+            <p class="section-help">Solo se aceptan archivos .xlsx (Excel). Máximo 10 MB.</p>
+        </div>
+
+        <!-- Upload Button -->
+        @if (selectedFile && !uploading) {
+        <div class="bulk-upload-section">
+            <h4>🚀 3. Procesar Archivo</h4>
+            <button type="button" class="btn btn--primary" (click)="uploadUsers()">
+                <mat-icon>cloud_upload</mat-icon> Subir y Procesar Usuarios
+            </button>
+            <p class="section-help">El sistema procesará el archivo fila por fila y mostrará los resultados.</p>
+        </div>
+        }
+
+        <!-- Loading -->
+        @if (uploading) {
+        <div class="bulk-upload-loading">
+            <mat-spinner diameter="40"></mat-spinner>
+            <span>Procesando archivo, por favor espera...</span>
+        </div>
+        }
+
+        <!-- Results -->
+        @if (uploadResult && !uploading) {
+        <div class="bulk-upload-results">
+            <h4>Resultados de la Carga</h4>
+            <div class="results-summary">
+                <div class="result-item result-item--success">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>{{ uploadResult.created }} usuarios creados correctamente</span>
+                </div>
+                <div class="result-item result-item--total">
+                    <mat-icon>description</mat-icon>
+                    <span>{{ uploadResult.totalRows }} filas procesadas</span>
+                </div>
+                @if (uploadResult.errors?.length > 0) {
+                <div class="result-item result-item--error">
+                    <mat-icon>error</mat-icon>
+                    <span>{{ uploadResult.errors.length }} errores encontrados</span>
+                </div>
+                }
+            </div>
+
+            <!-- Error Details -->
+            @if (uploadResult.errors?.length > 0) {
+            <div class="error-details">
+                <h5>Detalles de Errores:</h5>
+                <div class="error-list">
+                    @for (error of uploadResult.errors; track error.row) {
+                    <div class="error-item">
+                        <span class="error-row">Fila {{ error.row }}:</span>
+                        <span class="error-field">{{ error.field }}</span>
+                        <span class="error-reason">{{ error.reason }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+        }
+
+        <!-- Actions -->
+        <div class="editor-panel__actions">
+            <button type="button" class="btn btn--ghost" (click)="closeBulkUpload()">
+                <mat-icon>close</mat-icon> Cerrar
+            </button>
+        </div>
+    </div>
+    }
+
     <!-- Edit User Form -->
     @if (showEditForm && editingUser) {
     <div class="editor-panel">
@@ -238,7 +385,11 @@
             <button class="btn btn--outline btn--sm" (click)="loadUsers()" [disabled]="loading">
                 <mat-icon>refresh</mat-icon> Actualizar
             </button>
-            <button class="btn btn--primary btn--sm" (click)="showCreateForm = !showCreateForm; showEditForm = false">
+            <button class="btn btn--secondary btn--sm" (click)="showBulkUpload = !showBulkUpload; showCreateForm = false; showEditForm = false">
+                <mat-icon>{{ showBulkUpload ? 'close' : 'upload' }}</mat-icon>
+                {{ showBulkUpload ? 'Cerrar' : 'Carga Masiva' }}
+            </button>
+            <button class="btn btn--primary btn--sm" (click)="showCreateForm = !showCreateForm; showEditForm = false; showBulkUpload = false">
                 <mat-icon>{{ showCreateForm ? 'close' : 'person_add' }}</mat-icon>
                 {{ showCreateForm ? 'Cerrar' : 'Nuevo Usuario' }}
             </button>

@@ -298,7 +298,7 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         // Find worst-performing dimensions to name them explicitly
         const flagged = dims
             .filter(d => {
-                const tone = this.getBarTone(d.percent);
+                const tone = this.getBarTone(d.percent, d.riskLevel);
                 return tone === 'bad' || tone === 'warn';
             })
             .map(d => this.getDimensionLabel(d, dims.indexOf(d)))
@@ -330,7 +330,7 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
 
         let worst: AssessmentOutcome = 'adequate';
         for (const d of dims) {
-            const tone = this.getBarTone(d.percent);
+            const tone = this.getBarTone(d.percent, d.riskLevel);
             if (tone === 'bad') return 'high-risk'; // can't get worse
             if (tone === 'warn' && worst === 'adequate') worst = 'mild';
         }
@@ -339,39 +339,40 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
 
     getRiskLabel(riskLevel: string | undefined, percent: number): string {
         const v = (riskLevel ?? '').toLowerCase();
-        if (v.includes('green') || v.includes('low'))    return 'Bajo';
-        if (v.includes('yellow') || v.includes('medium') || v.includes('moderate')) return 'Moderado';
-        if (v.includes('severe')) return 'Severo';
-        if (v.includes('red') || v.includes('high'))     return 'Alto';
+        if (v.includes('green') || v.includes('low') || v.includes('bajo'))    return 'Bajo';
+        if (v.includes('yellow') || v.includes('medium') || v.includes('moderate') || v.includes('moderado')) return 'Moderado';
+        if (v.includes('severe') || v.includes('severo')) return 'Severo';
+        if (v.includes('red') || v.includes('high') || v.includes('alto'))     return 'Alto';
         // Fallback por percent si no hay riskLevel
-        const tone = this.getBarTone(percent);
+        const tone = this.getBarTone(percent, riskLevel);
         if (tone === 'good')  return 'Bajo';
         if (tone === 'warn')  return 'Moderado';
         return 'Alto';
     }
 
-    getDimensionInterpretation(dimension: { percent: number; riskLevel?: string }, _idx: number): string {
-        const tone = this.getBarTone(dimension.percent);
-        const higherIsWorse = this.moduleDef?.higherIsWorse ?? false;
-        if (higherIsWorse) {
-            if (tone === 'good')  return 'Dentro del rango normal. Sin indicadores de alerta.';
-            if (tone === 'warn')  return 'Nivel moderado. Se recomienda atención y seguimiento.';
-            return 'Nivel elevado. Requiere atención prioritaria.';
+    /**
+     * Maps a percent + optional riskLevel to a visual tone.
+     *
+     * Priority: if the backend provides a `riskLevel` on the dimension, use it directly
+     * (e.g. TMMS-24 sends riskLevel "Bajo" even though percentageScore is 100%).
+     * Only fall back to percent-based thresholds when riskLevel is absent.
+     */
+    getBarTone(percent: number, riskLevel?: string): 'good' | 'warn' | 'bad' {
+        // --- Backend riskLevel takes priority ---
+        if (riskLevel) {
+            const v = riskLevel.toLowerCase();
+            if (v.includes('low') || v.includes('green') || v.includes('bajo')) return 'good';
+            if (v.includes('moderate') || v.includes('medium') || v.includes('yellow') || v.includes('moderado')) return 'warn';
+            if (v.includes('high') || v.includes('severe') || v.includes('red') || v.includes('alto') || v.includes('severo')) return 'bad';
         }
-        if (tone === 'good')  return 'Nivel adecuado. Continúa con tus hábitos actuales.';
-        if (tone === 'warn')  return 'Nivel medio. Hay oportunidades de mejora.';
-        return 'Nivel bajo. Se recomienda intervención.';
-    }
 
-    getBarTone(percent: number): 'good' | 'warn' | 'bad' {
+        // --- Fallback: percent-based thresholds ---
         const higherIsWorse = this.moduleDef?.higherIsWorse ?? false;
         if (higherIsWorse) {
-            // For modules where higher score = worse (e.g., anxiety, depression)
             if (percent >= 70) return 'bad';
             if (percent >= 40) return 'warn';
             return 'good';
         }
-        // For modules where higher score = better (e.g., organizational climate)
         if (percent >= 70) return 'good';
         if (percent >= 50) return 'warn';
         return 'bad';
@@ -380,7 +381,7 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     getDimensionLabel(dimension: { id: string; label: string; instrumentCode?: string }, index: number): string {
         const labels = this.moduleDef?.dimensionLabels ?? [];
 
-        // 1. Match exacto por instrumentCode (e.g. "GAD7" → "Ansiedad")
+        // 1. Match exacto por instrumentCode (e.g. "DASS21_ANXIETY" → "Ansiedad")
         if (dimension.instrumentCode) {
             const code = dimension.instrumentCode.toUpperCase();
             const byCode = labels.find((dl) => dl.instrumentCode.toUpperCase() === code);
@@ -398,8 +399,9 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
             if (byLabelCode?.label) return byLabelCode.label;
         }
 
-        // 3. Fallback posicional
-        return labels[index]?.label ?? dimension.label?.trim() ?? '';
+        // 3. Usar directamente el dimensionName que viene del backend
+        //    (dinámico — no requiere entrada estática en dimensionLabels)
+        return dimension.label?.trim() ?? '';
     }
 
     getDimensionDisplayLabel(dimension: { id: string; label: string; instrumentCode?: string }, index: number): string {

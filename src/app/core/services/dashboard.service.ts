@@ -1,15 +1,16 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 export interface DashboardQuery {
     companyId?: number;
     siteId?: number;
     areaId?: number;
-    startDate?: string; // ISO 8601
-    endDate?: string; // ISO 8601
+    moduleId?: number;
+    startDate?: string; // ISO 8601 or YYYY-MM-DD
+    endDate?: string;   // ISO 8601 or YYYY-MM-DD
     periodType?: 'daily' | 'weekly' | 'monthly' | string;
 }
 
@@ -153,6 +154,21 @@ export class DashboardService {
 
     getIndicators(query?: DashboardQuery): Observable<DashboardIndicatorsDto> {
         const params = this.buildParams(query);
+        // Backend V5: GET /api/dashboard/indicators (SuperAdmin/HRManager)
+        return this.http.get<unknown>(`${this.apiUrl}/dashboard/indicators`, { params }).pipe(
+            map((res) => this.mapIndicators(this.unwrapObject<any>(res))),
+            catchError(() => {
+                // Fallback: return empty indicators if user lacks permission
+                return of(this.mapIndicators({}));
+            })
+        );
+    }
+
+    /**
+     * Estadísticas del usuario autenticado — GET /api/dashboard/user-stats (no en Postman, kept as fallback)
+     */
+    getUserStats(query?: DashboardQuery): Observable<DashboardIndicatorsDto> {
+        const params = this.buildParams(query);
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/indicators`, { params }).pipe(
             map((res) => {
                 return this.mapIndicators(this.unwrapObject<any>(res));
@@ -162,43 +178,68 @@ export class DashboardService {
 
     getRiskDistribution(query?: DashboardQuery): Observable<RiskDistributionDto> {
         const params = this.buildParams(query);
+        // Backend V5: GET /api/dashboard/risk-distribution
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/risk-distribution`, { params }).pipe(
             map((res) => {
-                return this.mapRiskDistribution(this.unwrapObject<any>(res));
-            })
+                const data = this.unwrapObject<any>(res);
+                return this.mapRiskDistribution(data);
+            }),
+            catchError(() => of(this.mapRiskDistribution({})))
         );
     }
 
     getTrends(query: DashboardQuery): Observable<TrendDataDto[]> {
         const params = this.buildParams(query);
+        // Backend V5: GET /api/dashboard/trends
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/trends`, { params }).pipe(
             map((res) => {
-                return this.unwrapArray<any>(res).map((t: any) => this.mapTrend(t));
-            })
+                const data = this.unwrapObject<any>(res);
+                return Array.isArray(data) ? data : (Array.isArray(data?.trends) ? data.trends : []);
+            }),
+            catchError(() => of([]))
         );
     }
 
     getModuleStatistics(query?: Omit<DashboardQuery, 'periodType'>): Observable<ModuleStatisticsDto[]> {
+        // Backend V5: GET /api/dashboard/module-statistics
         return this.http.get<unknown>(`${this.apiUrl}/dashboard/module-statistics`, { params: this.buildParams(query) }).pipe(
-            map((res) => this.unwrapArray<any>(res).map((m: any) => this.mapModuleStat(m)))
+            map((res) => {
+                const data = this.unwrapObject<any>(res);
+                return Array.isArray(data)
+                    ? data.map((m: any) => this.mapModuleStat(m))
+                    : Array.isArray(data?.moduleStatistics)
+                        ? data.moduleStatistics.map((m: any) => this.mapModuleStat(m))
+                        : [];
+            }),
+            catchError(() => of([]))
         );
     }
 
     private buildParams(query?: DashboardQuery): HttpParams {
         let params = new HttpParams();
-        if (!query) return params;
 
         const setIf = (key: string, value: unknown) => {
             if (value === undefined || value === null || value === '') return;
             params = params.set(key, String(value));
         };
 
-        setIf('companyId', query.companyId);
-        setIf('siteId', query.siteId);
-        setIf('areaId', query.areaId);
-        setIf('startDate', query.startDate);
-        setIf('endDate', query.endDate);
-        setIf('periodType', query.periodType);
+        // Backend V5 expects PascalCase query params (CompanyID, SiteID, etc.)
+        setIf('CompanyID', query?.companyId);
+        setIf('SiteID', query?.siteId);
+        setIf('AreaID', query?.areaId);
+        setIf('ModuleID', (query as any)?.moduleId);
+
+        // Dates: backend expects YYYY-MM-DD. Always send a default range if not provided
+        // (backend returns 400 when StartDate/EndDate are missing).
+        const toYMD = (iso: string) => iso.substring(0, 10);
+        const today = new Date();
+        const defaultEnd = toYMD(today.toISOString());
+        const defaultStart = toYMD(new Date(today.getFullYear(), today.getMonth() - 3, today.getDate()).toISOString());
+
+        setIf('StartDate', query?.startDate ? toYMD(query.startDate) : defaultStart);
+        setIf('EndDate',   query?.endDate   ? toYMD(query.endDate)   : defaultEnd);
+
+        setIf('periodType', query?.periodType);
         return params;
     }
 }

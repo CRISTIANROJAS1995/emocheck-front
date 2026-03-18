@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthService } from 'app/core/services/auth.service';
 import { environment } from '../../../environments/environment';
-import { map } from 'rxjs/operators';
-import { Observable, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 export interface UserProfileDto {
     userId: number;
@@ -43,20 +42,7 @@ export interface ChangePasswordDto {
 export class UsersService {
     private readonly apiUrl = environment.apiUrl;
 
-    constructor(private readonly http: HttpClient, private readonly auth: AuthService) { }
-
-    private getUserIdFromToken(): number | null {
-        const token = this.auth.getToken();
-        if (!token) return null;
-        try {
-            const payload = token.split('.')[1];
-            const decoded = JSON.parse(atob(payload));
-            const id = Number(decoded?.sub || decoded?.nameid || 0);
-            return id > 0 ? id : null;
-        } catch {
-            return null;
-        }
-    }
+    constructor(private readonly http: HttpClient) { }
 
     private mapProfile(data: any): UserProfileDto {
         return {
@@ -79,6 +65,7 @@ export class UsersService {
     }
 
     getMyProfile(): Observable<UserProfileDto> {
+        // Backend V5: GET /api/users/me — devuelve el usuario autenticado
         return this.http
             .get<any>(`${this.apiUrl}/users/me`)
             .pipe(
@@ -92,47 +79,61 @@ export class UsersService {
     }
 
     updateMyProfile(payload: UpdateUserProfileDto): Observable<UserProfileDto> {
-        const userId = this.getUserIdFromToken();
-        if (!userId) {
-            return throwError(() => ({ status: 401, message: 'No se pudo obtener el ID del usuario' }));
-        }
-
         const nameParts = (payload.fullName ?? '').trim().split(/\s+/).filter(Boolean);
         const firstName = nameParts[0] ?? undefined;
         const lastName = nameParts.slice(1).join(' ') || undefined;
 
-        return this.http
-            .put<any>(`${this.apiUrl}/users/${userId}`, {
-                ...(firstName ? { firstName } : {}),
-                ...(lastName ? { lastName } : {}),
-                ...(payload.documentNumber ? { documentNumber: payload.documentNumber } : {}),
-                ...(payload.areaId ? { areaID: payload.areaId } : {}),
-                ...(payload.jobTypeId ? { jobTypeID: payload.jobTypeId } : {}),
+        // Backend V5: First GET /users/me to obtain the userID, then PUT /users/{id}
+        return this.http.get<any>(`${this.apiUrl}/users/me`).pipe(
+            map((res: any) => {
+                const data = res?.data ?? res ?? {};
+                return data?.userID ?? data?.userId ?? data?.id;
+            }),
+            switchMap((userId: number) => {
+                if (!userId) throw new Error('No se pudo obtener el ID del usuario');
+                return this.http
+                    .put<any>(`${this.apiUrl}/users/${userId}`, {
+                        ...(firstName ? { firstName } : {}),
+                        ...(lastName ? { lastName } : {}),
+                        ...(payload.documentNumber ? { documentNumber: payload.documentNumber } : {}),
+                        ...(payload.areaId ? { areaID: payload.areaId } : {}),
+                        ...(payload.jobTypeId ? { jobTypeID: payload.jobTypeId } : {}),
+                    })
+                    .pipe(
+                        map((res) => {
+                            if (typeof res?.success === 'boolean' && !res.success) {
+                                throw { status: 400, message: res?.message || 'No fue posible actualizar el perfil' };
+                            }
+                            return this.mapProfile(res?.data ?? res ?? {});
+                        })
+                    );
             })
-            .pipe(
-                map((res) => {
-                    if (typeof res?.success === 'boolean' && !res.success) {
-                        throw { status: 400, message: res?.message || 'No fue posible actualizar el perfil' };
-                    }
-                    return this.mapProfile(res?.data ?? res ?? {});
-                })
-            );
+        );
     }
 
     /**
-     * Actualiza la foto de perfil: llama a PATCH /api/users/me/photo con la URL pública de S3.
+     * Actualiza la foto de perfil: GET /users/me para obtener el ID, luego PUT /users/{id}
      */
     updateProfilePhoto(photoUrl: string): Observable<UserProfileDto> {
-        return this.http
-            .patch<any>(`${this.apiUrl}/users/me/photo`, { photoUrl })
-            .pipe(
-                map((res) => {
-                    if (typeof res?.success === 'boolean' && !res.success) {
-                        throw { status: 400, message: res?.message || 'No fue posible actualizar la foto' };
-                    }
-                    return this.mapProfile(res?.data ?? res ?? {});
-                })
-            );
+        return this.http.get<any>(`${this.apiUrl}/users/me`).pipe(
+            map((res: any) => {
+                const data = res?.data ?? res ?? {};
+                return data?.userID ?? data?.userId ?? data?.id;
+            }),
+            switchMap((userId: number) => {
+                if (!userId) throw new Error('No se pudo obtener el ID del usuario');
+                return this.http
+                    .put<any>(`${this.apiUrl}/users/${userId}`, { profilePhotoUrl: photoUrl })
+                    .pipe(
+                        map((res) => {
+                            if (typeof res?.success === 'boolean' && !res.success) {
+                                throw { status: 400, message: res?.message || 'No fue posible actualizar la foto' };
+                            }
+                            return this.mapProfile(res?.data ?? res ?? {});
+                        })
+                    );
+            })
+        );
     }
 
     /**

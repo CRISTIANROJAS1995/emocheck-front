@@ -130,29 +130,31 @@ export class AdminRecommendationsComponent implements OnInit {
     loadRecommendationsForUser(): void {
         if (!this.selectedUserId) return;
         this.loadingUserRecs = true;
-        // Load user evaluations first, then get results, then get recommendations
+        this.userRecommendations = [];
+        // Backend V5: GET /api/evaluation/results/user/{userId} → resultados con evaluationResultID
         this.http.get<unknown>(`${this.apiUrl}/evaluation/results/user/${this.selectedUserId}`).pipe(
             map(r => this.unwrap<EvaluationResultDto>(r)),
             catchError(() => of([])),
             finalize(() => this.loadingUserRecs = false)
         ).subscribe(results => {
             this.lookupResults = results;
-            // Load recommendations for each result
             if (results.length === 0) {
                 this.userRecommendations = [];
                 return;
             }
+            // Auto-load recommendations for the first result
             const resultId = results[0]?.evaluationResultID ?? results[0]?.resultID;
-            if (!resultId) {
+            if (resultId) {
+                this.loadRecommendationsByResult(resultId);
+            } else {
                 this.userRecommendations = [];
-                return;
             }
-            this.loadRecommendationsByResult(resultId);
         });
     }
 
     loadRecommendationsByResult(resultId: number): void {
         this.loadingUserRecs = true;
+        // Backend V5: GET /api/recommendation/by-result/{evaluationResultId}
         this.http.get<unknown>(`${this.apiUrl}/recommendation/by-result/${resultId}`).pipe(
             map(r => this.unwrap<RecommendationDto>(r)),
             catchError(() => of([])),

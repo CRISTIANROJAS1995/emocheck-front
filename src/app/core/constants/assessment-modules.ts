@@ -52,14 +52,12 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             badgeShadow: '0 10px 22px rgba(37, 99, 235, 0.20)',
             questionCardBackground: '#EFF6FF',
         },
+        // Only entries that map a technical instrumentCode to a friendly UI label.
+        // Any dimension NOT listed here will display its dimensionName from the backend directly.
         dimensionLabels: [
             { id: 'dass21_anxiety',    instrumentCode: 'DASS21_ANXIETY',    label: 'Ansiedad' },
             { id: 'dass21_depression', instrumentCode: 'DASS21_DEPRESSION', label: 'Depresión' },
             { id: 'dass21_stress',     instrumentCode: 'DASS21_STRESS',     label: 'Estrés' },
-            { id: 'anxiety',           instrumentCode: 'GAD7',              label: 'Ansiedad' },
-            { id: 'depression',        instrumentCode: 'PHQ9',              label: 'Depresión' },
-            { id: 'insomnia',          instrumentCode: 'ISI',               label: 'Insomnio' },
-            { id: 'stress',            instrumentCode: 'PSS4',              label: 'Estrés Percibido' },
         ],
     },
     {

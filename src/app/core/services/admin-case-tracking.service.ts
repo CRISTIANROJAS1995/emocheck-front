@@ -178,7 +178,7 @@ export class AdminCaseTrackingService {
 
     // ── Cases CRUD ─────────────────────────────
     list(query?: AdminCaseQuery): Observable<CaseTrackingDto[]> {
-        // Si no hay filtro de status, traer todos los estados en paralelo (no existe endpoint "list all")
+        // Si no hay filtro de status, traer todos los estados en paralelo
         if (!query?.status) {
             const ALL_STATUSES = ['OPEN', 'IN_PROGRESS', 'CLOSED', 'ESCALATED'];
             return forkJoin(
@@ -190,29 +190,27 @@ export class AdminCaseTrackingService {
                 )
             ).pipe(
                 map(results => {
-                    const all = results.flat();
+                    const all = (results as CaseTrackingDto[][]).flat();
                     return this.applyClientFilters(all, query);
                 }),
             );
         }
 
         const status = query.status.toUpperCase();
-        const url = `${this.apiUrl}/casetracking/status/${status}`;
         return this.http
-            .get<unknown>(url)
+            .get<unknown>(`${this.apiUrl}/casetracking/status/${status}`)
             .pipe(
                 map((res) => {
                     const rows = this.unwrapArray<BackendCaseTrackingDto>(res);
                     return rows.map((x) => this.mapCase(x));
                 }),
-                map((rows) => {
-                    return this.applyClientFilters(rows, query);
-                }),
+                map((rows) => this.applyClientFilters(rows, query)),
                 catchError((err) => { console.error('[CaseTracking] ERROR:', err); return of([]); }),
             );
     }
 
     getById(caseId: number): Observable<CaseTrackingDto> {
+        // Backend V5: GET /api/casetracking/{id}
         return this.http
             .get<unknown>(`${this.apiUrl}/casetracking/${caseId}`)
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
@@ -229,6 +227,7 @@ export class AdminCaseTrackingService {
     }
 
     create(payload: CreateCaseTrackingDto): Observable<CaseTrackingDto> {
+        // Backend V5: POST /api/casetracking
         const backendPayload = {
             alertID: payload.alertId,
             userID: typeof payload.userId === 'number' ? payload.userId : undefined,
@@ -242,6 +241,7 @@ export class AdminCaseTrackingService {
     }
 
     update(caseId: number, payload: UpdateCaseTrackingDto): Observable<CaseTrackingDto> {
+        // Backend V5: PUT /api/casetracking/{id}
         return this.http
             .put<unknown>(`${this.apiUrl}/casetracking/${caseId}`, payload)
             .pipe(map((res) => this.mapCase(this.unwrapObject<BackendCaseTrackingDto>(res))));
@@ -257,6 +257,7 @@ export class AdminCaseTrackingService {
 
     // ── Follow-ups ─────────────────────────────
     getFollowUps(caseId: number): Observable<FollowUpDto[]> {
+        // Backend V5: GET /api/casetracking/{id}/follow-ups
         return this.http
             .get<unknown>(`${this.apiUrl}/casetracking/${caseId}/follow-ups`)
             .pipe(
@@ -266,7 +267,7 @@ export class AdminCaseTrackingService {
     }
 
     createFollowUp(caseId: number, payload: CreateFollowUpDto): Observable<FollowUpDto | null> {
-        // Backend requires: ActionType (string) + Description (string)
+        // Backend V5: POST /api/casetracking/{id}/follow-ups
         const body = {
             actionType: payload.followUpType ?? 'SESSION',
             description: payload.notes,
