@@ -20,123 +20,121 @@ interface SleepQuestion {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="sleep-questionnaire">
-      <!-- Header -->
-      <div class="sq-header">
-        <div class="sq-progress">
-          <div class="sq-progress__bar">
-            <div 
-              class="sq-progress__fill" 
-              [style.width.%]="progress()">
+    <div class="questionnaire-page">
+      <div class="blur-circle blur-circle--green-top-right"></div>
+      <div class="blur-circle blur-circle--blue-bottom-left"></div>
+
+      <div class="questionnaire-shell">
+        <!-- Header -->
+        <div class="questionnaire-header">
+          <div class="questionnaire-header-inner">
+            <div class="header-top">
+              <button class="back-button" type="button" (click)="previousQuestion()">
+                <svg viewBox="0 0 20 20"><path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/></svg>
+              </button>
+              <div class="header-main">
+                <div class="module-badge" style="--badge-gradient: linear-gradient(135deg,#06b6d4,#0891b2); --badge-shadow: 0 4px 12px rgba(6,182,212,0.35);">
+                  <img src="icons/Icon (29).svg" class="module-badge-icon" alt="">
+                </div>
+                <div class="header-text">
+                  <div class="header-title">Hábitos de Sueño (ICSP)</div>
+                  <div class="header-subtitle">Pregunta {{ currentQuestionIndex() + 1 }} de {{ totalQuestions }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="progress()"></div>
+              </div>
             </div>
           </div>
-          <span class="sq-progress__text">
-            {{ currentQuestionIndex() + 1 }} de {{ totalQuestions }}
-          </span>
         </div>
-      </div>
 
-      <!-- Question Container -->
-      <div class="sq-content" *ngIf="currentQuestion()">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          
-          <!-- Question Text -->
-          <div class="sq-question">
-            <h2>{{ currentQuestion()!.text }}</h2>
-          </div>
+        <!-- Main -->
+        <div class="questionnaire-main">
 
-          <!-- Time Input -->
-          <div class="sq-input" *ngIf="currentQuestion()!.type === 'time'">
-            <label>Selecciona la hora:</label>
-            <select [formControlName]="currentQuestion()!.id" class="sq-time-select">
-              <option value="">-- Selecciona --</option>
-              <option *ngFor="let hour of timeOptions" [value]="hour.value">
-                {{ hour.label }}
-              </option>
-            </select>
-          </div>
+          <!-- Question Card -->
+          <div class="question-card" *ngIf="currentQuestion() && !isCompleted()">
+            <p class="question-title">{{ currentQuestion()!.text }}</p>
+            <p class="question-help">Selecciona la opción que mejor describe tu situación</p>
 
-          <!-- Number Input -->
-          <div class="sq-input" *ngIf="currentQuestion()!.type === 'number'">
-            <label>Número en minutos:</label>
-            <input 
-              type="number" 
-              [formControlName]="currentQuestion()!.id"
-              placeholder="Ingresa los minutos"
-              class="sq-number-input">
-          </div>
+            <!-- Scale / Select → botones tipo radio igual que DASS-21 -->
+            <div class="options" *ngIf="currentQuestion()!.type === 'scale' || currentQuestion()!.type === 'select'">
+              <button
+                *ngFor="let option of currentQuestion()!.options"
+                type="button"
+                class="option"
+                [class.selected]="form.get(currentQuestion()!.id)?.value === option.value"
+                (click)="selectOption(option.value)">
+                <span class="radio">
+                  <span class="radio-inner" *ngIf="form.get(currentQuestion()!.id)?.value === option.value"></span>
+                </span>
+                <span class="option-label">{{ option.label }}</span>
+                <svg class="chevron" viewBox="0 0 20 20"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+              </button>
+            </div>
 
-          <!-- Scale Options -->
-          <div class="sq-options" *ngIf="currentQuestion()!.type === 'scale'">
-            <div class="sq-option" *ngFor="let option of currentQuestion()!.options">
-              <label class="sq-radio-label">
-                <input 
-                  type="radio" 
-                  [formControlName]="currentQuestion()!.id"
-                  [value]="option.value"
-                  class="sq-radio">
-                <span class="sq-radio-custom"></span>
-                <span class="sq-radio-text">{{ option.label }}</span>
-              </label>
+            <!-- Time Input -->
+            <div class="input-field-wrap" *ngIf="currentQuestion()!.type === 'time'">
+              <label class="input-field-label">Selecciona la hora</label>
+              <select class="input-field input-field--time" [formControl]="getControl(currentQuestion()!.id)">
+                <option value="">-- Selecciona --</option>
+                <option *ngFor="let hour of timeOptions" [value]="hour.value">{{ hour.label }}</option>
+              </select>
+            </div>
+
+            <!-- Number Input -->
+            <div class="input-field-wrap" *ngIf="currentQuestion()!.type === 'number'">
+              <label class="input-field-label">Cantidad en minutos</label>
+              <input type="number" class="input-field input-field--integer" [formControl]="getControl(currentQuestion()!.id)" placeholder="0">
+            </div>
+
+            <!-- Text Input -->
+            <div class="input-field-wrap" *ngIf="currentQuestion()!.type === 'text'">
+              <label class="input-field-label">Describe</label>
+              <input type="text" class="input-field" [formControl]="getControl(currentQuestion()!.id)" placeholder="Escribe aquí...">
+            </div>
+
+            <!-- Acción para tipos que necesitan botón explícito -->
+            <div class="input-action-row" *ngIf="currentQuestion()!.type === 'time' || currentQuestion()!.type === 'number' || currentQuestion()!.type === 'text'">
+              <button class="next-button" type="button" (click)="onSubmit()" [disabled]="!isCurrentQuestionValid()">
+                {{ isLastQuestion() ? 'Finalizar' : 'Siguiente' }}
+              </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="card-footer">
+              <button class="prev-button" type="button" (click)="previousQuestion()" [disabled]="currentQuestionIndex() === 0">
+                Pregunta anterior
+              </button>
+              <span class="answered-text">{{ currentQuestionIndex() }} de {{ totalQuestions }} respondidas</span>
             </div>
           </div>
 
-          <!-- Select Dropdown -->
-          <div class="sq-input" *ngIf="currentQuestion()!.type === 'select'">
-            <select [formControlName]="currentQuestion()!.id" class="sq-select">
-              <option value="">-- Selecciona una opción --</option>
-              <option *ngFor="let option of currentQuestion()!.options" [value]="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+          <!-- Completion Card -->
+          <div class="question-card" *ngIf="isCompleted()">
+            <div style="text-align:center; padding: 48px 0;">
+              <div style="font-size:64px; margin-bottom:16px;">🌙</div>
+              <h2 style="font-family:'Montserrat',sans-serif; font-size:22px; font-weight:700; color:#1E2939; margin:0 0 16px;">¡Has finalizado!</h2>
+              <p style="font-family:'Montserrat',sans-serif; font-size:15px; color:#6A7282; line-height:1.6; margin:0 0 12px;">
+                Cuidar tu descanso es también una forma de quererte. Detenerte a reconocer cómo duermes es el primer paso para mejorar tu bienestar.
+              </p>
+              <p style="font-family:'Montserrat',sans-serif; font-size:15px; color:#6A7282; line-height:1.6; margin:0 0 32px;">
+                Antes de ver tu resultado, realicemos un ejercicio rápido. ¡No dejes que el Extraterrestre se lleve al humano de su cama, Sálvalo!
+              </p>
+              <button class="continue-btn" (click)="showResults()">
+                Ver mis resultados
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+              </button>
+            </div>
           </div>
 
-          <!-- Text Input (for conditional questions) -->
-          <div class="sq-input" *ngIf="currentQuestion()!.type === 'text'">
-            <label>Describe:</label>
-            <textarea 
-              [formControlName]="currentQuestion()!.id"
-              placeholder="Escribe aquí..."
-              class="sq-textarea">
-            </textarea>
+          <!-- Reminder -->
+          <div class="reminder" *ngIf="!isCompleted()">
+            <span class="reminder-title">Recuerda:</span>
+            <span class="reminder-text"> No hay respuestas correctas o incorrectas. Sé honesto/a contigo mismo/a para obtener los mejores resultados.</span>
           </div>
 
-          <!-- Navigation -->
-          <div class="sq-navigation">
-            <button 
-              type="button" 
-              class="sq-btn sq-btn--secondary"
-              (click)="previousQuestion()"
-              [disabled]="currentQuestionIndex() === 0">
-              Anterior
-            </button>
-            
-            <button 
-              type="submit" 
-              class="sq-btn sq-btn--primary"
-              [disabled]="!isCurrentQuestionValid()">
-              {{ isLastQuestion() ? 'Finalizar' : 'Siguiente' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Completion Message -->
-      <div class="sq-completion" *ngIf="isCompleted()">
-        <div class="sq-completion__content">
-          <h2>¡Has finalizado!</h2>
-          <p>
-            Recuerda que cuidar tu salud mental no siempre implica grandes cambios, sino pequeños gestos de atención hacia ti mismo/a. 
-            Detenerte, respirar, leer algo que te conecte o expresar cómo te sientes es también una forma de sanar. 
-            Permítete estar presente, sin exigencias, sin juicios.
-          </p>
-          <p>
-            Antes de ver tu resultado realicemos un ejercicio de rapidez. 
-            A continuación, No dejes que el Extraterrestre se lleve al humano de su cama, ¡Sálvalo!
-          </p>
-          <button class="sq-btn sq-btn--primary" (click)="showResults()">
-            Ver mis resultados
-          </button>
         </div>
       </div>
     </div>
@@ -399,6 +397,18 @@ export class SleepQuestionnaireComponent implements OnInit {
   currentQuestion() {
     const visibleQuestions = this.getVisibleQuestions();
     return visibleQuestions[this.currentQuestionIndex()] || null;
+  }
+
+  getControl(id: string) {
+    return this.form.get(id) as any;
+  }
+
+  selectOption(value: number) {
+    const currentQ = this.currentQuestion();
+    if (!currentQ) return;
+    this.form.get(currentQ.id)?.setValue(value);
+    // Avanzar automáticamente igual que el questionnaire principal
+    setTimeout(() => this.onSubmit(), 300);
   }
 
   private getVisibleQuestions(): SleepQuestion[] {

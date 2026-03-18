@@ -14,107 +14,88 @@ interface EmotionalIntelligenceQuestion {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="ei-questionnaire">
-      <!-- Header -->
-      <div class="ei-header">
-        <div class="ei-progress">
-          <div class="ei-progress__bar">
-            <div 
-              class="ei-progress__fill" 
-              [style.width.%]="progress()">
+    <div class="questionnaire-page">
+      <div class="blur-circle blur-circle--green-top-right"></div>
+      <div class="blur-circle blur-circle--blue-bottom-left"></div>
+
+      <div class="questionnaire-shell">
+        <!-- Header -->
+        <div class="questionnaire-header">
+          <div class="questionnaire-header-inner">
+            <div class="header-top">
+              <button class="back-button" type="button" (click)="previousQuestion()">
+                <svg viewBox="0 0 20 20"><path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/></svg>
+              </button>
+              <div class="header-main">
+                <div class="module-badge" style="--badge-gradient: linear-gradient(135deg,#8b5cf6,#6d28d9); --badge-shadow: 0 4px 12px rgba(139,92,246,0.35);">
+                  <img src="icons/Icon (26).svg" class="module-badge-icon" alt="">
+                </div>
+                <div class="header-text">
+                  <div class="header-title">Inteligencia Emocional (TMMS-24)</div>
+                  <div class="header-subtitle">Pregunta {{ currentQuestionIndex() + 1 }} de {{ questions.length }}</div>
+                </div>
+              </div>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="progress()"></div>
+              </div>
             </div>
           </div>
-          <span class="ei-progress__text">
-            {{ currentQuestionIndex() + 1 }} de {{ questions.length }}
-          </span>
         </div>
-      </div>
 
-      <!-- Question Container -->
-      <div class="ei-content" *ngIf="currentQuestion()">
-        <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          
-          <!-- Question Text -->
-          <div class="ei-question">
-            <h2>{{ currentQuestion()!.text }}</h2>
-          </div>
+        <!-- Main -->
+        <div class="questionnaire-main">
 
-          <!-- Likert Scale Options -->
-          <div class="ei-options">
-            <div class="ei-option" *ngFor="let option of likertOptions">
-              <label class="ei-radio-label">
-                <input 
-                  type="radio" 
-                  [formControlName]="currentQuestion()!.id"
-                  [value]="option.value"
-                  class="ei-radio">
-                <span class="ei-radio-custom"></span>
-                <span class="ei-radio-text">{{ option.label }}</span>
-              </label>
+          <!-- Question Card -->
+          <div class="question-card" *ngIf="currentQuestion() && !isCompleted()">
+            <p class="question-title">{{ currentQuestion()!.text }}</p>
+            <p class="question-help">Selecciona la opción que mejor describe tu situación</p>
+
+            <div class="options">
+              <button
+                *ngFor="let option of likertOptions"
+                type="button"
+                class="option"
+                [class.selected]="form.get(currentQuestion()!.id)?.value === option.value"
+                (click)="selectOption(option.value)">
+                <span class="radio">
+                  <span class="radio-inner" *ngIf="form.get(currentQuestion()!.id)?.value === option.value"></span>
+                </span>
+                <span class="option-label">{{ option.label }}</span>
+                <svg class="chevron" viewBox="0 0 20 20"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+              </button>
+            </div>
+
+            <div class="card-footer">
+              <button class="prev-button" type="button" (click)="previousQuestion()" [disabled]="currentQuestionIndex() === 0">
+                Pregunta anterior
+              </button>
+              <span class="answered-text">{{ currentQuestionIndex() }} de {{ questions.length }} respondidas</span>
             </div>
           </div>
 
-          <!-- Navigation -->
-          <div class="ei-navigation">
-            <button 
-              type="button" 
-              class="ei-btn ei-btn--secondary"
-              (click)="previousQuestion()"
-              [disabled]="currentQuestionIndex() === 0">
-              Anterior
-            </button>
-            
-            <button 
-              type="submit" 
-              class="ei-btn ei-btn--primary"
-              [disabled]="!isCurrentQuestionValid()">
-              {{ isLastQuestion() ? 'Finalizar' : 'Siguiente' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Completion Message -->
-      <div class="ei-completion" *ngIf="isCompleted()">
-        <div class="ei-completion__content">
-          <h2>¡Has finalizado!</h2>
-          <p>
-            Identificar lo que sentimos, comprender por qué ocurre y responder de manera más consciente y equilibrada ante distintas situaciones hace que reforcemos nuestra inteligencia emocional. 
-            Este proceso permite reflexionar sobre la forma en que se gestionan las emociones en la vida diaria y abre un espacio para reconocer fortalezas, así como aspectos que pueden seguir desarrollándose.
-          </p>
-          
-          <!-- Results Preview -->
-          <div class="ei-results-preview">
-            <h3>Tus resultados son:</h3>
-            <div class="ei-dimensions">
-              <div class="ei-dimension">
-                <h4>Atención a los sentimientos</h4>
-                <div class="ei-result-indicator" [class]="getResultClass('attention')">
-                  {{ getResultLabel('attention') }}
-                </div>
-              </div>
-              <div class="ei-dimension">
-                <h4>Claridad emocional</h4>
-                <div class="ei-result-indicator" [class]="getResultClass('clarity')">
-                  {{ getResultLabel('clarity') }}
-                </div>
-              </div>
-              <div class="ei-dimension">
-                <h4>Reparación de las emociones</h4>
-                <div class="ei-result-indicator" [class]="getResultClass('repair')">
-                  {{ getResultLabel('repair') }}
-                </div>
-              </div>
+          <!-- Completion Card -->
+          <div class="question-card" *ngIf="isCompleted()">
+            <div style="text-align:center; padding: 48px 0;">
+              <div style="font-size:64px; margin-bottom:16px;">🧠</div>
+              <h2 style="font-family:'Montserrat',sans-serif; font-size:22px; font-weight:700; color:#1E2939; margin:0 0 16px;">¡Has finalizado!</h2>
+              <p style="font-family:'Montserrat',sans-serif; font-size:15px; color:#6A7282; line-height:1.6; margin:0 0 32px;">
+                Identificar lo que sentimos, comprender por qué ocurre y responder de manera más consciente y equilibrada ante distintas situaciones refuerza nuestra inteligencia emocional.
+              </p>
+              <button class="continue-btn" (click)="showResults()">
+                Ver mis resultados
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+              </button>
             </div>
           </div>
-          
-          <p class="ei-closing-message">
-            Tu bienestar comienza cuando te escuchas con compasión y te das el espacio para sentir y cuidar de tu mente, igual que cuidas de tu cuerpo.
-          </p>
-          
-          <button class="ei-btn ei-btn--primary" (click)="showResults()">
-            Ver mis resultados detallados
-          </button>
+
+          <!-- Reminder -->
+          <div class="reminder" *ngIf="!isCompleted()">
+            <span class="reminder-title">Recuerda:</span>
+            <span class="reminder-text"> No hay respuestas correctas o incorrectas. Sé honesto/a contigo mismo/a para obtener los mejores resultados.</span>
+          </div>
+
         </div>
       </div>
     </div>
@@ -189,6 +170,13 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
 
   currentQuestion() {
     return this.questions[this.currentQuestionIndex()] || null;
+  }
+
+  selectOption(value: number) {
+    const currentQ = this.currentQuestion();
+    if (!currentQ) return;
+    this.form.get(currentQ.id)?.setValue(value);
+    setTimeout(() => this.onSubmit(), 300);
   }
 
   progress() {
