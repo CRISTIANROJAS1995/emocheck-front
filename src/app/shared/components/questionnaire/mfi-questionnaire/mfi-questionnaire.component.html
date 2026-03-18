@@ -1,0 +1,74 @@
+<div class="mfi-page">
+    <app-background-circles></app-background-circles>
+
+    <div class="mfi-container">
+        <!-- Header -->
+        <header class="mfi-header">
+            <div class="mfi-header__back" (click)="goBack()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </div>
+            <div class="mfi-header__content">
+                <h1 class="mfi-header__title">MFI-20 - Fatiga Multidimensional</h1>
+                <p class="mfi-header__subtitle">{{ getDimensionInfo(currentQuestion.dimension).description }}</p>
+            </div>
+        </header>
+
+        <!-- Progress bar -->
+        <div class="mfi-progress">
+            <div class="mfi-progress__bar">
+                <div class="mfi-progress__fill" [style.width.%]="progress"></div>
+            </div>
+            <span class="mfi-progress__text">{{ currentQuestionIndex + 1 }} de {{ questions.length }}</span>
+        </div>
+
+        <!-- Question card -->
+        <div class="mfi-question-card">
+            <div class="mfi-question-card__header">
+                <div class="mfi-question-card__number">Pregunta {{ currentQuestionIndex + 1 }}</div>
+                <div class="mfi-question-card__dimension-badge" [attr.data-dimension]="currentQuestion.dimension">
+                    {{ getDimensionInfo(currentQuestion.dimension).title }}
+                </div>
+            </div>
+
+            <h2 class="mfi-question-card__text">{{ currentQuestion.text }}</h2>
+
+            <!-- Likert options -->
+            <div class="mfi-options">
+                @for (option of likertOptions; track option.value) {
+                <button type="button" class="mfi-option" [class.mfi-option--selected]="currentControl.value === option.value" [class.mfi-option--error]="currentControl.invalid && currentControl.touched" (click)="selectOption(option.value)">
+                    <div class="mfi-option__radio">
+                        <div class="mfi-option__radio-inner"></div>
+                    </div>
+                    <span class="mfi-option__text">{{ option.label }}</span>
+                </button> }
+            </div>
+
+            @if (currentControl.invalid && currentControl.touched) {
+            <div class="mfi-error">
+                Por favor selecciona una opción antes de continuar.
+            </div>
+            }
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="mfi-actions">
+            @if (!isFirstQuestion) {
+            <button type="button" class="mfi-button mfi-button--outline" (click)="previousQuestion()" [disabled]="isSubmitting">
+                Anterior
+            </button> }
+
+            <button type="button" class="mfi-button mfi-button--primary" (click)="nextQuestion()" [disabled]="isSubmitting || currentControl.invalid">
+                @if (isSubmitting) {
+                <div class="mfi-spinner"></div>
+                <span>Enviando...</span>
+                } @else if (isLastQuestion) {
+                <span>Finalizar</span>
+                } @else {
+                <span>Siguiente</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>

@@ -390,11 +390,13 @@ export class InstrumentSelectorComponent implements OnInit {
                         [...completedCodes].some(dc => dc.startsWith(upper + '_'));
                 };
 
-                // Calculate progress info for UI
-                this.progressInfo = this._calculateProgressInfo(completedCodes);
+                // Calculate progress info for UI (only for mental-health module)
+                this.progressInfo = this.moduleId === 'mental-health' ? this._calculateProgressInfo(completedCodes) : null;
 
-                // Filter instruments based on progressive activation rules
-                const availableDescriptors = this._getProgressivelyAvailableInstruments(descriptors, completedCodes);
+                // Filter instruments based on progressive activation rules (only for mental-health module)
+                const availableDescriptors = this.moduleId === 'mental-health' 
+                    ? this._getProgressivelyAvailableInstruments(descriptors, completedCodes)
+                    : descriptors; // Other modules show all instruments immediately
 
                 this.instruments = availableDescriptors.map((d, i) => {
                     const meta = INSTRUMENT_META[d.code];
@@ -689,7 +691,7 @@ export class InstrumentSelectorComponent implements OnInit {
 
     private _shouldUseSpecializedQuestionnaire(instrumentCode: string): boolean {
         // Based on the document specifications, these instruments need specialized questionnaires
-        const specializedInstruments = ['ICSP_VC', 'TMMS24'];
+        const specializedInstruments = ['ICSP_VC', 'TMMS24', 'MFI20'];
         return specializedInstruments.includes(instrumentCode);
     }
 
@@ -702,6 +704,9 @@ export class InstrumentSelectorComponent implements OnInit {
                 break;
             case 'TMMS24':
                 route = '/mental-health/emotional-intelligence';
+                break;
+            case 'MFI20':
+                route = '/work-fatigue/mfi-20';
                 break;
             default:
                 console.warn(`No specialized route found for instrument: ${instrumentCode}`);

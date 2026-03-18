@@ -1,0 +1,83 @@
+<div class="mfi-results-page">
+    <app-background-circles></app-background-circles>
+
+    <div class="mfi-results-container">
+        <!-- Header -->
+        <header class="mfi-results-header">
+            <div class="mfi-results-header__back" (click)="goBack()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m15 18-6-6 6-6"/>
+                </svg>
+            </div>
+            <div class="mfi-results-header__content">
+                <h1 class="mfi-results-header__title">Resultados MFI-20</h1>
+                <p class="mfi-results-header__subtitle">Evaluación Multidimensional de Fatiga Laboral</p>
+            </div>
+        </header>
+
+        <!-- Overall Result -->
+        <div class="mfi-overall-card" [ngClass]="getRiskColorClass(overallRisk)">
+            <div class="mfi-overall-card__header">
+                <div class="mfi-overall-card__icon">{{ getRiskIcon(overallRisk) }}</div>
+                <h2 class="mfi-overall-card__title">{{ getOverallTitle() }}</h2>
+            </div>
+            <p class="mfi-overall-card__message">{{ getOverallMessage() }}</p>
+        </div>
+
+        <!-- Dimensions Results -->
+        <div class="mfi-dimensions">
+            <h3 class="mfi-dimensions__title">Resultados por Dimensión</h3>
+
+            @for (dimension of dimensionResults; track dimension.id) {
+            <div class="mfi-dimension-card" [ngClass]="getRiskColorClass(dimension.riskLevel)">
+                <div class="mfi-dimension-card__header">
+                    <div class="mfi-dimension-card__info">
+                        <h4 class="mfi-dimension-card__name">{{ dimension.label }}</h4>
+                        <div class="mfi-dimension-card__score">
+                            {{ dimension.score }}/{{ dimension.maxScore }}
+                            <span class="mfi-dimension-card__percent">({{ dimension.percent }}%)</span>
+                        </div>
+                    </div>
+                    <div class="mfi-dimension-card__status">
+                        <div class="mfi-dimension-card__icon">{{ getRiskIcon(dimension.riskLevel) }}</div>
+                    </div>
+                </div>
+
+                <div class="mfi-dimension-card__progress">
+                    <div class="mfi-dimension-card__progress-bar">
+                        <div class="mfi-dimension-card__progress-fill" [style.width.%]="dimension.percent">
+                        </div>
+                    </div>
+                </div>
+
+                <p class="mfi-dimension-card__description">{{ dimension.description }}</p>
+            </div>
+            }
+        </div>
+
+        <!-- Recommendations -->
+        @if (result?.recommendations && result.recommendations.length > 0) {
+        <div class="mfi-recommendations">
+            <h3 class="mfi-recommendations__title">Recomendaciones</h3>
+            <div class="mfi-recommendations__list">
+                @for (recommendation of result.recommendations; track $index) {
+                <div class="mfi-recommendation-card">
+                    <div class="mfi-recommendation-card__icon">💡</div>
+                    <p class="mfi-recommendation-card__text">{{ recommendation }}</p>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Actions -->
+        <div class="mfi-results-actions">
+            <button class="mfi-results-button mfi-results-button--outline" (click)="goBack()">
+                Volver al Inicio
+            </button>
+            <button class="mfi-results-button mfi-results-button--primary" (click)="goToAllResults()">
+                Ver Reporte Completo
+            </button>
+        </div>
+    </div>
+</div>

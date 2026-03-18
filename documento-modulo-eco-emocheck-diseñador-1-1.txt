@@ -1,0 +1,1410 @@
+Módulo ECO (Escala de Compromiso Organizacional)
+
+
+
+Flujo General del diseñador 
+
+El colaborador ingresa a la plataforma.
+
+Da clic en el Módulo ECO.
+
+Se despliega una ventana inicial informativa.
+
+El colaborador acepta el consentimiento informado o no acepta.
+
+Inicia el cuestionario (18 ítems).
+
+Finaliza la encuesta.
+
+El sistema procesa automáticamente los resultados: resultados individuales (CA-CC-CN) el total de los 3 componentes y en general), resultados a los jefes de áreas y recursos humanos. 
+
+Se muestran los resultados en tarjetas visuales, semáforo y gráfico radar.
+
+
+
+
+
+Al dar clic sobre el módulo ECO emergerá un espacio donde estará una breve explicación de que se trata el módulo y en la parte posterior se encontrará   un cuadro donde se encontrará la prueba.
+
+
+
+Objetivo del Módulo
+
+El Módulo ECO (Escala de Compromiso Organizacional) tiene como finalidad medir el nivel de compromiso de los colaboradores con la organización, a partir de tres componentes: Afectivo, Continuidad y Normativo. Los resultados se utilizarán exclusivamente para diagnóstico organizacional, bienestar y mejora del clima laboral.
+
+
+
+Ventana emergente con explicación del Módulo ECO (Diseño + Contenido) 
+
+Texto Base
+
+Estimado/a colaborador/a: En nombre de la organización, valoramos profundamente tu opinión y tu experiencia dentro de nuestro equipo. El objetivo de esta consulta es conocer tu nivel de identificación y vínculo con la organización para seguir construyendo un mejor lugar para trabajar.
+
+Antes de comenzar, por favor toma en cuenta lo siguiente:
+
+Tu privacidad es prioridad: Esta encuesta es 100% anónima
+
+Uso de la Información: uso exclusivo para diagnóstico organizacional y planes de bienestar, nadie podrá identificar tus respuestas individuales.
+
+No hay respuestas correctas ni incorrectas: Solo buscamos conocer tu percepción sincera. La escala va de 1 (Totalmente en desacuerdo) a 7 (Totalmente de acuerdo).
+
+Su participación consiste en responder un cuestionario de 18 preguntas que le tomará aproximadamente de 5 a 7 minutos.
+
+(Después de leer la información aparecerá el consentimiento informado)
+
+ Consentimiento informado: "He leído y comprendido la información anterior. Entiendo que mi participación es voluntaria y que mis respuestas son confidenciales. Al continuar con el cuestionario doy mi consentimiento para participar en este proceso."
+
+
+
+Entendemos y respetamos tu decisión de no realizar la encuesta en este momento.
+
+Queremos comentarte que tu participación es muy valiosa, ya que el objetivo de esta medición es conocer los diferentes puntos de vista de nuestros colaboradores y así fortalecer las acciones de bienestar y mejora organizacional.
+
+Si en otro momento decides participar, la encuesta permanecerá disponible y podrás responderla de manera completamente anónima y voluntaria.
+
+Agradecemos tu tiempo y disposición.
+
+
+
+
+
+
+
+Aceptar
+
+No aceptar
+
+
+
+
+
+Botón: Comenzar Encuesta
+
+
+
+
+
+
+
+
+
+
+
+
+
+Escala de Compromiso Organizacional
+
+
+
+
+
+El Cuestionario (Diseño de Formulario o la escala )
+
+
+
+Estructura: Dividir en 3 secciones (Compromiso Afectivo, Compromiso de Continuidad, Compromiso Normativo).
+
+Escala Visual: Selector de 1 a 7 (Desde Totalmente en desacuerdo hasta Totalmente de acuerdo).
+
+Progreso: Barra de avance (Sección 1 de 3).
+
+
+
+
+
+
+
+
+
+A continuación, encontrará una serie de afirmaciones sobre su experiencia laboral. No hay respuestas correctas o incorrectas; responda con sinceridad según su experiencia actual en la institución.
+
+Escala de respuesta (Likert 1–7 
+
+1 = Totalmente en desacuerdo2 = Moderadamente en desacuerdo 3 = Débilmente en desacuerdo 4 = Ni de acuerdo ni en desacuerdo 5 = Débilmente en acuerdo 
+
+6 = Moderadamente en acuerdo
+
+7 = Totalmente de acuerdo
+
+
+
+SECCIÓN 1 DE 3
+
+Compromiso Afectivo (Deseo de permanecer)
+
+1 = Totalmente en desacuerdo
+
+2 = Moderadamente en desacuerdo
+
+3 = Débilmente en desacuerdo
+
+4 = Ni de acuerdo ni en desacuerdo
+
+5 = Débilmente en acuerdo
+
+6 = Moderadamente en acuerdo
+
+
+
+7 = Totalmente de acuerdo
+
+
+
+6) Sería muy feliz si trabajara el resto de mi vida en esta organización.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9) Realmente siento los problemas de mi organización como propios.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+12) Esta organización significa mucho para mí.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14) No me siento como “parte de la familia” en mi organización.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+15) No me siento parte de mi organización.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+18) No me siento “emocionalmente vinculado” con esta organización.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SECCIÓN 2 DE 3 Compromiso de Continuidad (Necesidad de permanecer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1) Si yo no hubiera invertido tanto en esta organización, consideraría trabajar en otra parte.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3)Renunciar a mi organización actualmente es un asunto tanto de necesidad como de deseo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4) Permanecer en mi organización actualmente es un asunto tanto de necesidad como de deseo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5) Si renunciara a esta organización pienso que tendría muy pocas opciones alternativas de conseguir algo mejor.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+16) Una de las consecuencias de renunciar a esta organización seria la escasez de alternativas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+17)Sería muy difícil dejar mi organización en este momento, incluso si lo deseara.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SECCIÓN 3 DE 3 Compromiso Normativo (Deber de permanecer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2) Aunque fuera ventajoso para mí, no siento que sea correcto renunciar a mi organización ahora
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7) Me sentiría culpable si renunciara a mi organización en este momento.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8) Esta organización merece mi lealtad.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10) No siento ningún compromiso de permanecer con mi empleador actual.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11) No renunciaría a mi organización ahora porque me siento comprometido con su gente.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+13) Le debo muchísimo a mi organización.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Mensaje de Finalización
+
+"¡Gracias por tu participación! Tus respuestas han sido registradas correctamente. Tu aporte es fundamental para el desarrollo de nuestra cultura organizacional."
+
+
+
+Sección 1 – Compromiso Afectivo (CA) Ítems: 6, 9, 12, 14*, 15*, 18*
+
+Sección 2 – Compromiso de Continuidad (CC)Ítems: 1*, 3, 4, 5, 16, 17
+
+Sección 3 – Compromiso Normativo (CN)Ítems: 2, 7, 8, 10*, 11, 13
+
+
+
+Al marcar la última respuesta, el sistema suma las 3 dimensiones y calcula el promedio general.
+
+Animación de Carga: Un breve efecto de "procesando" (2 segundos) para generar expectativa.
+
+Despliegue de Resultados:  En este paso se mostrará solo este mensaje al aparecer los resultados. 
+
+ "Este resultado es para tu desarrollo personal. Tu jefe directo verá únicamente las tendencias grupales para mejorar el ambiente de trabajo”. 
+
+
+
+(Dashboard Individual)
+
+RESULTADOS INDIVIDUALES (TRABAJADOR) 
+
+Primero se muestran las 3 barras pequeñas (Afectivo, Continuidad, Normativo).
+
+Luego, el Anillo General se llena automáticamente hasta el tope mientras aparece el icono del Diamante  o iconográfica de acuerdo al resultado y semaforización
+
+Visualización de Resultados Individuales (Reporte individual
+
+Tarjetas de Resultados (Cards) vista principal (Deben aparecer 3 tarjetas con iconos dinámicos y Barras de Estado de Color según los resultados , No debe ser solo un bloque de color. Sugiero una barra de progreso que se llene según el puntaje. Si el puntaje es 42, la barra se llena al 100% y cambia a verde.
+
+No se presentará como alto, promedio o bajo. 
+
+Iconografía Dinámica: * CA (Corazón o red de personas): Si es verde, el corazón puede tener un latido suave (animación).
+
+CC (Balanza): Si es amarillo, la balanza debe mostrarse en equilibrio perfecto.
+
+CN (Medalla): Si es rojo, la medalla puede verse en un tono grisáceo o tenue para invitar a la "recuperación" del compromiso.
+
+
+
+
+
+Tarjeta 1. Compromiso Afectivo   Icono: corazón / red de personas
+
+ Barra de estado con color dinámico según el puntaje y la interpretación del resultado, 
+
+
+
+Rango de Semaforización: 
+
+
+
+Compromiso Afectivo
+
+
+
+
+
+Rango
+
+
+
+Interpretación Técnica para el Trabajador
+
+
+
+Acción
+
+
+
+
+
+
+
+ALTO
+
+
+
+
+
+
+
+35 - 42 pts.
+
+"¡Tu corazón está con nosotros! Tus resultados muestran que te sientes plenamente identificado con la misión y los valores de la empresa. Disfrutas de tu entorno laboral y sientes orgullo de pertenecer aquí. ¡Eres un gran embajador de nuestra cultura!"
+
+
+
+
+
+
+
+PROMEDIO
+
+
+
+
+
+19 - 34 pts
+
+"Tienes un vínculo estable. Te sientes cómodo en la organización y cumples con tus metas. Hay una base sólida, pero aún existe espacio para que conectes más profundamente con los proyectos a largo plazo o el propósito de tu área."         
+
+
+
+
+
+BAJO
+
+
+
+6 - 18 pts
+
+Momento de reflexión. Tus resultados sugieren que podrías estar experimentando un desgaste o falta de conexión emocional con tu rol actual. Te invitamos a dialogar sobre qué factores (clima, reconocimiento o tareas) podrían mejorar para que vuelvas a disfrutar tu día a día."
+
+Rojo (6 pts): "Sentir desconexión es humano. Este resultado es una invitación a identificar qué actividades de tu día a día han dejado de generarte satisfacción."
+
+
+
+Tarjeta 2 – Compromiso de Continuidad    Icono: balanza / escudo
+
+Barra de estado con color dinámico según el puntaje y la interpretación del resultado, 
+
+
+
+Nivel
+
+Rango
+
+Interpretación Técnica para el Trabajador
+
+
+
+ALTO
+
+35 - 42 pts
+
+Anclaje Estratégico: Valoras profundamente la seguridad, beneficios y trayectoria construida. Sientes que el costo de dejar la empresa es alto por lo que has logrado aquí.
+
+
+
+PROMEDIO
+
+19 - 34 pts
+
+Equilibrio de Mercado: Mantienes un balance entre lo que recibes y tus opciones externas. Tu permanencia es racional y basada en la estabilidad actual.
+
+
+
+BAJO
+
+6 - 18 pts
+
+Movilidad Activa: Es posible que sientas incertidumbre sobre tu futuro. Revisar tus metas personales podría darte claridad.
+
+
+
+ Tarjeta 3 – Compromiso Normativo Icono: apretón de manos / medalla
+
+Barra de estado con color dinámico según el puntaje
+
+Nivel
+
+Rango
+
+Interpretación Técnica para el Trabajador
+
+ALTO
+
+35 - 42 pts
+
+Compromiso Ético: Sientes una fuerte lealtad basada en valores y gratitud. Consideras que permanecer y aportar es "lo correcto" por el respeto que tienes a la empresa.
+
+PROMEDIO
+
+19 - 34 pts
+
+Responsabilidad Profesional: Colaboración responsable. Cumples con tu deber y valoras la confianza que la empresa deposita en ti.
+
+BAJO
+
+6 - 18 pts
+
+Vínculo Transaccional: Tu relación es estrictamente profesional. No sientes una deuda moral con la organización, prefiriendo un trato basado en resultados objetivos.
+
+
+
+Al terminar de visualizar los resultados individuales por componente – se va a reflejar un resultado general de los 3 componentes o dimensiones, inmediatamente aparecerá según el resultado general. 
+
+Ejemplo : Anillo General se llena automáticamente hasta el tope mientras aparece el icono del Diamante 💎 Nivel: Vínculo de Excelencia (Diamante)
+
+Visualización:
+
+Icono: Un diamante brillante o medalla dorada en el centro.
+
+Gráfico: Un anillo de progreso circular (Radial Progress Bar) completado al 100% con un efecto de resplandor y enseguida el Texto del Resultado
+
+Rango de Semaforización: 
+
+
+
+Rango de Puntos
+
+Color
+
+Significado Visual para el Trabajador
+
+ACCION O RECOMENDACIÓN 
+
+
+
+
+
+126
+
+
+
+
+
+Verde esmeralda
+
+Compromiso Pleno: El anillo se completa al 100%.  (Aparece un ícono de un diamante o una medalla)  Vínculo Excelente: Tu conexión con la organización es máxima. Te identificas plenamente con nuestra misión y valores.
+
+
+
+
+
+
+
+
+
+19 a 125
+
+
+
+
+
+
+
+Amarillo Ámbar
+
+Compromiso en Marcha: El anillo se queda a nivel intermedio. (Aparece un ícono de una planta creciendo o un engranaje) 
+
+Vínculo en Construcción: Tienes un compromiso sólido. Existen áreas de oportunidad para fortalecer aún más tu identidad con el equipo.
+
+
+
+
+
+
+
+
+
+18
+
+
+
+
+
+
+
+Rojo Coral
+
+Compromiso Bajo: El anillo apenas se ilumina. (Aparece un ícono de una señal de alerta suave o una nube). 
+
+
+
+Vínculo a Fortalecer: Tu nivel de compromiso actual es bajo. Es un buen momento para dialogar sobre cómo podemos mejorar tu experiencia laboral.
+
+
+
+
+
+
+
+DASHBOARD DE RESULTADOS GRUPALES (MÓDULO ECO).
+
+
+
+
+
+Objetivo: Gestión del clima de equipo y prevención de riesgo.
+
+
+
+Restricción Ética (Crítica): El tablero solo se activa si hay 5 o más respuestas. Si hay menos, el líder verá un mensaje: "Datos insuficientes para garantizar el anonimato".
+
+
+
+Instrucción para el Diseñador: * Dashboard de Barras Comparativas: Mostrar el promedio del área frente al promedio global de la empresa.
+
+
+
+Sección de "Alertas de Liderazgo": Si el área tiene un Compromiso Normativo bajo, mostrar un icono de alerta que sugiera: "Reforzar el reconocimiento y la socialización de logros".
+
+
+
+Instrucción para la Estadista: Calcular la desviación estándar del área. Si es muy alta, significa que el equipo está polarizado (unos muy comprometidos y otros nada), lo cual es un indicador de conflicto interno. Especificación de la "Desviación Estándar" (Estadista)
+
+Para que la estadista sepa qué hacer con el dato de polarización:
+
+Instrucción: "Si la Desviación Estándar del área es > 1.5 (en escala de 1-7), activar una etiqueta de advertencia visual que diga: 'Opiniones Diversas: El equipo presenta percepciones muy opuestas entre sí'."
+
+
+
+Ajustes (Diseñador)
+
+Para que el Dashboard sea más "limpio" y efectivo:
+
+El Comparativo Mensual: No solo se ponga la barra.  Se coloco una "Flecha de Tendencia" (Verde hacia arriba, Roja hacia abajo) junto al anillo. Esto es lo que los gerentes miran primero.
+
+Segmentación por Dimensión: Aunque el Anillo muestra el promedio general, el diseñador debe poner debajo tres "mini-indicadores" con los iconos que ya definimos (Corazón, Balanza, Medalla) para que el jefe vea rápidamente cuál de las tres dimensiones está arrastrando el promedio hacia abajo.
+
+
+
+
+
+NIVEL JEFE DE ÁREA (DASHBOARD DE MANDO) la vista para el jefe debe ser un Resumen Ejecutivo:
+
+
+
+A. El "KPI de Salud Colectiva"
+
+Visual: Círculo concéntrico (Anillo) grande en el centro con el Promedio General del Área (Semaforizado).
+
+Dinámica: El anillo se completa y cambia de color según el puntaje (Rojo, Amarillo, Verde).
+
+Top Alertas: Un cuadro de texto automático con el porcentaje y la semaforización 
+
+Comparativo: Una pequeña barra que compare este mes con el anterior para ver si el compromiso subió o bajó. Estética: Las pilas deben ser visualmente proporcionales. Si la Pila Roja crece respecto al mes anterior, ponle un borde parpadeante o un signo de exclamación para llamar la atención del jefe.
+
+Contexto de Riesgo Psicosocial: Incluir una pequeña etiqueta que diga: "Este reporte es un insumo para el Sistema de Vigilancia Epidemiológica Psicosocial". Esto le recordará al jefe la importancia legal y técnica de lo que está viendo.
+
+Sugerencia  presentarle al diseñador esta Jerarquía Visual:
+
+Bloque Superior: Indicadores de Estado
+
+Izquierda: El Anillo de "Salud Colectiva" (Promedio General).
+
+Derecha: El Histograma de Frecuencia (Pilas Rojo, Amarillo, Verde).
+
+Debajo de los gráficos, el sistema debe presentar un Resumen Ejecutivo automático basado en el puntaje:
+
+Estado
+
+Título Dashboard
+
+Lógica Visual (Anillo)
+
+Lectura Técnica para el jefe Interacción: Al hacer clic en "Ver Recomendación", el sistema despliega el Plan de Acción Psicosocial 
+
+Recomendación del Sistema:
+
+
+
+Crítico
+
+18 - 59 puntos
+
+🚨 ALERTA DE DESCONEXIÓN
+
+14% - 47% (Rojo) El anillo apenas se ilumina según el porcentaje
+
+Vínculo debilitado: "Su equipo presenta un vínculo casi inexistente con la organización. Existe un alto riesgo de rotación masiva, absentismo y una baja calidad en el desempeño. Los colaboradores no ven un futuro aquí ni sienten una obligación moral de permanencia."
+
+Auditoría de Liderazgo: Evalúe si el estilo de mando actual está generando barreras comunicativas.
+
+Entrevistas de Diagnóstico: Realice sesiones de escucha anónimas para identificar factores higiénicos (sueldo, herramientas, seguridad) que puedan estar fallando.
+
+
+
+Moderado
+
+60 - 109 puntos
+
+⚠️ VÍNCULO EN DESARROLLO
+
+48% - 82% (Amarillo) El anillo se queda a nivel intermedio
+
+Vínculo con potencial de mejora:  "El equipo es funcional y cumple con sus tareas, pero carece de entusiasmo o compromiso pleno. El vínculo es principalmente transaccional (están por el sueldo o la estabilidad) más que emocional."
+
+Refuerzo Afectivo: Incremente las actividades de reconocimiento no monetario. Haga que los logros individuales sean visibles.
+
+Claridad de Propósito: Asegúrese de que cada colaborador entienda cómo su trabajo impacta en los objetivos grandes de la empresa.
+
+
+
+Óptimo
+
+110 - 126+ puntos
+
+✅ ZONA DE ALTO COMPROMISO
+
+83% - 100%(Verde)
+
+Vínculo Consolidado: "Usted lidera un equipo de 'Embajadores'. Los colaboradores están alineados con la cultura, valoran sus beneficios y sienten una lealtad ética hacia su gestión y la empresa."
+
+
+
+Empoderamiento: Es el momento ideal para delegar proyectos de alta responsabilidad; el equipo está listo para el siguiente nivel.
+
+Programas de Mentoría: Utilice a estos colaboradores para capacitar a nuevas contrataciones o áreas con menor compromiso.
+
+
+
+
+
+Distribución de Frecuencia (El Histograma)  El jefe no solo necesita el promedio, necesita ver cuántas personas hay en cada rango
+
+
+
+Regla Ética de Visualización: Si el total de respuestas del área es < 5, el resultado de las pilas debe aparecer bloqueado (N/A) para proteger el anonimato.
+
+Objetivo: Crear un gráfico de barras verticales (Histograma) que permita al jefe identificar la dispersión de su equipo de un vistazo.
+
+Interactividad : Al pasar el cursor sobre cada pila, el sistema debe desplegar la tarjeta correspondiente:
+
+
+
+
+
+Visual: Gráfico de "Pilas" o barras verticales con colores semafóricos
+
+Interactividad: Al pasar el cursor sobre cada pila, el sistema debe desplegar la tarjeta correspondiente, según los rangos y semaforización 
+
+El gráfico debe ser muy limpio. Lo más importante es que cuando el jefe vea gente en la 'Pila Roja', el sistema le diga exactamente cuántas personas son (ej. 'Usted tiene 3 personas en este rango') y le dispare automáticamente la recomendación de revisar carga mental y activar apoyo psicosocial. Es un llamado a la acción, no solo un gráfico decorativo."
+
+
+
+Pila (Segmento)
+
+Rango de Puntos
+
+Perfil
+
+Acción del Sistema (Recomendación)
+
+Pila Verde:
+
+Cuántos empleados sacaron 105-126 puntos.
+
+Embajadores: Alto sentido de pertenencia y lealtad.
+
+Potenciar como líderes naturales o mentores.
+
+Pila Amarilla:
+
+Cuántos están entre 60 y 104. 
+
+Transaccionales: Cumplen con sus tareas, pero su vínculo es frágil o por necesidad.
+
+Fortalecer el salario emocional y la cultura.
+
+Pila Roja:
+
+Cuántos están en 18 a 59 puntos.
+
+Usted tiene X personas en este rango Intervención Urgente: Desconexión severa y riesgo de fatiga.
+
+Se recomienda revisar la carga mental y el estilo de comunicación.
+
+Activación de protocolos de escucha y apoyo psicosocial.
+
+
+
+Glosario de Perfiles: Módulo ECO
+
+Instrucción para el Diseñador: Ubicar como un icono de interrogación (?) o botón de "Información" sobre el gráfico de Pilas.
+
+1. Embajadores (Pila Verde)
+
+Definición Técnica: Colaboradores con un alto Compromiso Afectivo.
+
+¿Qué significa?: Personas que permanecen en la empresa porque quieren estar aquí. Sienten orgullo de pertenencia, están alineados con los valores y son los motores de la cultura organizacional. Su riesgo de rotación es mínimo.
+
+2. Transaccionales (Pila Amarilla) 
+
+Colaboradores con predominancia de Compromiso de Continuidad o Normativo en niveles medios.
+
+¿Qué significa?: Personas que permanecen en la empresa porque lo necesitan (estabilidad económica) o porque sienten que deben hacerlo (gratitud por el empleo). Cumplen con su deber, pero su vínculo emocional es frágil. Son productivos, pero vulnerables a ofertas externas.
+
+3. Intervención Urgente (Pila Roja)
+
+Colaboradores con puntuaciones críticas en las tres dimensiones del modelo Meyer & Allen.
+
+¿Qué significa?: Personas que experimentan una desconexión psicológica con su rol. Es un indicador temprano de Fatiga Cognitiva y agotamiento emocional. Su presencia en el equipo requiere una revisión inmediata de las condiciones de trabajo para prevenir accidentes o ausentismo.
+
+Solo uno muy importante para la Estadista:
+
+¿Por qué este ajuste? Se necesita que el jefe identifique rápidamente a los que están por debajo de 60, ya que ellos son los que tienen mayor probabilidad de Fatiga Cognitiva y accidentalidad.
+
+Consideraciones para el Equipo Técnico
+
+1. Para la Estadista (Cálculo de Frecuencia)
+
+No promediar: Aquí el sistema debe contar "cabezas". Si hay 10 personas en el equipo, la suma de las 3 pilas debe ser siempre igual a 10.
+
+Variable de Cruce: Asegúrate de que este histograma pueda filtrarse por antigüedad (para ver si los "Rojos" son los nuevos o los antiguos) y por cargo.
+
+
+
+REPORTE AL NIVEL DE GERENCIA Y RRHH
+
+
+
+"Termómetro de Salud Cultural"
+
+En la parte superior del Dashboard, el Gerente debe ver un solo número grande que resuma todo.
+
+Para la Estadista: Es el promedio ponderado de todas las respuestas de la empresa (PT Global 126máximo y 18 mínimo)
+
+Para el Diseñador: Un gráfico de "Velocímetro" debajo dependiendo del color que marque el promedio global, debe aparecer automáticamente el Título, la Lectura y las 3 Recomendaciones Estratégicas correspondientes. Usar iconos (un rayo para crisis, una balanza para transición y una estrella para fortaleza) para que sea visualmente ejecutivo."
+
+Semaforización:  Los Niveles del Termómetro (Para el Diseñador)
+
+
+
+Porcentajes  Y PT
+
+Título para el Reporte
+
+Lectura
+
+Recomendación Estratégica
+
+Zona Roja (Crisis)
+
+(18-59 pts | 0% - 38%)
+
+🚨 Intervención prioritaria en salud organizacional
+
+Riesgo Psicosocial Crítico. Existe una desconexión severa; la operatividad está en riesgo por falta de compromiso
+
+Contención: Activar el protocolo de Atención en crisis psicosocial. Es imperativo revisar las condiciones de liderazgo y las cargas de trabajo en las áreas que arrastran el promedio a rojo.
+
+Suministro de Recursos: Evaluar si el equipo cuenta con las herramientas y el apoyo necesario para cumplir sus metas sin comprometer su salud mental.
+
+Auditoría de Clima: Realizar un diagnóstico profundo de los factores de riesgo psicosocial (Carga mental, liderazgo y demandas del entorno).
+
+Zona Amarilla (Alerta): (60-104 pts | 39% - 80%)
+
+⚠️ Cultura en transición / riesgo de desapego
+
+Cultura Transaccional. El compromiso es moderado pero inestable. La lealtad depende de factores externos (sueldo).
+
+Salario Emocional: Fortalecer beneficios no monetarios (tiempo flexible, formación, autonomía).
+
+ Comunicación de Propósito: El colaborador sabe "qué" hacer, pero quizás no "para qué" lo hace. Es vital alinear los objetivos individuales con la visión de la empresa para subir al nivel de compromiso afectivo.
+
+Capacitación en Liderazgo: Entrenar a los mandos medios para que pasen de ser "jefes de tarea" a "líderes de personas", fortaleciendo la confianza y la lealtad ética.
+
+
+
+Zona Verde (Fortaleza): (105-126 pts | 81% - 100%)
+
+✅ Modelo de cultura de alto desempeño
+
+Cultura de Alto Desempeño. El personal está altamente alineado y comprometido emocionalmente.
+
+
+
+Programa de Mentores: Utilizar el talento de estas áreas como referentes para capacitar a otras dependencias. Estos colaboradores son "Embajadores" naturales de la marca.
+
+Plan de Sostenibilidad: Mantener las políticas que han llevado a este éxito. El desafío aquí es evitar el conformismo y seguir innovando en beneficios que mantengan viva la llama del compromiso.
+
+Reconocimiento de Logros: Celebrar los hitos alcanzados por el equipo para reforzar el vínculo emocional y asegurar que el talento de alto nivel se sienta valorado y visto.
+
+
+
+
+
+El Mapa de Calor Psicosocial (La Vista del Mapa)
+
+
+
+El Mapa de Calor Psicosocial es la "radiografía" de la empresa. Para Recursos Humanos, es la herramienta de Vigilancia Epidemiológica porque permite detectar dónde está el "virus" de la desmotivación o el riesgo de rotación antes de que se extienda.
+
+Estructura de la Matriz:
+
+Eje Vertical (Filas): Dependencias o Sedes (Ej: Almacén, Servicios Generales, Jurídica, TI).
+
+Eje Horizontal (Columnas): Las 3 Dimensiones: CA (Afectivo), CC (Continuidad), CN (Normativo).
+
+Procesamiento de Datos:
+
+El Dato de la Celda: Es el promedio del área en esa dimensión específica (Escala 6 a 42 puntos por dimensión).
+
+Criterio de Anonimato: Si una dependencia tiene menos de 5 respuestas, la fila completa debe mostrarse en gris o con un candado 🔒
+
+Para el Diseñador: Visualización Térmica Visualización Térmica: El objetivo es que el ojo del Gerente viaje directo al Rojo. Las celdas deben cambiar de color según el puntaje:
+
+Puntaje T
+
+DIAGNOSTICO
+
+Acción para la Empresa
+
+🔴 Rojo Intenso (6 - 19.9 pts)
+
+Crisis severa / Foco de intervención
+
+Cese de actividades de presión y apertura de canales de escucha.
+
+Diagnóstico Profundo de Clima: Entrevistas focales para entender la raíz del descontento.
+
+Coaching de Liderazgo: Intervención directa con los jefes de esa área para ajustar estilos de mando.
+
+Auditoría de Procesos: Revisar si la carga de trabajo está superando la capacidad humana.
+
+🟡 Naranja/Amarillo (20 - 34.9 pts): 
+
+
+
+Vínculo frágil / Alerta preventiva.
+
+Revisión de la comunicación interna y beneficios actuales.
+
+Diseño de Salario Emocional: Crear un catálogo de beneficios no económicos (tiempo, flexibilidad, formación).
+
+Talleres de Sentido de Propósito: Alinear los objetivos de vida del trabajador con la misión de la empresa.
+
+Team Building Estratégico: Actividades para fortalecer la confianza y el apoyo mutuo entre compañeros
+
+
+
+🟢 Verde Esmeralda (35 - 42 pts
+
+Cultura saludable de alto desempeño
+
+Reconocimiento público y mantenimiento de políticas actuales
+
+Programa de Mentores: Capacitar a los empleados destacados de esta área para que entrenen a otros.
+
+Sistematización de Buenas Prácticas: Documentar qué hace bien esta área para replicarlo en toda la empresa.
+
+
+
+
+
+Interacción (Tooltip): Al pasar el cursor sobre un cuadro del mapa, debe aparecer un tooltip con:
+
+Nombre del Área.
+
+Puntaje promedio de CA obtenido en esa dimensión (ej: 15/42)
+
+Número de personas evaluadas en esa área (N).
+
+Línea de Corte: Línea de Corte: Añadir una línea visual (punteada o de color neutro) que marque el Promedio Global de la Empresa, para que el Gerente identifique qué áreas están por encima o por debajo de la media organizacional.
+
+INTERPRETACIÓN AUTOMÁTICA (Reporte para RR.HH.)
+
+El sistema debe generar diagnósticos automáticos basados en la combinación de colores:
+
+Escenario Detectado
+
+Diagnóstico del Sistema
+
+Lectura
+
+Acción:
+
+CA en Rojo
+
+Crisis de Liderazgo"
+
+El equipo está desconectado emocionalmente. Puede haber un liderazgo autoritario, falta de reconocimiento o un clima de desconfianza. Aunque el compromiso de Continuidad (sueldo) sea alto, la gente se irá en cuanto pueda
+
+Intervención inmediata con el jefe de área (Coaching o diagnóstico de clima).
+
+
+
+CC en Rojo
+
+Riesgo de Fuga Inminente
+
+El personal no siente que pierda nada si se va.
+
+Revisión de tabla salarial y beneficios.
+
+CA amarillo/Naranja
+
+Cultura Transaccional
+
+El equipo opera bajo un modelo de vinculación por cumplimiento, donde prevalece el respeto a los acuerdos contractuales sobre la identificación emocional. Existe una alineación con los estándares operativos, pero se identifica una brecha en la discrecionalidad del esfuerzo (voluntad de ir más allá), lo que limita el potencial de innovación disruptiva."
+
+
+
+Realizar talleres de propósito y actividades de integración Team Building.
+
+
+
+CA Verde 
+
+Cultura de Alto Desempeño 
+
+Existe una fuerte identificación con los valores. El jefe de esta área es un "Líder Inspirador". Esta área debe ser el modelo para el resto de la empresa.
+
+
+
+Utilizar a este líder como mentor para las áreas que están en rojo
+
+
+
+CA Verde + CC Rojo
+
+Talento Vulnerable 
+
+Aman la empresa, pero el mercado los está tentando.
+
+Fortalecer estabilidad y plan de carrera.
+
+CA Rojo + CC Verde
+
+Anclaje por Necesidad
+
+Odian el trabajo, pero se quedan por el sueldo. 
+
+Riesgo de accidentes y bajo desempeño.
+
+
+
+
+
+FUNCIONALIDADES EXTRA PARA GERENCIA
+
+Alerta de Prioridad: Si más del 30% de las áreas están en Rojo, el Dashboard debe mostrar un aviso: "Alerta: Su Capital Humano requiere atención profesional prioritaria".
+
+
+
+
+
+RADAR DE FORTALEZAS (DIAGNÓSTICO ADN ) 
+
+Objetivo: Mostrar el equilibrio o desequilibrio de las tres dimensiones del compromiso dentro de una misma área. Es la vista profunda que se activa al seleccionar un departamento.
+
+Concepto Visual El gráfico de radar (o telaraña) debe mostrar dos capas de datos superpuestas:
+
+
+
+PARA LA ESTADISTA (Lógica de Comparación)
+
+Además de los promedios de 6 a 42 puntos, el sistema debe calcular la Brecha de Compromiso:
+
+Capa Base (El Ideal): Un polígono gris claro o punteado que llegue al máximo de 42 puntos en los tres ejes.
+
+Capa Activa (Realidad del Equipo): El área sombreada que representa el promedio actual del área en CA, CC y CN. El color de esta área debe cambiar según el promedio general (Rojo, Amarillo o Verde).
+
+Lógica de Insights (Cruce de Datos):
+
+Fuga Afectiva: Si el puntaje de CA es el menor de los tres.
+
+Talento Atrapado: Si el puntaje de CC es un 30% mayor que los otros dos.
+
+Pilares de Confianza: Si el puntaje de CN es el predominante (el más alto).
+
+
+
+PARA EL DISEÑADOR (Visualización) 
+
+Estética del Gráfico Radar debe mostrar dos capas de datos superpuestas:
+
+Visual de las Notas: No usar párrafos largos. Usar Cards de Información con iconos que ayuden a identificar el problema rápidamente (ej. un cubo de hielo para el CA bajo, un ancla para el CC alto).
+
+Privacidad (Recordatorio Visual): En la esquina superior del reporte de Gestión Humana, colocar siempre un sello visual: "Datos Agregados: 100% Confidencial".
+
+Diseño: Limpio, moderno, vértices redondeados.
+
+Ejes: Triángulo con vértices etiquetados como:
+
+Eje CA (Vínculo Afectivo): Representa el "Querer" estar.
+
+Eje CN (Vínculo Normativo): Representa el "Deber" estar (Lealtad).
+
+Eje CC (Vínculo de Continuidad): Representa el "Necesitar" estar (Estabilidad).
+
+Semaforización del radar:
+
+Si el área sombreada está cerca del centro (<20 pts): Borde Coral (Rojo).
+
+Si el área ocupa la mitad (20-34 pts): Borde Ámbar (Amarillo).
+
+Si el área toca los bordes (>35 pts): Borde Esmeralda (Verde).
+
+Interacción 
+
+Al pasar el ratón por cada punta del radar: Mostrar puntaje exacto (ej. 28/42) y definición breve.
+
+Sistema de alertas  Insights Automáticos  
+
+El diseñador debe crear un contenedor especial debajo del Gráfico Radar llamado "Lupa Estratégica" o "Insights del Equipo". Estos mensajes solo aparecen cuando el sistema detecta un desequilibrio (un eje significativamente más alto o bajo que los otros).
+
+
+
+Si la fuga es en...
+
+Título
+
+Insight constructivo
+
+Acción Recomendada:
+
+Card 1.  Fuga Afectiva 
+
+(CA Bajo)
+
+🧊 Distanciamiento Emocional.
+
+El equipo demuestra alta capacidad operativa, pero se percibe una desconexión con la cultura organizacional. Existe un riesgo de 'cumplimiento pasivo' donde se ejecutan tareas sin involucramiento creativo
+
+Oportunidad de Conexión: El equipo cumple, pero falta fortalecer el entusiasmo y la identidad.
+
+Implementar programas de reconocimiento y escucha activa.
+
+
+
+Card 2: (Talento Atrapado)
+
+(CC Alto)
+
+
+
+⚓ Anclaje por Necesidad
+
+
+
+La permanencia del equipo está ligada principalmente a la seguridad económica y estabilidad. Existe un riesgo de baja innovación por miedo al error o a perder la seguridad alcanzada."
+
+Fortalecimiento de Lealtad: Momento para reforzar los valores compartidos y el reconocimiento del compromiso.
+
+
+
+Fomentar una cultura de seguridad psicológica donde se premie el aprendizaje y el ensayo-error.
+
+Card 3 : El Valor de la Integridad (CN Alto)
+
+🤝 Pilares de Confianza.
+
+
+
+El equipo posee una lealtad admirable basada en la ética y el sentido del deber. Son perfiles altamente confiables para proyectos de alta responsabilidad y manejo de información sensible."
+
+Gestión de Retención: Involucrar a estos colaboradores en comités de ética o programas de mentoría para nuevos ingresos.
+
+
+
+
+
+Variables de Riesgo (Batería Psicosocial)
+
+ECO
+
+Variable Batería Riesgo Psicosocial
+
+Hipótesis de Cruce
+
+¿Para qué sirve este dato?
+
+Compromiso afectivo
+
+Liderazgo y relaciones sociales 
+
+A mayor calidad de liderazgo, mayor Compromiso Afectivo.
+
+Evaluar si los jefes están "enamorando" o "expulsando" al talento
+
+Compromiso afectivo
+
+Compromiso continuidad
+
+Carga de Trabajo
+
+Una carga excesiva suele desplomar el compromiso Afectivo pero mantiene alto el de Continuidad (miedo a irse por cansancio).
+
+Detectar riesgo de Burnout (agotamiento).
+
+Compromiso normativo
+
+Reconocimiento
+
+La falta de reconocimiento afecta directamente el Compromiso Normativo (lealtad).
+
+Ajustar programas de incentivos no económicos.
+
+Compromiso afectivo
+
+
+
+Autonomía
+
+A mayor control sobre el propio trabajo, mayor sentido de pertenencia (CA).
+
+Rediseñar puestos de trabajo para dar más libertad.
+
+ 
+
+Variables Sociodemográficas (El "Quién")
+
+Estos cruces ayudan al diseñador a crear filtros en el Dashboard:
+
+Antigüedad: Es común que el Compromiso Afectivo baje después de los 2 años (etapa de desilusión). El de Continuidad suele subir (por beneficios acumulados).
+
+Rango de Edad: Los Millennials/Gen Z suelen puntuar bajo en Normativo (lealtad por deber), mientras que los Baby Boomers suelen puntuar alto.
+
+Cargo (Nivel Jerárquico): Generalmente, los niveles directivos tienen mayor compromiso Afectivo que los niveles operativos.
+
+
+
+OJO REVISAR LOS CLIPS QUE NECESITO QUE ME APAREZCAN PARA DECIRLE AL DISEÑADOR 
+
+
+
+
+
+
+
+ Variables de Resultados Laborales (El "Impacto")
+
+Cruzar el compromiso con datos duros de la empresa:
+
+Intención de Renuncia: Cruza el puntaje Bajo con la pregunta: "¿Ha pensado en dejar la empresa en los últimos 6 meses?". Es el mejor predictor de rotación.
+
+Desempeño (Evaluación anual): Un Compromiso Afectivo alto debería correlacionar con un alto desempeño. Si alguien tiene CA alto, pero desempeño bajo, el problema es de capacitación, no de actitud.
+
+
+
+
+
+
+
+
+
