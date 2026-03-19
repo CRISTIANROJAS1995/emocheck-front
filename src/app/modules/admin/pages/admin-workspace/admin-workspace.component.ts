@@ -48,14 +48,6 @@ export class AdminWorkspaceComponent implements OnInit {
             color: 'rose',
         },
         {
-            title: 'Casos Clínicos',
-            description: 'Seguimiento de casos, intervenciones y resultados.',
-            icon: 'heroicons_outline:clipboard-document-check',
-            route: '/admin/cases',
-            metric: '-',
-            color: 'amber',
-        },
-        {
             title: 'Módulos & Instrumentos',
             description: 'Gestiona módulos de evaluación, instrumentos y preguntas.',
             icon: 'heroicons_outline:squares-2x2',

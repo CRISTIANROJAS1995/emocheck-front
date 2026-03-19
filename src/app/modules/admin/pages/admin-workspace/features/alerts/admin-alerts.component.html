@@ -115,10 +115,10 @@
                     <td><span [class]="statusBadgeClass(alert.status)">{{ statusLabel(alert.status) }}</span></td>
                     <td class="actions-cell">
                         @if (alert.status === 'OPEN') {
-                        <button class="btn btn--primary btn--xs" (click)="selectAlert(alert); $event.stopPropagation()">
-                            <mat-icon>done</mat-icon> Reconocer
+                        <button class="btn btn--primary btn--xs" (click)="openAcknowledgeModal(alert, $event)">
+                            <mat-icon>assignment_turned_in</mat-icon> Reconocer
                         </button> }
-                        <button class="btn btn--outline btn--xs" (click)="selectAlert(alert); $event.stopPropagation()">
+                        <button class="btn btn--outline btn--xs" title="Ver detalle y caso" (click)="openDetailModal(alert, $event)">
                             <mat-icon>visibility</mat-icon>
                         </button>
                     </td>
@@ -134,120 +134,357 @@
         }
     </div>
     }
+</section>
 
-    <!-- Detail / Resolve Panel -->
-    @if (selectedAlert; as current) {
-    <div class="detail-panel">
-        <div class="detail-panel__header">
-            <h3>Alerta #{{ current.alertId }}</h3>
-            <button class="btn btn--ghost btn--sm" (click)="selectedAlert = null">
-                <mat-icon>close</mat-icon>
+<!-- ═══════════════════════════════════════════════════════════════
+     Modal: Detalle completo — Alerta + Caso + Seguimientos
+     ═══════════════════════════════════════════════════════════════ -->
+@if (showDetailModal && detailAlert) {
+<div class="dm-backdrop">
+    <div class="dm">
+
+        <!-- Header -->
+        <div class="dm__header">
+            <div class="dm__header-left">
+                <span [class]="severityBadgeClass(detailAlert.alertLevel)">{{ severityLabel(detailAlert.alertLevel) }}</span>
+                <div>
+                    <h2>Alerta #{{ detailAlert.alertId }}</h2>
+                    <p>{{ detailAlert.title || detailAlert.alertType || '-' }}</p>
+                </div>
+            </div>
+            <div class="dm__header-right">
+                <span [class]="statusBadgeClass(detailAlert.status)">{{ statusLabel(detailAlert.status) }}</span>
+                <button class="btn btn--ghost btn--sm" (click)="closeDetailModal()"><mat-icon>close</mat-icon></button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="dm__tabs">
+            <button class="dm__tab" [class.dm__tab--active]="detailTab === 'alert'" (click)="setDetailTab('alert')">
+                <mat-icon>notifications</mat-icon> Alerta
+            </button>
+            <button class="dm__tab" [class.dm__tab--active]="detailTab === 'case'" (click)="setDetailTab('case')">
+                <mat-icon>folder_open</mat-icon> Caso
+                @if (detailCase) { <span class="dm__tab-badge">{{ caseStatusLabel(detailCase.status) }}</span> }
+                @else if (!detailCaseLoading) { <span class="dm__tab-badge dm__tab-badge--warn">Sin caso</span> }
+            </button>
+            <button class="dm__tab" [class.dm__tab--active]="detailTab === 'followups'" (click)="setDetailTab('followups')" [disabled]="!detailCase">
+                <mat-icon>event_note</mat-icon> Seguimientos
+                @if (followUps.length > 0) { <span class="dm__tab-badge">{{ followUps.length }}</span> }
             </button>
         </div>
-        <div class="detail-panel__grid">
-            <div class="detail-panel__field">
-                <label>Nivel</label>
-                <span [class]="severityBadgeClass(current.alertLevel)">{{ severityLabel(current.alertLevel) }}</span>
-            </div>
-            <div class="detail-panel__field">
-                <label>Tipo</label>
-                <span>{{ current.alertType || '-' }}</span>
-            </div>
-            @if (current.title) {
-            <div class="detail-panel__field detail-panel__field--full">
-                <label>Título</label>
-                <span>{{ current.title }}</span>
-            </div>
-            } @if (current.description) {
-            <div class="detail-panel__field detail-panel__field--full">
-                <label>Descripción</label>
-                <span>{{ current.description }}</span>
-            </div>
-            }
-            <!-- Usuario: nombre + doc + email + área + empresa -->
-            <div class="detail-panel__field detail-panel__field--full">
-                <label>Usuario</label> @if (current.userName) {
-                <div class="user-detail-block">
-                    <div class="user-detail-block__name">
-                        <mat-icon class="user-detail-block__icon">person</mat-icon>
-                        <strong>{{ current.userName }}</strong>
+
+        <div class="dm__body">
+
+            <!-- ───── TAB: ALERTA ───── -->
+            @if (detailTab === 'alert') {
+            <div class="dm__section">
+                <div class="dm__grid">
+                    <div class="dm__field">
+                        <label>Tipo</label>
+                        <span>{{ detailAlert.alertType || '-' }}</span>
                     </div>
-                    @if (current.userDocumentNumber) {
-                    <div class="user-detail-block__row">
-                        <mat-icon>badge</mat-icon>
-                        <span>ID: {{ current.userDocumentNumber }}</span>
+                    <div class="dm__field">
+                        <label>Fecha</label>
+                        <span>{{ detailAlert.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
                     </div>
-                    } @if (current.userEmail) {
-                    <div class="user-detail-block__row">
-                        <mat-icon>email</mat-icon>
-                        <span>{{ current.userEmail }}</span>
+                    @if (detailAlert.description) {
+                    <div class="dm__field dm__field--full">
+                        <label>Descripción</label>
+                        <span class="dm__desc">{{ detailAlert.description }}</span>
                     </div>
-                    } @if (current.userArea) {
-                    <div class="user-detail-block__row">
-                        <mat-icon>business_center</mat-icon>
-                        <span>{{ current.userArea }}</span>
-                    </div>
-                    } @if (current.userCompany) {
-                    <div class="user-detail-block__row">
-                        <mat-icon>domain</mat-icon>
-                        <span>{{ current.userCompany }}</span>
+                    } @if (detailAlert.actionTaken) {
+                    <div class="dm__field dm__field--full">
+                        <label>Acción tomada</label>
+                        <span>{{ detailAlert.actionTaken }}</span>
                     </div>
                     }
                 </div>
-                } @else {
-                <span>{{ current.userIdAnonymized || current.userId || '-' }}</span> }
-            </div>
-            <div class="detail-panel__field">
-                <label>Estado</label>
-                <span [class]="statusBadgeClass(current.status)">{{ statusLabel(current.status) }}</span>
-            </div>
-            <div class="detail-panel__field">
-                <label>Fecha creación</label>
-                <span>{{ current.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-            </div>
-            <div class="detail-panel__field">
-                <label>Acción tomada</label>
-                <span>{{ current.actionTaken || 'Sin acción' }}</span>
-            </div>
-            @if (current.notes) {
-            <div class="detail-panel__field detail-panel__field--full">
-                <label>Notas</label>
-                <span>{{ current.notes }}</span>
+
+                <!-- Usuario -->
+                @if (detailAlert.userName) {
+                <div class="dm__user-block">
+                    <div class="dm__user-block__name">
+                        <mat-icon>person</mat-icon>
+                        <strong>{{ detailAlert.userName }}</strong>
+                    </div>
+                    @if (detailAlert.userDocumentNumber) {
+                    <div class="dm__user-block__row">
+                        <mat-icon>badge</mat-icon><span>ID: {{ detailAlert.userDocumentNumber }}</span></div>
+                    } @if (detailAlert.userEmail) {
+                    <div class="dm__user-block__row">
+                        <mat-icon>email</mat-icon><span>{{ detailAlert.userEmail }}</span></div>
+                    } @if (detailAlert.userArea) {
+                    <div class="dm__user-block__row">
+                        <mat-icon>business_center</mat-icon><span>{{ detailAlert.userArea }}</span></div>
+                    } @if (detailAlert.userCompany) {
+                    <div class="dm__user-block__row">
+                        <mat-icon>domain</mat-icon><span>{{ detailAlert.userCompany }}</span></div>
+                    }
+                </div>
+                }
+
+                <!-- Resolver alerta -->
+                @if (detailAlert.status !== 'RESOLVED' && detailAlert.status !== 'DISMISSED') {
+                <div class="dm__resolve-block">
+                    <h4>
+                        <mat-icon>check_circle</mat-icon> Marcar como resuelta</h4>
+                    <p class="dm__hint">Describe el resultado final de la intervención.</p>
+                    <textarea class="dm__textarea" rows="3" [(ngModel)]="resolution" placeholder="Ej: El empleado fue atendido por el psicólogo y se encuentra estable..."></textarea>
+                    <div class="dm__actions">
+                        <button class="btn btn--success" [disabled]="saving" (click)="resolveAlertFromDetail()">
+                            <mat-icon>check_circle</mat-icon> Marcar como resuelta
+                        </button>
+                    </div>
+                </div>
+                }
             </div>
             }
+
+            <!-- ───── TAB: CASO ───── -->
+            @if (detailTab === 'case') { @if (detailCaseLoading) {
+            <div class="dm__loading">
+                <mat-spinner diameter="32"></mat-spinner><span>Buscando caso...</span></div>
+            } @else if (!detailCase) {
+            <div class="dm__empty-case">
+                <mat-icon>folder_off</mat-icon>
+                <p>Esta alerta aún no tiene un caso de seguimiento.</p>
+                @if (detailAlert.status === 'OPEN') {
+                <button class="btn btn--primary" (click)="closeDetailModal(); openAcknowledgeModal(detailAlert!, $event)">
+                    <mat-icon>assignment_turned_in</mat-icon> Reconocer y crear caso
+                </button> } @else {
+                <p class="dm__hint">La alerta fue reconocida externamente. Crea el caso desde la sección de Casos.</p>
+                }
+            </div>
+            } @else {
+            <div class="dm__section">
+                <!-- Info del caso -->
+                <div class="dm__case-header">
+                    <div class="dm__case-number">
+                        <mat-icon>folder_open</mat-icon>
+                        <strong>{{ detailCase.caseNumber ?? 'CASE-' + detailCase.caseTrackingId }}</strong>
+                    </div>
+                    <div class="dm__case-badges">
+                        <span [class]="caseStatusBadge(detailCase.status)">{{ caseStatusLabel(detailCase.status) }}</span>
+                        <span [class]="casePriorityBadge(detailCase.priority)">{{ casePriorityLabel(detailCase.priority) }}</span>
+                    </div>
+                </div>
+
+                <div class="dm__grid">
+                    <div class="dm__field dm__field--full">
+                        <label>Psicólogo asignado</label>
+                        <span>{{ detailCase.assignedToPsychologistName || '-' }}</span>
+                    </div>
+                    @if (detailCase.initialAssessment) {
+                    <div class="dm__field dm__field--full">
+                        <label>Descripción / Evaluación inicial</label>
+                        <span class="dm__desc">{{ detailCase.initialAssessment }}</span>
+                    </div>
+                    } @if (detailCase.interventionPlan) {
+                    <div class="dm__field dm__field--full">
+                        <label>Plan de acción</label>
+                        <span class="dm__desc">{{ detailCase.interventionPlan }}</span>
+                    </div>
+                    }
+                    <div class="dm__field">
+                        <label>Apertura</label>
+                        <span>{{ detailCase.openedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    @if (detailCase.closedAt) {
+                    <div class="dm__field">
+                        <label>Cierre</label>
+                        <span>{{ detailCase.closedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    } @if (detailCase.nextFollowUpDate) {
+                    <div class="dm__field">
+                        <label>Próximo seguimiento</label>
+                        <span>{{ detailCase.nextFollowUpDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    } @if (detailCase.finalOutcome) {
+                    <div class="dm__field dm__field--full">
+                        <label>Motivo de cierre</label>
+                        <span class="dm__desc">{{ detailCase.finalOutcome }}</span>
+                    </div>
+                    }
+                </div>
+
+                <!-- Editar estado del caso -->
+                @if ((detailCase.status ?? '').toUpperCase() !== 'CLOSED') {
+                <div class="dm__resolve-block">
+                    <h4>
+                        <mat-icon>edit</mat-icon> Actualizar caso</h4>
+                    <div class="dm__form-row">
+                        <div class="dm__form-group">
+                            <label class="dm__form-label">Estado</label>
+                            <select class="dm__select" [(ngModel)]="editCaseStatus">
+                                <option value="OPEN">Abierto</option>
+                                <option value="IN_PROGRESS">En Proceso</option>
+                                <option value="ESCALATED">Escalado</option>
+                            </select>
+                        </div>
+                        <div class="dm__form-group">
+                            <label class="dm__form-label">Prioridad</label>
+                            <select class="dm__select" [(ngModel)]="editCasePriority">
+                                <option value="LOW">Baja</option>
+                                <option value="MEDIUM">Media</option>
+                                <option value="HIGH">Alta</option>
+                                <option value="CRITICAL">Crítica</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="dm__actions">
+                        <button class="btn btn--primary btn--sm" [disabled]="saving" (click)="updateCase()">
+                            <mat-icon>save</mat-icon> Guardar cambios
+                        </button>
+                    </div>
+
+                    <div class="dm__divider"></div>
+
+                    <h4>
+                        <mat-icon>lock</mat-icon> Cerrar caso</h4>
+                    <textarea class="dm__textarea" rows="2" [(ngModel)]="closeReason" placeholder="Motivo de cierre (opcional)..."></textarea>
+                    <div class="dm__actions">
+                        <button class="btn btn--danger btn--sm" [disabled]="saving" (click)="closeCase()">
+                            <mat-icon>lock</mat-icon> Cerrar caso
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+            } }
+
+            <!-- ───── TAB: SEGUIMIENTOS ───── -->
+            @if (detailTab === 'followups' && detailCase) {
+            <div class="dm__section">
+                <!-- Agregar seguimiento -->
+                <div class="dm__followup-add">
+                    <h4>
+                        <mat-icon>add_circle</mat-icon> Agregar seguimiento</h4>
+                    <textarea class="dm__textarea" rows="3" [(ngModel)]="newFollowUpNotes" placeholder="Describe la sesión, llamada o acción realizada..."></textarea>
+                    <div class="dm__actions">
+                        <button class="btn btn--primary btn--sm" [disabled]="saving || !newFollowUpNotes.trim()" (click)="addFollowUp()">
+                            <mat-icon>save</mat-icon> Guardar seguimiento
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de seguimientos -->
+                @if (followUpsLoading) {
+                <div class="dm__loading">
+                    <mat-spinner diameter="28"></mat-spinner><span>Cargando seguimientos...</span></div>
+                } @else if (followUps.length === 0) {
+                <div class="dm__empty-followups">
+                    <mat-icon>event_busy</mat-icon>
+                    <p>No hay seguimientos registrados aún.</p>
+                </div>
+                } @else {
+                <div class="dm__followup-list">
+                    @for (fu of followUps; track fu.followUpId) {
+                    <div class="dm__followup-item">
+                        <div class="dm__followup-meta">
+                            <span class="dm__followup-date">
+                                <mat-icon>schedule</mat-icon>
+                                {{ (fu.followUpDate || fu.createdAt) | date:'dd/MM/yyyy HH:mm' }}
+                            </span> @if (fu.createdByName) {
+                            <span class="dm__followup-author"><mat-icon>person</mat-icon> {{ fu.createdByName }}</span> } @if (fu.actionType) {
+                            <span class="dm__followup-type">{{ fu.actionType }}</span> }
+                        </div>
+                        <p class="dm__followup-notes">{{ fu.notes || '-' }}</p>
+                        @if (fu.outcome) {
+                        <p class="dm__followup-outcome">
+                            <mat-icon>flag</mat-icon> {{ fu.outcome }}</p>
+                        }
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+
         </div>
+        <!-- /dm__body -->
+    </div>
+    <!-- /dm -->
+</div>
+<!-- /dm-backdrop -->
+}
 
-        @if (current.status === 'OPEN' || current.status === 'ACKNOWLEDGED' || current.status === 'IN_REVIEW' || current.status === 'IN_PROGRESS') {
-        <div class="detail-panel__resolve">
+<!-- ═══════════════════════════════════════════════════════════════
+     Modal: Reconocer alerta + Crear caso de seguimiento
+     ═══════════════════════════════════════════════════════════════ -->
+@if (showAcknowledgeModal && modalAlert) {
+<div class="ack-modal-backdrop">
+    <div class="ack-modal">
 
-            <!-- Reconocer: solo cuando está OPEN -->
-            @if (current.status === 'OPEN') {
-            <div class="detail-panel__acknowledge">
-                <h4>
-                    <mat-icon>done_all</mat-icon> Reconocer alerta</h4>
-                <p class="detail-panel__hint">Indica qué acción vas a tomar antes de reconocer la alerta.</p>
-                <textarea rows="2" class="resolve-textarea" [(ngModel)]="actionTaken" placeholder="Ej: Llamaré al empleado, Agendaré cita con psicólogo..."></textarea>
-                <div class="detail-panel__actions">
-                    <button class="btn btn--primary" [disabled]="saving" (click)="acknowledgeAlert(current, actionTaken)">
-                        <mat-icon>done</mat-icon> Reconocer alerta
-                    </button>
+        <!-- Header -->
+        <div class="ack-modal__header">
+            <div class="ack-modal__header-left">
+                <mat-icon class="ack-modal__header-icon">assignment_turned_in</mat-icon>
+                <div>
+                    <h2>Reconocer Alerta #{{ modalAlert.alertId }}</h2>
+                    <p>Se reconocerá la alerta y se creará automáticamente un caso de seguimiento clínico.</p>
                 </div>
             </div>
-            <div class="detail-panel__divider"></div>
-            }
+            <button class="btn btn--ghost btn--sm" (click)="closeAcknowledgeModal()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
 
-            <!-- Resolver -->
-            <h4>
-                <mat-icon>check_circle</mat-icon> Resolver alerta</h4>
-            <p class="detail-panel__hint">Describe el resultado final de la intervención.</p>
-            <textarea rows="3" class="resolve-textarea" [(ngModel)]="resolution" placeholder="Ej: El empleado fue atendido por el psicólogo y se encuentra estable..."></textarea>
-            <div class="detail-panel__actions">
-                <button class="btn btn--success" [disabled]="saving" (click)="resolveAlert()">
-                    <mat-icon>check_circle</mat-icon> Marcar como resuelta
-                </button>
+        <!-- Resumen de la alerta -->
+        <div class="ack-modal__alert-summary">
+            <span [class]="severityBadgeClass(modalAlert.alertLevel)">{{ severityLabel(modalAlert.alertLevel) }}</span>
+            <span class="ack-modal__alert-type">{{ modalAlert.alertType || '-' }}</span> @if (modalAlert.title) { <span class="ack-modal__alert-title">{{ modalAlert.title }}</span> } @if (modalAlert.userName) {
+            <span class="ack-modal__alert-user">
+                <mat-icon>person</mat-icon> {{ modalAlert.userName }}
+                @if (modalAlert.userDocumentNumber) { <span class="ack-modal__alert-doc">· {{ modalAlert.userDocumentNumber }}</span> }
+            </span>
+            }
+        </div>
+
+        <div class="ack-modal__divider"></div>
+
+        <!-- Formulario -->
+        <div class="ack-modal__body">
+            <div class="ack-modal__field">
+                <label class="ack-modal__label">Acción inmediata tomada <span class="ack-modal__optional">(opcional)</span></label>
+                <textarea class="ack-modal__textarea" rows="2" [(ngModel)]="modalForm.actionTaken" placeholder="Ej: Contactaré al empleado hoy, Agendaré cita con psicólogo..."></textarea>
+            </div>
+            <div class="ack-modal__field">
+                <label class="ack-modal__label">Psicólogo asignado <span class="ack-modal__required">*</span></label> @if (psychologistsLoading) {
+                <div class="ack-modal__loading">
+                    <mat-spinner diameter="20"></mat-spinner> <span>Cargando psicólogos...</span></div>
+                } @else {
+                <select class="ack-modal__select" [(ngModel)]="modalForm.assignedToUserID">
+                    <option [ngValue]="null">-- Seleccionar psicólogo --</option>
+                    @for (psy of psychologists; track psy.userId) {
+                    <option [ngValue]="psy.userId">{{ psy.fullName }}</option>
+                    }
+                </select> }
+            </div>
+            <div class="ack-modal__field">
+                <label class="ack-modal__label">Prioridad del caso</label>
+                <select class="ack-modal__select" [(ngModel)]="modalForm.priority">
+                    <option value="LOW">Baja</option>
+                    <option value="MEDIUM">Media</option>
+                    <option value="HIGH">Alta</option>
+                    <option value="CRITICAL">Crítica</option>
+                </select>
+            </div>
+            <div class="ack-modal__field">
+                <label class="ack-modal__label">Descripción del caso <span class="ack-modal__required">*</span></label>
+                <textarea class="ack-modal__textarea ack-modal__textarea--lg" rows="4" [(ngModel)]="modalForm.description" placeholder="Describe la situación, los síntomas observados y el plan de intervención inicial..."></textarea>
             </div>
         </div>
-        }
+
+        <!-- Footer -->
+        <div class="ack-modal__footer">
+            <button class="btn btn--outline" (click)="closeAcknowledgeModal()" [disabled]="saving">Cancelar</button>
+            <button class="btn btn--primary" (click)="confirmAcknowledgeAndCreateCase()" [disabled]="saving">
+                @if (saving) { <mat-spinner diameter="18" style="display:inline-flex"></mat-spinner> }
+                @else { <mat-icon>assignment_turned_in</mat-icon> }
+                Reconocer y crear caso
+            </button>
+        </div>
     </div>
-    }
-</section>
+</div>
+}

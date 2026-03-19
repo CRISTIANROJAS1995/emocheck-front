@@ -80,14 +80,6 @@ export class NavigationService {
                         classes: baseItemClasses,
                     },
                     {
-                        id: 'admin-cases',
-                        title: 'Casos',
-                        type: 'basic',
-                        icon: 'heroicons_outline:briefcase',
-                        link: '/admin/cases',
-                        classes: baseItemClasses,
-                    },
-                    {
                         id: 'admin-reports',
                         title: 'Reportes',
                         type: 'basic',
