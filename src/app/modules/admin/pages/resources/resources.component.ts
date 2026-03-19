@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -38,16 +38,49 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         return this.categories.find(c => c.resourceCategoryID === this.selectedCategoryId)?.name ?? null;
     }
 
+    get isMindfulnessCategory(): boolean {
+        const name = (this.selectedCategoryName ?? '').trim().toLowerCase();
+        return ['mindfulness', 'atención plena', 'atencion plena', 'meditación', 'meditacion'].includes(name);
+    }
+
+    get isActionPlanCategory(): boolean {
+        const name = (this.selectedCategoryName ?? '').trim().toLowerCase();
+        return ['plan de acción', 'plan de accion', 'plan acción', 'plan accion'].includes(name);
+    }
+
     featured: WellnessResourceDto[] = [];
     recommended: WellnessResourceDto[] = [];
     resources: WellnessResourceDto[] = [];
     professionals: ProfessionalSupportDto[] = [];
     emergencyContacts: ProfessionalSupportDto[] = [];
 
+    // ── Infografía slider — Mindfulness ───────────────────────────────────
+    readonly sliderImages = [
+        'images/infografia/1.png',
+        'images/infografia/2.png',
+        'images/infografia/3.png',
+        'images/infografia/4.png',
+        'images/infografia/5.png',
+    ];
+    readonly sliderVideoUrl = 'https://emocheck-storage.s3.us-east-2.amazonaws.com/recursos/videos/1773932340162-z32655.mp4';
+
+    // ── Infografía slider — Plan de acción ────────────────────────────────
+    readonly actionPlanSliderImages = [
+        'planaccion/ansiedad%201.jpeg',
+        'planaccion/ansiedad%202.jpeg',
+    ];
+    readonly actionPlanSliderVideoUrl = 'https://emocheck-storage.s3.us-east-2.amazonaws.com/recursos/videos/1773933707490-vtdlfy.mp4';
+    actionPlanSliderIndex = 0;
+    private _actionPlanSliderTimer: ReturnType<typeof setInterval> | null = null;
+
+    sliderIndex = 0;
+    private _sliderTimer: ReturnType<typeof setInterval> | null = null;
+
     constructor(
         private readonly resourcesApi: ResourcesService,
         private readonly route: ActivatedRoute,
-        private readonly router: Router
+        private readonly router: Router,
+        private readonly ngZone: NgZone
     ) { }
 
     ngOnInit(): void {
@@ -59,6 +92,8 @@ export class ResourcesComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscriptions.unsubscribe();
+        this._stopSlider();
+        this._stopActionPlanSlider();
     }
 
     loadInitial(): void {
@@ -113,6 +148,8 @@ export class ResourcesComponent implements OnInit, OnDestroy {
 
     selectCategory(categoryId: number | null): void {
         this.selectedCategoryId = categoryId != null ? Number(categoryId) : null;
+        this._stopSlider();
+        this._stopActionPlanSlider();
         this.loadResources();
     }
 
@@ -137,6 +174,16 @@ export class ResourcesComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (items) => {
                     this.resources = items;
+                    // Start slider automatically when Mindfulness category is loaded
+                    this._stopSlider();
+                    this._stopActionPlanSlider();
+                    if (this.isMindfulnessCategory) {
+                        this.sliderIndex = 0;
+                        this._startSlider();
+                    } else if (this.isActionPlanCategory) {
+                        this.actionPlanSliderIndex = 0;
+                        this._startActionPlanSlider();
+                    }
                 },
                 error: (e) => {
                     this.error = this.extractErrorMessage(e, 'No fue posible cargar el listado');
@@ -144,7 +191,7 @@ export class ResourcesComponent implements OnInit, OnDestroy {
             });
     }
 
-    openQuickAccess(item: 'emotional-calibration' | 'mindfulness' | 'neuropauses' | 'professional-support'): void {
+    openQuickAccess(item: 'emotional-calibration' | 'mindfulness' | 'neuropauses' | 'professional-support' | 'action-plan'): void {
         switch (item) {
             case 'emotional-calibration':
                 this.router.navigate(['/emotional-analysis']);
@@ -170,6 +217,15 @@ export class ResourcesComponent implements OnInit, OnDestroy {
                     'Pausas activas',
                     'Pausas Activas',
                     'Pausas Neurales',
+                ]);
+                return;
+            case 'action-plan':
+                this.selectCategoryByAnyName([
+                    'Plan de acción',
+                    'Plan de Accion',
+                    'Plan de accion',
+                    'Plan Acción',
+                    'Plan Accion',
                 ]);
                 return;
         }
@@ -219,8 +275,95 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         this.selectCategory(match?.resourceCategoryID ?? null);
     }
 
-    openResource(resource: { wellnessResourceID: number; contentUrl: string }): void {
-        const url = (resource?.contentUrl ?? '').trim();
+    // ── Slider helpers — Mindfulness ─────────────────────────────────────
+    sliderPrev(): void {
+        this.sliderIndex = (this.sliderIndex - 1 + this.sliderImages.length) % this.sliderImages.length;
+        this._resetSliderTimer();
+    }
+
+    sliderNext(): void {
+        this.sliderIndex = (this.sliderIndex + 1) % this.sliderImages.length;
+        this._resetSliderTimer();
+    }
+
+    sliderGoTo(index: number): void {
+        this.sliderIndex = index;
+        this._resetSliderTimer();
+    }
+
+    sliderClickImage(index: number): void {
+        if (index === this.sliderImages.length - 1) {
+            window.open(this.sliderVideoUrl, '_blank', 'noopener,noreferrer');
+        }
+    }
+
+    private _startSlider(): void {
+        this.ngZone.runOutsideAngular(() => {
+            this._sliderTimer = setInterval(() => {
+                this.ngZone.run(() => {
+                    this.sliderIndex = (this.sliderIndex + 1) % this.sliderImages.length;
+                });
+            }, 3000);
+        });
+    }
+
+    private _stopSlider(): void {
+        if (this._sliderTimer != null) {
+            clearInterval(this._sliderTimer);
+            this._sliderTimer = null;
+        }
+    }
+
+    private _resetSliderTimer(): void {
+        this._stopSlider();
+        this._startSlider();
+    }
+
+    // ── Slider helpers — Plan de acción ──────────────────────────────────
+    actionPlanSliderPrev(): void {
+        this.actionPlanSliderIndex = (this.actionPlanSliderIndex - 1 + this.actionPlanSliderImages.length) % this.actionPlanSliderImages.length;
+        this._resetActionPlanSliderTimer();
+    }
+
+    actionPlanSliderNext(): void {
+        this.actionPlanSliderIndex = (this.actionPlanSliderIndex + 1) % this.actionPlanSliderImages.length;
+        this._resetActionPlanSliderTimer();
+    }
+
+    actionPlanSliderGoTo(index: number): void {
+        this.actionPlanSliderIndex = index;
+        this._resetActionPlanSliderTimer();
+    }
+
+    actionPlanSliderClickImage(index: number): void {
+        if (index === this.actionPlanSliderImages.length - 1) {
+            window.open(this.actionPlanSliderVideoUrl, '_blank', 'noopener,noreferrer');
+        }
+    }
+
+    private _startActionPlanSlider(): void {
+        this.ngZone.runOutsideAngular(() => {
+            this._actionPlanSliderTimer = setInterval(() => {
+                this.ngZone.run(() => {
+                    this.actionPlanSliderIndex = (this.actionPlanSliderIndex + 1) % this.actionPlanSliderImages.length;
+                });
+            }, 3000);
+        });
+    }
+
+    private _stopActionPlanSlider(): void {
+        if (this._actionPlanSliderTimer != null) {
+            clearInterval(this._actionPlanSliderTimer);
+            this._actionPlanSliderTimer = null;
+        }
+    }
+
+    private _resetActionPlanSliderTimer(): void {
+        this._stopActionPlanSlider();
+        this._startActionPlanSlider();
+    }
+
+    openResource(resource: { wellnessResourceID: number; contentUrl: string }): void {        const url = (resource?.contentUrl ?? '').trim();
         if (url) {
             try {
                 window.open(url, '_blank', 'noopener,noreferrer');

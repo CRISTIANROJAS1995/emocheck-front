@@ -704,6 +704,17 @@ a.resources-hero__back mat-icon.resources-hero__back-icon {
     --qc-cta-color: rgba(21, 93, 252, 0.98);
 }
 
+.quick-card--orange {
+    --qc-glow-a: rgba(251, 146, 60, 0.24);
+    --qc-glow-b: rgba(239, 68, 68, 0.14);
+    --qc-icon-from: rgba(251, 146, 60, 0.75);
+    --qc-icon-to: rgba(239, 68, 68, 0.52);
+    --qc-icon-color: rgba(255, 255, 255, 0.98);
+    --qc-cta-border: rgba(251, 146, 60, 0.30);
+    --qc-cta-bg: rgba(251, 146, 60, 0.12);
+    --qc-cta-color: rgba(194, 65, 12, 0.95);
+}
+
 .resources-categories {
     display: flex;
     flex-wrap: wrap;
@@ -1027,5 +1038,155 @@ a.resources-hero__back mat-icon.resources-hero__back-icon {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+// ── Infografía Slider ────────────────────────────────────────────────────────
+.infografia-slider {
+    margin-top: 32px;
+    &__header {
+        margin-bottom: 16px;
+    }
+    &__subtitle--lg {
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    &__stage {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    &__track {
+        flex: 1;
+        overflow: hidden;
+        border-radius: 16px;
+        position: relative;
+        height: 600px;
+        background: rgba(0, 0, 0, 0.04);
+    }
+    &__slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.45s ease;
+        &.is-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        &.is-last {
+            cursor: pointer;
+        }
+    }
+    &__img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 14px;
+        display: block;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+    // Overlay play button on last slide
+    &__video-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.38);
+        border-radius: 14px;
+        transition: background 0.25s ease;
+        &:hover {
+            background: rgba(0, 0, 0, 0.52);
+        }
+    }
+    &__play-btn {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        transition: transform 0.2s ease;
+        mat-icon {
+            color: #00BBA7;
+            font-size: 36px;
+            width: 36px;
+            height: 36px;
+        }
+        .infografia-slider__slide:hover & {
+            transform: scale(1.1);
+        }
+    }
+    &__video-label {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+    // Arrow buttons
+    &__arrow {
+        flex-shrink: 0;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+        color: #374151;
+        mat-icon {
+            width: 24px;
+            height: 24px;
+            font-size: 24px;
+        }
+        &:hover {
+            background: #f3f4f6;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: scale(1.08);
+        }
+        &:active {
+            transform: scale(0.96);
+        }
+    }
+    // Dot indicators
+    &__dots {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+    }
+    &__dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(0, 187, 167, 0.25);
+        cursor: pointer;
+        padding: 0;
+        transition: background 0.25s ease, transform 0.2s ease;
+        &.is-active {
+            background: #00BBA7;
+            transform: scale(1.4);
+        }
+        &:hover:not(.is-active) {
+            background: rgba(0, 187, 167, 0.55);
+        }
     }
 }

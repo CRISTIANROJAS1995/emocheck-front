@@ -91,6 +91,17 @@
                         <div class="quick-card__desc">Solicita una cita o consulta opciones de contacto</div>
                         <span class="quick-card__cta">Solicitar</span>
                     </button>
+
+                    <button class="quick-card quick-card--orange" type="button" (click)="openQuickAccess('action-plan')">
+                        <div class="quick-card__head">
+                            <div class="quick-card__glyph">
+                                <mat-icon svgIcon="heroicons_outline:clipboard-document-list"></mat-icon>
+                            </div>
+                            <div class="quick-card__title">Plan de acción</div>
+                        </div>
+                        <div class="quick-card__desc">Estrategias personalizadas para tu bienestar</div>
+                        <span class="quick-card__cta">Explorar</span>
+                    </button>
                 </div>
             </section>
 
@@ -218,6 +229,81 @@
                                 <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
                             </div>
                             <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Infografía slider (solo en categoría Mindfulness) -->
+                    <div class="infografia-slider" *ngIf="isMindfulnessCategory">
+                        <div class="infografia-slider__header">
+                            <div class="resources-section__title">Antes de comenzar</div>
+                            <div class="resources-section__subtitle infografia-slider__subtitle--lg">Algunos consejos para "navegar" en el Mindfulness</div>
+                        </div>
+
+                        <div class="infografia-slider__stage">
+                            <!-- Botón anterior -->
+                            <button class="infografia-slider__arrow infografia-slider__arrow--prev" type="button" (click)="sliderPrev()" aria-label="Anterior">
+                                <mat-icon svgIcon="heroicons_outline:chevron-left"></mat-icon>
+                            </button>
+
+                            <!-- Track de imágenes -->
+                            <div class="infografia-slider__track">
+                                <div class="infografia-slider__slide" *ngFor="let img of sliderImages; let i = index" [class.is-active]="i === sliderIndex" [class.is-last]="i === sliderImages.length - 1" (click)="sliderClickImage(i)">
+                                    <img [src]="img" [alt]="'Infografía ' + (i + 1)" class="infografia-slider__img" />
+                                    <!-- Overlay en la última imagen -->
+                                    <div class="infografia-slider__video-overlay" *ngIf="i === sliderImages.length - 1">
+                                        <div class="infografia-slider__play-btn">
+                                            <mat-icon svgIcon="heroicons_solid:play"></mat-icon>
+                                        </div>
+                                        <span class="infografia-slider__video-label">Ver video</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón siguiente -->
+                            <button class="infografia-slider__arrow infografia-slider__arrow--next" type="button" (click)="sliderNext()" aria-label="Siguiente">
+                                <mat-icon svgIcon="heroicons_outline:chevron-right"></mat-icon>
+                            </button>
+                        </div>
+
+                        <!-- Dots -->
+                        <div class="infografia-slider__dots">
+                            <button class="infografia-slider__dot" *ngFor="let img of sliderImages; let i = index" [class.is-active]="i === sliderIndex" type="button" (click)="sliderGoTo(i)" [attr.aria-label]="'Ir a imagen ' + (i + 1)">
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Slider — Plan de acción -->
+                    <div class="infografia-slider" *ngIf="isActionPlanCategory">
+                        <div class="infografia-slider__header">
+                            <div class="resources-section__title">Antes de comenzar</div>
+                            <div class="resources-section__subtitle infografia-slider__subtitle--lg">Algunos consejos para gestionar tu ansiedad</div>
+                        </div>
+
+                        <div class="infografia-slider__stage">
+                            <button class="infografia-slider__arrow infografia-slider__arrow--prev" type="button" (click)="actionPlanSliderPrev()" aria-label="Anterior">
+                                <mat-icon svgIcon="heroicons_outline:chevron-left"></mat-icon>
+                            </button>
+
+                            <div class="infografia-slider__track">
+                                <div class="infografia-slider__slide" *ngFor="let img of actionPlanSliderImages; let i = index" [class.is-active]="i === actionPlanSliderIndex" [class.is-last]="i === actionPlanSliderImages.length - 1" (click)="actionPlanSliderClickImage(i)">
+                                    <img [src]="img" [alt]="'Plan de acción ' + (i + 1)" class="infografia-slider__img" />
+                                    <div class="infografia-slider__video-overlay" *ngIf="i === actionPlanSliderImages.length - 1">
+                                        <div class="infografia-slider__play-btn">
+                                            <mat-icon svgIcon="heroicons_solid:play"></mat-icon>
+                                        </div>
+                                        <span class="infografia-slider__video-label">Ver video</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="infografia-slider__arrow infografia-slider__arrow--next" type="button" (click)="actionPlanSliderNext()" aria-label="Siguiente">
+                                <mat-icon svgIcon="heroicons_outline:chevron-right"></mat-icon>
+                            </button>
+                        </div>
+
+                        <div class="infografia-slider__dots">
+                            <button class="infografia-slider__dot" *ngFor="let img of actionPlanSliderImages; let i = index" [class.is-active]="i === actionPlanSliderIndex" type="button" (click)="actionPlanSliderGoTo(i)" [attr.aria-label]="'Ir a imagen ' + (i + 1)">
+                            </button>
                         </div>
                     </div>
                 </section>
