@@ -113,9 +113,21 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         }
     }
 
+    /** Mensaje introductorio del banner superior, personalizado por instrumento. */
+    get introBannerText(): string {
+        const messages: Record<string, string> = {
+            DASS21:  'Identificar señales en nuestro estado de ánimo es un paso importante para comprender el bienestar general de nuestra salud mental.',
+            BDI:     'Reconocer aquello que puede estar influyendo en nuestro bienestar interno permite abrir la posibilidad de buscar estrategias de afrontamiento y apoyo en el entorno cercano.',
+            BAI:     'La forma en que el cuerpo siente lo que tu mente piensa, establece qué síntomas puedes estar viviendo en este momento.',
+            ICSP_VC: 'Reconocer si los hábitos relacionados con tu descanso están influyendo en la calidad de tu sueño es un paso importante para comprender mejor cómo tus rutinas diarias afectan tu descanso y qué acciones puedes implementar para dormir mejor.',
+            TMMS24:  'La inteligencia emocional te permite reconocer cómo percibes, comprendes y gestionas tus emociones en diferentes situaciones y con diferentes grupos de personas. Conocer estos aspectos es un paso importante para fortalecer tu bienestar personal, mejorar tus relaciones y el desarrollo de estrategias sociales que se presentan en los entornos sociales.',
+        };
+        const code = (this.instrumentCode ?? '').toUpperCase();
+        return messages[code] ?? 'Identificar señales en nuestro estado de ánimo es un paso importante para comprender el bienestar general de nuestra salud mental.';
+    }
+
     /** Page title: instrument-specific when filtered, otherwise the module results title. */
-    get pageTitle(): string {
-        if (!this.instrumentCode) return this.moduleDef?.resultsTitle ?? '';
+    get pageTitle(): string {        if (!this.instrumentCode) return this.moduleDef?.resultsTitle ?? '';
         const labels = this.moduleDef?.dimensionLabels ?? [];
         const match = labels.find(l => l.instrumentCode.toUpperCase() === this.instrumentCode);
         return match ? `Resultados: ${match.label}` : `Resultados: ${this.instrumentCode}`;

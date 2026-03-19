@@ -159,17 +159,6 @@ export class NavigationService {
                         link: '/admin/evaluations',
                         classes: baseItemClasses,
                     },
-                    {
-                        id: 'seguimiento-colaboradores',
-                        title: 'Seguimiento Colaboradores',
-                        type: 'basic',
-                        icon: 'heroicons_outline:chart-bar-square',
-                        link: '/team-tracking',
-                        classes: {
-                            ...baseItemClasses,
-                            wrapper: '!mb-3 nav-hover-green',
-                        },
-                    },
                 ],
             });
         } else {
@@ -203,20 +192,6 @@ export class NavigationService {
                     icon: 'emocheck:mi-plan',
                     link: '/home',
                     classes: baseItemClasses,
-                });
-            }
-
-            if (isSupportStaff) {
-                defaultItems.push({
-                    id: 'seguimiento-colaboradores',
-                    title: 'Seguimiento Colaboradores',
-                    type: 'basic',
-                    icon: 'heroicons_outline:chart-bar-square',
-                    link: '/team-tracking',
-                    classes: {
-                        ...baseItemClasses,
-                        wrapper: '!mb-3 nav-hover-green',
-                    },
                 });
             }
 

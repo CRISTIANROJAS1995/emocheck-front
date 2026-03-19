@@ -16,7 +16,7 @@ function hasAnyRole(userRoles: string[] | null | undefined, requiredRoles: strin
 
 function getFallbackUrl(roles: string[] | null | undefined): string {
     const r = roles ?? [];
-    if (r.some(x => normalizeRole(x) === 'psychologist')) return '/team-tracking';
+    if (r.some(x => normalizeRole(x) === 'psychologist')) return '/home';
     if (r.some(x => ['admin', 'companyadmin', 'systemadmin', 'superadmin'].includes(normalizeRole(x)))) return '/admin';
     return '/home';
 }
@@ -24,7 +24,7 @@ function getFallbackUrl(roles: string[] | null | undefined): string {
 /**
  * Guard de roles basado en `route.data.roles`.
  * - Si no hay token → /sign-in
- * - Si el usuario no tiene el rol → fallback según su rol (Psychologist→/team-tracking, Admin→/admin, resto→/home)
+ * - Si el usuario no tiene el rol → fallback según su rol (Psychologist→/home, Admin→/admin, resto→/home)
  * - Si ya tiene el usuario en memoria → verificación síncrona (sin HTTP)
  * - Si aún no cargó el usuario → espera a ensureCurrentUserLoaded()
  */

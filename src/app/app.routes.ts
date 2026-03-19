@@ -145,15 +145,6 @@ export const appRoutes: Route[] = [
                 loadChildren: () => import('app/modules/admin/pages/resources/resources.routes'),
             },
             {
-                path: 'team-tracking',
-                canActivate: [RoleGuard],
-                data: {
-                    roles: ['SuperAdmin', 'SystemAdmin', 'Psychologist', 'HSE', 'Admin', 'CompanyAdmin'],
-                    seo: { title: 'Seguimiento del Equipo', canonical: '/team-tracking' }
-                },
-                loadChildren: () => import('app/modules/admin/pages/team-tracking/team-tracking.routes'),
-            },
-            {
                 path: 'admin',
                 canActivate: [RoleGuard],
                 data: {

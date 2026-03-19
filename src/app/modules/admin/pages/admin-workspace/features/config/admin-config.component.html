@@ -15,20 +15,16 @@
 
     <!-- Tabs -->
     <div class="admin-tabs">
-        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'companies'"
-            (click)="switchTab('companies')">
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'companies'" (click)="switchTab('companies')">
             <mat-icon>business</mat-icon> Empresas
         </button>
-        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'sites'"
-            (click)="switchTab('sites')">
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'sites'" (click)="switchTab('sites')">
             <mat-icon>location_city</mat-icon> Sedes
         </button>
-        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'areas'"
-            (click)="switchTab('areas')">
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'areas'" (click)="switchTab('areas')">
             <mat-icon>account_tree</mat-icon> Áreas
         </button>
-        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'jobtypes'"
-            (click)="switchTab('jobtypes')">
+        <button class="admin-tabs__tab" [class.admin-tabs__tab--active]="activeTab === 'jobtypes'" (click)="switchTab('jobtypes')">
             <mat-icon>work</mat-icon> Cargos
         </button>
     </div>
@@ -40,21 +36,27 @@
     <!-- KPIs -->
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>business</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>business</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ companies.length }}</span>
                 <span class="kpi-card__label">Total Empresas</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ activeCompanies }}</span>
                 <span class="kpi-card__label">Activas</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--rose">
-            <div class="kpi-card__icon"><mat-icon>cancel</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>cancel</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ companies.length - activeCompanies }}</span>
                 <span class="kpi-card__label">Inactivas</span>
@@ -65,7 +67,8 @@
     <!-- Create Company -->
     @if (showForm) {
     <div class="editor-panel">
-        <h3><mat-icon>add_business</mat-icon> Nueva Empresa</h3>
+        <h3>
+            <mat-icon>add_business</mat-icon> Nueva Empresa</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Nombre *</span>
@@ -99,9 +102,38 @@
                 <span>Dirección</span>
                 <input [(ngModel)]="companyForm.address" placeholder="Dirección física" />
             </label>
+
+            <!-- Geo cascade: País → Departamento → Ciudad -->
+            <label class="editor-panel__field">
+                <span>País</span>
+                <select [(ngModel)]="selectedCountryId" (ngModelChange)="onCountryChange($event)">
+                    <option [ngValue]="null">-- Seleccionar país --</option>
+                    @for (c of countries; track c.countryID) {
+                    <option [ngValue]="c.countryID">{{ c.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Departamento</span>
+                <select [(ngModel)]="selectedStateId" (ngModelChange)="onStateChange($event)" [disabled]="!selectedCountryId || loadingStates">
+                    <option [ngValue]="null">{{ loadingStates ? 'Cargando...' : '-- Seleccionar departamento --' }}</option>
+                    @for (s of states; track s.stateID) {
+                    <option [ngValue]="s.stateID">{{ s.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Ciudad</span>
+                <select [(ngModel)]="companyForm.cityID" [disabled]="!selectedStateId || loadingCities">
+                    <option [ngValue]="undefined">{{ loadingCities ? 'Cargando...' : '-- Seleccionar ciudad --' }}</option>
+                    @for (c of cities; track c.cityID) {
+                    <option [ngValue]="c.cityID">{{ c.name }}</option>
+                    }
+                </select>
+            </label>
         </div>
         <div class="editor-panel__actions">
-            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
+            <button class="btn btn--ghost" (click)="showForm = false; selectedCountryId = null; selectedStateId = null; states = []; cities = [];">Cancelar</button>
             <button class="btn btn--primary" [disabled]="saving" (click)="createCompany()">
                 <mat-icon>save</mat-icon> Crear Empresa
             </button>
@@ -113,8 +145,7 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="companySearch" (ngModelChange)="applyFilter()"
-                placeholder="Buscar por nombre, razón social, industria..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="companySearch" (ngModelChange)="applyFilter()" placeholder="Buscar por nombre, razón social, industria..." class="admin-filters__search" />
         </div>
         <div style="display:flex;align-items:center;gap:8px">
             <span class="admin-filters__count">{{ filteredCompanies.length }} empresas</span>
@@ -126,10 +157,9 @@
     </div>
 
     @if (loading) {
-    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando empresas...</span></div>
-    }
-
-    @if (!loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner><span>Cargando empresas...</span></div>
+    } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
             <thead>
@@ -166,12 +196,10 @@
                         </span>
                     </td>
                     <td class="actions-cell">
-                        <button class="btn btn--outline btn--xs" (click)="startEditCompany(c); $event.stopPropagation()"
-                            title="Editar">
+                        <button class="btn btn--outline btn--xs" (click)="startEditCompany(c); $event.stopPropagation()" title="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button class="btn btn--outline btn--xs" (click)="toggleCompany(c); $event.stopPropagation()"
-                            [title]="c.isActive ? 'Desactivar' : 'Activar'">
+                        <button class="btn btn--outline btn--xs" (click)="toggleCompany(c); $event.stopPropagation()" [title]="c.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ c.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
                         </button>
                     </td>
@@ -190,7 +218,8 @@
     <!-- Edit Company -->
     @if (showEditForm && editCompanyId !== null) {
     <div class="editor-panel">
-        <h3><mat-icon>edit</mat-icon> Editar Empresa #{{ editCompanyId }}</h3>
+        <h3>
+            <mat-icon>edit</mat-icon> Editar Empresa #{{ editCompanyId }}</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Nombre *</span>
@@ -232,9 +261,7 @@
             </button>
         </div>
     </div>
-    }
-    }
-    }
+    } } }
 
     <!-- ═══════════════════════════════════════════════════════
          SITES TAB
@@ -242,14 +269,18 @@
     @if (activeTab === 'sites') {
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>location_city</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>location_city</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ sites.length }}</span>
                 <span class="kpi-card__label">Total Sedes</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ activeSites }}</span>
                 <span class="kpi-card__label">Activas</span>
@@ -259,7 +290,8 @@
 
     @if (showForm) {
     <div class="editor-panel">
-        <h3><mat-icon>add_location</mat-icon> Nueva Sede</h3>
+        <h3>
+            <mat-icon>add_location</mat-icon> Nueva Sede</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Empresa *</span>
@@ -290,9 +322,38 @@
                 <span>Dirección</span>
                 <input [(ngModel)]="siteForm.address" placeholder="Dirección de la sede" />
             </label>
+
+            <!-- Geo cascade: País → Departamento → Ciudad -->
+            <label class="editor-panel__field">
+                <span>País</span>
+                <select [(ngModel)]="siteSelectedCountryId" (ngModelChange)="onSiteCountryChange($event)">
+                    <option [ngValue]="null">-- Seleccionar país --</option>
+                    @for (c of countries; track c.countryID) {
+                    <option [ngValue]="c.countryID">{{ c.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Departamento</span>
+                <select [(ngModel)]="siteSelectedStateId" (ngModelChange)="onSiteStateChange($event)" [disabled]="!siteSelectedCountryId || loadingSiteStates">
+                    <option [ngValue]="null">{{ loadingSiteStates ? 'Cargando...' : '-- Seleccionar departamento --' }}</option>
+                    @for (s of siteStates; track s.stateID) {
+                    <option [ngValue]="s.stateID">{{ s.name }}</option>
+                    }
+                </select>
+            </label>
+            <label class="editor-panel__field">
+                <span>Ciudad</span>
+                <select [(ngModel)]="siteForm.cityID" [disabled]="!siteSelectedStateId || loadingSiteCities">
+                    <option [ngValue]="undefined">{{ loadingSiteCities ? 'Cargando...' : '-- Seleccionar ciudad --' }}</option>
+                    @for (c of siteCities; track c.cityID) {
+                    <option [ngValue]="c.cityID">{{ c.name }}</option>
+                    }
+                </select>
+            </label>
         </div>
         <div class="editor-panel__actions">
-            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
+            <button class="btn btn--ghost" (click)="showForm = false; siteSelectedCountryId = null; siteSelectedStateId = null; siteStates = []; siteCities = [];">Cancelar</button>
             <button class="btn btn--primary" [disabled]="saving" (click)="createSite()">
                 <mat-icon>save</mat-icon> Crear Sede
             </button>
@@ -303,8 +364,7 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="siteSearch" (ngModelChange)="applyFilter()"
-                placeholder="Buscar por nombre, código, empresa..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="siteSearch" (ngModelChange)="applyFilter()" placeholder="Buscar por nombre, código, empresa..." class="admin-filters__search" />
             <select [(ngModel)]="siteCompanyFilter" (ngModelChange)="loadTab()">
                 <option [value]="0">Todas las empresas</option>
                 @for (comp of companies; track comp.companyID) {
@@ -322,10 +382,9 @@
     </div>
 
     @if (loading) {
-    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando sedes...</span></div>
-    }
-
-    @if (!loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner><span>Cargando sedes...</span></div>
+    } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
             <thead>
@@ -360,12 +419,10 @@
                         </span>
                     </td>
                     <td class="actions-cell">
-                        <button class="btn btn--outline btn--xs" (click)="startEditSite(s); $event.stopPropagation()"
-                            title="Editar">
+                        <button class="btn btn--outline btn--xs" (click)="startEditSite(s); $event.stopPropagation()" title="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button class="btn btn--outline btn--xs" (click)="toggleSite(s); $event.stopPropagation()"
-                            [title]="s.isActive ? 'Desactivar' : 'Activar'">
+                        <button class="btn btn--outline btn--xs" (click)="toggleSite(s); $event.stopPropagation()" [title]="s.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ s.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
                         </button>
                     </td>
@@ -384,7 +441,8 @@
     <!-- Edit Site -->
     @if (showEditForm && editSiteId !== null) {
     <div class="editor-panel">
-        <h3><mat-icon>edit</mat-icon> Editar Sede #{{ editSiteId }}</h3>
+        <h3>
+            <mat-icon>edit</mat-icon> Editar Sede #{{ editSiteId }}</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Empresa *</span>
@@ -422,9 +480,7 @@
             </button>
         </div>
     </div>
-    }
-    }
-    }
+    } } }
 
     <!-- ═══════════════════════════════════════════════════════
          AREAS TAB
@@ -432,14 +488,18 @@
     @if (activeTab === 'areas') {
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>account_tree</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>account_tree</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ areas.length }}</span>
                 <span class="kpi-card__label">Total Áreas</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ activeAreas }}</span>
                 <span class="kpi-card__label">Activas</span>
@@ -449,7 +509,8 @@
 
     @if (showForm) {
     <div class="editor-panel">
-        <h3><mat-icon>add</mat-icon> Nueva Área</h3>
+        <h3>
+            <mat-icon>add</mat-icon> Nueva Área</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Empresa *</span>
@@ -493,8 +554,7 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="areaSearch" (ngModelChange)="applyFilter()"
-                placeholder="Buscar por nombre, código, empresa..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="areaSearch" (ngModelChange)="applyFilter()" placeholder="Buscar por nombre, código, empresa..." class="admin-filters__search" />
             <select [(ngModel)]="areaCompanyFilter" (ngModelChange)="loadTab()">
                 <option [value]="0">Todas las empresas</option>
                 @for (comp of companies; track comp.companyID) {
@@ -512,10 +572,9 @@
     </div>
 
     @if (loading) {
-    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando áreas...</span></div>
-    }
-
-    @if (!loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner><span>Cargando áreas...</span></div>
+    } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
             <thead>
@@ -555,12 +614,10 @@
                         </span>
                     </td>
                     <td class="actions-cell">
-                        <button class="btn btn--outline btn--xs" (click)="startEditArea(a); $event.stopPropagation()"
-                            title="Editar">
+                        <button class="btn btn--outline btn--xs" (click)="startEditArea(a); $event.stopPropagation()" title="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button class="btn btn--outline btn--xs" (click)="toggleArea(a); $event.stopPropagation()"
-                            [title]="a.isActive ? 'Desactivar' : 'Activar'">
+                        <button class="btn btn--outline btn--xs" (click)="toggleArea(a); $event.stopPropagation()" [title]="a.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ a.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
                         </button>
                     </td>
@@ -579,7 +636,8 @@
     <!-- Edit Area -->
     @if (showEditForm && editAreaId !== null) {
     <div class="editor-panel">
-        <h3><mat-icon>edit</mat-icon> Editar Área #{{ editAreaId }}</h3>
+        <h3>
+            <mat-icon>edit</mat-icon> Editar Área #{{ editAreaId }}</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Empresa *</span>
@@ -617,9 +675,7 @@
             </button>
         </div>
     </div>
-    }
-    }
-    }
+    } } }
 
     <!-- ═══════════════════════════════════════════════════════
          JOB TYPES TAB
@@ -627,14 +683,18 @@
     @if (activeTab === 'jobtypes') {
     <div class="kpi-row">
         <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon"><mat-icon>work</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>work</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ jobTypes.length }}</span>
                 <span class="kpi-card__label">Total Cargos</span>
             </div>
         </div>
         <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon"><mat-icon>check_circle</mat-icon></div>
+            <div class="kpi-card__icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
             <div class="kpi-card__body">
                 <span class="kpi-card__value">{{ activeJobTypes }}</span>
                 <span class="kpi-card__label">Activos</span>
@@ -644,7 +704,8 @@
 
     @if (showForm) {
     <div class="editor-panel">
-        <h3><mat-icon>work</mat-icon> Nuevo Tipo de Cargo</h3>
+        <h3>
+            <mat-icon>work</mat-icon> Nuevo Tipo de Cargo</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Nombre *</span>
@@ -672,8 +733,7 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="jobTypeSearch" (ngModelChange)="applyFilter()"
-                placeholder="Buscar por nombre, descripción, nivel..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="jobTypeSearch" (ngModelChange)="applyFilter()" placeholder="Buscar por nombre, descripción, nivel..." class="admin-filters__search" />
         </div>
         <div style="display:flex;align-items:center;gap:8px">
             <span class="admin-filters__count">{{ filteredJobTypes.length }} cargos</span>
@@ -685,10 +745,9 @@
     </div>
 
     @if (loading) {
-    <div class="loading-state"><mat-spinner diameter="40"></mat-spinner><span>Cargando cargos...</span></div>
-    }
-
-    @if (!loading) {
+    <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner><span>Cargando cargos...</span></div>
+    } @if (!loading) {
     <div class="admin-table-wrapper">
         <table class="admin-table">
             <thead>
@@ -716,12 +775,10 @@
                         </span>
                     </td>
                     <td class="actions-cell">
-                        <button class="btn btn--outline btn--xs" (click)="startEditJobType(j); $event.stopPropagation()"
-                            title="Editar">
+                        <button class="btn btn--outline btn--xs" (click)="startEditJobType(j); $event.stopPropagation()" title="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button class="btn btn--outline btn--xs" (click)="toggleJobType(j); $event.stopPropagation()"
-                            [title]="j.isActive ? 'Desactivar' : 'Activar'">
+                        <button class="btn btn--outline btn--xs" (click)="toggleJobType(j); $event.stopPropagation()" [title]="j.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ j.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
                         </button>
                     </td>
@@ -740,7 +797,8 @@
     <!-- Edit JobType -->
     @if (showEditForm && editJobTypeId !== null) {
     <div class="editor-panel">
-        <h3><mat-icon>edit</mat-icon> Editar Cargo #{{ editJobTypeId }}</h3>
+        <h3>
+            <mat-icon>edit</mat-icon> Editar Cargo #{{ editJobTypeId }}</h3>
         <div class="editor-panel__grid">
             <label class="editor-panel__field">
                 <span>Nombre *</span>
@@ -762,7 +820,5 @@
             </button>
         </div>
     </div>
-    }
-    }
-    }
+    } } }
 </section>

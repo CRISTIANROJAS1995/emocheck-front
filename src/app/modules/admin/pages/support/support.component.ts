@@ -29,8 +29,8 @@ export class SupportComponent implements OnInit {
 
     // ── WhatsApp ──────────────────────────────────────────────────────────────
     /** Número en formato internacional sin + ni espacios, ej: 573001234567 */
-    readonly whatsappNumber = '573175930202';
-    readonly whatsappDisplay = '+57 317 593 0202';
+    readonly whatsappNumber = '573122503928';
+    readonly whatsappDisplay = '+57 312 250 3928';
 
     get whatsappUrl(): string {
         const text = encodeURIComponent(
@@ -61,14 +61,18 @@ export class SupportComponent implements OnInit {
             });
     }
 
+    showNoPsychologistModal = false;
+
     call123(): void {
         try { window.open('tel:123', '_self'); } catch { /* ignore */ }
     }
 
     openCalendly(): void {
-        (window as any).Calendly?.initPopupWidget({
-            url: 'https://calendly.com/cristianjoseroj0410/30min',
-        });
+        this.showNoPsychologistModal = true;
+    }
+
+    closeNoPsychologistModal(): void {
+        this.showNoPsychologistModal = false;
     }
 
     createEmergencyRequest(): void {

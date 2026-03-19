@@ -196,57 +196,6 @@
             </div>
         </section>
 
-        <!-- Results by module -->
-        <section class="tracking-results">
-            <div class="tracking-section-title">Mis Resultados por Módulo</div>
-            <div class="tracking-section-subtitle">Tus puntajes actuales en cada evaluación</div>
-
-            <div class="tracking-results__grid">
-                @for (card of moduleResults; track card.id) {
-                <div class="result-card" [ngClass]="'result-card--' + card.id" [class.result-card--disabled]="!card.isCompleted" [class.result-card--good]="card.isCompleted && card.toneClass === 'good'" [class.result-card--warn]="card.isCompleted && card.toneClass === 'warn'"
-                    [class.result-card--bad]="card.isCompleted && card.toneClass === 'bad'" (click)="openModuleResults(card.id)">
-                    <div class="result-card__head">
-                        <div class="result-card__icon">
-                            <img class="result-card__icon-img" [src]="moduleIcon(card.id)" alt="" aria-hidden="true" />
-                        </div>
-                        <div>
-                            <div class="result-card__title">{{ card.title }}</div>
-                            <div class="result-card__meta">
-                                @if (card.isCompleted) { {{ card.completedAt }} } @else { No completado }
-                            </div>
-                        </div>
-                        @if (card.isCompleted) {
-                        <div class="result-card__actions">
-                            @if (card.toneClass !== 'disabled') {
-                            <div class="result-card__status-pill" [ngClass]="'result-card__status-pill--' + card.toneClass">
-                                <img class="result-card__status-pill-icon" [src]="riskPillIcon(card.toneClass)" alt="" aria-hidden="true" />
-                            </div>
-                            }
-                            <div class="result-card__eye">
-                                <mat-icon svgIcon="heroicons_outline:eye"></mat-icon>
-                            </div>
-                        </div>
-                        }
-                    </div>
-
-                    @if (card.isCompleted) {
-                    <div class="result-card__body">
-                        <div class="result-card__row">
-                            <span>Tu puntaje:</span>
-                            <span class="result-card__pct">{{ card.scorePercent }}%</span>
-                        </div>
-                        <div class="result-card__bar">
-                            <div class="result-card__bar-fill" [style.width.%]="card.scorePercent"></div>
-                        </div>
-                        <div class="result-card__footer">{{ card.riskLabel || card.riskLevel }}</div>
-                    </div>
-                    } @else {
-                    <div class="result-card__hint">Completa esta evaluación para ver tus resultados</div>
-                    }
-                </div>
-                }
-            </div>
-        </section>
 
         <!-- Evolution + radar comparison -->
         <section class="tracking-charts">

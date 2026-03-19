@@ -31,8 +31,8 @@ export class SignedInRedirectComponent implements OnInit {
                     // Admin roles go straight to admin panel.
                     if (isSystemAdmin || isAdmin) return of('/admin');
 
-                    // Psychologist goes straight to team-tracking.
-                    if (isPsychologist) return of('/team-tracking');
+                    // Psychologist goes straight to home.
+                    if (isPsychologist) return of('/home');
 
                     // Everyone else: Consent -> (Employee => Instructions) else Home.
                     // Profile is completed by admin during user creation, no need to check here.

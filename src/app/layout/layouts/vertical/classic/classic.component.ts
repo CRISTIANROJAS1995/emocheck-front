@@ -38,7 +38,7 @@ export class ClassicLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
     /** Ruta a la que lleva el logo del header según el rol */
     get homeLink(): string {
         const roles = this._authService.getCurrentUser()?.roles ?? [];
-        if (roles.includes('Psychologist')) return '/team-tracking';
+        if (roles.includes('Psychologist')) return '/home';
         if (roles.includes('Admin') || roles.includes('CompanyAdmin') ||
             roles.includes('SystemAdmin') || roles.includes('SuperAdmin')) return '/admin';
         return '/home';

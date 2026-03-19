@@ -43,6 +43,7 @@ export class AdminPanelComponent implements OnInit {
     showCreateForm = false;
     showEditForm = false;
     showBulkUpload = false;
+    showCreatePassword = false;
     searchText = '';
 
     users: AdminUserListItemDto[] = [];
@@ -263,6 +264,7 @@ export class AdminPanelComponent implements OnInit {
                     this.alert.success('Usuario creado exitosamente');
                     this.createForm.reset({ roleIDs: [6] });
                     this.showCreateForm = false;
+                    this.showCreatePassword = false;
                     this.loadUsers();
                 },
                 error: (e) => this.alert.error(this.extractErrorMessage(e, 'No fue posible crear el usuario')),
@@ -288,6 +290,7 @@ export class AdminPanelComponent implements OnInit {
         this.editingUser = user;
         this.showEditForm = true;
         this.showCreateForm = false;
+        this.showCreatePassword = false;
         // Split fullName into firstName / lastName for the API
         const nameParts = (user.fullName ?? '').trim().split(/\s+/);
         const firstName = nameParts[0] ?? '';

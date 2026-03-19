@@ -13,6 +13,7 @@ import {
     AreaDto, CreateAreaDto,
     JobTypeDto, CreateJobTypeDto,
 } from '../../../../../../core/services/admin-organization.service';
+import { AdminCatalogService, CountryDto, StateDto, CityDto } from '../../../../../../core/services/admin-catalog.service';
 
 type OrgTab = 'companies' | 'sites' | 'areas' | 'jobtypes';
 
@@ -38,6 +39,15 @@ export class AdminConfigComponent implements OnInit {
     editCompanyId: number | null = null;
     editCompanyForm: CreateCompanyDto = this.emptyCompany();
 
+    // ── Geo cascade (create company) ──
+    countries: CountryDto[] = [];
+    states: StateDto[] = [];
+    cities: CityDto[] = [];
+    selectedCountryId: number | null = null;
+    selectedStateId: number | null = null;
+    loadingStates = false;
+    loadingCities = false;
+
     // ── Sites ──
     sites: SiteDto[] = [];
     filteredSites: SiteDto[] = [];
@@ -46,6 +56,14 @@ export class AdminConfigComponent implements OnInit {
     siteForm: CreateSiteDto = this.emptySite();
     editSiteId: number | null = null;
     editSiteForm: CreateSiteDto = this.emptySite();
+
+    // ── Geo cascade (create site) ──
+    siteStates: StateDto[] = [];
+    siteCities: CityDto[] = [];
+    siteSelectedCountryId: number | null = null;
+    siteSelectedStateId: number | null = null;
+    loadingSiteStates = false;
+    loadingSiteCities = false;
 
     // ── Areas ──
     areas: AreaDto[] = [];
@@ -66,11 +84,13 @@ export class AdminConfigComponent implements OnInit {
 
     constructor(
         private readonly orgService: AdminOrganizationService,
+        private readonly catalogService: AdminCatalogService,
         private readonly alert: AlertService,
     ) { }
 
     ngOnInit(): void {
         this.loadTab();
+        this.catalogService.getActiveCountries().subscribe(c => this.countries = c);
     }
 
     switchTab(tab: OrgTab): void {
@@ -175,14 +195,63 @@ export class AdminConfigComponent implements OnInit {
     get activeJobTypes(): number { return this.jobTypes.filter(j => j.isActive).length; }
 
     // ── Create ──
+    onCountryChange(countryId: number | null): void {
+        this.states = [];
+        this.cities = [];
+        this.selectedStateId = null;
+        this.companyForm.cityID = undefined;
+        if (!countryId) return;
+        this.loadingStates = true;
+        this.catalogService.getStatesByCountry(countryId)
+            .subscribe({ next: s => { this.states = s; this.loadingStates = false; }, error: () => { this.loadingStates = false; } });
+    }
+
+    onStateChange(stateId: number | null): void {
+        this.cities = [];
+        this.companyForm.cityID = undefined;
+        if (!stateId) return;
+        this.loadingCities = true;
+        this.catalogService.getCitiesByState(stateId)
+            .subscribe({ next: c => { this.cities = c; this.loadingCities = false; }, error: () => { this.loadingCities = false; } });
+    }
+
     async createCompany(): Promise<void> {
         if (!this.companyForm.name?.trim()) { this.alert.error('El nombre es requerido'); return; }
         this.saving = true;
         this.orgService.createCompany(this.companyForm).subscribe({
-            next: () => { this.alert.success('Empresa creada exitosamente'); this.companyForm = this.emptyCompany(); this.showForm = false; this.loadTab(); },
+            next: () => {
+                this.alert.success('Empresa creada exitosamente');
+                this.companyForm = this.emptyCompany();
+                this.selectedCountryId = null;
+                this.selectedStateId = null;
+                this.states = [];
+                this.cities = [];
+                this.showForm = false;
+                this.loadTab();
+            },
             error: () => { this.alert.error('Error al crear empresa'); this.saving = false; },
             complete: () => this.saving = false,
         });
+    }
+
+    onSiteCountryChange(countryId: number | null): void {
+        this.siteStates = [];
+        this.siteCities = [];
+        this.siteSelectedStateId = null;
+        this.siteForm.cityID = undefined;
+        if (!countryId) return;
+        this.loadingSiteStates = true;
+        this.catalogService.getStatesByCountry(countryId)
+            .subscribe({ next: s => { this.siteStates = s; this.loadingSiteStates = false; }, error: () => { this.loadingSiteStates = false; } });
+    }
+
+    onSiteStateChange(stateId: number | null): void {
+        this.siteCities = [];
+        this.siteForm.cityID = undefined;
+        if (!stateId) return;
+        this.loadingSiteCities = true;
+        this.catalogService.getCitiesByState(stateId)
+            .subscribe({ next: c => { this.siteCities = c; this.loadingSiteCities = false; }, error: () => { this.loadingSiteCities = false; } });
     }
 
     async createSite(): Promise<void> {
@@ -190,7 +259,16 @@ export class AdminConfigComponent implements OnInit {
         if (!this.siteForm.companyID) { this.alert.error('La empresa es requerida'); return; }
         this.saving = true;
         this.orgService.createSite(this.siteForm).subscribe({
-            next: () => { this.alert.success('Sede creada exitosamente'); this.siteForm = this.emptySite(); this.showForm = false; this.loadTab(); },
+            next: () => {
+                this.alert.success('Sede creada exitosamente');
+                this.siteForm = this.emptySite();
+                this.siteSelectedCountryId = null;
+                this.siteSelectedStateId = null;
+                this.siteStates = [];
+                this.siteCities = [];
+                this.showForm = false;
+                this.loadTab();
+            },
             error: () => { this.alert.error('Error al crear sede'); this.saving = false; },
             complete: () => this.saving = false,
         });
