@@ -2,6 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize, switchMap } from 'rxjs';
+
+import { AssessmentService, RichAnswer } from 'app/core/services/assessment.service';
+import { AssessmentStateService } from 'app/core/services/assessment-state.service';
+import { AlertService } from 'app/core/swal/sweet-alert.service';
+import { AssessmentQuestion } from 'app/core/models/assessment.model';
 
 interface EmotionalIntelligenceQuestion {
   id: string;
@@ -48,7 +54,7 @@ interface EmotionalIntelligenceQuestion {
         <div class="questionnaire-main">
 
           <!-- Question Card -->
-          <div class="question-card" *ngIf="currentQuestion() && !isCompleted()">
+          <div class="question-card" *ngIf="currentQuestion() && !isSubmitting()">
             <p class="question-title">{{ currentQuestion()!.text }}</p>
             <p class="question-help">Selecciona la opción que mejor describe tu situación</p>
 
@@ -75,23 +81,17 @@ interface EmotionalIntelligenceQuestion {
             </div>
           </div>
 
-          <!-- Completion Card -->
-          <div class="question-card" *ngIf="isCompleted()">
+          <!-- Submitting Card -->
+          <div class="question-card" *ngIf="isSubmitting()">
             <div style="text-align:center; padding: 48px 0;">
-              <div style="font-size:64px; margin-bottom:16px;">🧠</div>
-              <h2 style="font-family:'Montserrat',sans-serif; font-size:22px; font-weight:700; color:#1E2939; margin:0 0 16px;">¡Has finalizado!</h2>
-              <p style="font-family:'Montserrat',sans-serif; font-size:15px; color:#6A7282; line-height:1.6; margin:0 0 32px;">
-                Identificar lo que sentimos, comprender por qué ocurre y responder de manera más consciente y equilibrada ante distintas situaciones refuerza nuestra inteligencia emocional.
-              </p>
-              <button class="continue-btn" (click)="showResults()">
-                Ver mis resultados
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
-              </button>
+              <div style="font-size:48px; margin-bottom:16px;">⏳</div>
+              <h2 style="font-family:'Montserrat',sans-serif; font-size:20px; font-weight:700; color:#1E2939; margin:0 0 12px;">Guardando tus respuestas...</h2>
+              <p style="font-family:'Montserrat',sans-serif; font-size:14px; color:#6A7282; line-height:1.6; margin:0;">Un momento, estamos registrando tu evaluación.</p>
             </div>
           </div>
 
           <!-- Reminder -->
-          <div class="reminder" *ngIf="!isCompleted()">
+          <div class="reminder" *ngIf="!isSubmitting()">
             <span class="reminder-title">Recuerda:</span>
             <span class="reminder-text"> No hay respuestas correctas o incorrectas. Sé honesto/a contigo mismo/a para obtener los mejores resultados.</span>
           </div>
@@ -107,6 +107,10 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
   form: FormGroup;
   currentQuestionIndex = signal(0);
   isCompleted = signal(false);
+  isSubmitting = signal(false);
+
+  private backendQuestions: AssessmentQuestion[] = [];
+  private tmmsInstrumentId: number | undefined;
   
   readonly likertOptions = [
     { value: 1, label: 'Nada de acuerdo' },
@@ -150,7 +154,10 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private assessmentService: AssessmentService,
+    private assessmentState: AssessmentStateService,
+    private alert: AlertService
   ) {
     this.form = this.fb.group({});
     this.initializeForm();
@@ -158,6 +165,18 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
 
   ngOnInit() {
     this.updateProgress();
+    // Cargar preguntas del backend para obtener los questionIds reales
+    this.assessmentService.getModuleInstruments('mental-health').pipe(
+      switchMap((instruments) => {
+        const tmms = instruments.find(i => i.code === 'TMMS24');
+        if (!tmms) throw new Error('Instrumento TMMS24 no encontrado');
+        this.tmmsInstrumentId = tmms.instrumentId;
+        return this.assessmentService.getInstrumentQuestions('mental-health', tmms.index);
+      })
+    ).subscribe({
+      next: (questions) => { this.backendQuestions = questions; },
+      error: () => { /* Se maneja en submit */ }
+    });
   }
 
   private initializeForm() {
@@ -222,8 +241,56 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
   }
 
   private complete() {
-    this.isCompleted.set(true);
-    console.log('Cuestionario de Inteligencia Emocional completado:', this.form.value);
+    if (this.backendQuestions.length === 0) {
+      this.alert.error('No se pudieron cargar las preguntas del servidor. Por favor, recarga la página e inténtalo de nuevo.');
+      return;
+    }
+
+    this.isSubmitting.set(true);
+
+    // TMMS-24: 24 preguntas LIKERT 1-5 en orden q1..q24
+    // submitRichResponses espera value como índice 0-based, pero el form guarda 1-5
+    const richAnswers: RichAnswer[] = this.questions.map((q, idx) => {
+      const rawValue = this.form.get(q.id)?.value ?? 1;
+      const backendQ = this.backendQuestions[idx];
+      return {
+        questionId: backendQ?.id ?? idx + 1,
+        value: Math.max(0, Number(rawValue) - 1), // convertir 1-5 → índice 0-4
+        text: null,
+      };
+    });
+
+    this.assessmentService.submitRich('mental-health', richAnswers, 'TMMS24', this.tmmsInstrumentId).pipe(
+      finalize(() => this.isSubmitting.set(false))
+    ).subscribe({
+      next: (result) => {
+        this.assessmentState.mergeResult(result);
+        this.router.navigate(['/mental-health/instrument-results']);
+      },
+      error: (err) => {
+        if (err?.code === 'CONSENT_REQUIRED') {
+          this.alert.confirm(
+            'Debes aceptar el consentimiento informado para continuar.',
+            'Consentimiento requerido',
+            'Ir a consentimiento',
+            'Cancelar',
+          ).then((go) => {
+            if (go) this.router.navigate(['/informed-consent']);
+          });
+          return;
+        }
+        if (err?.code === 'ALREADY_COMPLETED') {
+          this.alert.info(
+            'Este cuestionario ya fue completado anteriormente.',
+            'Ya completado',
+          );
+          this.router.navigate(['/mental-health/instrument-results']);
+          return;
+        }
+        const msg = err?.error?.detail || err?.error?.title || err?.message || 'Error al guardar las respuestas. Por favor, inténtalo de nuevo.';
+        this.alert.error(msg);
+      }
+    });
   }
 
   private calculateScores() {
@@ -287,9 +354,6 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
   }
 
   showResults() {
-    // Navigate to specialized results with emotional intelligence context
-    this.router.navigate(['/mental-health/specialized-results'], {
-      queryParams: { instrument: 'emotional-intelligence' }
-    });
+    this.router.navigate(['/mental-health/instrument-results']);
   }
 }

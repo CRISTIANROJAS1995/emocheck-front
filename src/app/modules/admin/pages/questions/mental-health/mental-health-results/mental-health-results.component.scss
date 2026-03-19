@@ -1,8 +1,468 @@
-// Mental Health Results Styles
-.mh-results {
+// ── Specialized Results Page ─────────────────────────────────────────────────
+.spr-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 2rem 1rem;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 50%, #F0FDFA 100%);
+    font-family: 'Montserrat', Inter, system-ui, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
+.spr-header {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    background: rgba(255, 255, 255, 0.85);
+    border-bottom: 0.667px solid #E5E7EB;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+}
+
+.spr-header__inner {
+    max-width: 740px;
+    margin: 0 auto;
+    height: 64px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.spr-back-btn {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    color: rgba(15, 23, 42, 0.65);
+    cursor: pointer;
+    flex-shrink: 0;
+    svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+    }
+    &:hover {
+        background: rgba(15, 23, 42, 0.06);
+        color: rgba(15, 23, 42, 0.9);
+    }
+}
+
+.spr-header__title {
+    font-size: 15px;
+    font-weight: 400;
+    color: #1E2939;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1 1 0;
+}
+
+// ── Shell ────────────────────────────────────────────────────────────────────
+.spr-shell {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// ── Summary card ─────────────────────────────────────────────────────────────
+.spr-summary {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 32px 32px 28px;
+    border-radius: 20px;
+    border: 2px solid #BFDBFE;
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 60%, #EFF6FF 100%);
+    box-shadow: 0 16px 32px rgba(37, 99, 235, 0.10);
+    &--low {
+        border-color: #B9F8CF;
+        background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 60%, #F0FDF4 100%);
+        box-shadow: 0 16px 32px rgba(0, 201, 80, 0.08);
+    }
+    &--moderate {
+        border-color: #FDE68A;
+        background: linear-gradient(135deg, #FFFBEB 0%, #FEF9C3 60%, #FFFBEB 100%);
+        box-shadow: 0 16px 32px rgba(240, 177, 0, 0.10);
+    }
+    &--high {
+        border-color: rgba(201, 31, 37, 0.22);
+        background: linear-gradient(135deg, #FEF2F2 0%, #FFF1F2 60%, #FEF2F2 100%);
+        box-shadow: 0 16px 32px rgba(201, 31, 37, 0.08);
+    }
+}
+
+.spr-summary__icon-wrap {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    svg {
+        width: 34px;
+        height: 34px;
+    }
+    &--low {
+        background: rgba(0, 201, 80, 0.12);
+        color: #16a34a;
+    }
+    &--moderate {
+        background: rgba(240, 177, 0, 0.12);
+        color: #a16207;
+    }
+    &--high {
+        background: rgba(201, 31, 37, 0.10);
+        color: #C91F25;
+    }
+}
+
+.spr-summary__body {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.spr-summary__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1E2939;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+
+.spr-summary__desc {
+    font-size: 14px;
+    font-weight: 400;
+    color: #364153;
+    line-height: 1.6;
+    margin: 0 0 14px;
+}
+
+// ── Badges ───────────────────────────────────────────────────────────────────
+.spr-summary__badge,
+.spr-badge--low,
+.spr-badge--moderate,
+.spr-badge--high {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+.spr-badge--low {
+    background: #DCFCE7;
+    color: #16a34a;
+}
+
+.spr-badge--moderate {
+    background: #FEF9C3;
+    color: #a16207;
+}
+
+.spr-badge--high {
+    background: #FEE2E2;
+    color: #C91F25;
+}
+
+// ── Generic card ─────────────────────────────────────────────────────────────
+.spr-card {
+    background: #FFFFFF;
+    border: 0.667px solid #E5E7EB;
+    border-radius: 20px;
+    padding: 28px 28px 24px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+}
+
+.spr-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1E2939;
+    margin-bottom: 20px;
+    svg {
+        color: #00BBA7;
+        flex-shrink: 0;
+    }
+}
+
+// ── DASS-21 dim grid ─────────────────────────────────────────────────────────
+.spr-dim-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.spr-dim-card {
+    border-radius: 12px;
+    border: 1.5px solid #E5E7EB;
+    border-left-width: 4px;
+    background: #FAFAFA;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    &--low {
+        border-left-color: #00C950;
+    }
+    &--moderate {
+        border-left-color: #F0B100;
+    }
+    &--high {
+        border-left-color: #FB2C36;
+    }
+}
+
+.spr-dim-card__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1E2939;
+}
+
+// ── EI list ──────────────────────────────────────────────────────────────────
+.spr-ei-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.spr-ei-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    &--ok {
+        background: rgba(0, 201, 80, 0.06);
+    }
+    &--warn {
+        background: rgba(240, 177, 0, 0.07);
+    }
+}
+
+.spr-ei-item__dot {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    border-radius: 9999px;
+    margin-top: 5px;
+    flex-shrink: 0;
+    .spr-ei-item--ok & {
+        background: #00C950;
+    }
+    .spr-ei-item--warn & {
+        background: #F0B100;
+    }
+}
+
+.spr-ei-item__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1 1 0;
+}
+
+.spr-ei-item__name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1E2939;
+}
+
+.spr-ei-item__status {
+    font-size: 12px;
+    font-weight: 500;
+    .spr-ei-item--ok & {
+        color: #16a34a;
+    }
+    .spr-ei-item--warn & {
+        color: #a16207;
+    }
+}
+
+.spr-ei-item__desc {
+    font-size: 13px;
+    color: #6A7282;
+    line-height: 1.5;
+    margin: 4px 0 0;
+}
+
+// ── Recommendations card ─────────────────────────────────────────────────────
+.spr-card--rec {
+    border-color: #96F7E4;
+    background: linear-gradient(135deg, #F0FDFA 0%, #EFF6FF 100%);
+}
+
+.spr-rec-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.spr-rec-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.70);
+    border-radius: 10px;
+}
+
+.spr-rec-item__badge {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 9999px;
+    background: #00BBA7;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.spr-rec-item__text {
+    font-size: 14px;
+    font-weight: 400;
+    color: #364153;
+    line-height: 1.55;
+}
+
+// ── High-risk alert ──────────────────────────────────────────────────────────
+.spr-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    border: 2px solid #FFC9C9;
+    background: #FEF2F2;
+}
+
+.spr-alert__icon-wrap {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 9999px;
+    background: rgba(201, 31, 37, 0.10);
+    color: #C91F25;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.spr-alert__body {
+    flex: 1 1 0;
+}
+
+.spr-alert__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #9F0712;
+    margin: 0 0 4px;
+}
+
+.spr-alert__desc {
+    font-size: 13px;
+    color: #C10007;
+    line-height: 1.5;
+    margin: 0;
+}
+
+// ── Action buttons ───────────────────────────────────────────────────────────
+.spr-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 4px;
+}
+
+.spr-btn {
+    height: 44px;
+    padding: 0 24px;
+    border-radius: 9999px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: filter 150ms ease, background 150ms ease;
+    border: none;
+    &--primary {
+        background: linear-gradient(90deg, #2B7FFF 0%, #155DFC 100%);
+        color: #fff;
+        box-shadow: 0 8px 16px rgba(37, 99, 235, 0.20);
+        &:hover {
+            filter: brightness(1.07);
+        }
+        &:active {
+            filter: brightness(0.95);
+        }
+    }
+    &--ghost {
+        background: #fff;
+        color: #364153;
+        border: 0.667px solid rgba(0, 0, 0, 0.12);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        &:hover {
+            background: #F3F4F6;
+        }
+        &:active {
+            background: #E5E7EB;
+        }
+    }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 600px) {
+    .spr-shell {
+        padding: 16px 12px 48px;
+        gap: 12px;
+    }
+    .spr-summary {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 22px 18px;
+        gap: 16px;
+    }
+    .spr-card {
+        padding: 20px 16px;
+    }
+    .spr-dim-grid {
+        grid-template-columns: 1fr;
+    }
+    .spr-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .spr-btn {
+        width: 100%;
+        justify-content: center;
+        display: flex;
+    }
 }
 
 .mh-header {

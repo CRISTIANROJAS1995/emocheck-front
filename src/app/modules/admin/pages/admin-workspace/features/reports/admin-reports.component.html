@@ -1,10 +1,11 @@
 <section class="admin-page-wrapper">
+
     <!-- Header -->
     <header class="admin-page-header">
         <div class="admin-page-header__left">
-            <div class="admin-page-header__badge">REPORTES Y DATOS</div>
-            <h1>Reportes y Exportaciones</h1>
-            <p>Solicita y descarga extracciones de datos con trazabilidad completa.</p>
+            <div class="admin-page-header__badge">REPORTES & ESTADÍSTICAS</div>
+            <h1>Reportes y Estadísticas</h1>
+            <p>Visualiza el desempeño y tendencias de bienestar de tu organización en tiempo real.</p>
         </div>
         <div class="admin-page-header__actions">
             <a routerLink="/admin" class="btn btn--outline btn--sm">
@@ -13,159 +14,35 @@
         </div>
     </header>
 
-    <!-- KPIs -->
-    <div class="kpi-row">
-        <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-card__icon">
-                <mat-icon>cloud_download</mat-icon>
-            </div>
-            <div class="kpi-card__body">
-                <span class="kpi-card__value">{{ exports.length }}</span>
-                <span class="kpi-card__label">Total Exportaciones</span>
-            </div>
-        </div>
-        <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-card__icon">
-                <mat-icon>check_circle</mat-icon>
-            </div>
-            <div class="kpi-card__body">
-                <span class="kpi-card__value">{{ completedCount }}</span>
-                <span class="kpi-card__label">Completadas</span>
-            </div>
-        </div>
-        <div class="kpi-card kpi-card--amber">
-            <div class="kpi-card__icon">
-                <mat-icon>hourglass_empty</mat-icon>
-            </div>
-            <div class="kpi-card__body">
-                <span class="kpi-card__value">{{ pendingCount }}</span>
-                <span class="kpi-card__label">En proceso</span>
+    <!-- Power BI iframe -->
+    <div class="powerbi-wrapper">
+
+        <!-- Overlay: instrucción de sesión -->
+        <div class="powerbi-overlay" id="pbi-overlay">
+            <img src="https://powerbi.microsoft.com/pictures/application-logos/svg/powerbi.svg" alt="Power BI" class="powerbi-overlay__logo" />
+            <p class="powerbi-overlay__title">Reporte de Estadísticas EmoCheck</p>
+            <p class="powerbi-overlay__hint">
+                Para visualizar el reporte necesitas iniciar sesión con tu cuenta Microsoft.<br> Haz clic en <strong>"Abrir en Power BI"</strong> para acceder directamente.
+            </p>
+            <div class="powerbi-overlay__actions">
+                <a class="pbi-btn pbi-btn--primary" href="https://app.powerbi.com/reportEmbed?reportId=c8193d9c-6442-4485-960c-51a22b0e5931&autoAuth=true&ctid=ba0c1f4b-739d-4949-8e2e-89e24f53ec38" target="_blank" rel="noopener">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                        <polyline points="15 3 21 3 21 9"/>
+                        <line x1="10" y1="14" x2="21" y2="3"/>
+                    </svg> Abrir en Power BI
+                </a>
+                <button class="pbi-btn pbi-btn--ghost" onclick="
+                    document.getElementById('pbi-overlay').style.display='none';
+                    document.getElementById('pbi-frame').style.display='block';">
+                    Intentar en esta página
+                </button>
             </div>
         </div>
+
+        <iframe id="pbi-frame" title="EMOCHECK V2" src="https://app.powerbi.com/reportEmbed?reportId=c8193d9c-6442-4485-960c-51a22b0e5931&autoAuth=true&ctid=ba0c1f4b-739d-4949-8e2e-89e24f53ec38" frameborder="0" allowfullscreen="true" style="display:none;">
+        </iframe>
+
     </div>
 
-    <!-- Create Form -->
-    @if (showForm) {
-    <div class="editor-panel">
-        <h3>
-            <mat-icon>cloud_upload</mat-icon> Solicitar Exportación</h3>
-        <div class="editor-panel__grid">
-            <label class="editor-panel__field">
-                <span>Tipo de exportación *</span>
-                <select [(ngModel)]="request.exportType">
-                    @for (t of exportTypes; track t.value) {
-                    <option [value]="t.value">{{ t.label }}</option>
-                    }
-                </select>
-            </label>
-            <label class="editor-panel__field">
-                <span>Formato *</span>
-                <select [(ngModel)]="request.format">
-                    @for (f of exportFormats; track f.value) {
-                    <option [value]="f.value">{{ f.label }}</option>
-                    }
-                </select>
-            </label>
-            <label class="editor-panel__field">
-                <span>Desde (opcional)</span>
-                <input type="date" [(ngModel)]="filterStartDate" />
-            </label>
-            <label class="editor-panel__field">
-                <span>Hasta (opcional)</span>
-                <input type="date" [(ngModel)]="filterEndDate" />
-            </label>
-            <label class="editor-panel__field">
-                <span>ID Empresa (opcional)</span>
-                <input type="number" [(ngModel)]="filterCompanyId" placeholder="ej: 1" min="1" />
-            </label>
-        </div>
-        <div class="editor-panel__actions">
-            <button class="btn btn--ghost" (click)="showForm = false">Cancelar</button>
-            <button class="btn btn--primary" [disabled]="saving" (click)="create()">
-                @if (saving) { <mat-progress-spinner diameter="16" mode="indeterminate"></mat-progress-spinner> }
-                <mat-icon>send</mat-icon> Solicitar Exportación
-            </button>
-        </div>
-    </div>
-    }
-
-    <!-- Filters -->
-    <div class="admin-filters">
-        <div class="admin-filters__group">
-            <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()" placeholder="Buscar por tipo, formato, estado..." class="admin-filters__search" />
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-            <span class="admin-filters__count">{{ filteredExports.length }} exportaciones</span>
-            <button class="btn btn--primary btn--sm" (click)="showForm = !showForm">
-                <mat-icon>{{ showForm ? 'list' : 'add' }}</mat-icon>
-                {{ showForm ? 'Ver lista' : 'Nueva Exportación' }}
-            </button>
-        </div>
-    </div>
-
-    <!-- Loading -->
-    @if (loading) {
-    <div class="loading-state">
-        <mat-spinner diameter="40"></mat-spinner>
-        <span>Cargando exportaciones...</span>
-    </div>
-    }
-
-    <!-- Table -->
-    @if (!loading) {
-    <div class="admin-table-wrapper">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th (click)="toggleSort('dataExportId')" [class]="sortClass('dataExportId')">ID</th>
-                    <th (click)="toggleSort('exportType')" [class]="sortClass('exportType')">Tipo</th>
-                    <th>Formato</th>
-                    <th (click)="toggleSort('status')" [class]="sortClass('status')">Estado</th>
-                    <th>Solicitada</th>
-                    <th>Completada</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (row of filteredExports; track row.dataExportId) {
-                <tr>
-                    <td><strong>#{{ row.dataExportId }}</strong></td>
-                    <td>{{ row.exportType || '-' }}</td>
-                    <td><span class="badge badge--info">{{ row.format || row.fileFormat || '-' }}</span></td>
-                    <td>
-                        <span [class]="statusBadge(row.status)">
-                            @if (isPending(row)) {
-                            <mat-progress-spinner diameter="10" mode="indeterminate" style="display:inline-block;margin-right:4px"></mat-progress-spinner>
-                            }
-                            {{ statusLabel(row.status) }}
-                        </span>
-                    </td>
-                    <td>{{ row.requestedAt | date:'dd/MM/yyyy HH:mm' }}</td>
-                    <td>{{ row.completedAt ? (row.completedAt | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
-                    <td class="td-actions">
-                        @if (isPending(row)) {
-                        <button class="icon-btn" title="Verificar estado" (click)="refresh(row)">
-                            <mat-icon>refresh</mat-icon>
-                        </button> } @if (isReady(row)) {
-                        <a [href]="downloadUrl(row)" target="_blank" class="btn btn--primary btn--xs">
-                            <mat-icon>download</mat-icon> Descargar
-                        </a>
-                        }
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
-        @if (filteredExports.length === 0) {
-        <div class="empty-state">
-            <mat-icon>cloud_off</mat-icon>
-            <p>No hay exportaciones para mostrar.</p>
-            <button class="btn btn--primary btn--sm" (click)="showForm = true">
-                <mat-icon>add</mat-icon> Solicitar primera exportación
-            </button>
-        </div>
-        }
-    </div>
-    }
 </section>

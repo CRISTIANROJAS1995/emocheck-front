@@ -388,6 +388,63 @@
     z-index: 1;
 }
 
+// ─── Card bloqueada (visible pero inactiva) ───────────────────────────────────
+.is-card--locked {
+    cursor: not-allowed !important;
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    border-style: dashed;
+    opacity: 0.82;
+    &:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    .is-card__bar {
+        background: #cbd5e1 !important;
+    }
+    .is-card__label,
+    .is-card__description {
+        color: #94a3b8;
+    }
+}
+
+.is-card__lock-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.is-card__lock-reason {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 5px;
+    margin-top: 6px;
+    font-size: 11.5px;
+    color: #64748b;
+    line-height: 1.45;
+    font-style: italic;
+    svg {
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+}
+
+.is-card__icon-img--locked {
+    filter: grayscale(100%) opacity(0.45);
+}
+
 // ─── Estado vacío (sin instrumentos) ─────────────────────────────────────────
 .is-empty {
     display: flex;

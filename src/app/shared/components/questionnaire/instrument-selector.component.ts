@@ -528,6 +528,10 @@ export interface InstrumentCard extends InstrumentDescriptor {
     color: string;
     /** true si el usuario ya completó este instrumento en la evaluación más reciente */
     completed?: boolean;
+    /** true si el instrumento aún no está disponible (requiere cumplir criterios de score) */
+    locked?: boolean;
+    /** Razón por la que está bloqueado, para mostrar al usuario */
+    lockReason?: string;
 }
 
 @Component({
@@ -580,6 +584,8 @@ export class InstrumentSelectorComponent implements OnInit {
         nextUnlockCount: number;
         nextUnlockInstruments: string[];
         allCoreCompleted: boolean;
+        baiUnlocked: boolean;
+        bdiUnlocked: boolean;
     } | null = null;
 
     moduleDef = getAssessmentModuleDefinition('mental-health'); // sobrescrito en ngOnInit
@@ -627,8 +633,9 @@ export class InstrumentSelectorComponent implements OnInit {
         forkJoin({
             completedCodes: this.hydration.getCompletedInstrumentCodes(this.moduleId),
             descriptors: this.assessmentService.getModuleInstruments(this.moduleId),
+            completedEvals: this.assessmentService.getMyCompletedEvaluationsWithResult(),
         }).subscribe({
-            next: ({ completedCodes, descriptors }) => {
+            next: ({ completedCodes, descriptors, completedEvals }) => {
                 // completedCodes contains both exact codes (e.g. "BAI") and sub-scale
                 // codes (e.g. "DASS21_ANXIETY"). Match by exact code OR by prefix so
                 // that DASS21 is marked completed when DASS21_* dimensions exist.
@@ -638,17 +645,23 @@ export class InstrumentSelectorComponent implements OnInit {
                         [...completedCodes].some(dc => dc.startsWith(upper + '_'));
                 };
 
+                // Extract DASS-21 dimension scores for score-based BAI/BDI activation
+                const dass21Scores = this._extractDass21Scores(completedEvals);
+
                 // Calculate progress info for UI (only for mental-health module)
-                this.progressInfo = this.moduleId === 'mental-health' ? this._calculateProgressInfo(completedCodes) : null;
+                this.progressInfo = this.moduleId === 'mental-health' ? this._calculateProgressInfo(completedCodes, dass21Scores) : null;
 
                 // Filter instruments based on progressive activation rules (only for mental-health module)
                 const availableDescriptors = this.moduleId === 'mental-health' 
-                    ? this._getProgressivelyAvailableInstruments(descriptors, completedCodes)
+                    ? this._getProgressivelyAvailableInstruments(descriptors, completedCodes, dass21Scores)
                     : descriptors; // Other modules show all instruments immediately
 
                 this.instruments = availableDescriptors.map((d, i) => {
                     const meta = INSTRUMENT_META[d.code];
                     const isCurrentlyCompleted = isCompleted(d.code);
+                    const lockInfo = this.moduleId === 'mental-health'
+                        ? this._isInstrumentLocked(d.code, dass21Scores)
+                        : { locked: false };
                     
                     return {
                         ...d,
@@ -657,6 +670,8 @@ export class InstrumentSelectorComponent implements OnInit {
                         icon:  meta?.icon  ?? this.moduleDef.icon,
                         color: meta?.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
                         completed: isCurrentlyCompleted,
+                        locked: lockInfo.locked,
+                        lockReason: lockInfo.lockReason,
                     };
                 });
             },
@@ -669,7 +684,7 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     selectInstrument(card: InstrumentCard): void {
-        if (this.loadingQuestions || card.completed) return;
+        if (this.loadingQuestions || card.completed || card.locked) return;
         // Abrir modal de consentimiento primero — el usuario debe autorizar antes de continuar
         this.pendingInstrument = card;
         this.showConsentModal = true;
@@ -755,6 +770,13 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     onCompletedRich(richAnswers: RichAnswer[]): void {
+        // Para el módulo mental-health, enviar directo sin modal de cierre
+        // (BAI, BDI y el resto van directo a instrument-results)
+        if (this.moduleId === 'mental-health') {
+            this._submitRichAnswers(richAnswers);
+            return;
+        }
+
         // Guardar respuestas y mostrar modal de cierre antes de enviar
         this.pendingRichAnswers = richAnswers;
         const code = (this.selectedInstrument?.code ?? '').toUpperCase();
@@ -846,12 +868,36 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     /**
-     * Calculates progress information for displaying to the user
+     * Extracts the DASS-21 anxiety and depression scores from the completed evaluations.
+     * These are used to determine whether BAI and BDI should be unlocked.
      */
-    private _calculateProgressInfo(completedCodes: Set<string>) {
+    private _extractDass21Scores(completedEvals: any[]): { anxietyScore: number; depressionScore: number } {
+        let anxietyScore = 0;
+        let depressionScore = 0;
+        for (const ev of (completedEvals ?? [])) {
+            for (const dim of (ev?.result?.dimensionScores ?? [])) {
+                const code = String(dim?.instrumentCode ?? '').toUpperCase();
+                if (code === 'DASS21_ANXIETY' || (code.startsWith('DASS') && code.includes('ANXIETY'))) {
+                    anxietyScore = Math.max(anxietyScore, dim.score ?? 0);
+                }
+                if (code === 'DASS21_DEPRESSION' || (code.startsWith('DASS') && code.includes('DEPRESSION'))) {
+                    depressionScore = Math.max(depressionScore, dim.score ?? 0);
+                }
+            }
+        }
+        return { anxietyScore, depressionScore };
+    }
+
+    /**
+     * Calculates progress information for displaying to the user.
+     * BAI/BDI unlock info is now shown based on DASS-21 score thresholds.
+     */
+    private _calculateProgressInfo(
+        completedCodes: Set<string>,
+        dass21Scores: { anxietyScore: number; depressionScore: number }
+    ) {
         const coreInstruments = ['TMMS24', 'ICSP_VC', 'DASS21'];
         
-        // Check how many core instruments have been completed
         const completedCoreCount = coreInstruments.filter(code => {
             const upper = code.toUpperCase();
             return completedCodes.has(upper) || 
@@ -859,82 +905,72 @@ export class InstrumentSelectorComponent implements OnInit {
         }).length;
 
         const allCoreCompleted = completedCoreCount >= 3;
+        const baiUnlocked = dass21Scores.anxietyScore >= 5;
+        const bdiUnlocked = dass21Scores.depressionScore >= 14;
         
-        // Determine next unlock information
-        let nextUnlockCount = 0;
-        let nextUnlockInstruments: string[] = [];
-        
-        if (completedCoreCount === 0) {
-            nextUnlockCount = 1;
-            nextUnlockInstruments = ['Escala de Estrés Percibido', 'Inventario de Fatiga Multidimensional'];
-        } else if (completedCoreCount === 1) {
-            nextUnlockCount = 1;
-            nextUnlockInstruments = ['Inventario de Ansiedad de Beck', 'Inventario de Depresión de Beck'];
-        } else if (completedCoreCount === 2) {
-            nextUnlockCount = 1;
-            nextUnlockInstruments = ['Evaluaciones adicionales de salud mental'];
-        }
+        const nextUnlockInstruments: string[] = [];
+        if (!baiUnlocked) nextUnlockInstruments.push('Inventario de Ansiedad de Beck (requiere resultados DASS-21)');
+        if (!bdiUnlocked) nextUnlockInstruments.push('Inventario de Depresión de Beck (requiere resultados DASS-21)');
         
         return {
             completedCoreCount,
-            nextUnlockCount,
+            nextUnlockCount: nextUnlockInstruments.length,
             nextUnlockInstruments,
-            allCoreCompleted
+            allCoreCompleted,
+            baiUnlocked,
+            bdiUnlocked,
         };
     }
 
     /**
-     * Implements progressive instrument activation based on document specifications.
-     * Initially only 3 instruments are active: Inteligencia Emocional, Hábitos de sueño, Estado anímico.
-     * Additional instruments unlock as user completes the core assessments.
+     * Builds the list of instruments for the mental-health module.
+     * All 5 instruments are always included, but BAI and BDI are marked as
+     * `locked` when the DASS-21 scores do not meet the required thresholds.
+     *
+     * Unlock rules:
+     *   - BAI: DASS-21 Ansiedad score >= 5 (moderada, severa o extremadamente severa)
+     *   - BDI: DASS-21 Depresión score >= 14 (extremadamente severa)
      */
     private _getProgressivelyAvailableInstruments(
         allDescriptors: InstrumentDescriptor[], 
-        completedCodes: Set<string>
+        completedCodes: Set<string>,
+        dass21Scores: { anxietyScore: number; depressionScore: number }
     ): InstrumentDescriptor[] {
-        
-        // Core instruments available from the start (as per document specification)
         const coreInstruments = ['TMMS24', 'ICSP_VC', 'DASS21'];
-        
-        // Secondary instruments that unlock after core completion
-        const secondaryInstruments = ['PSS10', 'MFI20', 'BAI', 'BDI', 'GAD7', 'PHQ9', 'ISI', 'PSS4'];
-        
-        // Check how many core instruments have been completed
-        const completedCoreCount = coreInstruments.filter(code => {
-            const upper = code.toUpperCase();
-            return completedCodes.has(upper) || 
-                   [...completedCodes].some(dc => dc.startsWith(upper + '_'));
-        }).length;
-        
-        // Filter descriptors based on progression rules
+        const conditionalInstruments = ['BAI', 'BDI'];
+
+        // Return core + conditional instruments (always show all 5)
         return allDescriptors.filter(descriptor => {
             const code = descriptor.code.toUpperCase();
-            
-            // Always show core instruments
-            if (coreInstruments.some(coreCode => coreCode.toUpperCase() === code)) {
-                return true;
-            }
-            
-            // Show secondary instruments based on progression:
-            // - If 1+ core completed: unlock PSS10, MFI20
-            // - If 2+ core completed: unlock BAI, BDI
-            // - If all 3 core completed: unlock remaining instruments
-            if (secondaryInstruments.some(secCode => secCode.toUpperCase() === code)) {
-                if (completedCoreCount >= 3) return true;
-                if (completedCoreCount >= 2 && ['BAI', 'BDI'].some(unlockCode => unlockCode.toUpperCase() === code)) return true;
-                if (completedCoreCount >= 1 && ['PSS10', 'MFI20'].some(unlockCode => unlockCode.toUpperCase() === code)) return true;
-            }
-            
-            // For any other instruments not in our lists, show them if all core are complete
-            const isKnownInstrument = [...coreInstruments, ...secondaryInstruments]
-                .some(knownCode => knownCode.toUpperCase() === code);
-            
-            if (!isKnownInstrument && completedCoreCount >= 3) {
-                return true;
-            }
-            
-            return false;
+            return coreInstruments.some(c => c === code) ||
+                   conditionalInstruments.some(c => c === code);
         });
+    }
+
+    /**
+     * Returns whether a given instrument should be locked (visible but not clickable)
+     * based on DASS-21 dimension scores.
+     */
+    private _isInstrumentLocked(
+        code: string,
+        dass21Scores: { anxietyScore: number; depressionScore: number }
+    ): { locked: boolean; lockReason?: string } {
+        const upper = code.toUpperCase();
+        if (upper === 'BAI') {
+            const locked = dass21Scores.anxietyScore < 5;
+            return {
+                locked,
+                lockReason: locked ? 'Se activa cuando el DASS-21 detecta ansiedad moderada o superior' : undefined,
+            };
+        }
+        if (upper === 'BDI') {
+            const locked = dass21Scores.depressionScore < 14;
+            return {
+                locked,
+                lockReason: locked ? 'Se activa cuando el DASS-21 detecta depresión extremadamente severa' : undefined,
+            };
+        }
+        return { locked: false };
     }
 
     private _shouldUseSpecializedQuestionnaire(instrumentCode: string): boolean {

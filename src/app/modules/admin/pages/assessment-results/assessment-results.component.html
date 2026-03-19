@@ -25,37 +25,18 @@
     </header>
 
     <main class="results-shell" *ngIf="result as r">
-        <section class="summary-card" [ngClass]="outcomeClass">
-            <div class="summary-row">
-                <!-- Estado visual: ícono grande con color según resultado -->
-                <div class="outcome-icon-block" [ngClass]="'outcome-icon-block--' + effectiveOutcome" aria-hidden="true">
-                    <svg *ngIf="effectiveOutcome === 'adequate'" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
-                        <path d="M7 12.5l3.5 3.5 6.5-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <svg *ngIf="effectiveOutcome === 'mild'" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
-                        <path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-                        <circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>
-                    </svg>
-                    <svg *ngIf="effectiveOutcome === 'high-risk'" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
-                        <path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-                        <circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>
-                    </svg>
-                </div>
 
-                <div class="summary-content">
-                    <p class="summary-message">{{ effectiveMessage }}</p>
-
-                    <div class="summary-date">
-                        <svg class="calendar" viewBox="0 0 24 24" aria-hidden="true">
-                            <path
-                                d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm13 8H4v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V10Z" />
-                        </svg>
-                        <span>{{ evaluatedDateLabel }}</span>
-                    </div>
-                </div>
+        <!-- Banner intro estático — solo Salud Mental -->
+        <section class="mh-intro-banner" *ngIf="moduleId === 'mental-health'">
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--1">🧠</div>
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--2">💙</div>
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--3">✨</div>
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--4">🌿</div>
+            <div class="mh-intro-banner__inner">
+                <span class="mh-intro-banner__icon" aria-hidden="true">🫧</span>
+                <p class="mh-intro-banner__text">
+                    Identificar señales en nuestro estado de ánimo es un paso importante para comprender el bienestar general de nuestra salud mental.
+                </p>
             </div>
         </section>
 
@@ -70,7 +51,7 @@
             <div class="dim-cards">
                 <div class="dim-card" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-card--' + getBarTone(d.percent, d.riskLevel)" [style.border-left-color]="d.scoreRangeColor || null">
                     <div class="dim-card__name-row">
-                        <span class="dim-card__name" [style.color]="d.scoreRangeColor || null">{{ d.scoreRangeLabel || getDimensionLabel(d, idx) }}</span>
+                        <span class="dim-card__name" [style.color]="d.scoreRangeColor || null">{{ getDimensionLabel(d, idx) }}</span>
                         <span class="dim-card__percent" [ngClass]="'dim-percent--' + getBarTone(d.percent, d.riskLevel)" [style.color]="d.scoreRangeColor || null">{{ d.percent }}%</span>
                     </div>
                     <div class="dim-card__score-fraction" *ngIf="d.score != null && d.maxScore != null">
@@ -101,7 +82,7 @@
             <div class="dim-interp-item" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-interp--' + getBarTone(d.percent, d.riskLevel)">
                 <div class="dim-interp__dot" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-dot--' + getBarTone(d.percent, d.riskLevel)"></div>
                 <div class="dim-interp__body">
-                    <span *ngIf="d.scoreRangeLabel" class="dim-interp__label" [style.color]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-label--' + getBarTone(d.percent, d.riskLevel)">{{ d.scoreRangeLabel }}</span>
+                    <span class="dim-interp__label" [style.color]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-interp-label--' + getBarTone(d.percent, d.riskLevel)">{{ getDimensionLabel(d, idx) }}</span>
                     <span *ngIf="d.scoreRangeDescription" class="dim-interp__sep">:</span>
                     <span class="dim-interp__text">{{ d.scoreRangeDescription || '' }}</span>
                 </div>

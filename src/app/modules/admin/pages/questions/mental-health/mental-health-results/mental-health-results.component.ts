@@ -15,116 +15,118 @@ interface ResultInterpretation {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="mh-results">
-      <!-- Header -->
-      <div class="mh-header">
-        <button class="mh-back-btn" (click)="goBack()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          Volver
-        </button>
-        <h1>Resultados de {{ instrumentName }}</h1>
-      </div>
+    <div class="spr-page">
 
-      <!-- Results Container -->
-      <div class="mh-content" *ngIf="results">
-        
-        <!-- Score Display -->
-        <div class="mh-score-section">
-          <div class="mh-score-card" [class]="'mh-score-card--' + results.level">
-            <div class="mh-score-icon">
-              <div class="mh-risk-indicator" [class]="'mh-risk-indicator--' + results.level">
-                {{ getRiskIcon(results.level) }}
-              </div>
+      <!-- Sticky header -->
+      <header class="spr-header">
+        <div class="spr-header__inner">
+          <button class="spr-back-btn" (click)="goBack()" type="button" aria-label="Volver">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M10.5 19.5a1 1 0 0 1-.707-.293l-7-7a1 1 0 0 1 0-1.414l7-7a1 1 0 1 1 1.414 1.414L6.914 10.5H20a1 1 0 1 1 0 2H6.914l4.293 4.293A1 1 0 0 1 10.5 19.5Z"/>
+            </svg>
+          </button>
+          <span class="spr-header__title">{{ instrumentName }}</span>
+        </div>
+      </header>
+
+      <main class="spr-shell" *ngIf="results">
+
+        <!-- Summary card -->
+        <section class="spr-summary" [ngClass]="'spr-summary--' + results.level">
+          <div class="spr-summary__icon-wrap" [ngClass]="'spr-summary__icon-wrap--' + results.level" aria-hidden="true">
+            <svg *ngIf="results.level === 'low'" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <path d="M7 12.5l3.5 3.5 6.5-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg *ngIf="results.level === 'moderate'" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>
+            </svg>
+            <svg *ngIf="results.level === 'high'" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <path d="M12 7v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="spr-summary__body">
+            <h2 class="spr-summary__title">{{ results.title }}</h2>
+            <p class="spr-summary__desc">{{ results.description }}</p>
+            <span class="spr-summary__badge" [ngClass]="'spr-badge--' + results.level">
+              {{ getRiskLabel(results.level) }}
+            </span>
+          </div>
+        </section>
+
+        <!-- DASS-21 breakdown -->
+        <section class="spr-card" *ngIf="instrumentType === 'dass21' && dassComponents">
+          <div class="spr-card__title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Desglose por componente
+          </div>
+          <div class="spr-dim-grid">
+            <div class="spr-dim-card" *ngFor="let c of dassComponents" [ngClass]="'spr-dim-card--' + c.level">
+              <span class="spr-dim-card__name">{{ c.name }}</span>
+              <span class="spr-dim-card__badge" [ngClass]="'spr-badge--' + c.level">{{ getRiskLabel(c.level) }}</span>
             </div>
-            <div class="mh-score-content">
-              <h2>{{ results.title }}</h2>
-              <p class="mh-score-description">{{ results.description }}</p>
-              <div class="mh-score-badge" [style.background-color]="results.color">
-                {{ getRiskLabel(results.level) }}
+          </div>
+        </section>
+
+        <!-- EI breakdown -->
+        <section class="spr-card" *ngIf="instrumentType === 'emotional-intelligence' && eiComponents">
+          <div class="spr-card__title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            Dimensiones de Inteligencia Emocional
+          </div>
+          <div class="spr-ei-list">
+            <div class="spr-ei-item" *ngFor="let d of eiComponents" [ngClass]="d.adequate ? 'spr-ei-item--ok' : 'spr-ei-item--warn'">
+              <div class="spr-ei-item__dot"></div>
+              <div class="spr-ei-item__body">
+                <span class="spr-ei-item__name">{{ d.name }}</span>
+                <span class="spr-ei-item__status">{{ d.adequate ? '✓ Adecuada' : '⚠ Debe mejorar' }}</span>
+                <p class="spr-ei-item__desc">{{ d.description }}</p>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- DASS-21 Specific Results -->
-        <div class="mh-dass-breakdown" *ngIf="instrumentType === 'dass21' && dassComponents">
-          <h3>Desglose por componente:</h3>
-          <div class="mh-component-grid">
-            <div class="mh-component-card" *ngFor="let component of dassComponents">
-              <div class="mh-component-icon" [style.background-color]="component.color">
-                {{ component.icon }}
-              </div>
-              <div class="mh-component-info">
-                <h4>{{ component.name }}</h4>
-                <span class="mh-component-level" [class]="'mh-level--' + component.level">
-                  {{ getRiskLabel(component.level) }}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sleep Quality Results -->
-        <div class="mh-sleep-results" *ngIf="instrumentType === 'sleep'">
-          <div class="mh-visual-result">
-            <div class="mh-face-indicator" [class]="'mh-face--' + results.level">
-              {{ getFaceIcon(results.level) }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Emotional Intelligence Results -->
-        <div class="mh-ei-results" *ngIf="instrumentType === 'emotional-intelligence' && eiComponents">
-          <h3>Dimensiones de Inteligencia Emocional:</h3>
-          <div class="mh-ei-puzzle">
-            <div class="mh-puzzle-piece" *ngFor="let dimension of eiComponents" 
-                 [class]="'mh-puzzle-piece--' + (dimension.adequate ? 'green' : 'yellow')">
-              <h4>{{ dimension.name }}</h4>
-              <p>{{ dimension.description }}</p>
-              <div class="mh-puzzle-status">
-                {{ dimension.adequate ? '✓ Adecuada' : '⚠ Debe mejorar' }}
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
 
         <!-- Recommendations -->
-        <div class="mh-recommendations" *ngIf="results.recommendations.length > 0">
-          <h3>Recomendaciones:</h3>
-          <ul class="mh-recommendation-list">
-            <li *ngFor="let recommendation of results.recommendations">
-              {{ recommendation }}
-            </li>
-          </ul>
-        </div>
-
-        <!-- Alert Generation -->
-        <div class="mh-alert" *ngIf="shouldGenerateAlert()">
-          <div class="mh-alert-content">
-            <svg class="mh-alert-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-            <div>
-              <h4>Seguimiento requerido</h4>
-              <p>Se ha generado una alerta para seguimiento en la plataforma de monitoreo.</p>
+        <section class="spr-card spr-card--rec" *ngIf="results.recommendations.length > 0">
+          <div class="spr-card__title">Recomendaciones</div>
+          <div class="spr-rec-list">
+            <div class="spr-rec-item" *ngFor="let r of results.recommendations; let i = index">
+              <span class="spr-rec-item__badge">{{ i + 1 }}</span>
+              <span class="spr-rec-item__text">{{ r }}</span>
             </div>
           </div>
+        </section>
+
+        <!-- High risk alert -->
+        <section class="spr-alert" *ngIf="results.level === 'high'">
+          <div class="spr-alert__icon-wrap" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3L22 21H2L12 3Z" stroke-linejoin="round"/>
+              <path d="M12 9v5" stroke-linecap="round"/>
+              <circle cx="12" cy="17" r="1.25" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div class="spr-alert__body">
+            <p class="spr-alert__title">¿Necesitas ayuda inmediata?</p>
+            <p class="spr-alert__desc">Si sientes que necesitas apoyo urgente, no dudes en contactarnos. Estamos aquí para ayudarte.</p>
+          </div>
+        </section>
+
+        <!-- Actions -->
+        <div class="spr-actions">
+          <button class="spr-btn spr-btn--ghost" (click)="goToModule()" type="button">Ver otros instrumentos</button>
+          <button class="spr-btn spr-btn--primary" (click)="goToTracking()" type="button">Ver mi seguimiento completo</button>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="mh-actions">
-          <button class="mh-btn mh-btn--secondary" (click)="goToModule()">
-            Ver otros instrumentos
-          </button>
-          <button class="mh-btn mh-btn--primary" (click)="goToTracking()">
-            Ver mi seguimiento completo
-          </button>
-        </div>
-      </div>
+      </main>
     </div>
   `,
   styleUrl: './mental-health-results.component.scss'

@@ -1,18 +1,114 @@
 @use '../../admin-shared' as *;
-
 :host {
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    height: 100%;
 }
 
-.truncate-cell {
-    max-width: 220px;
-    white-space: nowrap;
+// ── Power BI wrapper ─────────────────────────────────────────────────────────
+.powerbi-wrapper {
+    position: relative;
+    width: 100%;
+    flex: 1 1 auto;
+    margin-top: 24px;
+    border-radius: 16px;
     overflow: hidden;
-    text-overflow: ellipsis;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07);
+    background: #fff;
+    height: calc(100vh - 230px);
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
 }
 
-.text-muted {
-    color: #94a3b8;
-    font-size: 13px;
+// ── Overlay de instrucción ───────────────────────────────────────────────────
+.powerbi-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 48px 32px;
+    text-align: center;
+    z-index: 2;
+}
+
+.powerbi-overlay__logo {
+    width: 56px;
+    height: 56px;
+}
+
+.powerbi-overlay__title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1E2939;
+    margin: 0;
+}
+
+.powerbi-overlay__hint {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    color: #6A7282;
+    line-height: 1.6;
+    max-width: 420px;
+    margin: 0;
+}
+
+.powerbi-overlay__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+// ── Botones del overlay ──────────────────────────────────────────────────────
+.pbi-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 9999px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: filter 150ms ease, background 150ms ease;
+    border: none;
+    &--primary {
+        background: linear-gradient(90deg, #F2C811 0%, #E4B400 100%);
+        color: #1a1200;
+        box-shadow: 0 4px 12px rgba(242, 200, 17, 0.35);
+        &:hover {
+            filter: brightness(1.05);
+        }
+    }
+    &--ghost {
+        background: transparent;
+        border: 1.5px solid #D1D5DB;
+        color: #4A5565;
+        &:hover {
+            background: #F3F4F6;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .powerbi-wrapper {
+        margin-top: 16px;
+        min-height: calc(100vh - 180px);
+    }
 }
