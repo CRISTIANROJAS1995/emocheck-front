@@ -49,8 +49,7 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
         }),
         catchError((refreshErr) => {
           authService.logout();
-          const current = router.routerState.snapshot.url || '';
-          router.navigate(['/sign-in'], { queryParams: { redirectURL: current } });
+          router.navigate(['/welcome']);
           return throwError(() => refreshErr);
         })
       );
