@@ -121,9 +121,34 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
             BAI:     'La forma en que el cuerpo siente lo que tu mente piensa, establece qué síntomas puedes estar viviendo en este momento.',
             ICSP_VC: 'Reconocer si los hábitos relacionados con tu descanso están influyendo en la calidad de tu sueño es un paso importante para comprender mejor cómo tus rutinas diarias afectan tu descanso y qué acciones puedes implementar para dormir mejor.',
             TMMS24:  'La inteligencia emocional te permite reconocer cómo percibes, comprendes y gestionas tus emociones en diferentes situaciones y con diferentes grupos de personas. Conocer estos aspectos es un paso importante para fortalecer tu bienestar personal, mejorar tus relaciones y el desarrollo de estrategias sociales que se presentan en los entornos sociales.',
+            MFI20:   'Reconocer la importancia de tú rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.',
         };
         const code = (this.instrumentCode ?? '').toUpperCase();
-        return messages[code] ?? 'Identificar señales en nuestro estado de ánimo es un paso importante para comprender el bienestar general de nuestra salud mental.';
+        if (messages[code]) return messages[code];
+        if (this.moduleId === 'work-fatigue') return 'Reconocer la importancia de tú rol como trabajador es fundamental, pero cuando se pierden los límites personales, el equilibrio y el bienestar pueden verse afectados. Reconocer y respetar esos límites es una forma esencial de cuidarse.';
+        return 'Identificar señales en nuestro estado de ánimo es un paso importante para comprender el bienestar general de nuestra salud mental.';
+    }
+
+    /** Floating decorative icons + center icon for the intro banner, keyed by instrumentCode. */
+    get bannerIcons(): { floats: [string, string, string, string]; center: string } {
+        const map: Record<string, { floats: [string, string, string, string]; center: string }> = {
+            DASS21:  { floats: ['🧠', '💙', '✨', '🌿'], center: '🪷' },
+            BDI:     { floats: ['💜', '🌚', '✨', '🌻'], center: '🪷' },
+            BAI:     { floats: ['💙', '👨‍⚕️', '✨', '🌿'], center: '🔵' },
+            ICSP_VC: { floats: ['🌙', '⭐', '💤', '🌙'], center: '🛌' },
+            TMMS24:  { floats: ['💛', '💡', '✨', '🌼'], center: '🤍' },
+            GAD7:    { floats: ['💙', '🌬️', '✨', '🌿'], center: '🧠' },
+            PHQ9:    { floats: ['💜', '🌞', '✨', '🌸'], center: '🪷' },
+            ISI:     { floats: ['🌙', '💤', '⭐', '🌙'], center: '🛌' },
+            PSS4:    { floats: ['💚', '🌲', '✨', '🌿'], center: '🧘' },
+            PSS10:   { floats: ['💚', '🌲', '✨', '🌿'], center: '🧘' },
+            BAI_ALT: { floats: ['💙', '💨', '✨', '🌿'], center: '🔵' },
+            MFI20:   { floats: ['💪', '⚡', '✨', '🌱'], center: '🔋' },
+        };
+        const code = (this.instrumentCode ?? '').toUpperCase();
+        if (map[code]) return map[code];
+        if (this.moduleId === 'work-fatigue') return { floats: ['💪', '⚡', '✨', '🌱'], center: '🔋' };
+        return { floats: ['🧠', '💙', '✨', '🌿'], center: '🪷' };
     }
 
     /** Page title: instrument-specific when filtered, otherwise the module results title. */
@@ -153,7 +178,13 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
         // the caller redirects instead of showing a page with wrong/empty content.
         if (!filtered.length) return undefined;
 
-        return { ...result, dimensions: filtered };
+        const filteredRecs = result.recommendations.filter(
+            (r) => !r.instrumentCode ||
+                   r.instrumentCode.toUpperCase() === code ||
+                   r.instrumentCode.toUpperCase().startsWith(code + '_')
+        );
+
+        return { ...result, dimensions: filtered, recommendations: filteredRecs };
     }
 
     scheduleFollowUp(): void {
@@ -178,9 +209,10 @@ export class AssessmentResultsComponent implements OnInit, OnDestroy {
     }
 
     downloadResults(): void {
-        // Simple, cross-browser way to let the user "download" the results as PDF.
-        // Users can choose "Save as PDF" in the print dialog.
+        const prev = document.title;
+        document.title = this.pageTitle || this.moduleDef?.resultsTitle || 'Resultados EmoCheck';
         window.print();
+        document.title = prev;
     }
 
     async shareResults(): Promise<void> {

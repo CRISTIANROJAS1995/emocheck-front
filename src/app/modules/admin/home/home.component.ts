@@ -36,6 +36,8 @@ interface Resource {
 export class HomeComponent implements OnInit {
     user: User;
 
+    showDisclaimer = false;
+
     loadingModules = true;
     modulesError: string | null = null;
 
@@ -136,17 +138,12 @@ export class HomeComponent implements OnInit {
     private applyResultsToModules(): void {
         this.modules = this.baseModules.map((module) => {
             const result = this.latestResults[module.id as AssessmentModuleId];
+            const hasResult = result != null;
             return {
                 ...module,
-                points: result?.score,
-                disabled: false,   // Siempre navegable — el bloqueo por instrumento ya presentado va en la pantalla del selector
-                status: result
-                    ? {
-                        label: this.getOutcomeLabel(result.outcome),
-                        tone: this.getOutcomeTone(result.outcome),
-                        icon: this.getOutcomeIcon(result.outcome),
-                    }
-                    : undefined,
+                points: hasResult ? (result!.score ?? 0) : undefined,
+                disabled: false,
+                status: undefined,
             };
         });
     }
@@ -194,7 +191,7 @@ export class HomeComponent implements OnInit {
     viewPlan(moduleId: string): void {
         // Multi-instrument modules show the instrument picker first so the user
         // can choose which individual result to review.
-        const multiInstrumentModules = ['mental-health'];
+        const multiInstrumentModules = ['mental-health', 'psychosocial-risk'];
         if (multiInstrumentModules.includes(moduleId)) {
             this.router.navigate([`/${moduleId}/instrument-results`]);
         } else {

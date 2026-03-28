@@ -13,6 +13,7 @@
                 <h1 class="mfi-header__title">MFI-20 - Fatiga Multidimensional</h1>
                 <p class="mfi-header__subtitle">{{ getDimensionInfo(currentQuestion.dimension).description }}</p>
             </div>
+            <app-exam-timer storageKey="exam-timer:mfi-questionnaire" (timeUp)="onTimeUp()"></app-exam-timer>
         </header>
 
         <!-- Progress bar -->
@@ -27,9 +28,6 @@
         <div class="mfi-question-card">
             <div class="mfi-question-card__header">
                 <div class="mfi-question-card__number">Pregunta {{ currentQuestionIndex + 1 }}</div>
-                <div class="mfi-question-card__dimension-badge" [attr.data-dimension]="currentQuestion.dimension">
-                    {{ getDimensionInfo(currentQuestion.dimension).title }}
-                </div>
             </div>
 
             <h2 class="mfi-question-card__text">{{ currentQuestion.text }}</h2>

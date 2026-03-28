@@ -32,12 +32,12 @@
             <p class="module-description">{{ module.description }}</p>
             }
 
-            <div class="flex gap-3" [class.module-actions--has-status]="!!module.status">
+            <div class="flex gap-3" [class.module-actions--has-status]="module.points !== undefined">
                 <emo-button [variant]="getButtonVariant()" size="medium" [fullWidth]="true" class="flex-1 module-start-btn" [disabled]="false" (clicked)="startEvaluation()">
                     Comenzar evaluación
                 </emo-button>
-                <emo-button [variant]="module.status ? getButtonVariant() : 'secondary'" size="medium" [fullWidth]="true" class="flex-1 module-plan-btn" [disabled]="!module.status" (clicked)="viewPlan()">
-                    Ver mi plan
+                <emo-button [variant]="module.points !== undefined ? getButtonVariant() : 'secondary'" size="medium" [fullWidth]="true" class="flex-1 module-plan-btn" [disabled]="module.points === undefined" (clicked)="viewPlan()">
+                    Ver resultados
                 </emo-button>
             </div>
         </div>

@@ -47,6 +47,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    width: 100%;
 }
 
 .back-button {
@@ -283,6 +284,33 @@
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+    }
+}
+
+.input-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.next-button {
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 9999px;
+    border: 1px solid #00D5BE;
+    background: rgba(255, 255, 255, 0.75);
+    color: #009689;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    &:hover:not(:disabled) {
+        background: #00D5BE;
+        color: #fff;
     }
 }
 

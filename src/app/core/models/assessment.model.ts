@@ -65,5 +65,19 @@ export interface AssessmentResult {
     message: string;
 
     dimensions: AssessmentDimensionBreakdown[];
-    recommendations: string[];
+    recommendations: AssessmentRecommendation[];
+}
+
+export interface AssessmentRecommendation {
+    text: string;
+    /** Short descriptive title for the recommendation. */
+    title?: string;
+    /** Category label from backend (e.g. "Autocuidado", "Apoyo Profesional"). */
+    recommendationTypeName?: string;
+    /** Dimension name paired by index with dimensionScores (e.g. "Estrés", "Ansiedad"). */
+    dimensionLabel?: string;
+    /** Hex color from the paired dimension's scoreRangeColor (e.g. "#DC3545"). */
+    dimensionColor?: string;
+    /** Instrument code this recommendation belongs to (e.g. "BDI", "DASS21"). */
+    instrumentCode?: string;
 }

@@ -7,13 +7,18 @@ import { finalize, switchMap } from 'rxjs';
 import { AssessmentService, RichAnswer } from 'app/core/services/assessment.service';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
+import { PendingClosingService } from 'app/core/services/pending-closing.service';
 import { AssessmentQuestion } from 'app/core/models/assessment.model';
+import { ExamTimerComponent } from 'app/shared/components/ui/exam-timer/exam-timer.component';
 
 interface SleepQuestion {
   id: string;
   text: string;
-  type: 'time' | 'number' | 'scale' | 'select' | 'text';
+  type: 'time' | 'number' | 'scale' | 'select' | 'text' | 'matrix';
+  unit?: 'minutes' | 'hours';
   options?: { value: number; label: string }[];
+  /** For matrix type: list of sub-items (rows) */
+  items?: { id: string; label: string }[];
   required?: boolean;
   conditional?: {
     dependsOn: string;
@@ -24,7 +29,7 @@ interface SleepQuestion {
 @Component({
   selector: 'app-sleep-questionnaire',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ExamTimerComponent],
   template: `
     <div class="questionnaire-page">
       <div class="blur-circle blur-circle--green-top-right"></div>
@@ -47,6 +52,7 @@ interface SleepQuestion {
                   <div class="header-subtitle">Pregunta {{ currentQuestionIndex() + 1 }} de {{ totalQuestions }}</div>
                 </div>
               </div>
+              <app-exam-timer storageKey="exam-timer:sleep-questionnaire" (timeUp)="onTimeUp()"></app-exam-timer>
             </div>
             <div class="progress-wrap">
               <div class="progress-track">
@@ -91,8 +97,8 @@ interface SleepQuestion {
 
             <!-- Number Input -->
             <div class="input-field-wrap" *ngIf="currentQuestion()!.type === 'number'">
-              <label class="input-field-label">Cantidad en minutos</label>
-              <input type="number" class="input-field input-field--integer" [formControl]="getControl(currentQuestion()!.id)" placeholder="0">
+              <label class="input-field-label">{{ currentQuestion()!.unit === 'hours' ? 'Cantidad en horas' : 'Cantidad en minutos' }}</label>
+              <input type="number" min="0" class="input-field input-field--integer" [formControl]="getControl(currentQuestion()!.id)" [placeholder]="currentQuestion()!.unit === 'hours' ? '0' : '0'">
             </div>
 
             <!-- Text Input -->
@@ -101,8 +107,48 @@ interface SleepQuestion {
               <input type="text" class="input-field" [formControl]="getControl(currentQuestion()!.id)" placeholder="Escribe aquí...">
             </div>
 
+            <!-- Matrix (tabla de sub-ítems con opciones comunes) -->
+            <div class="matrix-wrap" *ngIf="currentQuestion()!.type === 'matrix'">
+              <div class="matrix-table">
+                <!-- Header -->
+                <div class="matrix-header">
+                  <div class="matrix-header__item-label">Situación</div>
+                  <div class="matrix-header__opt" *ngFor="let opt of currentQuestion()!.options">{{ opt.label }}</div>
+                </div>
+                <!-- Rows -->
+                <div class="matrix-row" *ngFor="let item of currentQuestion()!.items; let rowIdx = index"
+                     [class.matrix-row--alt]="rowIdx % 2 === 1">
+                  <div class="matrix-row__label">{{ item.label }}</div>
+                  <div class="matrix-row__opt" *ngFor="let opt of currentQuestion()!.options">
+                    <button type="button" class="matrix-opt"
+                            [class.matrix-opt--selected]="form.get(item.id)?.value === opt.value"
+                            (click)="selectMatrixOption(item.id, opt.value)">
+                      <span class="matrix-radio">
+                        <span class="matrix-radio-inner" *ngIf="form.get(item.id)?.value === opt.value"></span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conditional text for 5j when value >= 2 -->
+              <div class="matrix-conditional" *ngIf="showTrouble5jText() && currentQuestion()!.id === 'trouble5_matrix'">
+                <label class="matrix-conditional__label">¿Cuál? <span style="color:#94a3b8">(Describe la otra razón)</span></label>
+                <input type="text" class="input-field matrix-conditional__input"
+                       [formControl]="getControl('trouble5jDescription')"
+                       placeholder="Escribe aquí...">
+              </div>
+              <!-- Conditional text for partnerE when value >= 2 -->
+              <div class="matrix-conditional" *ngIf="showPartnerEText() && currentQuestion()!.id === 'partner_matrix'">
+                <label class="matrix-conditional__label">¿Cuál? <span style="color:#94a3b8">(Describe el otro inconveniente)</span></label>
+                <input type="text" class="input-field matrix-conditional__input"
+                       [formControl]="getControl('partnerEDescription')"
+                       placeholder="Escribe aquí...">
+              </div>
+            </div>
+
             <!-- Acción para tipos que necesitan botón explícito -->
-            <div class="input-action-row" *ngIf="currentQuestion()!.type === 'time' || currentQuestion()!.type === 'number' || currentQuestion()!.type === 'text'">
+            <div class="input-action-row" *ngIf="currentQuestion()!.type === 'time' || currentQuestion()!.type === 'number' || currentQuestion()!.type === 'text' || currentQuestion()!.type === 'matrix' || isCurrentQuestionValid()">
               <button class="next-button" type="button" (click)="onSubmit()" [disabled]="!isCurrentQuestionValid() || isSubmitting()">
                 {{ isLastQuestion() ? (isSubmitting() ? 'Guardando...' : 'Finalizar') : 'Siguiente' }}
               </button>
@@ -151,7 +197,7 @@ export class SleepQuestionnaireComponent implements OnInit {
   /** ICSP_VC instrumentId from backend — passed to submitRich for per-instrument tracking */
   private icspInstrumentId: number | undefined;
   
-  readonly totalQuestions = 19; // Máximo posible incluyendo condicionales
+  readonly totalQuestions = 11; // 10 base steps + partner matrix (conditional)
   
   private readonly questions: SleepQuestion[] = [
     {
@@ -164,6 +210,7 @@ export class SleepQuestionnaireComponent implements OnInit {
       id: 'sleepLatency',
       text: '¿Cuánto tiempo ha tardado normalmente en dormirse cada noche durante el último mes?',
       type: 'number',
+      unit: 'minutes',
       required: true
     },
     {
@@ -176,136 +223,32 @@ export class SleepQuestionnaireComponent implements OnInit {
       id: 'hoursSlept',
       text: '¿Cuántas horas calcula que ha dormido verdaderamente cada noche durante el último mes?',
       type: 'number',
+      unit: 'hours',
       required: true
     },
     {
-      id: 'trouble5a',
-      text: 'Durante el mes pasado, ¿cuántas veces ha tenido problemas para dormir a causa de... No poder quedarse dormido en la primera media hora?',
-      type: 'scale',
+      id: 'trouble5_matrix',
+      text: 'Durante el mes pasado, ¿cuántas veces ha tenido problemas para dormir a causa de...? Marca la respuesta que mayormente represente su situación.',
+      type: 'matrix',
       options: [
         { value: 0, label: 'Ninguna vez en el último mes' },
         { value: 1, label: 'Menos de una vez a la semana' },
         { value: 2, label: 'Una o dos veces a la semana' },
         { value: 3, label: 'Tres o más veces a la semana' }
       ],
-      required: true
-    },
-    {
-      id: 'trouble5b',
-      text: 'Despertarse durante la noche o de madrugada',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
+      items: [
+        { id: 'trouble5a', label: 'a. No poder quedarse dormido en la primera media hora' },
+        { id: 'trouble5b', label: 'b. Despertarse durante la noche o de madrugada' },
+        { id: 'trouble5c', label: 'c. Tener que levantarse para ir al baño' },
+        { id: 'trouble5d', label: 'd. No poder respirar bien' },
+        { id: 'trouble5e', label: 'e. Toser o roncar ruidosamente' },
+        { id: 'trouble5f', label: 'f. Sentir frío' },
+        { id: 'trouble5g', label: 'g. Sentir calor' },
+        { id: 'trouble5h', label: 'h. Tener \'malos sueños\' o pesadillas' },
+        { id: 'trouble5i', label: 'i. Tener dolores' },
+        { id: 'trouble5j', label: 'j. Otras razones' },
       ],
       required: true
-    },
-    {
-      id: 'trouble5c',
-      text: 'Tener que levantarse para ir al baño',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5d',
-      text: 'No poder respirar bien',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5e',
-      text: 'Toser o roncar ruidosamente',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5f',
-      text: 'Sentir frío',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5g',
-      text: 'Sentir calor',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5h',
-      text: 'Tener \'malos sueños\' o pesadillas',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5i',
-      text: 'Tener dolores',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5j',
-      text: 'Otras razones',
-      type: 'scale',
-      options: [
-        { value: 0, label: 'Ninguna vez en el último mes' },
-        { value: 1, label: 'Menos de una vez a la semana' },
-        { value: 2, label: 'Una o dos veces a la semana' },
-        { value: 3, label: 'Tres o más veces a la semana' }
-      ],
-      required: true
-    },
-    {
-      id: 'trouble5jDescription',
-      text: '¿Cuáles son esas otras razones?',
-      type: 'text',
-      conditional: {
-        dependsOn: 'trouble5j',
-        showWhen: (value) => value >= 2
-      }
     },
     {
       id: 'medication',
@@ -366,6 +309,29 @@ export class SleepQuestionnaireComponent implements OnInit {
         { value: 3, label: 'Si tengo y duerme en la misma cama.' }
       ],
       required: true
+    },
+    {
+      id: 'partner_matrix',
+      text: 'Si usted tiene pareja o compañero/a de habitación, pregúntele si usted durante el último mes ha tenido...',
+      type: 'matrix',
+      options: [
+        { value: 0, label: 'Ninguna vez en el último mes' },
+        { value: 1, label: 'Menos de una vez a la semana' },
+        { value: 2, label: 'Una o dos veces a la semana' },
+        { value: 3, label: 'Tres o más veces a la semana' }
+      ],
+      items: [
+        { id: 'partnerA', label: 'a. Ronquidos ruidosos.' },
+        { id: 'partnerB', label: 'b. Grandes pausas entre respiraciones, mientras duerme.' },
+        { id: 'partnerC', label: 'c. Sacudidas o espasmos de piernas mientras duerme.' },
+        { id: 'partnerD', label: 'd. Episodios de desorientación o confusión mientras duerme.' },
+        { id: 'partnerE', label: 'e. Presentó otros inconvenientes mientras dormía.' },
+      ],
+      required: true,
+      conditional: {
+        dependsOn: 'partner',
+        showWhen: (value: any) => value !== null && value !== '' && Number(value) >= 1
+      }
     }
   ];
 
@@ -379,7 +345,8 @@ export class SleepQuestionnaireComponent implements OnInit {
     private router: Router,
     private assessmentService: AssessmentService,
     private assessmentState: AssessmentStateService,
-    private alert: AlertService
+    private alert: AlertService,
+    private pendingClosingService: PendingClosingService,
   ) {
     this.form = this.fb.group({});
     this.initializeForm();
@@ -404,7 +371,20 @@ export class SleepQuestionnaireComponent implements OnInit {
   private initializeForm() {
     const controls: any = {};
     this.questions.forEach(q => {
-      if (q.required || !q.conditional) {
+      if (q.type === 'matrix' && q.items) {
+        // Each matrix item gets its own control
+        q.items.forEach(item => {
+          controls[item.id] = ['', Validators.required];
+        });
+        // Conditional description for 5j (trouble matrix)
+        if (q.id === 'trouble5_matrix') {
+          controls['trouble5jDescription'] = [''];
+        }
+        // Conditional description for partnerE (partner matrix)
+        if (q.id === 'partner_matrix') {
+          controls['partnerEDescription'] = [''];
+        }
+      } else if (q.required || !q.conditional) {
         controls[q.id] = ['', q.required ? Validators.required : null];
       } else {
         controls[q.id] = [''];
@@ -428,7 +408,23 @@ export class SleepQuestionnaireComponent implements OnInit {
     if (!currentQ) return;
     this.form.get(currentQ.id)?.setValue(value);
     // Avanzar automáticamente igual que el questionnaire principal
+    // For 'partner' with value 0, this is the last question → complete
     setTimeout(() => this.onSubmit(), 300);
+  }
+
+  selectMatrixOption(itemId: string, value: number) {
+    if (this.isSubmitting()) return;
+    this.form.get(itemId)?.setValue(value);
+  }
+
+  showTrouble5jText(): boolean {
+    const val = this.form.get('trouble5j')?.value;
+    return val === 2 || val === 3;
+  }
+
+  showPartnerEText(): boolean {
+    const val = this.form.get('partnerE')?.value;
+    return val === 2 || val === 3;
   }
 
   private getVisibleQuestions(): SleepQuestion[] {
@@ -448,7 +444,15 @@ export class SleepQuestionnaireComponent implements OnInit {
   isCurrentQuestionValid(): boolean {
     const currentQ = this.currentQuestion();
     if (!currentQ) return false;
-    
+
+    if (currentQ.type === 'matrix' && currentQ.items) {
+      // All matrix items must have a selection (value !== '')
+      return currentQ.items.every(item => {
+        const val = this.form.get(item.id)?.value;
+        return val !== '' && val !== null && val !== undefined;
+      });
+    }
+
     const control = this.form.get(currentQ.id);
     return control ? control.valid : false;
   }
@@ -478,14 +482,24 @@ export class SleepQuestionnaireComponent implements OnInit {
     if (this.currentQuestionIndex() > 0) {
       this.currentQuestionIndex.set(this.currentQuestionIndex() - 1);
       this.updateProgress();
+    } else {
+      this.router.navigate(['/mental-health']);
     }
+  }
+
+  onTimeUp() {
+    this.alert.info(
+      'El tiempo para completar la evaluación ha terminado. Las preguntas respondidas hasta ahora serán enviadas.',
+      'Tiempo agotado'
+    );
+    this.complete(); // Mismo comportamiento que si hubiera respondido todo
   }
 
   private updateProgress() {
     // Update progress logic if needed
   }
 
-  private complete() {
+  private complete(partial = false) {
     if (this.backendQuestions.length === 0) {
       this.alert.error('No se pudieron cargar las preguntas del servidor. Por favor, recarga la página e inténtalo de nuevo.');
       return;
@@ -494,14 +508,23 @@ export class SleepQuestionnaireComponent implements OnInit {
     this.isSubmitting.set(true);
     this.submitError.set(null);
 
-    const richAnswers = this._buildRichAnswers();
+    const richAnswers = this._buildRichAnswers(partial);
 
     this.assessmentService.submitRich('mental-health', richAnswers, 'ICSP_VC', this.icspInstrumentId).pipe(
       finalize(() => this.isSubmitting.set(false))
     ).subscribe({
       next: (result) => {
         this.assessmentState.mergeResult(result);
-        this.router.navigate(['/mental-health/instrument-results']);
+        // Limpiar el timer persistido para que el próximo intento empiece desde 0
+        ExamTimerComponent.clearKey('exam-timer:sleep-questionnaire');
+        // Guardar closing pendiente y volver al selector para mostrar el modal
+        this.pendingClosingService.set({
+          richAnswers,
+          instrumentCode: 'ICSP_VC',
+          instrumentId: this.icspInstrumentId,
+          moduleId: 'mental-health',
+        });
+        this.router.navigate(['/mental-health']);
       },
       error: (err) => {
         if (err?.code === 'CONSENT_REQUIRED') {
@@ -534,8 +557,10 @@ export class SleepQuestionnaireComponent implements OnInit {
    * Builds the RichAnswer[] array by mapping form values to backend question IDs.
    * The backend ICSP_VC questions follow the same order as the frontend static list.
    * TIME questions → textValue; INTEGER questions → value; LIKERT → value (option index).
+   * @param partial If true, questions with no answer (empty/null) are skipped entirely
+   *                so the backend calculates results only from answered questions.
    */
-  private _buildRichAnswers(): RichAnswer[] {
+  private _buildRichAnswers(partial = false): RichAnswer[] {
     const formValue = this.form.value;
     const richAnswers: RichAnswer[] = [];
 
@@ -549,21 +574,26 @@ export class SleepQuestionnaireComponent implements OnInit {
       'sleepLatency',   // INTEGER (minutes)
       'wakeTime',       // TIME
       'hoursSlept',     // INTEGER (hours)
-      'trouble5a',      // LIKERT
-      'trouble5b',      // LIKERT
-      'trouble5c',      // LIKERT
-      'trouble5d',      // LIKERT
-      'trouble5e',      // LIKERT
-      'trouble5f',      // LIKERT
-      'trouble5g',      // LIKERT
-      'trouble5h',      // LIKERT
-      'trouble5i',      // LIKERT
-      'trouble5j',      // LIKERT
+      'trouble5a',      // LIKERT (matrix item)
+      'trouble5b',      // LIKERT (matrix item)
+      'trouble5c',      // LIKERT (matrix item)
+      'trouble5d',      // LIKERT (matrix item)
+      'trouble5e',      // LIKERT (matrix item)
+      'trouble5f',      // LIKERT (matrix item)
+      'trouble5g',      // LIKERT (matrix item)
+      'trouble5h',      // LIKERT (matrix item)
+      'trouble5i',      // LIKERT (matrix item)
+      'trouble5j',      // LIKERT (matrix item)
       'medication',     // LIKERT
       'stayAwake',      // LIKERT
       'enthusiasm',     // LIKERT
       'sleepQuality',   // LIKERT
       'partner',        // LIKERT
+      'partnerA',       // LIKERT (partner matrix item, optional)
+      'partnerB',       // LIKERT (partner matrix item, optional)
+      'partnerC',       // LIKERT (partner matrix item, optional)
+      'partnerD',       // LIKERT (partner matrix item, optional)
+      'partnerE',       // LIKERT (partner matrix item, optional)
     ];
 
     coreIds.forEach((frontendId, idx) => {
@@ -572,6 +602,12 @@ export class SleepQuestionnaireComponent implements OnInit {
 
       const rawValue = formMap[frontendId];
       const qType = backendQ.questionType ?? 'LIKERT';
+
+      // In partial mode, skip questions that have no answer yet
+      if (partial) {
+        const isEmpty = rawValue === '' || rawValue === null || rawValue === undefined;
+        if (isEmpty) return;
+      }
 
       if (qType === 'TIME') {
         richAnswers.push({

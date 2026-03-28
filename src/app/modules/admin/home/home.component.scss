@@ -167,6 +167,7 @@
     margin: 0;
     margin-bottom: 4px;
     line-height: 27px;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
 }
 
 .welcome-banner-subtitle {
@@ -179,16 +180,18 @@
     margin-bottom: 10px;
     line-height: 18px;
     font-style: italic;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
 }
 
 .welcome-banner-text {
     font-family: 'Montserrat', sans-serif;
     font-size: 12px;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    color: #fff;
     line-height: 19px;
     margin: 0;
     margin-bottom: 14px;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
 }
 
 

@@ -680,6 +680,7 @@
     font-style: italic;
     border-left: 3px solid #2B7FFF;
     padding-left: 14px;
+    text-align: justify;
 }
 
 .wm-body__secondary {
@@ -687,6 +688,7 @@
     color: #64748b;
     line-height: 1.70;
     margin: 0;
+    text-align: justify;
     &+& {
         padding-top: 4px;
         border-top: 1px dashed #e2e8f0;
@@ -833,6 +835,7 @@
     color: #475569;
     font-family: 'Montserrat', sans-serif;
     margin-bottom: 16px;
+    text-align: justify;
 }
 
 .wm-consent__box {
@@ -857,6 +860,7 @@
     line-height: 1.65;
     color: #334155;
     font-family: 'Montserrat', sans-serif;
+    text-align: justify;
 }
 
 .wm-consent__actions {
@@ -950,6 +954,7 @@
     color: #334155;
     font-family: 'Montserrat', sans-serif;
     margin-bottom: 18px;
+    text-align: justify;
 }
 
 // ── Bloque visual interactivo (vibe) ──────────────────────────────────────────
@@ -1189,6 +1194,7 @@
     color: #475569;
     font-family: 'Montserrat', sans-serif;
     font-style: italic;
+    text-align: justify;
 }
 
 .wm-instr__timeframe-icon {
@@ -1245,7 +1251,7 @@
 // ─── Closing Modal (post-cuestionario) ────────────────────────────────────────
 .wm-modal--closing {
     max-width: 420px;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 // Visual container
@@ -1644,6 +1650,7 @@
     color: #475569;
     font-family: 'Montserrat', sans-serif;
     margin: 0;
+    text-align: justify;
 }
 
 .wcl-body__pre-result {
@@ -1660,6 +1667,7 @@
     margin: 0;
     width: 100%;
     box-sizing: border-box;
+    text-align: justify;
 }
 
 .wcl-body__cta {

@@ -41,7 +41,7 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
     {
         id: 'mental-health',
         title: 'Salud Mental',
-        description: 'Tamizaje de ansiedad, depresión, trastorno del sueño y desgaste emocional',
+        description: 'Bienestar emocional, pensando, sintiendo y actuando',
         icon: 'icons/Icon (37).svg',
         colorClass: 'module-card--mental-health',
         iconClass: 'module-icon--blue',
@@ -50,7 +50,7 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         resultsTitle: 'Resultados de Salud Mental',
         welcomeIntro: {
             lead: 'La salud mental no solo se trata de "estar bien", sino de aprender a escucharte, reconocer tus pensamientos y cuidar de tu bienestar emocional día a día.',
-            secondary: 'Este espacio te invita a hacer una pausa para ti. Aquí podrás encontrar pequeñas acciones que te ayuden a recuperar tu equilibrio y serenidad interior. Antes de ello vamos a realizar unas pruebas para ayudarte a comprender qué está pasando en este momento con tu yo interior:',
+            secondary: 'Este espacio te invitamos a hacer una pausa consciente contigo mismo. Aquí encontrarás pequeñas acciones orientadas a favorecer la recuperación de tu equilibrio y serenidad interior, pero antes de comenzar, te proponemos responder algunas preguntas que te permitirán comprender con mayor claridad qué está ocurriendo en tu estado interno en este momento.',
         },
         higherIsWorse: true,
         theme: {
@@ -69,7 +69,7 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
     {
         id: 'work-fatigue',
         title: 'Fatiga Laboral',
-        description: 'Evaluación rápida de energía cognitiva y emocional',
+        description: 'Apreciación de la energía cognitiva y emocional',
         icon: 'icons/Icon (38).svg',
         colorClass: 'module-card--work-fatigue',
         iconClass: 'module-icon--green',

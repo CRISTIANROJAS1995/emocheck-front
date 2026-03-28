@@ -85,7 +85,35 @@
             @if (currentClosing.preResultText) {
             <p class="wcl-body__pre-result">{{ currentClosing.preResultText }}</p>
             }
-            <button class="wcl-body__cta" (click)="onClosingContinue()" [style.background]="heroGradient" type="button">
+
+            <!-- Bloque de aviso legal (solo cuando requiresDisclaimer = true) -->
+            @if (currentClosing.requiresDisclaimer) {
+            <div style="
+                margin: 14px 0 4px;
+                padding: 12px 14px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 11px;
+                color: #475569;
+                line-height: 1.65;
+                text-align: justify;
+            ">
+                Los componentes y cuestionarios de autopercepción aquí presentados no constituyen instrumentos de evaluación clínica ni diagnóstica, ni sustituyen la valoración, diagnóstico o intervención de profesionales de la salud. Su uso se limita a fines informativos
+                y de orientación, como apoyo a la reflexión personal y a la promoción de factores psicosociales protectores en el marco de acciones preventivas en entornos organizacionales.
+            </div>
+            <label style="
+                display: flex; align-items: flex-start; gap: 9px;
+                margin: 10px 0 16px;
+                font-size: 12px; color: #334155;
+                cursor: pointer; text-align: justify; line-height: 1.5;
+            ">
+                <input type="checkbox" [(ngModel)]="disclaimerAccepted" style="margin-top: 2px; accent-color: #155DFC; width: 15px; height: 15px; flex-shrink: 0; cursor: pointer;" />
+                Declaro que he leído y comprendido la información anteriormente expuesta.
+            </label> }
+
+            <button class="wcl-body__cta" (click)="onClosingContinue()" [style.background]="heroGradient" [disabled]="currentClosing.requiresDisclaimer && !disclaimerAccepted" [style.opacity]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? '0.45' : '1'"
+                [style.cursor]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? 'not-allowed' : 'pointer'" type="button">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
@@ -100,7 +128,7 @@
 
 @if (config) {
 <!-- Fase 2: Cuestionario -->
-<emo-questionnaire [config]="config" (back)="goBack()" (completed)="onCompleted($event)" (completedRich)="onCompletedRich($event)"></emo-questionnaire>
+<emo-questionnaire [config]="config" [timerKey]="'exam-timer:questionnaire:' + (selectedInstrument?.code ?? 'generic')" (back)="goBack()" (completed)="onCompleted($event)" (completedRich)="onCompletedRich($event)"></emo-questionnaire>
 } @else {
 <!-- Fase 1: Selección de instrumento -->
 
@@ -113,6 +141,19 @@
         <div class="wm-header" [style.background]="heroGradient">
             <div class="wm-header__blur wm-header__blur--1"></div>
             <div class="wm-header__blur wm-header__blur--2"></div>
+            <!-- Close button -->
+            <button (click)="closeWelcomeModal()" aria-label="Cerrar" style="
+                    position: absolute; top: 12px; right: 14px; z-index: 10;
+                    display: flex; align-items: center; justify-content: center;
+                    width: 30px; height: 30px; border-radius: 50%;
+                    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+                    color: #fff; cursor: pointer; transition: background 0.2s;
+                ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
             <div class="wm-header__inner">
                 <div class="wm-header__icon-wrap">
                     <img [src]="moduleDef.icon" alt="" class="wm-header__icon" />
@@ -253,7 +294,7 @@
                 <div class="wm-header__icon-wrap">
                     <img [src]="pendingInstrument.icon" alt="" class="wm-instr__icon" />
                 </div>
-                <span class="wm-header__module-tag">{{ pendingInstrument.code }}</span>
+                <span class="wm-header__module-tag">{{ formatCode(pendingInstrument.code) }}</span>
                 <h2 class="wm-header__title" style="font-size: 1.15rem;">{{ currentInstructions.heading }}</h2>
             </div>
             <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -324,7 +365,7 @@
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
-                Comenzar prueba
+                Comenzar cuestionario
             </button>
 
             <!-- Vínculo cancelar -->
@@ -465,7 +506,7 @@
                 </span>
 
                 <span class="is-card__body">
-                    <span class="is-card__code" [style.color]="card.locked ? '#94a3b8' : card.color">{{ card.code }}</span>
+                    <span class="is-card__code" [style.color]="card.locked ? '#94a3b8' : card.color">{{ formatCode(card.code) }}</span>
                     <span class="is-card__label">{{ card.label }}</span>
                     <span class="is-card__description">{{ card.description }}</span>
                     @if (card.locked && card.lockReason) {

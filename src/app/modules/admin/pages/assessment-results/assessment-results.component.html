@@ -26,14 +26,14 @@
 
     <main class="results-shell" *ngIf="result as r">
 
-        <!-- Banner intro estático — solo Salud Mental -->
-        <section class="mh-intro-banner" *ngIf="moduleId === 'mental-health'">
-            <div class="mh-intro-banner__floating mh-intro-banner__floating--1">🧠</div>
-            <div class="mh-intro-banner__floating mh-intro-banner__floating--2">💙</div>
-            <div class="mh-intro-banner__floating mh-intro-banner__floating--3">✨</div>
-            <div class="mh-intro-banner__floating mh-intro-banner__floating--4">🌿</div>
+        <!-- Banner intro estático — Salud Mental y Fatiga Laboral -->
+        <section class="mh-intro-banner" *ngIf="moduleId === 'mental-health' || moduleId === 'work-fatigue'">
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--1">{{ bannerIcons.floats[0] }}</div>
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--2">{{ bannerIcons.floats[1] }}</div>
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--3">{{ bannerIcons.floats[2] }}</div>
+            <div class="mh-intro-banner__floating mh-intro-banner__floating--4">{{ bannerIcons.floats[3] }}</div>
             <div class="mh-intro-banner__inner">
-                <span class="mh-intro-banner__icon" aria-hidden="true">🫧</span>
+                <span class="mh-intro-banner__icon" aria-hidden="true">{{ bannerIcons.center }}</span>
                 <p class="mh-intro-banner__text">
                     {{ introBannerText }}
                 </p>
@@ -48,7 +48,8 @@
                 <span>Desglose por dimensiones</span>
             </div>
 
-            <div class="dim-cards">
+            <!-- Tarjetas normales (todos los instrumentos excepto ICSP_VC) -->
+            <div class="dim-cards" *ngIf="instrumentCode !== 'ICSP_VC'">
                 <div class="dim-card" *ngFor="let d of r.dimensions; let idx = index" [ngClass]="'dim-card--' + getBarTone(d.percent, d.riskLevel)" [style.border-left-color]="d.scoreRangeColor || null">
                     <div class="dim-card__name-row">
                         <span class="dim-card__name" [style.color]="d.scoreRangeColor || null">{{ getDimensionLabel(d, idx) }}</span>
@@ -62,6 +63,14 @@
                         <div class="dim-card__bar-fill" [style.width.%]="d.percent" [style.background]="d.scoreRangeColor || null" [ngClass]="d.scoreRangeColor ? '' : 'dim-bar--' + getBarTone(d.percent, d.riskLevel)">
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Tarjetas ICSP_VC: pill compacto, solo título + puntaje + color -->
+            <div class="icsp-dim-cards" *ngIf="instrumentCode === 'ICSP_VC'">
+                <div class="icsp-dim-card" *ngFor="let d of r.dimensions; let idx = index" [style.border-color]="d.scoreRangeColor || null" [style.background]="(d.scoreRangeColor || '#e5e7eb') + '12'">
+                    <span class="icsp-dim-card__score" [style.color]="d.scoreRangeColor || null">{{ d.score | number:'1.0-0' }}</span>
+                    <span class="icsp-dim-card__name">{{ getDimensionLabel(d, idx) }}</span>
                 </div>
             </div>
 
@@ -96,7 +105,12 @@
 
             <div class="rec-item" *ngFor="let item of r.recommendations; let idx = index">
                 <div class="rec-badge">{{ idx + 1 }}</div>
-                <div class="rec-text">{{ item }}</div>
+                <div class="rec-body">
+                    <span class="rec-dim-chip" *ngIf="item.dimensionLabel" [style.background]="item.dimensionColor ? item.dimensionColor + '1A' : null" [style.color]="item.dimensionColor || null" [style.borderColor]="item.dimensionColor ? item.dimensionColor + '55' : null">
+                        {{ item.dimensionLabel }}
+                    </span>
+                    <div class="rec-text">{{ item.text }}</div>
+                </div>
             </div>
 
             <p *ngIf="(r.recommendations ?? []).length === 0">

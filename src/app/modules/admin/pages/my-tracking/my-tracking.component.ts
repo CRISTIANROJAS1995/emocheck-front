@@ -466,7 +466,7 @@ export class MyTrackingComponent implements OnInit {
         if (!card?.isCompleted) return;
 
         // Multi-instrument modules show the instrument picker first.
-        const multiInstrumentModules: ModuleProgressId[] = ['mental-health'];
+        const multiInstrumentModules: ModuleProgressId[] = ['mental-health', 'psychosocial-risk'];
         if (multiInstrumentModules.includes(moduleId)) {
             this.router.navigate([`/${moduleId}/instrument-results`]);
         } else {

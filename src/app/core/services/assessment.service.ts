@@ -471,8 +471,11 @@ export class AssessmentService {
      *   When provided, the already-completed check is scoped to THAT instrument only.
      *   This is required for multi-instrument modules (e.g. mental-health) so that completing
      *   BAI does not block the user from later completing BDI in the same module.
+     * @param instrumentId    Optional: the specific instrument ID
+     * @param isTimeout       Optional: true if this submission is due to timer expiry.
+     *   When true, the backend should mark the instrument as completed even if not all questions were answered.
      */
-    submitRich(moduleId: AssessmentModuleId, richAnswers: RichAnswer[], instrumentCode?: string, instrumentId?: number): Observable<AssessmentResult> {
+    submitRich(moduleId: AssessmentModuleId, richAnswers: RichAnswer[], instrumentCode?: string, instrumentId?: number, isTimeout?: boolean): Observable<AssessmentResult> {
         return this.consentService.hasAccepted().pipe(
             switchMap((hasAccepted) =>
                 hasAccepted
@@ -925,9 +928,42 @@ export class AssessmentService {
                     ? Math.round(Math.max(0, Math.min(100, Number(d.percentageScore))))
                     : this.safePercent(Number(d?.score ?? 0), Number(d?.maxScore ?? 0)),
             })),
-            recommendations: ((anyRes?.recommendations ?? []) as any[])
-                .map((r) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
-                .filter(Boolean),
+            recommendations: (() => {
+                const rawRecs = (anyRes?.recommendations ?? []) as any[];
+                const rawDims = (anyRes?.dimensionScores ?? []) as any[];
+                const dimsByInstrId = new Map<number, any[]>();
+                for (const d of rawDims) {
+                    const id = Number(d?.instrumentID ?? 0);
+                    if (!id) continue;
+                    if (!dimsByInstrId.has(id)) dimsByInstrId.set(id, []);
+                    dimsByInstrId.get(id)!.push(d);
+                }
+                const mapped = rawRecs.map((r: any, i: number) => {
+                    let matchedDim: any;
+                    const recInstrId = Number(r?.instrumentID ?? 0);
+                    if (recInstrId) {
+                        const candidates = dimsByInstrId.get(recInstrId) ?? [];
+                        if (candidates.length === 1) matchedDim = candidates[0];
+                    }
+                    if (!matchedDim && rawDims.length === rawRecs.length) {
+                        matchedDim = rawDims[i];
+                    }
+                    return {
+                        text: String(r?.recommendationText ?? r?.description ?? r?.text ?? '').trim(),
+                        title: String(r?.title ?? '').trim() || undefined,
+                        recommendationTypeName: String(r?.recommendationTypeName ?? '').trim() || undefined,
+                        dimensionLabel: matchedDim ? (String(matchedDim?.dimensionName ?? '').trim() || undefined) : undefined,
+                        dimensionColor: matchedDim ? (String(matchedDim?.scoreRangeColor ?? '').trim() || undefined) : undefined,
+                        instrumentCode: undefined as string | undefined,
+                    };
+                });
+                const seen = new Set<string>();
+                return mapped.filter((r: any) => {
+                    if (!r.text || seen.has(r.text)) return false;
+                    seen.add(r.text);
+                    return true;
+                });
+            })(),
         };
     }
 

@@ -241,9 +241,7 @@ export class AssessmentHydrationService {
                 return this.unwrapArray<SwaggerRecommendationDto>(res);
             }),
             map((items) =>
-                (items ?? [])
-                    .map((r: any) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
-                    .filter(Boolean)
+                this._mapRecs(items ?? [], [], undefined)
             ),
             tap((recs) => {
                 if (!recs.length) return;
@@ -302,9 +300,11 @@ export class AssessmentHydrationService {
                     scoreRangeDescription: d?.scoreRangeDescription ?? undefined,
                     percent: Math.round(Number(d?.percentageScore ?? 0)),
                 }));
-                const recs = ((result?.recommendations ?? []) as any[])
-                    .map((r: any) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
-                    .filter(Boolean);
+                const recs = this._mapRecs(
+                    (result?.recommendations ?? []) as any[],
+                    (result?.dimensionScores ?? []) as any[],
+                    undefined,
+                );
 
                 this.state.setResult({
                     ...latest,
@@ -329,6 +329,8 @@ export class AssessmentHydrationService {
 
         const outcome = this.mapRiskLevelToOutcome(result?.riskLevel);
         const score = Math.round(Math.max(0, Math.min(100, result?.scorePercentage ?? 0)));
+
+        const evalInstrumentCode = String(anyItem?.instrumentCode ?? '').toUpperCase().trim() || undefined;
 
         return {
             moduleId,
@@ -363,10 +365,62 @@ export class AssessmentHydrationService {
                     percent,
                 };
             }),
-            recommendations: ((result?.recommendations ?? []) as any[])
-                .map((r) => String(r?.recommendationText ?? r?.description ?? r?.text ?? r?.title ?? '').trim())
-                .filter(Boolean),
+            recommendations: this._mapRecs(
+                (result?.recommendations ?? []) as any[],
+                (result?.dimensionScores ?? []) as any[],
+                evalInstrumentCode,
+            ),
         };
+    }
+
+    private _mapRecs(
+        rawRecs: any[],
+        rawDims: any[],
+        instrumentCode: string | undefined,
+    ) {
+        // Build a map: instrumentID → dims that share that ID.
+        // When a given ID appears exactly once, we can safely match by it
+        // (covers ICSP_VC where each component = its own instrument).
+        // When multiple dims share an ID (DASS21 sub-scales) we fall back to index.
+        const dimsByInstrId = new Map<number, any[]>();
+        for (const d of rawDims) {
+            const id = Number(d?.instrumentID ?? 0);
+            if (!id) continue;
+            if (!dimsByInstrId.has(id)) dimsByInstrId.set(id, []);
+            dimsByInstrId.get(id)!.push(d);
+        }
+
+        const mapped = rawRecs.map((r, i) => {
+            let matchedDim: any;
+
+            // 1. Match by instrumentID when that ID is unique across dims
+            const recInstrId = Number(r?.instrumentID ?? 0);
+            if (recInstrId) {
+                const candidates = dimsByInstrId.get(recInstrId) ?? [];
+                if (candidates.length === 1) matchedDim = candidates[0];
+            }
+
+            // 2. Fallback: 1:1 index pairing when rec & dim counts match
+            if (!matchedDim && rawDims.length === rawRecs.length) {
+                matchedDim = rawDims[i];
+            }
+
+            return {
+                text: String(r?.recommendationText ?? r?.description ?? r?.text ?? '').trim(),
+                title: String(r?.title ?? '').trim() || undefined,
+                recommendationTypeName: String(r?.recommendationTypeName ?? '').trim() || undefined,
+                dimensionLabel: matchedDim ? (String(matchedDim?.dimensionName ?? '').trim() || undefined) : undefined,
+                dimensionColor: matchedDim ? (String(matchedDim?.scoreRangeColor ?? '').trim() || undefined) : undefined,
+                instrumentCode,
+            };
+        });
+        // Deduplicate by text — keeps first occurrence with its dimension info
+        const seen = new Set<string>();
+        return mapped.filter((r) => {
+            if (!r.text || seen.has(r.text)) return false;
+            seen.add(r.text);
+            return true;
+        });
     }
 
     private safePercent(score: number, maxScore: number): number {
@@ -501,9 +555,9 @@ export class AssessmentHydrationService {
                 // If already present (same instrumentCode/id), keep the newer one (already in allDims)
             }
 
-            // Merge recommendations (union)
+            // Merge recommendations (union by text)
             for (const rec of olderResult.recommendations ?? []) {
-                if (!base.recommendations.includes(rec)) base.recommendations.push(rec);
+                if (!base.recommendations.some((r) => r.text === rec.text)) base.recommendations.push(rec);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿export const environment = {
     production: true,
-    apiUrl: 'https://www.emocheckhealth.com/api',
+    apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
     apiTimeout: 30000,
     appName: 'EmoCheck',
     version: '1.0.0',

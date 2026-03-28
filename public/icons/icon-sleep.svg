@@ -1,0 +1,8 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Moon crescent -->
+  <path d="M26 17.5C24.5 21.5 20.5 24.5 16 24.5C9.9 24.5 5 19.6 5 13.5C5 9 7.9 5.1 12 3.5C7 5 3.5 10.3 3.5 16.5C3.5 23.4 9.1 29 16 29C21.5 29 26.2 25.5 28 20.5C27.4 20.9 26.7 21 26 17.5Z" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Stars -->
+  <circle cx="22" cy="6" r="1.2" fill="#f59e0b"/>
+  <circle cx="26" cy="10" r="0.9" fill="#f59e0b"/>
+  <circle cx="19" cy="3" r="0.8" fill="#f59e0b"/>
+</svg>

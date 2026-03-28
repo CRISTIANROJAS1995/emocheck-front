@@ -7,7 +7,9 @@ import { finalize, switchMap } from 'rxjs';
 import { AssessmentService, RichAnswer } from 'app/core/services/assessment.service';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
+import { PendingClosingService } from 'app/core/services/pending-closing.service';
 import { AssessmentQuestion } from 'app/core/models/assessment.model';
+import { ExamTimerComponent } from 'app/shared/components/ui/exam-timer/exam-timer.component';
 
 interface EmotionalIntelligenceQuestion {
   id: string;
@@ -18,7 +20,7 @@ interface EmotionalIntelligenceQuestion {
 @Component({
   selector: 'app-emotional-intelligence-questionnaire',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ExamTimerComponent],
   template: `
     <div class="questionnaire-page">
       <div class="blur-circle blur-circle--green-top-right"></div>
@@ -41,6 +43,7 @@ interface EmotionalIntelligenceQuestion {
                   <div class="header-subtitle">Pregunta {{ currentQuestionIndex() + 1 }} de {{ questions.length }}</div>
                 </div>
               </div>
+              <app-exam-timer storageKey="exam-timer:emotional-intelligence" (timeUp)="onTimeUp()"></app-exam-timer>
             </div>
             <div class="progress-wrap">
               <div class="progress-track">
@@ -70,6 +73,12 @@ interface EmotionalIntelligenceQuestion {
                 </span>
                 <span class="option-label">{{ option.label }}</span>
                 <svg class="chevron" viewBox="0 0 20 20"><path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+              </button>
+            </div>
+
+            <div class="input-action-row" *ngIf="isCurrentQuestionValid()">
+              <button class="next-button" type="button" (click)="onSubmit()" [disabled]="!isCurrentQuestionValid() || isSubmitting()">
+                {{ isLastQuestion() ? (isSubmitting() ? 'Guardando...' : 'Finalizar') : 'Siguiente' }}
               </button>
             </div>
 
@@ -157,7 +166,8 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
     private router: Router,
     private assessmentService: AssessmentService,
     private assessmentState: AssessmentStateService,
-    private alert: AlertService
+    private alert: AlertService,
+    private pendingClosingService: PendingClosingService,
   ) {
     this.form = this.fb.group({});
     this.initializeForm();
@@ -233,14 +243,24 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
     if (this.currentQuestionIndex() > 0) {
       this.currentQuestionIndex.set(this.currentQuestionIndex() - 1);
       this.updateProgress();
+    } else {
+      this.router.navigate(['/mental-health']);
     }
+  }
+
+  onTimeUp() {
+    this.alert.info(
+      'El tiempo para completar la evaluación ha terminado. Las preguntas respondidas hasta ahora serán enviadas.',
+      'Tiempo agotado'
+    );
+    this.complete(); // Mismo comportamiento que si hubiera respondido todo
   }
 
   private updateProgress() {
     // Update progress logic if needed
   }
 
-  private complete() {
+  private complete(partial = false) {
     if (this.backendQuestions.length === 0) {
       this.alert.error('No se pudieron cargar las preguntas del servidor. Por favor, recarga la página e inténtalo de nuevo.');
       return;
@@ -249,23 +269,38 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
     this.isSubmitting.set(true);
 
     // TMMS-24: 24 preguntas LIKERT 1-5 en orden q1..q24
-    // submitRichResponses espera value como índice 0-based, pero el form guarda 1-5
-    const richAnswers: RichAnswer[] = this.questions.map((q, idx) => {
-      const rawValue = this.form.get(q.id)?.value ?? 1;
-      const backendQ = this.backendQuestions[idx];
-      return {
-        questionId: backendQ?.id ?? idx + 1,
-        value: Math.max(0, Number(rawValue) - 1), // convertir 1-5 → índice 0-4
-        text: null,
-      };
-    });
+    // En modo partial se omiten preguntas sin respuesta (valor null/'')
+    const richAnswers: RichAnswer[] = this.questions
+      .map((q, idx) => {
+        const rawValue = this.form.get(q.id)?.value;
+        const backendQ = this.backendQuestions[idx];
+        // Skip unanswered questions in partial mode
+        if (partial && (rawValue === null || rawValue === '' || rawValue === undefined)) {
+          return null;
+        }
+        return {
+          questionId: backendQ?.id ?? idx + 1,
+          value: Math.max(0, Number(rawValue ?? 1) - 1), // convertir 1-5 → índice 0-4
+          text: null,
+        };
+      })
+      .filter((r): r is RichAnswer => r !== null);
 
     this.assessmentService.submitRich('mental-health', richAnswers, 'TMMS24', this.tmmsInstrumentId).pipe(
       finalize(() => this.isSubmitting.set(false))
     ).subscribe({
       next: (result) => {
         this.assessmentState.mergeResult(result);
-        this.router.navigate(['/mental-health/instrument-results']);
+        // Limpiar el timer persistido para que el próximo intento empiece desde 0
+        ExamTimerComponent.clearKey('exam-timer:emotional-intelligence');
+        // Guardar closing pendiente y volver al selector para mostrar el modal
+        this.pendingClosingService.set({
+          richAnswers,
+          instrumentCode: 'TMMS24',
+          instrumentId: this.tmmsInstrumentId,
+          moduleId: 'mental-health',
+        });
+        this.router.navigate(['/mental-health']);
       },
       error: (err) => {
         if (err?.code === 'CONSENT_REQUIRED') {

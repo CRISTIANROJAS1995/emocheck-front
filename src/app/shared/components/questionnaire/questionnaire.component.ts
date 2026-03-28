@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AssessmentQuestion } from 'app/core/models/assessment.model';
 import { RichAnswer } from 'app/core/services/assessment.service';
 import { QuestionnaireConfig } from './questionnaire.types';
+import { ExamTimerComponent } from 'app/shared/components/ui/exam-timer/exam-timer.component';
 
 /** Internal answer: numeric for LIKERT/ROUTING/INTEGER; string for TIME; mixed for ROUTING with text companion. */
 interface QuestionAnswer {
@@ -15,12 +16,15 @@ interface QuestionAnswer {
 @Component({
     selector: 'emo-questionnaire',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, ExamTimerComponent],
     templateUrl: './questionnaire.component.html',
     styleUrls: ['./questionnaire.component.scss'],
 })
 export class EmoQuestionnaireComponent implements OnChanges {
     @Input({ required: true }) config!: QuestionnaireConfig;
+
+    /** Unique key used to persist the timer in localStorage across refreshes/navigation */
+    @Input() timerKey = 'exam-timer:questionnaire:generic';
 
     @Output() back = new EventEmitter<void>();
     @Output() completed = new EventEmitter<number[]>();
@@ -210,37 +214,53 @@ export class EmoQuestionnaireComponent implements OnChanges {
         }
     }
 
-    submit(): void {
+    submit(partial = false): void {
         if (this.hasSubmitted) return;
         this.hasSubmitted = true;
 
         // Build rich answers (preserves sub-items, TIME text, INTEGER, ROUTING)
-        const rich: RichAnswer[] = this.config.questions.map((q, i) => {
-            const ans = this.answers[i] ?? { value: null, text: null };
-            const subItems = q.subItems ?? [];
-            const subAnswers = subItems.length
-                ? (ans.subItems ?? []).map((sa, si) => ({
-                    questionId: subItems[si]?.id ?? 0,
-                    value: sa.value,
-                    text: sa.text,
-                }))
-                : undefined;
-            return {
-                questionId: q.id,
-                value: ans.value,
-                text: ans.text,
-                subAnswers,
-            };
-        });
+        // In partial mode, skip questions that have not been answered
+        const rich: RichAnswer[] = this.config.questions
+            .map((q, i) => {
+                const ans = this.answers[i] ?? { value: null, text: null };
+
+                if (partial && ans.value === null && !(ans.text ?? '').trim()) {
+                    return null;
+                }
+
+                const subItems = q.subItems ?? [];
+                const subAnswers = subItems.length
+                    ? (ans.subItems ?? []).map((sa, si) => ({
+                        questionId: subItems[si]?.id ?? 0,
+                        value: sa.value,
+                        text: sa.text,
+                    }))
+                    : undefined;
+                return {
+                    questionId: q.id,
+                    value: ans.value,
+                    text: ans.text,
+                    subAnswers,
+                };
+            })
+            .filter((r): r is NonNullable<typeof r> => r !== null) as RichAnswer[];
 
         // Backward-compat flat emission (value index per question)
         const flat = this.answers.map((a) => (a.value ?? 0));
+        // Limpiar el timer persistido — el examen terminó (enviado o tiempo agotado)
+        ExamTimerComponent.clearKey(this.timerKey);
         this.completed.emit(flat);
         this.completedRich.emit(rich);
     }
 
     goBack(): void {
         this.back.emit();
+    }
+
+    onTimeUp(): void {
+        // Submit exactly the same as if completed normally
+        // — this ensures timeout submissions are marked as completed
+        this.submit();
     }
 
     get canGoBack(): boolean {

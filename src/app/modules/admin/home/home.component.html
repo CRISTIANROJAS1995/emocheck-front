@@ -19,15 +19,45 @@
                 <p class="welcome-banner-text">
                     Gracias por cuidar de ti. EmoCheck te acompañará en un recorrido breve para conocer tu bienestar y salud mental. Cada paso que das hacia el autocuidado fortalece no solo tu vida, sino también el ambiente en el que trabajas.
                 </p>
+
+                @if (showDisclaimer) {
+                <p class="welcome-banner-text" style="margin-top: 10px; font-size: 11.5px; line-height: 1.7; color: rgba(255,255,255,0.95); background: rgba(0,0,0,0.15); border-left: 3px solid rgba(255,255,255,0.4); padding: 8px 12px; border-radius: 0 8px 8px 0;">
+                    Recuerda que este espacio tiene como propósito orientar y facilitar la comprensión de cómo tu cuerpo y tu mente responden a las diferentes exigencias de la vida cotidiana. Los componentes y cuestionarios de autopercepción aquí presentados no constituyen
+                    instrumentos de evaluación clínica, ni cuentan con la validez para reemplazar un proceso de atención profesional en salud, sino que constituye herramientas de apoyo para la reflexión, la comprensión personal y la promoción de factores
+                    psicosociales protectores, en el marco de la prevención.
+                </p>
+                }
+
+                <!-- Badges + disclaimer toggle en una misma fila -->
+                <div class="flex flex-wrap items-center gap-2.5" style="margin-top: 14px;">
+                    <emo-badge icon="icons/Icon (25).svg" [iconSize]="16">
+                        Todas tus respuestas son confidenciales
+                    </emo-badge>
+                    <emo-badge icon="icons/Icon (26).svg" [iconSize]="16">
+                        Tu bienestar es nuestra prioridad
+                    </emo-badge>
+                    <button (click)="showDisclaimer = !showDisclaimer" style="
+                            display: inline-flex; align-items: center; gap: 5px;
+                            padding: 4px 11px;
+                            background: rgba(255,255,255,0.95); border: 1px solid rgba(255,255,255,1);
+                            border-radius: 20px; color: #1a5276; font-size: 11.5px; font-weight: 700;
+                            cursor: pointer; transition: background 0.2s; letter-spacing: 0.01em;
+                        ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        {{ showDisclaimer ? 'Ver menos' : 'Más información' }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                            [style.transform]="showDisclaimer ? 'rotate(180deg)' : 'rotate(0deg)'"
+                            style="transition: transform 0.25s;">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-2.5">
-                <emo-badge icon="icons/Icon (25).svg" [iconSize]="16">
-                    Todas tus respuestas son confidenciales
-                </emo-badge>
-                <emo-badge icon="icons/Icon (26).svg" [iconSize]="16">
-                    Tu bienestar es nuestra prioridad
-                </emo-badge>
-            </div>
+            <!-- Eliminado el div de badges original ya que fue movido arriba -->
         </div>
 
         <!-- Modules section -->

@@ -2,11 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, switchMap } from 'rxjs';
 
 import { AssessmentService, RichAnswer } from 'app/core/services/assessment.service';
+import { AssessmentQuestion } from 'app/core/models/assessment.model';
 import { AssessmentStateService } from 'app/core/services/assessment-state.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
+import { PendingClosingService } from 'app/core/services/pending-closing.service';
+import { ExamTimerComponent } from 'app/shared/components/ui/exam-timer/exam-timer.component';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 
 interface MFIQuestion {
@@ -19,7 +22,7 @@ interface MFIQuestion {
 @Component({
     selector: 'app-mfi-questionnaire',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, BackgroundCirclesComponent],
+    imports: [CommonModule, ReactiveFormsModule, BackgroundCirclesComponent, ExamTimerComponent],
     templateUrl: './mfi-questionnaire.component.html',
     styleUrl: './mfi-questionnaire.component.scss'
 })
@@ -29,6 +32,10 @@ export class MfiQuestionnaireComponent implements OnInit {
     currentQuestionIndex = 0;
     isSubmitting = false;
     showResults = false;
+
+    /** Backend questions loaded on init — needed to get real questionIDs for submission */
+    private backendQuestions: AssessmentQuestion[] = [];
+    private mfiInstrumentId: number | undefined;
 
     // Preguntas del MFI-20 basadas en la literatura científica
     readonly questions: MFIQuestion[] = [
@@ -76,11 +83,24 @@ export class MfiQuestionnaireComponent implements OnInit {
         private router: Router,
         private assessmentService: AssessmentService,
         private assessmentState: AssessmentStateService,
-        private alert: AlertService
+        private alert: AlertService,
+        private pendingClosingService: PendingClosingService,
     ) {}
 
     ngOnInit(): void {
         this.initializeForm();
+        // Load backend questions to get real questionIDs for submission (same pattern as SleepQuestionnaire)
+        this.assessmentService.getModuleInstruments('work-fatigue').pipe(
+            switchMap((instruments) => {
+                const mfi = instruments.find(i => i.code === 'MFI20');
+                if (!mfi) throw new Error('Instrumento MFI20 no encontrado');
+                this.mfiInstrumentId = mfi.instrumentId;
+                return this.assessmentService.getInstrumentQuestions('work-fatigue', mfi.index);
+            })
+        ).subscribe({
+            next: (questions) => { this.backendQuestions = questions; },
+            error: () => { /* Will be caught at submit time if questions fail to load */ }
+        });
     }
 
     private initializeForm(): void {
@@ -143,38 +163,61 @@ export class MfiQuestionnaireComponent implements OnInit {
         }, 150);
     }
 
-    private submitQuestionnaire(): void {
-        if (this.form.invalid || this.isSubmitting) {
+    private submitQuestionnaire(partial = false): void {
+        if (!partial && (this.form.invalid || this.isSubmitting)) {
             this.form.markAllAsTouched();
             return;
         }
 
+        if (this.isSubmitting) return;
+
         this.isSubmitting = true;
 
         // Convertir las respuestas al formato RichAnswer
-        const richAnswers: RichAnswer[] = this.questions.map(question => {
-            let rawValue = this.form.get(`q${question.id}`)?.value;
-            
-            // Aplicar inversión de puntuación si es necesario
-            if (question.reversed) {
-                rawValue = 6 - rawValue; // Invertir escala 1-5 a 5-1
-            }
+        // En modo partial se omiten preguntas sin respuesta
+        const richAnswers: RichAnswer[] = this.questions
+            .map((question, qi) => {
+                let rawValue = this.form.get(`q${question.id}`)?.value;
 
-            return {
-                questionId: question.id,
-                value: rawValue,
-                text: null
-            };
-        });
+                // Skip unanswered questions in partial mode
+                if (partial && (rawValue === null || rawValue === undefined || rawValue === '')) {
+                    return null;
+                }
 
-        // Enviar al backend
-        this.assessmentService.submitRich('work-fatigue', richAnswers, 'MFI20').pipe(
+                // Aplicar inversión de puntuación si es necesario
+                if (question.reversed) {
+                    rawValue = 6 - rawValue; // Invertir escala 1-5 a 5-1
+                }
+
+                // Convertir valor 1-5 a índice 0-based para que submitRichResponses
+                // resuelva correctamente el numericValue de la opción del backend.
+                // Usar el questionID real del backend (posición qi) cuando esté disponible.
+                const optionIndex = (rawValue ?? 1) - 1;
+                const questionId = this.backendQuestions[qi]?.id ?? question.id;
+
+                return {
+                    questionId,
+                    value: optionIndex,
+                    text: null
+                };
+            })
+            .filter((r): r is RichAnswer => r !== null);
+
+        // Enviar al backend pasando también el instrumentId para el evaluation/start
+        this.assessmentService.submitRich('work-fatigue', richAnswers, 'MFI20', this.mfiInstrumentId).pipe(
             finalize(() => { this.isSubmitting = false; })
         ).subscribe({
             next: (result) => {
                 this.assessmentState.mergeResult(result);
-                // Navegar a resultados especializados
-                this.router.navigate(['/work-fatigue/mfi-results']);
+                // Limpiar el timer persistido para que el próximo intento empiece desde 0
+                ExamTimerComponent.clearKey('exam-timer:mfi-questionnaire');
+                this.pendingClosingService.set({
+                    richAnswers,
+                    instrumentCode: 'MFI20',
+                    instrumentId: undefined,
+                    moduleId: 'work-fatigue',
+                });
+                this.router.navigate(['/work-fatigue']);
             },
             error: (error) => {
                 if (error?.code === 'CONSENT_REQUIRED') {
@@ -211,6 +254,14 @@ export class MfiQuestionnaireComponent implements OnInit {
 
     goBack(): void {
         this.router.navigate(['/work-fatigue']);
+    }
+
+    onTimeUp(): void {
+        this.alert.info(
+            'El tiempo para completar la evaluación ha terminado. Las preguntas respondidas hasta ahora serán enviadas.',
+            'Tiempo agotado'
+        );
+        this.submitQuestionnaire(); // Mismo comportamiento que si hubiera respondido todo
     }
 
     getDimensionInfo(dimension: string): { title: string; description: string } {

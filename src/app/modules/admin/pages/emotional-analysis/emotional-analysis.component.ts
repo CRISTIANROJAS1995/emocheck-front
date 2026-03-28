@@ -136,139 +136,137 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         'emotional-load': {
             neutral: [
                 {
-                    title: 'Estás en piloto automático',
-                    messageText: 'Hagamos un ajuste pequeño. Activación consciente (2 minutos).',
+                    title: 'Estás en piloto automático. Hagamos un ajuste pequeño.',
+                    messageText: 'Activación consciente (2 minutos).',
                     steps: [
-                        { text: 'Endereza tu postura.' },
-                        { text: 'Inhala 3 segundos – exhala 5 segundos (5 veces).' },
-                        { text: 'Elige una sola tarea y enfócate solo en esa por 2 minutos.' },
+                        { text: 'Endereza tu postura.', emoji: '🪑' },
+                        { text: 'Inhala 3 segundos – exhala 5 segundos (5 veces).', emoji: '🌬️' },
+                        { text: 'Elige una sola tarea y enfócate solo en esa por 2 minutos.', emoji: '🎯' },
                     ],
                     finalMessage: 'Pequeños ajustes cambian tu energía.',
                     buttonText: 'Regular ahora',
                     buttonEmoji: '🔄',
                 },
                 {
-                    title: 'Tu energía está estable, pero en modo automático',
-                    messageText: 'Cambio de postura (1 minuto). Tu cuerpo influye en tu mente.',
+                    title: 'Tu energía está estable, pero en modo automático.',
+                    messageText: 'No es un estado negativo. Es un momento perfecto para hacer un pequeño ajuste. Cambio de postura (1 minuto) — Tu cuerpo influye en tu mente.',
                     steps: [
-                        { text: 'Endereza la espalda.' },
-                        { text: 'Apoya ambos pies firmes en el suelo.' },
-                        { text: 'Lleva hombros ligeramente hacia atrás.' },
-                        { text: 'Respira lento durante 60 segundos.' },
+                        { text: 'Endereza la espalda.', emoji: '🧍' },
+                        { text: 'Apoya ambos pies firmes en el suelo.', emoji: '🦶' },
+                        { text: 'Lleva hombros ligeramente hacia atrás.', emoji: '↩️' },
+                        { text: 'Respira lento durante 60 segundos.', emoji: '🌬️' },
                     ],
                     finalMessage: 'Siente cómo cambia tu energía.',
-                    buttonText: 'Sentí el cambio',
-                    buttonEmoji: '✔️',
+                    buttonText: '✔ Sentí el cambio',
+                    buttonEmoji: '',
                 },
                 {
-                    title: 'Micro-reto de foco (2 minutos)',
-                    messageText: 'Vamos a recuperar claridad.',
+                    title: 'Vamos a recuperar claridad. Micro-reto de foco (2 minutos)',
+                    messageText: 'Hay algo de carga emocional, activa tu sistema suavemente.',
                     steps: [
-                        { text: 'Elige una sola tarea pequeña.' },
-                        { text: 'Activa un cronómetro de 2 minutos.' },
-                        { text: 'Haz únicamente esa tarea. Sin interrupciones.' },
+                        { text: 'Elige una sola tarea pequeña.', emoji: '📌' },
+                        { text: 'Activa un cronómetro de 2 minutos.', emoji: '⏱️' },
+                        { text: 'Haz únicamente esa tarea. Sin interrupciones.', emoji: '🚫' },
                     ],
                     finalMessage: 'Cuando suene el tiempo, detente.',
-                    buttonText: 'Iniciar 2 minutos',
-                    buttonEmoji: '▶️',
+                    buttonText: '▶ Iniciar 2 minutos',
+                    buttonEmoji: '',
                 },
                 {
-                    title: 'La dirección cambia la energía',
-                    messageText: 'Pregunta de intención (1 minuto).',
+                    title: 'La dirección cambia la energía.',
+                    messageText: 'Pregunta de intención (1 minuto). Pregúntate: ¿Qué intención quiero ponerle a la próxima hora?',
                     steps: [
-                        { text: '¿Qué intención quiero ponerle a la próxima hora?' },
-                        { text: 'Elige una palabra: Enfoque. Calma. Claridad. Productividad. Presencia.' },
-                        { text: 'Repítela mentalmente 3 veces.' },
+                        { text: 'Elige una palabra: Enfoque. Calma. Claridad. Productividad. Presencia.', emoji: '💡' },
+                        { text: 'Repítela mentalmente 3 veces.', emoji: '🔁' },
                     ],
                     finalMessage: '',
-                    buttonText: 'Definir intención',
-                    buttonEmoji: '🎯',
+                    buttonText: '✔ Definir intención',
+                    buttonEmoji: '',
                 },
                 {
-                    title: 'Sal del piloto automático',
+                    title: 'Sal del piloto automático.',
                     messageText: 'Escaneo corporal rápido (1 minuto).',
                     steps: [
-                        { text: 'Cierra los ojos si puedes.' },
-                        { text: 'Recorre mentalmente tu cuerpo: Frente — Mandíbula — Hombros — Pecho — Abdomen.' },
-                        { text: 'Si detectas tensión, suéltala.' },
+                        { text: 'Cierra los ojos si puedes.', emoji: '👁️' },
+                        { text: 'Recorre mentalmente tu cuerpo: Frente — Mandíbula — Hombros — Pecho — Abdomen.', emoji: '🧠' },
+                        { text: 'Si detectas tensión, suéltala.', emoji: '🌿' },
                     ],
                     finalMessage: '',
-                    buttonText: 'Más consciente',
-                    buttonEmoji: '🧠',
+                    buttonText: '✔ Más consciente',
+                    buttonEmoji: '',
                 },
             ],
             surprise: [
                 {
-                    title: 'Tu sistema está activado por algo inesperado',
-                    messageText: 'Exhalación prolongada para estabilizar (1–2 minutos).',
+                    title: 'Tu sistema está activado por algo inesperado.',
+                    messageText: 'La sorpresa activa tu energía rápidamente. Antes de reaccionar, vamos a estabilizar. Exhalación prolongada (1–2 minutos).',
                     steps: [
-                        { text: 'Inhala durante 4 segundos.' },
-                        { text: 'Exhala lentamente durante 8 segundos.' },
-                        { text: 'Repite 5 veces. La exhalación más larga que la inhalación.' },
+                        { text: 'Inhala durante 4 segundos.', emoji: '🌬️' },
+                        { text: 'Exhala lentamente durante 8 segundos.', emoji: '💨' },
+                        { text: 'Repite 5 veces. Concéntrate en hacer la exhalación más larga que la inhalación.', emoji: '🔁' },
                     ],
                     finalMessage: 'Este ejercicio baja activación simpática.',
-                    buttonText: 'Más estable',
-                    buttonEmoji: '✔️',
+                    buttonText: '✔ Más estable',
+                    buttonEmoji: '',
                 },
                 {
-                    title: 'Reorganiza tu ritmo interno',
-                    messageText: 'Movimiento lento (1 minuto).',
+                    title: 'Reorganiza tu ritmo interno.',
+                    messageText: 'Movimiento lento (1 minuto). Reorganiza ritmo fisiológico.',
                     steps: [
-                        { text: 'Ponte de pie.' },
-                        { text: 'Camina lentamente y más consciente durante 1 minuto.' },
-                        { text: 'Siente cada paso apoyarse en el suelo. No te apresures.' },
+                        { text: 'Ponte de pie.', emoji: '🧍' },
+                        { text: 'Camina lentamente y más consciente durante 1 minuto.', emoji: '🚶' },
+                        { text: 'Siente cada paso apoyarse en el suelo. No te apresures. Solo camina.', emoji: '🦶' },
                     ],
-                    finalMessage: 'Reorganiza ritmo fisiológico.',
-                    buttonText: 'Regulé mi ritmo',
-                    buttonEmoji: '✔️',
+                    finalMessage: '',
+                    buttonText: '✔ Regulé mi ritmo',
+                    buttonEmoji: '',
                 },
                 {
-                    title: 'Nombrar la emoción reduce su intensidad',
-                    messageText: 'Nombrar la emoción (30 segundos).',
+                    title: 'Algunas emociones necesitan atención. Nombrarlas reduce intensidad.',
+                    messageText: 'Nombrar la emoción (30 segundos). Di internamente:',
                     steps: [
-                        { text: 'Di internamente: "Estoy sorprendido, no en peligro."' },
-                        { text: 'Repite 3 veces.' },
+                        { text: '"Estoy sorprendido, no en peligro." — Repite 3 veces.', emoji: '💬' },
                     ],
                     finalMessage: 'Disminuye reactividad límbica.',
-                    buttonText: 'Entendido',
-                    buttonEmoji: '✔️',
+                    buttonText: '✔ Entendido',
+                    buttonEmoji: '',
                 },
                 {
-                    title: 'Activa tu claridad mental',
-                    messageText: 'Chequeo de evidencia (1 minuto).',
+                    title: 'Vamos a activar tu claridad mental.',
+                    messageText: 'Chequeo de evidencia (1 minuto). Respira profundo mientras reflexionas. Este ejercicio activa la corteza prefrontal.',
                     steps: [
-                        { text: '¿Qué datos reales tengo?' },
-                        { text: '¿Estoy interpretando o observando hechos?' },
-                        { text: '¿Necesito más información antes de actuar?' },
+                        { text: '¿Qué datos reales tengo?', emoji: '🔍' },
+                        { text: '¿Estoy interpretando o observando hechos?', emoji: '🤔' },
+                        { text: '¿Necesito más información antes de actuar?', emoji: '⏸️' },
                     ],
-                    finalMessage: 'Este ejercicio activa la corteza prefrontal.',
-                    buttonText: 'Más claridad',
-                    buttonEmoji: '💡',
+                    finalMessage: '',
+                    buttonText: '✔ Más claridad',
+                    buttonEmoji: '',
                 },
                 {
-                    title: 'Antes de reaccionar, haz una pausa',
-                    messageText: 'Autoinstrucción breve (30 segundos).',
+                    title: 'Antes de reaccionar, repite.',
+                    messageText: 'Autoinstrucción breve (30 segundos). Este ejercicio reduce impulsividad.',
                     steps: [
-                        { text: 'Repite: "Primero observo, luego reacciono."' },
-                        { text: 'Siente la pausa antes de cualquier respuesta.' },
+                        { text: '"Primero observo, luego reacciono."', emoji: '💬' },
+                        { text: 'Siente la pausa antes de cualquier respuesta.', emoji: '⏸️' },
                     ],
-                    finalMessage: 'Este ejercicio reduce impulsividad.',
-                    buttonText: 'Pausa aplicada',
-                    buttonEmoji: '✔️',
+                    finalMessage: '',
+                    buttonText: '✔ Pausa aplicada',
+                    buttonEmoji: '',
                 },
             ],
             default: [
                 {
-                    title: 'Parece que hay algo de carga emocional',
+                    title: 'Parece que hay algo de carga emocional.',
                     messageText: 'Está bien no estar al 100%. Te propongo una respiración 4-7-8 para soltar tensión.',
                     steps: [
-                        { text: 'Inhala 4 segundos.' },
-                        { text: 'Sostén 7 segundos.' },
-                        { text: 'Exhala 8 segundos. Repite 3 veces.' },
+                        { text: 'Inhala 4 segundos.', emoji: '🌬️' },
+                        { text: 'Sostén 7 segundos.', emoji: '⏸️' },
+                        { text: 'Exhala 8 segundos. Repite 3 veces.', emoji: '💨' },
                     ],
                     finalMessage: 'Tu cuerpo agradece este momento de pausa.',
-                    buttonText: 'Comenzar respiración',
-                    buttonEmoji: '�️',
+                    buttonText: '✔ Comenzar respiración',
+                    buttonEmoji: '',
                 },
             ],
         },
@@ -277,58 +275,264 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
         alert: {
             anger: [
                 {
-                    title: 'Tu cuerpo está en alerta',
-                    messageText: 'Vamos a bajarle el ritmo juntos. Pausa guiada de 2 minutos para estabilizar tu mente.',
+                    title: 'Tu sistema está en alerta. Pausar ahora evita reacciones impulsivas.',
+                    messageText: 'Relajación progresiva (2 min). Regula la activación simpática y reorienta intención.',
                     steps: [
-                        { text: 'Respira profundo 4 segundos.' },
-                        { text: 'Exhala lento 6 segundos. Repite 5 veces.' },
-                        { text: 'Apoya ambos pies en el suelo y siente tu peso.' },
+                        { text: 'Aprieta puños 5 segundos → suelta (3 veces).', emoji: '✊' },
+                        { text: 'Inhala 3 – exhala 7 (5 veces).', emoji: '🌬️' },
+                        { text: 'Completa: "Lo que necesito realmente es ______."', emoji: '💭' },
                     ],
-                    finalMessage: 'Tu cuerpo empieza a calmarse con cada exhalación.',
-                    buttonText: 'Iniciar pausa guiada de 2 min',
-                    buttonEmoji: '🧘',
+                    finalMessage: '',
+                    buttonText: '✔ Más claridad',
+                    buttonEmoji: '',
                 },
-            ],
-            sadness: [
                 {
-                    title: 'Tu cuerpo está en alerta',
-                    messageText: 'Tus emociones tienen sentido. Vamos a acompañarlas con un ejercicio suave.',
+                    title: 'Tu sistema está en alta activación. Primero regulamos. Luego pensamos.',
+                    messageText: 'Cambio de temperatura (1 min). Este ejercicio reduce la activación del sistema simpático rápidamente.',
                     steps: [
-                        { text: 'Pon una mano en tu pecho.' },
-                        { text: 'Respira lento: inhala 4s, exhala 6s. Repite 5 veces.' },
-                        { text: 'Di internamente: "Esta emoción pasará. Me cuido."' },
+                        { text: 'Lava manos con agua fría o sostén algo frío.', emoji: '🧊' },
+                        { text: 'Repite mentalmente: "Puedo pausar antes de reaccionar."', emoji: '💬' },
+                        { text: 'Dilo 3 veces.', emoji: '🔁' },
                     ],
-                    finalMessage: 'Reconocer lo que sientes es el primer paso para cuidarte.',
-                    buttonText: 'Iniciar pausa guiada de 2 min',
-                    buttonEmoji: '🧘',
+                    finalMessage: '',
+                    buttonText: '✔ Me calmé',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Tu cuerpo está en alerta. Vamos a liberar esa activación.',
+                    messageText: 'Cuando aparece el enojo, el organismo libera adrenalina y tensión muscular. Mover el cuerpo cambia el estado. Esto tomará solo un minuto.',
+                    steps: [
+                        { text: 'Opción 1: 20 sentadillas. Baja despacio. Sube con fuerza. Siente cómo tus músculos trabajan.', emoji: '🏋️' },
+                        { text: 'Opción 2: Camina rápido durante 1 minuto. Balancea los brazos. Respira profundo mientras caminas.', emoji: '🚶' },
+                        { text: 'Mientras te mueves recuerda: No estás huyendo del enojo. Estás canalizando la energía que trae.', emoji: '💪' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Energía liberada',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Estás enojado. Tu energía está alta y quiere salir.',
+                    messageText: 'El enojo no es el problema. Reaccionar sin regularlo sí puede serlo. Toma 2 minutos conmigo.',
+                    steps: [
+                        { text: 'Inhala profundo por la nariz durante 4 segundos.', emoji: '🌬️' },
+                        { text: 'Exhala lento por la boca durante 6 segundos. Deja que el cuerpo suelte tensión.', emoji: '💨' },
+                        { text: 'Repite esta respiración 5 veces.', emoji: '🔁' },
+                        { text: 'Repite mentalmente 3 veces: "Puedo pausar antes de reaccionar."', emoji: '💬' },
+                    ],
+                    finalMessage: 'No necesitas resolver nada ahora mismo. Solo recuperar el control de tu respuesta.',
+                    buttonText: '✔ Estoy más calmado',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Parece que tu enojo tiene energía. Vamos a usarla a tu favor.',
+                    messageText: 'No la bloquees. Dirígela. Las emociones tienen un pico y luego descienden. Hoy elegiste esperar la bajada.',
+                    steps: [
+                        { text: 'Cierra los ojos (si puedes). Ubica el enojo en tu cuerpo. ¿Pecho? ¿Mandíbula? ¿Estómago?', emoji: '👁️' },
+                        { text: 'No lo cambies. Solo obsérvalo. Imagina que es una ola que sube…', emoji: '🌊' },
+                        { text: 'Mantente respirando lento. Observa cómo luego empieza a bajar sola.', emoji: '🌬️' },
+                    ],
+                    finalMessage: 'El problema no es el enojo. Es reaccionar en el punto más alto.',
+                    buttonText: '✔ Estoy más calmado',
+                    buttonEmoji: '',
                 },
             ],
             fear: [
                 {
-                    title: 'Tu cuerpo está en alerta',
-                    messageText: 'Vamos a activar tu sistema de calma. Grounding rápido (2 minutos).',
+                    title: 'Tu sistema está en alerta. El miedo intenta protegerte.',
+                    messageText: 'Pero ahora necesitamos verificar si hay peligro real o solo anticipación. Pies al suelo (1 minuto) — Vamos a crear base segura.',
                     steps: [
-                        { text: 'Nombra 5 cosas que puedes VER ahora.' },
-                        { text: 'Nombra 4 cosas que puedes TOCAR.' },
-                        { text: 'Nombra 3 cosas que puedes OÍR.' },
-                        { text: 'Respira profundo 3 veces.' },
+                        { text: 'Apoya ambos pies firmemente en el piso.', emoji: '🦶' },
+                        { text: 'Presiona ligeramente las plantas contra el suelo. Siente el contacto.', emoji: '⬇️' },
+                        { text: 'Respira lento mientras presionas. Tu cuerpo necesita sentir estabilidad.', emoji: '🌬️' },
                     ],
-                    finalMessage: 'Este ejercicio ancla tu mente al presente.',
-                    buttonText: 'Iniciar pausa guiada de 2 min',
-                    buttonEmoji: '🧘',
+                    finalMessage: '',
+                    buttonText: '✔ Me siento más firme',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Tu sistema está en alerta. El miedo intenta protegerte.',
+                    messageText: 'Respiración con manos (1 minuto). Ahora enviamos señal de calma al sistema nervioso.',
+                    steps: [
+                        { text: 'Coloca una mano en el pecho. Otra en el abdomen.', emoji: '🤲' },
+                        { text: 'Inhala lento.', emoji: '🌬️' },
+                        { text: 'Exhala más largo que la inhalación. Hazlo 5 veces.', emoji: '💨' },
+                    ],
+                    finalMessage: 'Tu cuerpo empieza a entender que no hay peligro inmediato.',
+                    buttonText: '✔ Más tranquilo',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Tu cuerpo percibe amenaza. Vamos a enviarle seguridad.',
+                    messageText: 'Chequeo de realidad (1 minuto). Activa claridad. Pregúntate: ¿Estoy a salvo ahora mismo? Responde solo Sí o No.',
+                    steps: [
+                        { text: 'Si la respuesta es "Sí" → Repite lentamente 3 veces: "Ahora mismo estoy a salvo." "Esto es incómodo, pero no es una amenaza real."', emoji: '✅' },
+                        { text: 'Si la respuesta es "No" → Elige una acción pequeña y concreta: alejarte del lugar, llamar a alguien, pedir ayuda, establecer un límite.', emoji: '🚨' },
+                        { text: 'Exhala más largo que la inhalación mientras decides.', emoji: '🌬️' },
+                    ],
+                    finalMessage: 'No necesitas resolver todo. Solo dar el siguiente paso seguro.',
+                    buttonText: '✔ Me siento más claro',
+                    buttonEmoji: '',
+                },
+                {
+                    title: '"Tu sistema detecta amenaza. Vamos a enviarle seguridad."',
+                    messageText: 'Antes de pensar más, vamos a ayudar al sistema nervioso a sentir estabilidad. Movimiento rítmico — Cuando el cuerpo se mueve con ritmo, el cerebro interpreta seguridad.',
+                    steps: [
+                        { text: 'Ponte de pie con los pies separados al ancho de tus hombros. Rodillas ligeramente flexionadas.', emoji: '🧍' },
+                        { text: 'Comienza a balancear tu peso hacia la derecha… luego hacia la izquierda. Suave. Lento. Constante.', emoji: '↔️' },
+                        { text: 'Coordina con tu respiración: inhala cuando te mueves a un lado, exhala cuando cambias.', emoji: '🌬️' },
+                        { text: 'Puedes decirte: "Aquí estoy. Estoy estable."', emoji: '💬' },
+                    ],
+                    finalMessage: 'No todo miedo necesita más análisis. A veces necesita más suelo.',
+                    buttonText: '✔ Más estable',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Cuando hay miedo, tu atención se estrecha. Vamos a ampliar el campo visual.',
+                    messageText: 'El cerebro necesita evidencia visual de seguridad. Cuando amplías la mirada, le muestras que no todo es amenaza.',
+                    steps: [
+                        { text: 'Sin mover la cabeza, amplía tu visión periférica. Intenta notar lo que está a los lados.', emoji: '👁️' },
+                        { text: 'Gira lentamente la cabeza hacia la derecha. Observa detalles concretos (colores, formas). Haz lo mismo hacia la izquierda.', emoji: '↩️' },
+                        { text: 'Identifica 3 señales de normalidad: algo estable, algo quieto, algo familiar.', emoji: '🔍' },
+                    ],
+                    finalMessage: 'Más campo visual = menos alarma interna.',
+                    buttonText: '✔ Me siento más presente',
+                    buttonEmoji: '',
+                },
+            ],
+            sadness: [
+                {
+                    title: 'Hay carga emocional. No necesitas resolver todo ahora.',
+                    messageText: 'No vamos a forzarte. Vamos a avanzar 1%. Exposición a luz (2 min) — Estimular sistema de alerta natural.',
+                    steps: [
+                        { text: 'Acércate a una ventana o fuente de luz.', emoji: '🪟' },
+                        { text: 'Mira hacia el exterior.', emoji: '🌤️' },
+                        { text: 'Respira profundo 5 veces. Si puedes, recibe luz directa en el rostro.', emoji: '🌬️' },
+                    ],
+                    finalMessage: 'La luz le dice a tu cerebro que el día continúa.',
+                    buttonText: '✔ Conectado',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Hay carga emocional. No necesitas resolver todo ahora.',
+                    messageText: 'Activación corporal suave (2 min). El cuerpo influye en el ánimo. Moverte suavemente cambia la química interna.',
+                    steps: [
+                        { text: 'Ponte de pie.', emoji: '🧍' },
+                        { text: 'Eleva brazos lentamente al inhalar.', emoji: '🙆' },
+                        { text: 'Baja brazos al exhalar. Repite 6 veces.', emoji: '🌬️' },
+                    ],
+                    finalMessage: 'Siente cómo se activa tu respiración.',
+                    buttonText: '✔ Más despierto',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Hay carga emocional. No necesitas resolver todo ahora.',
+                    messageText: 'Tener un contacto humano mínimo protege (2 min). No necesitas explicar nada. Solo mantener conexión.',
+                    steps: [
+                        { text: 'Piensa en una persona segura.', emoji: '👤' },
+                        { text: 'Envía un mensaje breve: "Hola, solo quería saludarte."', emoji: '💬' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Mensaje enviado',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Parece que estás triste. Esta emoción nos ayuda a reconocer necesidades internas.',
+                    messageText: 'Diálogo autocompasivo. La tristeza se agrava con exigencia. La compasión regula. No es debilidad. Es estrategia emocional.',
+                    steps: [
+                        { text: 'Coloca una mano sobre el pecho. Respira lento.', emoji: '🤲' },
+                        { text: 'Di: "Esto es difícil." "No tengo que resolver todo hoy." "Puedo cuidarme mientras avanzo."', emoji: '💬' },
+                        { text: 'Mantén la respiración estable.', emoji: '🌬️' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Más contenido',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'La tristeza se siente grande porque está difusa. Vamos a darle forma.',
+                    messageText: 'No la quites. Obsérvala. Tu historia no es solo tristeza. También has sido sostenido antes. Esa memoria sigue disponible.',
+                    steps: [
+                        { text: 'Piensa en un momento donde te sentiste comprendido. No perfecto. Solo acompañado.', emoji: '🧠' },
+                        { text: 'Recuerda dónde estabas. Qué persona estaba allí. Qué palabras o gesto hubo.', emoji: '💭' },
+                        { text: 'Respira mientras revives esa sensación.', emoji: '🌬️' },
+                    ],
+                    finalMessage: 'Tu cerebro puede reactivar esa red emocional.',
+                    buttonText: '✔ Lo recordé',
+                    buttonEmoji: '',
+                },
+            ],
+            contempt: [
+                {
+                    title: 'Estás sintiendo desagrado. Antes de reaccionar, vamos a crear distancia mental.',
+                    messageText: 'Cuando creamos distancia mental, el cerebro reduce la intensidad emocional y recupera claridad.',
+                    steps: [
+                        { text: 'Imagina la situación frente a ti como si estuviera en una pantalla.', emoji: '🖥️' },
+                        { text: 'Obsérvala durante unos segundos sin intervenir. Ahora imagina que bajas el brillo de esa pantalla.', emoji: '🌫️' },
+                        { text: 'Reduce también el volumen de lo que ocurre allí. Respira lentamente mientras observas.', emoji: '🔇' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Tomar distancia',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'El desagrado puede tensar el cuerpo sin que lo notes.',
+                    messageText: 'Cuando la respiración se vuelve más lenta, el cerebro interpreta que no hay peligro inmediato y reduce la intensidad de la emoción.',
+                    steps: [
+                        { text: 'Inhala lentamente por la nariz contando 4 segundos.', emoji: '🌬️' },
+                        { text: 'Exhala lentamente por la boca contando 6 segundos.', emoji: '💨' },
+                        { text: 'Repite el ciclo 5 veces. Mientras respiras, suelta los hombros.', emoji: '🔁' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Regular respiración',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'El desagrado suele venir acompañado de juicios rápidos.',
+                    messageText: 'Vamos a transformar ese lenguaje interno. Cambiar el lenguaje interno ayuda al cerebro a pasar del rechazo emocional a una evaluación más objetiva.',
+                    steps: [
+                        { text: 'Identifica el pensamiento automático. Ejemplo: "Esto es terrible."', emoji: '💭' },
+                        { text: 'Cámbialo por una descripción neutral: "Esto es algo que no me gusta."', emoji: '🔄' },
+                        { text: 'Repite mentalmente la nueva frase.', emoji: '🔁' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Reencuadrar pensamiento',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'Cuando sentimos desagrado, solemos enfocarnos en lo que no controlamos.',
+                    messageText: 'Vamos a cambiar el foco. Enfocarnos en lo que sí podemos hacer reduce la frustración y devuelve sensación de control.',
+                    steps: [
+                        { text: '¿Qué parte de esta situación sí depende de mí?', emoji: '🔍' },
+                        { text: '¿Qué pequeña acción puedo tomar ahora?', emoji: '🎯' },
+                        { text: 'Elige una acción mínima: aclarar información, reorganizar una tarea, pedir apoyo.', emoji: '✅' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Elegir acción',
+                    buttonEmoji: '',
+                },
+                {
+                    title: 'El desagrado también se queda en el cuerpo.',
+                    messageText: 'Vamos a liberar esa tensión. Liberar tensión física envía una señal de calma al sistema nervioso.',
+                    steps: [
+                        { text: 'Eleva los hombros hacia las orejas. Mantén la tensión 5 segundos. Suelta lentamente.', emoji: '🙆' },
+                        { text: 'Repite 3 veces.', emoji: '🔁' },
+                        { text: 'Luego mueve ligeramente el cuello.', emoji: '↩️' },
+                    ],
+                    finalMessage: '',
+                    buttonText: '✔ Soltar tensión',
+                    buttonEmoji: '',
                 },
             ],
             default: [
                 {
-                    title: 'Tu cuerpo está en alerta',
+                    title: 'Tu cuerpo está en alerta.',
                     messageText: 'Vamos a bajarle el ritmo juntos. Haz una pausa guiada de 2 minutos para estabilizar tu mente.',
                     steps: [
-                        { text: 'Respira profundo 4 segundos.' },
-                        { text: 'Exhala lento 6 segundos. Repite 5 veces.' },
+                        { text: 'Respira profundo 4 segundos.', emoji: '🌬️' },
+                        { text: 'Exhala lento 6 segundos. Repite 5 veces.', emoji: '💨' },
                     ],
                     finalMessage: 'Tu bienestar es la prioridad.',
-                    buttonText: 'Iniciar pausa guiada de 2 min',
-                    buttonEmoji: '🧘',
+                    buttonText: '✔ Iniciar pausa guiada',
+                    buttonEmoji: '',
                 },
             ],
         },
@@ -640,7 +844,14 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
             // Progreso visual
             const got = Math.min(this.detections.length, this.minDetections);
             this.progress = Math.min(60, Math.round((got / this.minDetections) * 60));
-            this.currentStep = 1 + Math.min(2, got);
+            // Distribuir currentStep a lo largo de los 5 pasos según detecciones (1→5 en totalSteps)
+            this.currentStep = Math.min(this.totalSteps, 1 + Math.round((got / this.minDetections) * (this.totalSteps - 1)));
+            // Actualizar status de cada step para que el banner dinámico sea correcto
+            this.steps.forEach((s, idx) => {
+                if (idx < this.currentStep - 1) s.status = 'completed';
+                else if (idx === this.currentStep - 1) s.status = 'active';
+                else s.status = 'pending';
+            });
 
             // Cuando tenemos suficientes detecciones, finalizar
             if (this.detections.length >= this.maxDetections ||
@@ -929,6 +1140,11 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
 
     goToEvaluations(): void {
         this.cleanup();
+        this._router.navigate(['/resources']);
+    }
+
+    goToHome(): void {
+        this.cleanup();
         this._router.navigate(['/home']);
     }
 
@@ -957,7 +1173,7 @@ export class EmotionalAnalysisComponent implements OnInit, AfterViewInit, OnDest
             anger: 'anger', angry: 'anger',
             sadness: 'sadness', sad: 'sadness',
             fear: 'fear', fearful: 'fear',
-            contempt: 'default', disgust: 'default', disgusted: 'default',
+            contempt: 'contempt', disgust: 'contempt', disgusted: 'contempt',
         };
         const key = emotionMap[dominantEmotion?.toLowerCase()] ?? 'default';
         const variants = bank[key] ?? bank['default'] ?? [];
