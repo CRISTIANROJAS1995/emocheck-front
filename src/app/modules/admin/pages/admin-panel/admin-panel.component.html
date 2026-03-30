@@ -53,118 +53,245 @@
         </div>
     </div>
 
-    <!-- Create User Form -->
+    <!-- Create User Modal -->
     @if (showCreateForm) {
-    <div class="editor-panel">
-        <h3>
-            <mat-icon>person_add</mat-icon> Crear Nuevo Usuario</h3>
-        <form [formGroup]="createForm" (ngSubmit)="createUser()">
-            <div class="editor-panel__grid">
-                <label class="editor-panel__field">
-                    <span>Nombre *</span>
-                    <input formControlName="firstName" placeholder="Juan" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Apellido *</span>
-                    <input formControlName="lastName" placeholder="Pérez" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Tipo de Documento *</span>
-                    <select formControlName="documentType">
-                        <option value="CC">Cédula de Ciudadanía (CC)</option>
-                        <option value="CE">Cédula de Extranjería (CE)</option>
-                        <option value="PA">Pasaporte (PA)</option>
-                        <option value="TI">Tarjeta de Identidad (TI)</option>
-                        <option value="NIT">NIT</option>
-                    </select>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Número de Documento *</span>
-                    <input formControlName="documentNumber" placeholder="1234567890" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Teléfono *</span>
-                    <input formControlName="phone" placeholder="3001234567" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Género *</span>
-                    <select formControlName="gender">
-                        <option value="">-- Seleccionar --</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Femenino</option>
-                        <option value="O">Otro</option>
-                        <option value="NI">Prefiero no indicarlo</option>
-                    </select>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Email *</span>
-                    <input type="email" formControlName="email" placeholder="correo@empresa.com" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Contraseña temporal * (mín. 8 caracteres)</span>
-                    <div style="position:relative;display:flex;align-items:center;">
-                        <input [type]="showCreatePassword ? 'text' : 'password'" formControlName="password" placeholder="TempPass123!" style="width:100%;padding-right:40px;" />
-                        <button type="button" (click)="showCreatePassword = !showCreatePassword"
-                            style="position:absolute;right:8px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;color:#64748b;"
-                            [attr.aria-label]="showCreatePassword ? 'Ocultar contraseña' : 'Ver contraseña'">
-                            <mat-icon style="font-size:20px;width:20px;height:20px;">{{ showCreatePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                        </button>
-                    </div>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Empresa</span>
-                    <select formControlName="companyID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (c of companies; track c.companyID) {
-                        <option [ngValue]="c.companyID">{{ c.name }}</option>
-                        }
-                    </select>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Sede</span>
-                    <select formControlName="siteID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (s of filteredCreateSites; track s.siteID) {
-                        <option [ngValue]="s.siteID">{{ s.name }}</option>
-                        }
-                    </select>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Área</span>
-                    <select formControlName="areaID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (a of filteredCreateAreas; track a.areaID) {
-                        <option [ngValue]="a.areaID">{{ a.name }}</option>
-                        }
-                    </select>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Tipo de Cargo *</span>
-                    <select formControlName="jobTypeID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (j of jobTypes; track j.jobTypeID) {
-                        <option [ngValue]="j.jobTypeID">{{ j.name }}</option>
-                        }
-                    </select>
-                </label>
-                <div class="editor-panel__field editor-panel__field--full">
-                    <span>Roles *</span>
-                    <mat-form-field appearance="outline" style="width:100%">
-                        <mat-select formControlName="roleIDs" multiple>
-                            @for (r of roleOptions; track r.id) {
-                            <mat-option [value]="r.id">{{ r.name }}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </div>
+    <div class="user-modal-overlay" (click)="showCreateForm = false">
+        <div class="user-modal" (click)="$event.stopPropagation()">
+            <div class="user-modal__header">
+                <h3>
+                    <mat-icon>person_add</mat-icon> Crear Nuevo Usuario</h3>
+                <button type="button" class="user-modal__close" (click)="showCreateForm = false" aria-label="Cerrar">
+                    <mat-icon>close</mat-icon>
+                </button>
             </div>
-            <div class="editor-panel__actions">
+            <div class="user-modal__body">
+                <form [formGroup]="createForm" (ngSubmit)="createUser()" id="create-user-form">
+
+                    <!-- Sección: Datos personales -->
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>person</mat-icon> Datos Personales
+                        </div>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Nombre *</span>
+                                <input formControlName="firstName" placeholder="Juan" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Apellido *</span>
+                                <input formControlName="lastName" placeholder="Pérez" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Tipo de Documento *</span>
+                                <select formControlName="documentType">
+                                    <option value="CC">Cédula de Ciudadanía (CC)</option>
+                                    <option value="CE">Cédula de Extranjería (CE)</option>
+                                    <option value="PP">Pasaporte (PP)</option>
+                                    <option value="TI">Tarjeta de Identidad (TI)</option>
+                                    <option value="NIT">NIT</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Número de Documento *</span>
+                                <input formControlName="documentNumber" placeholder="1234567890" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Género *</span>
+                                <select formControlName="gender">
+                                    <option value="">-- Seleccionar --</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                    <option value="O">Otro</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Fecha de Nacimiento *</span>
+                                <input type="date" formControlName="dateOfBirth" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Teléfono *</span>
+                                <input formControlName="phone" placeholder="3001234567" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Email *</span>
+                                <input type="email" formControlName="email" placeholder="correo@empresa.com" />
+                            </label>
+                            <label class="editor-panel__field editor-panel__field--full">
+                                <span>Contraseña temporal * (mín. 8 caracteres)</span>
+                                <div style="position:relative;display:flex;align-items:center;">
+                                    <input [type]="showCreatePassword ? 'text' : 'password'" formControlName="password" placeholder="TempPass123!" style="width:100%;padding-right:40px;" />
+                                    <button type="button" (click)="showCreatePassword = !showCreatePassword"
+                                        style="position:absolute;right:8px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;color:#64748b;"
+                                        [attr.aria-label]="showCreatePassword ? 'Ocultar contraseña' : 'Ver contraseña'">
+                                        <mat-icon style="font-size:20px;width:20px;height:20px;">{{ showCreatePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                                    </button>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Información laboral -->
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>work</mat-icon> Información Laboral
+                        </div>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Fecha de Contratación *</span>
+                                <input type="date" formControlName="hireDate" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Empresa</span>
+                                <select formControlName="companyID">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    @for (c of companies; track c.companyID) {
+                                    <option [ngValue]="c.companyID">{{ c.name }}</option>
+                                    }
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Sede</span>
+                                <select formControlName="siteID">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    @for (s of filteredCreateSites; track s.siteID) {
+                                    <option [ngValue]="s.siteID">{{ s.name }}</option>
+                                    }
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Área</span>
+                                <select formControlName="areaID">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    @for (a of filteredCreateAreas; track a.areaID) {
+                                    <option [ngValue]="a.areaID">{{ a.name }}</option>
+                                    }
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Tipo de Cargo *</span>
+                                <select formControlName="jobTypeID">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    @for (j of jobTypes; track j.jobTypeID) {
+                                    <option [ngValue]="j.jobTypeID">{{ j.name }}</option>
+                                    }
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Tipo de Contrato</span>
+                                <select formControlName="contractType">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Indefinido">Indefinido</option>
+                                    <option value="Temporal">Temporal</option>
+                                    <option value="Prestación de servicios">Prestación de servicios</option>
+                                    <option value="Aprendizaje">Aprendizaje</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Horas laborales diarias</span>
+                                <select formControlName="dailyWorkHours">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option [ngValue]="1">Menos de 8 horas</option>
+                                    <option [ngValue]="2">8 horas</option>
+                                    <option [ngValue]="3">Más de 8 horas</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Antigüedad en el cargo</span>
+                                <select formControlName="jobSeniority">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option [ngValue]="1">Menos de 1 año</option>
+                                    <option [ngValue]="2">Entre 1 y 5 años</option>
+                                    <option [ngValue]="3">Entre 6 y 10 años</option>
+                                    <option [ngValue]="4">Entre 11 y 20 años</option>
+                                    <option [ngValue]="5">Más de 20 años</option>
+                                </select>
+                            </label>
+                            <div class="editor-panel__field editor-panel__field--full">
+                                <span>Roles *</span>
+                                <mat-form-field appearance="outline" style="width:100%">
+                                    <mat-select formControlName="roleIDs" multiple>
+                                        @for (r of roleOptions; track r.id) {
+                                        <mat-option [value]="r.id">{{ r.name }}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Datos sociodemográficos -->
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>people_alt</mat-icon> Datos Sociodemográficos <span class="form-section__optional">(opcionales)</span>
+                        </div>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Estado Civil</span>
+                                <select formControlName="maritalStatus">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Soltero/a">Soltero/a</option>
+                                    <option value="Casado/a">Casado/a</option>
+                                    <option value="Unión libre">Unión libre</option>
+                                    <option value="Separado/a">Separado/a</option>
+                                    <option value="Viudo/a">Viudo/a</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Nivel de Escolaridad</span>
+                                <select formControlName="educationLevel">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Ninguno">Ninguno</option>
+                                    <option value="Primaria incompleta">Primaria incompleta</option>
+                                    <option value="Primaria completa">Primaria completa</option>
+                                    <option value="Bachillerato incompleto">Bachillerato incompleto</option>
+                                    <option value="Bachillerato completo">Bachillerato completo</option>
+                                    <option value="Técnica/tecnología incompleta">Técnica/tecnología incompleta</option>
+                                    <option value="Técnica/tecnología completa">Técnica/tecnología completa</option>
+                                    <option value="Profesional incompleto">Profesional incompleto</option>
+                                    <option value="Profesional completo">Profesional completo</option>
+                                    <option value="Posgrado">Posgrado</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Estrato Socioeconómico</span>
+                                <select formControlName="stratum">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option [ngValue]="1">1</option>
+                                    <option [ngValue]="2">2</option>
+                                    <option [ngValue]="3">3</option>
+                                    <option [ngValue]="4">4</option>
+                                    <option [ngValue]="5">5</option>
+                                    <option [ngValue]="6">6</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Tipo de Vivienda</span>
+                                <select formControlName="housingType">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Propia">Propia</option>
+                                    <option value="Arrendada">Arrendada</option>
+                                    <option value="Familiar">Familiar</option>
+                                    <option value="Otra">Otra</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Personas a cargo</span>
+                                <input type="number" formControlName="dependents" placeholder="0" min="0" />
+                            </label>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="user-modal__footer">
                 <button type="button" class="btn btn--ghost" (click)="showCreateForm = false">Cancelar</button>
-                <button type="submit" class="btn btn--primary" [disabled]="saving">
+                <button type="submit" form="create-user-form" class="btn btn--primary" [disabled]="saving">
+                    @if (saving) { <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner> }
                     <mat-icon>save</mat-icon> Crear Usuario
                 </button>
             </div>
-        </form>
+        </div>
     </div>
     }
 
@@ -207,19 +334,59 @@
                 </div>
                 <div class="ref-item">
                     <span class="ref-field">Password</span>
-                    <span class="ref-desc">Contraseña (mínimo 6 caracteres)</span>
+                    <span class="ref-desc">Contraseña (mínimo 8 caracteres)</span>
                 </div>
                 <div class="ref-item">
                     <span class="ref-field">DocumentType</span>
-                    <span class="ref-desc">CC, CE, PA, TI o NIT</span>
+                    <span class="ref-desc">CC, CE, PP, TI o NIT</span>
                 </div>
                 <div class="ref-item">
                     <span class="ref-field">Gender</span>
-                    <span class="ref-desc">M (masculino) o F (femenino)</span>
+                    <span class="ref-desc">M (masculino), F (femenino) u O (otro)</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">DateOfBirth</span>
+                    <span class="ref-desc">Fecha nacimiento YYYY-MM-DD (ej. 1990-05-15) — requerido</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">HireDate</span>
+                    <span class="ref-desc">Fecha contratación YYYY-MM-DD (ej. 2023-01-10) — requerido</span>
                 </div>
                 <div class="ref-item">
                     <span class="ref-field">RoleIDs</span>
                     <span class="ref-desc">6=Empleado, 4=HR, 5=Manager, 3=Psicólogo (separados por coma)</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">MaritalStatus</span>
+                    <span class="ref-desc">Soltero/a · Casado/a · Unión libre · Separado/a · Viudo/a</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">EducationLevel</span>
+                    <span class="ref-desc">Ninguno · Primaria incompleta · … · Posgrado</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">Stratum</span>
+                    <span class="ref-desc">Estrato socioeconómico: entero del 1 al 6</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">HousingType</span>
+                    <span class="ref-desc">Propia · Arrendada · Familiar · Otra</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">Dependents</span>
+                    <span class="ref-desc">Personas a cargo: entero ≥ 0</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">ContractType</span>
+                    <span class="ref-desc">Indefinido · Temporal · Prestación de servicios · Aprendizaje · Otro</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">DailyWorkHours</span>
+                    <span class="ref-desc">1 = menos de 8h · 2 = 8h · 3 = más de 8h</span>
+                </div>
+                <div class="ref-item">
+                    <span class="ref-field">JobSeniority</span>
+                    <span class="ref-desc">1 = &lt;1 año · 2 = 1-5 · 3 = 6-10 · 4 = 11-20 · 5 = &gt;20 años</span>
                 </div>
             </div>
         </div>
@@ -315,72 +482,197 @@
     </div>
     }
 
-    <!-- Edit User Form -->
+    <!-- Edit User Modal -->
     @if (showEditForm && editingUser) {
-    <div class="editor-panel">
-        <h3>
-            <mat-icon>edit</mat-icon> Editar Usuario #{{ editingUser.userId }} — {{ editingUser.email }}</h3>
-        <form [formGroup]="editForm" (ngSubmit)="saveEditUser()">
-            <div class="editor-panel__grid">
-                <label class="editor-panel__field">
-                    <span>Nombre *</span>
-                    <input formControlName="firstName" placeholder="Juan" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Apellido *</span>
-                    <input formControlName="lastName" placeholder="Pérez" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Teléfono</span>
-                    <input formControlName="phone" placeholder="+57311000000" />
-                </label>
-                <label class="editor-panel__field">
-                    <span>Área</span>
-                    <select formControlName="areaID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (a of filteredEditAreas; track a.areaID) {
-                        <option [ngValue]="a.areaID">{{ a.name }}</option>
-                        }
-                    </select>
-                </label>
-                <label class="editor-panel__field">
-                    <span>Tipo de Cargo</span>
-                    <select formControlName="jobTypeID">
-                        <option [ngValue]="null">-- Seleccionar --</option>
-                        @for (j of jobTypes; track j.jobTypeID) {
-                        <option [ngValue]="j.jobTypeID">{{ j.name }}</option>
-                        }
-                    </select>
-                </label>
+    <div class="user-modal-overlay" (click)="cancelEdit()">
+        <div class="user-modal" (click)="$event.stopPropagation()">
+            <div class="user-modal__header">
+                <h3>
+                    <mat-icon>edit</mat-icon> Editar Usuario — {{ editingUser.email }}</h3>
+                <button type="button" class="user-modal__close" (click)="cancelEdit()" aria-label="Cerrar">
+                    <mat-icon>close</mat-icon>
+                </button>
             </div>
+            <div class="user-modal__body">
+                <form [formGroup]="editForm" (ngSubmit)="saveEditUser()" id="edit-user-form">
 
-            <!-- Roles -->
-            <div class="editor-panel__roles">
-                <span class="editor-panel__roles-label">
-                    <mat-icon>shield</mat-icon> Roles asignados
-                    @if (savingRole) {
-                    <mat-progress-spinner diameter="14" mode="indeterminate" style="display:inline-block;margin-left:6px"></mat-progress-spinner>
-                    }
-                </span>
-                <div class="editor-panel__roles-grid">
-                    @for (role of roleOptions; track role.id) {
-                    <button type="button" class="role-toggle" [class.role-toggle--active]="hasEditRole(role.id)" [disabled]="savingRole" (click)="toggleEditRole(role.id)">
-                        <mat-icon>{{ hasEditRole(role.id) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-                        {{ role.name }}
-                    </button> }
-                </div>
+                    <!-- Sección: Datos personales -->
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>person</mat-icon> Datos Personales
+                        </div>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Nombre *</span>
+                                <input formControlName="firstName" placeholder="Juan" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Apellido *</span>
+                                <input formControlName="lastName" placeholder="Pérez" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Teléfono</span>
+                                <input formControlName="phone" placeholder="+57311000000" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Fecha de Nacimiento</span>
+                                <input type="date" formControlName="dateOfBirth" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Información laboral -->
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>work</mat-icon> Información Laboral
+                        </div>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Fecha de Contratación</span>
+                                <input type="date" formControlName="hireDate" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Área</span>
+                                <select formControlName="areaID">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    @for (a of filteredEditAreas; track a.areaID) {
+                                    <option [ngValue]="a.areaID">{{ a.name }}</option>
+                                    }
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Tipo de Cargo</span>
+                                <select formControlName="jobTypeID">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    @for (j of jobTypes; track j.jobTypeID) {
+                                    <option [ngValue]="j.jobTypeID">{{ j.name }}</option>
+                                    }
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Tipo de Contrato</span>
+                                <select formControlName="contractType">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Indefinido">Indefinido</option>
+                                    <option value="Temporal">Temporal</option>
+                                    <option value="Prestación de servicios">Prestación de servicios</option>
+                                    <option value="Aprendizaje">Aprendizaje</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Horas laborales diarias</span>
+                                <select formControlName="dailyWorkHours">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option [ngValue]="1">Menos de 8 horas</option>
+                                    <option [ngValue]="2">8 horas</option>
+                                    <option [ngValue]="3">Más de 8 horas</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Antigüedad en el cargo</span>
+                                <select formControlName="jobSeniority">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option [ngValue]="1">Menos de 1 año</option>
+                                    <option [ngValue]="2">Entre 1 y 5 años</option>
+                                    <option [ngValue]="3">Entre 6 y 10 años</option>
+                                    <option [ngValue]="4">Entre 11 y 20 años</option>
+                                    <option [ngValue]="5">Más de 20 años</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sección: Datos sociodemográficos -->
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>people_alt</mat-icon> Datos Sociodemográficos
+                        </div>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Estado Civil</span>
+                                <select formControlName="maritalStatus">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Soltero/a">Soltero/a</option>
+                                    <option value="Casado/a">Casado/a</option>
+                                    <option value="Unión libre">Unión libre</option>
+                                    <option value="Separado/a">Separado/a</option>
+                                    <option value="Viudo/a">Viudo/a</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Nivel de Escolaridad</span>
+                                <select formControlName="educationLevel">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Ninguno">Ninguno</option>
+                                    <option value="Primaria incompleta">Primaria incompleta</option>
+                                    <option value="Primaria completa">Primaria completa</option>
+                                    <option value="Bachillerato incompleto">Bachillerato incompleto</option>
+                                    <option value="Bachillerato completo">Bachillerato completo</option>
+                                    <option value="Técnica/tecnología incompleta">Técnica/tecnología incompleta</option>
+                                    <option value="Técnica/tecnología completa">Técnica/tecnología completa</option>
+                                    <option value="Profesional incompleto">Profesional incompleto</option>
+                                    <option value="Profesional completo">Profesional completo</option>
+                                    <option value="Posgrado">Posgrado</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Estrato Socioeconómico</span>
+                                <select formControlName="stratum">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option [ngValue]="1">1</option>
+                                    <option [ngValue]="2">2</option>
+                                    <option [ngValue]="3">3</option>
+                                    <option [ngValue]="4">4</option>
+                                    <option [ngValue]="5">5</option>
+                                    <option [ngValue]="6">6</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Tipo de Vivienda</span>
+                                <select formControlName="housingType">
+                                    <option [ngValue]="null">-- Seleccionar --</option>
+                                    <option value="Propia">Propia</option>
+                                    <option value="Arrendada">Arrendada</option>
+                                    <option value="Familiar">Familiar</option>
+                                    <option value="Otra">Otra</option>
+                                </select>
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Personas a cargo</span>
+                                <input type="number" formControlName="dependents" placeholder="0" min="0" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Roles -->
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>shield</mat-icon> Roles asignados @if (savingRole) {
+                            <mat-progress-spinner diameter="14" mode="indeterminate" style="display:inline-block;margin-left:6px"></mat-progress-spinner>
+                            }
+                        </div>
+                        <div class="editor-panel__roles-grid">
+                            @for (role of roleOptions; track role.id) {
+                            <button type="button" class="role-toggle" [class.role-toggle--active]="hasEditRole(role.id)" [disabled]="savingRole" (click)="toggleEditRole(role.id)">
+                                <mat-icon>{{ hasEditRole(role.id) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                                {{ role.name }}
+                            </button> }
+                        </div>
+                    </div>
+
+                </form>
             </div>
-
-            <div class="editor-panel__actions">
+            <div class="user-modal__footer">
                 <button type="button" class="btn btn--ghost" (click)="cancelEdit()">Cancelar</button>
-                <button type="submit" class="btn btn--primary" [disabled]="saving">
+                <button type="submit" form="edit-user-form" class="btn btn--primary" [disabled]="saving || savingRole">
+                    @if (saving) { <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner> }
                     <mat-icon>save</mat-icon> Guardar Cambios
                 </button>
             </div>
-        </form>
+        </div>
     </div>
     }
-
     <!-- Filters -->
     <div class="admin-filters">
         <div class="admin-filters__group">

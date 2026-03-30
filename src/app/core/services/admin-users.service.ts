@@ -21,6 +21,8 @@ export interface AdminUserListItemDto {
     documentNumber?: string;
     phone?: string;
     gender?: string;
+    dateOfBirth?: string;
+    hireDate?: string;
     companyID?: number;
     companyName?: string;
     siteID?: number;
@@ -38,6 +40,14 @@ export interface AdminUserListItemDto {
     lastEvaluationDate?: string;
     evaluationsCompleted?: number;
     lastRiskLevel?: RiskLevel;
+    maritalStatus?: string;
+    educationLevel?: string;
+    stratum?: number;
+    housingType?: string;
+    dependents?: number;
+    contractType?: string;
+    dailyWorkHours?: number;
+    jobSeniority?: number;
 }
 
 export interface BulkUploadResult {
@@ -61,11 +71,21 @@ export interface AdminCreateUserRequestDto {
     gender: string;
     email: string;
     password: string;
+    dateOfBirth: string;         // ISO 8601, required
+    hireDate: string;            // ISO 8601, required (NOT NULL in DB)
     companyID?: number | null;
     siteID?: number | null;
     areaID?: number | null;
     jobTypeID: number;
     roleIDs: number[];
+    maritalStatus?: string | null;
+    educationLevel?: string | null;
+    stratum?: number | null;
+    housingType?: string | null;
+    dependents?: number | null;
+    contractType?: string | null;
+    dailyWorkHours?: number | null;
+    jobSeniority?: number | null;
 }
 
 export interface AdminCreateUserResponseDto {
@@ -80,8 +100,18 @@ export interface AdminUpdateUserRequestDto {
     firstName?: string;
     lastName?: string;
     phone?: string;
+    dateOfBirth?: string | null;
+    hireDate?: string | null;
     areaID?: number | null;
     jobTypeID?: number | null;
+    maritalStatus?: string | null;
+    educationLevel?: string | null;
+    stratum?: number | null;
+    housingType?: string | null;
+    dependents?: number | null;
+    contractType?: string | null;
+    dailyWorkHours?: number | null;
+    jobSeniority?: number | null;
 }
 
 /** Shape returned by the deployed backend (flat fields, no nested objects) */
@@ -94,6 +124,8 @@ interface BackendUserDto {
     documentNumber?: string | null;
     phone?: string | null;
     gender?: string | null;
+    dateOfBirth?: string | null;
+    hireDate?: string | null;
     companyID?: number | null;
     companyName?: string | null;
     company?: { id?: number; name?: string } | null;
@@ -110,6 +142,14 @@ interface BackendUserDto {
     createdAt?: string | null;
     lastLoginAt?: string | null;
     roles?: (string | { id?: number; name?: string })[] | null;
+    maritalStatus?: string | null;
+    educationLevel?: string | null;
+    stratum?: number | null;
+    housingType?: string | null;
+    dependents?: number | null;
+    contractType?: string | null;
+    dailyWorkHours?: number | null;
+    jobSeniority?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -126,6 +166,8 @@ export class AdminUsersService {
             documentNumber: u.documentNumber ?? undefined,
             phone: u.phone ?? undefined,
             gender: u.gender ?? undefined,
+            dateOfBirth: u.dateOfBirth ? u.dateOfBirth.substring(0, 10) : undefined,
+            hireDate: u.hireDate ? u.hireDate.substring(0, 10) : undefined,
             companyID: u.companyID ?? u.company?.id ?? undefined,
             companyName: u.companyName ?? u.company?.name ?? undefined,
             siteID: u.siteID ?? u.site?.id ?? undefined,
@@ -144,6 +186,14 @@ export class AdminUsersService {
                 : [],
             creationDate: u.createdAt ?? undefined,
             lastLoginAt: u.lastLoginAt ?? undefined,
+            maritalStatus: u.maritalStatus ?? undefined,
+            educationLevel: u.educationLevel ?? undefined,
+            stratum: u.stratum != null ? Number(u.stratum) : undefined,
+            housingType: u.housingType ?? undefined,
+            dependents: u.dependents != null ? Number(u.dependents) : undefined,
+            contractType: u.contractType ?? undefined,
+            dailyWorkHours: u.dailyWorkHours != null ? Number(u.dailyWorkHours) : undefined,
+            jobSeniority: u.jobSeniority != null ? Number(u.jobSeniority) : undefined,
         };
     }
 
