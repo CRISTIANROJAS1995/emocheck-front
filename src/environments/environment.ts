@@ -1,8 +1,8 @@
 export const environment = {
     production: false,
     // DEV: API local para pruebas
-    apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
-    //apiUrl: 'https://www.emocheckhealth.com/api',
+    //apiUrl: 'https://kratosconquer-001-site1.mtempurl.com/api',
+    apiUrl: 'https://www.emocheckhealth.com/api',
     apiTimeout: 30000,
     appName: 'EmoCheck',
     version: '1.0.0',

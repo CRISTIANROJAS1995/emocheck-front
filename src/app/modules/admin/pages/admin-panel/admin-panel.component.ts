@@ -95,19 +95,39 @@ export class AdminPanelComponent implements OnInit {
             gender: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             password: ['', [Validators.required, Validators.minLength(8)]],
+            dateOfBirth: ['', Validators.required],
+            hireDate: ['', Validators.required],
             companyID: [null],
             siteID: [null],
             areaID: [null],
             jobTypeID: [null, Validators.required],
             roleIDs: [[6], Validators.required],
+            maritalStatus: [null],
+            educationLevel: [null],
+            stratum: [null],
+            housingType: [null],
+            dependents: [null],
+            contractType: [null],
+            dailyWorkHours: [null],
+            jobSeniority: [null],
         });
 
         this.editForm = this.fb.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             phone: [''],
+            dateOfBirth: [null],
+            hireDate: [null],
             areaID: [null],
             jobTypeID: [null],
+            maritalStatus: [null],
+            educationLevel: [null],
+            stratum: [null],
+            housingType: [null],
+            dependents: [null],
+            contractType: [null],
+            dailyWorkHours: [null],
+            jobSeniority: [null],
         });
 
         this.loadUsers();
@@ -252,11 +272,21 @@ export class AdminPanelComponent implements OnInit {
                 gender: String(v.gender || '').trim(),
                 email: String(v.email || '').trim(),
                 password: String(v.password || '').trim(),
+                dateOfBirth: String(v.dateOfBirth || '').trim(),
+                hireDate: String(v.hireDate || '').trim(),
                 companyID: toOptionalNum(v.companyID),
                 siteID: toOptionalNum(v.siteID),
                 areaID: toOptionalNum(v.areaID),
                 jobTypeID: Number(v.jobTypeID),
                 roleIDs: roleIDs.length ? roleIDs : [6],
+                maritalStatus: v.maritalStatus || null,
+                educationLevel: v.educationLevel || null,
+                stratum: toOptionalNum(v.stratum),
+                housingType: v.housingType || null,
+                dependents: toOptionalNum(v.dependents),
+                contractType: v.contractType || null,
+                dailyWorkHours: toOptionalNum(v.dailyWorkHours),
+                jobSeniority: toOptionalNum(v.jobSeniority),
             })
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
@@ -299,8 +329,18 @@ export class AdminPanelComponent implements OnInit {
             firstName,
             lastName,
             phone: user.phone ?? '',
+            dateOfBirth: user.dateOfBirth ?? null,
+            hireDate: user.hireDate ?? null,
             areaID: user.areaID ?? null,
             jobTypeID: user.jobTypeID ?? null,
+            maritalStatus: user.maritalStatus ?? null,
+            educationLevel: user.educationLevel ?? null,
+            stratum: user.stratum ?? null,
+            housingType: user.housingType ?? null,
+            dependents: user.dependents ?? null,
+            contractType: user.contractType ?? null,
+            dailyWorkHours: user.dailyWorkHours ?? null,
+            jobSeniority: user.jobSeniority ?? null,
         });
         // Inicializar roles actuales del usuario
         this.editRoleIDs = new Set(
@@ -370,8 +410,18 @@ export class AdminPanelComponent implements OnInit {
             firstName: String(v.firstName || '').trim() || undefined,
             lastName: String(v.lastName || '').trim() || undefined,
             phone: String(v.phone || '').trim() || undefined,
+            dateOfBirth: v.dateOfBirth || null,
+            hireDate: v.hireDate || null,
             areaID: toOptionalNum(v.areaID),
             jobTypeID: toOptionalNum(v.jobTypeID),
+            maritalStatus: v.maritalStatus || null,
+            educationLevel: v.educationLevel || null,
+            stratum: toOptionalNum(v.stratum),
+            housingType: v.housingType || null,
+            dependents: toOptionalNum(v.dependents),
+            contractType: v.contractType || null,
+            dailyWorkHours: toOptionalNum(v.dailyWorkHours),
+            jobSeniority: toOptionalNum(v.jobSeniority),
         };
 
         this.adminUsers
@@ -540,15 +590,17 @@ export class AdminPanelComponent implements OnInit {
         try {
             // Crear datos estructurados para Excel
             const headers = [
-                'FirstName', 'LastName', 'Email', 'Password', 'DocumentType', 
-                'DocumentNumber', 'Phone', 'Gender', 'CompanyID', 'SiteID', 
-                'AreaID', 'JobTypeID', 'RoleIDs'
+                'FirstName', 'LastName', 'Email', 'Password', 'DocumentType',
+                'DocumentNumber', 'Phone', 'Gender', 'DateOfBirth', 'HireDate',
+                'CompanyID', 'SiteID', 'AreaID', 'JobTypeID', 'RoleIDs',
+                'MaritalStatus', 'EducationLevel', 'Stratum', 'HousingType',
+                'Dependents', 'ContractType', 'DailyWorkHours', 'JobSeniority'
             ];
-            
+
             const examples = [
-                ['Juan', 'Pérez', 'juan.perez@empresa.com', 'Pass123!', 'CC', '12345678', '3001234567', 'M', '1', '1', '1', '1', '6'],
-                ['María', 'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321', '3007654321', 'F', '1', '1', '2', '2', '6,4'],
-                ['Carlos', 'López', 'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344', '3009876543', 'M', '1', '2', '3', '1', '5']
+                ['Juan',   'Pérez',  'juan.perez@empresa.com',   'Pass123!', 'CC', '12345678',   '3001234567', 'M', '1990-05-15', '2023-01-10', '1', '1', '1', '1', '6',   'Soltero/a',  'Profesional completo',   '3', 'Arrendada', '0', 'Indefinido', '2', '2'],
+                ['María',  'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321',   '3007654321', 'F', '1992-08-20', '2022-06-01', '1', '1', '2', '2', '6,4', 'Casado/a',   'Técnica/tecnología completa', '2', 'Propia',    '1', 'Temporal',   '2', '1'],
+                ['Carlos', 'López',  'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344',   '3009876543', 'M', '1985-03-10', '2020-09-15', '1', '2', '3', '1', '5',   'Unión libre','Bachillerato completo',   '4', 'Familiar',  '2', 'Prestación de servicios', '3', '3']
             ];
 
             // Crear datos del worksheet: headers + ejemplos + filas vacías
@@ -561,22 +613,32 @@ export class AdminPanelComponent implements OnInit {
 
             // Crear worksheet usando SheetJS
             const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-            
+
             // Configurar anchos de columnas
             const columnWidths = [
                 { wch: 12 }, // FirstName
-                { wch: 12 }, // LastName  
-                { wch: 25 }, // Email
+                { wch: 12 }, // LastName
+                { wch: 28 }, // Email
                 { wch: 12 }, // Password
-                { wch: 12 }, // DocumentType
-                { wch: 15 }, // DocumentNumber
-                { wch: 15 }, // Phone
-                { wch: 8 },  // Gender
+                { wch: 14 }, // DocumentType
+                { wch: 16 }, // DocumentNumber
+                { wch: 14 }, // Phone
+                { wch: 8  }, // Gender
+                { wch: 13 }, // DateOfBirth
+                { wch: 13 }, // HireDate
                 { wch: 10 }, // CompanyID
-                { wch: 8 },  // SiteID
-                { wch: 8 },  // AreaID
+                { wch: 8  }, // SiteID
+                { wch: 8  }, // AreaID
                 { wch: 10 }, // JobTypeID
-                { wch: 10 }  // RoleIDs
+                { wch: 10 }, // RoleIDs
+                { wch: 16 }, // MaritalStatus
+                { wch: 30 }, // EducationLevel
+                { wch: 9  }, // Stratum
+                { wch: 14 }, // HousingType
+                { wch: 12 }, // Dependents
+                { wch: 26 }, // ContractType
+                { wch: 16 }, // DailyWorkHours
+                { wch: 14 }, // JobSeniority
             ];
             worksheet['!cols'] = columnWidths;
 
@@ -662,15 +724,17 @@ export class AdminPanelComponent implements OnInit {
     downloadCSVTemplate(): void {
         // CSV optimizado para Excel con BOM y formato correcto
         const headers = [
-            'FirstName', 'LastName', 'Email', 'Password', 'DocumentType', 
-            'DocumentNumber', 'Phone', 'Gender', 'CompanyID', 'SiteID', 
-            'AreaID', 'JobTypeID', 'RoleIDs'
+            'FirstName', 'LastName', 'Email', 'Password', 'DocumentType',
+            'DocumentNumber', 'Phone', 'Gender', 'DateOfBirth', 'HireDate',
+            'CompanyID', 'SiteID', 'AreaID', 'JobTypeID', 'RoleIDs',
+            'MaritalStatus', 'EducationLevel', 'Stratum', 'HousingType',
+            'Dependents', 'ContractType', 'DailyWorkHours', 'JobSeniority'
         ];
-        
+
         const examples = [
-            ['Juan', 'Pérez', 'juan.perez@empresa.com', 'Pass123!', 'CC', '12345678', '3001234567', 'M', '1', '1', '1', '1', '6'],
-            ['María', 'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321', '3007654321', 'F', '1', '1', '2', '2', '"6,4"'],
-            ['Carlos', 'López', 'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344', '3009876543', 'M', '1', '2', '3', '1', '5']
+            ['Juan',   'Pérez',  'juan.perez@empresa.com',   'Pass123!', 'CC', '12345678',   '3001234567', 'M', '1990-05-15', '2023-01-10', '1', '1', '1', '1', '6',    'Soltero/a',  'Profesional completo',          '3', 'Arrendada', '0', 'Indefinido',              '2', '2'],
+            ['María',  'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321',   '3007654321', 'F', '1992-08-20', '2022-06-01', '1', '1', '2', '2', '"6,4"','Casado/a',   'Técnica/tecnología completa',   '2', 'Propia',    '1', 'Temporal',                '2', '1'],
+            ['Carlos', 'López',  'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344',   '3009876543', 'M', '1985-03-10', '2020-09-15', '1', '2', '3', '1', '5',    'Unión libre','Bachillerato completo',          '4', 'Familiar',  '2', 'Prestación de servicios', '3', '3']
         ];
 
         // Función para escapar valores CSV

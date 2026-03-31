@@ -196,13 +196,14 @@
 }
 
 .option {
-    height: 68px;
+    min-height: 68px;
+    height: auto;
     width: 748px;
     max-width: 100%;
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 22px;
+    padding: 14px 22px;
     background: rgba(255, 255, 255, 0.50);
     border: 2px solid #E5E7EB;
     border-radius: 16px;
@@ -260,6 +261,8 @@
     line-height: 24px;
     color: #364153;
     flex: 1;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .chevron {
@@ -616,5 +619,66 @@
     .matrix-header__opt,
     .matrix-row__opt {
         padding: 8px 4px;
+    }
+}
+
+@media (max-width: 640px) {
+    .questionnaire-page {
+        padding: 0 12px 48px;
+    }
+    .questionnaire-header-inner {
+        padding: 2px 12px 0.667px 12px;
+        height: auto;
+        min-height: 64px;
+    }
+    .question-card {
+        padding: 20px 16px 10px 16px;
+        min-height: unset;
+        border-radius: 16px;
+        margin-top: 20px;
+    }
+    .question-title {
+        font-size: 15px;
+        line-height: 22px;
+    }
+    .option-label {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .option {
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .options {
+        gap: 12px;
+    }
+    .header-title {
+        font-size: 14px;
+        line-height: 20px;
+        white-space: normal;
+        word-break: break-word;
+    }
+    .header-main {
+        gap: 8px;
+    }
+    .card-footer {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .matrix-table {
+        min-width: 440px;
+    }
+    .matrix-header,
+    .matrix-row {
+        grid-template-columns: 1.2fr repeat(4, minmax(60px, 1fr));
+    }
+    .matrix-header__opt {
+        font-size: 9.5px;
+        padding: 8px 4px;
+    }
+    .matrix-row__label {
+        font-size: 11.5px;
+        padding: 8px 8px;
     }
 }
