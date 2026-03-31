@@ -12,10 +12,13 @@ import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-mod
 import { AlertService } from 'app/core/swal/sweet-alert.service';
 import { AuthService } from 'app/core/services/auth.service';
 import { PendingClosingService } from 'app/core/services/pending-closing.service';
+import { PsychosocialConsentService, PsychosocialConsentDto } from 'app/core/services/psychosocial-consent.service';
+import { UsersService } from 'app/core/services/users.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { ExamTimerComponent } from 'app/shared/components/ui/exam-timer/exam-timer.component';
 import { EmoQuestionnaireComponent, QuestionnaireConfig } from 'app/shared/components/questionnaire';
 import { finalize, forkJoin, take } from 'rxjs';
+import jsPDF from 'jspdf';
 
 // ── Paleta de colores para instrumentos sin metadato explícito ───────────────
 const FALLBACK_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444'];
@@ -23,36 +26,36 @@ const FALLBACK_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', 
 // ── Metadatos por código de instrumento ──────────────────────────────────────
 const INSTRUMENT_META: Record<string, { icon: string; description: string; color: string }> = {
     // Salud Mental
-    GAD7:    { icon: 'icons/Icon (37).svg', description: 'Trastorno de Ansiedad Generalizada',      color: '#3b82f6' },
-    PHQ9:    { icon: 'icons/Icon (28).svg', description: 'Cuestionario de Salud del Paciente',      color: '#8b5cf6' },
-    ISI:     { icon: 'icons/Icon (29).svg', description: 'Índice de Severidad del Insomnio',        color: '#06b6d4' },
-    PSS4:    { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido',              color: '#f59e0b' },
-    DASS21:  { icon: 'icons/Icon (37).svg', description: 'Escala de Depresión, Ansiedad y Estrés',  color: '#3b82f6' },
-    BAI:     { icon: 'icons/Icon (28).svg', description: 'Inventario de Ansiedad de Beck',          color: '#8b5cf6' },
-    BDI:     { icon: 'icons/Icon (29).svg', description: 'Inventario de Depresión de Beck',         color: '#06b6d4' },
-    ICSP_VC: { icon: 'icons/icon-sleep.svg', description: 'Índice de Calidad del Sueño',             color: '#f59e0b' },
-    TMMS24:  { icon: 'icons/Icon (31).svg', description: 'Escala de Inteligencia Emocional',        color: '#10b981' },
-    PSS10:   { icon: 'icons/Icon (32).svg', description: 'Escala de Estrés Percibido (10 ítems)',   color: '#ef4444' },
+    GAD7: { icon: 'icons/Icon (37).svg', description: 'Trastorno de Ansiedad Generalizada', color: '#3b82f6' },
+    PHQ9: { icon: 'icons/Icon (28).svg', description: 'Cuestionario de Salud del Paciente', color: '#8b5cf6' },
+    ISI: { icon: 'icons/Icon (29).svg', description: 'Índice de Severidad del Insomnio', color: '#06b6d4' },
+    PSS4: { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido', color: '#f59e0b' },
+    DASS21: { icon: 'icons/Icon (37).svg', description: 'Escala de Depresión, Ansiedad y Estrés', color: '#3b82f6' },
+    BAI: { icon: 'icons/Icon (28).svg', description: 'Inventario de Ansiedad de Beck', color: '#8b5cf6' },
+    BDI: { icon: 'icons/Icon (29).svg', description: 'Inventario de Depresión de Beck', color: '#06b6d4' },
+    ICSP_VC: { icon: 'icons/icon-sleep.svg', description: 'Índice de Calidad del Sueño', color: '#f59e0b' },
+    TMMS24: { icon: 'icons/Icon (31).svg', description: 'Escala de Inteligencia Emocional', color: '#10b981' },
+    PSS10: { icon: 'icons/Icon (32).svg', description: 'Escala de Estrés Percibido (10 ítems)', color: '#ef4444' },
     // Fatiga Laboral
-    FATIGUE_ENERGY:     { icon: 'icons/Icon (38).svg', description: 'Nivel de energía física disponible',      color: '#84cc16' },
-    FATIGUE_COGNITIVE:  { icon: 'icons/Icon (33).svg', description: 'Capacidad de concentración y foco',       color: '#22c55e' },
-    FATIGUE_EMOTIONAL:  { icon: 'icons/Icon (34).svg', description: 'Reserva emocional y resiliencia',         color: '#06b6d4' },
-    FATIGUE_MOTIVATION: { icon: 'icons/Icon (35).svg', description: 'Motivación e impulso laboral',            color: '#f59e0b' },
+    FATIGUE_ENERGY: { icon: 'icons/Icon (38).svg', description: 'Nivel de energía física disponible', color: '#84cc16' },
+    FATIGUE_COGNITIVE: { icon: 'icons/Icon (33).svg', description: 'Capacidad de concentración y foco', color: '#22c55e' },
+    FATIGUE_EMOTIONAL: { icon: 'icons/Icon (34).svg', description: 'Reserva emocional y resiliencia', color: '#06b6d4' },
+    FATIGUE_MOTIVATION: { icon: 'icons/Icon (35).svg', description: 'Motivación e impulso laboral', color: '#f59e0b' },
     // Clima Organizacional
-    ECO:                   { icon: 'icons/Icon (39).svg', description: 'Escala de Compromiso Organizacional',  color: '#3b82f6' },
-    CLIMATE_LEADERSHIP:    { icon: 'icons/Icon (39).svg', description: 'Liderazgo y dirección del equipo',     color: '#00bba7' },
-    CLIMATE_TEAMWORK:      { icon: 'icons/Icon (36).svg', description: 'Colaboración y trabajo en equipo',     color: '#3b82f6' },
-    CLIMATE_COMMUNICATION: { icon: 'icons/Icon (25).svg', description: 'Canales y calidad de comunicación',    color: '#8b5cf6' },
-    CLIMATE_RECOGNITION:   { icon: 'icons/Icon (26).svg', description: 'Reconocimiento y valoración',          color: '#f59e0b' },
+    ECO: { icon: 'icons/Icon (39).svg', description: 'Escala de Compromiso Organizacional', color: '#3b82f6' },
+    CLIMATE_LEADERSHIP: { icon: 'icons/Icon (39).svg', description: 'Liderazgo y dirección del equipo', color: '#00bba7' },
+    CLIMATE_TEAMWORK: { icon: 'icons/Icon (36).svg', description: 'Colaboración y trabajo en equipo', color: '#3b82f6' },
+    CLIMATE_COMMUNICATION: { icon: 'icons/Icon (25).svg', description: 'Canales y calidad de comunicación', color: '#8b5cf6' },
+    CLIMATE_RECOGNITION: { icon: 'icons/Icon (26).svg', description: 'Reconocimiento y valoración', color: '#f59e0b' },
     // Riesgo Psicosocial
-    INTRA_A:       { icon: 'icons/Icon (40).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma A',  color: '#f97316' },
-    INTRA_B:       { icon: 'icons/Icon (41).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma B',  color: '#ef4444' },
-    EXTRALABORAL:  { icon: 'icons/Icon (42).svg', description: 'Factores de Riesgo Psicosocial Extralaboral',            color: '#8b5cf6' },
-    ESTRES:        { icon: 'icons/Icon (43).svg', description: 'Síntomas de Estrés',                                     color: '#ec4899' },
-    PSYCHO_DEMANDS:  { icon: 'icons/Icon (40).svg', description: 'Demandas y carga del trabajo',               color: '#f97316' },
-    PSYCHO_CONTROL:  { icon: 'icons/Icon (41).svg', description: 'Autonomía y control sobre el trabajo',       color: '#ef4444' },
-    PSYCHO_SUPPORT:  { icon: 'icons/Icon (42).svg', description: 'Apoyo social y liderazgo',                   color: '#8b5cf6' },
-    PSYCHO_REWARDS:  { icon: 'icons/Icon (43).svg', description: 'Recompensas y reconocimiento',               color: '#f59e0b' },
+    INTRA_A: { icon: 'icons/Icon (40).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma A', color: '#f97316' },
+    INTRA_B: { icon: 'icons/Icon (41).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma B', color: '#ef4444' },
+    EXTRALABORAL: { icon: 'icons/Icon (42).svg', description: 'Factores de Riesgo Psicosocial Extralaboral', color: '#8b5cf6' },
+    ESTRES: { icon: 'icons/Icon (43).svg', description: 'Síntomas de Estrés', color: '#ec4899' },
+    PSYCHO_DEMANDS: { icon: 'icons/Icon (40).svg', description: 'Demandas y carga del trabajo', color: '#f97316' },
+    PSYCHO_CONTROL: { icon: 'icons/Icon (41).svg', description: 'Autonomía y control sobre el trabajo', color: '#ef4444' },
+    PSYCHO_SUPPORT: { icon: 'icons/Icon (42).svg', description: 'Apoyo social y liderazgo', color: '#8b5cf6' },
+    PSYCHO_REWARDS: { icon: 'icons/Icon (43).svg', description: 'Recompensas y reconocimiento', color: '#f59e0b' },
 };
 
 // ── Instrucciones por instrumento (modal pre-cuestionario) ──────────────────
@@ -428,7 +431,7 @@ export interface InstrumentVibeData {
 }
 
 const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
-    DASS21:  {
+    DASS21: {
         emoji: '🧠',
         focus: 'Estado anímico',
         tagline: 'Conocerte es el primer paso para cuidarte.',
@@ -438,7 +441,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '21' },
         ],
     },
-    BAI:     {
+    BAI: {
         emoji: '🌬️',
         focus: 'Ansiedad',
         tagline: 'Respirar es también un acto de valentía.',
@@ -448,7 +451,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '21' },
         ],
     },
-    BDI:     {
+    BDI: {
         emoji: '🌱',
         focus: 'Bienestar emocional',
         tagline: 'Escucharte es el inicio del cambio.',
@@ -468,7 +471,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '10' },
         ],
     },
-    TMMS24:  {
+    TMMS24: {
         emoji: '❤️',
         focus: 'Inteligencia emocional',
         tagline: 'Tus emociones son tu mayor fortaleza.',
@@ -478,7 +481,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '24' },
         ],
     },
-    GAD7:    {
+    GAD7: {
         emoji: '🌿',
         focus: 'Ansiedad generalizada',
         tagline: 'Identificar es avanzar hacia el equilibrio.',
@@ -488,7 +491,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '7' },
         ],
     },
-    PHQ9:    {
+    PHQ9: {
         emoji: '☀️',
         focus: 'Estado de ánimo',
         tagline: 'Tu bienestar merece atención y cuidado.',
@@ -498,7 +501,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '9' },
         ],
     },
-    ISI:     {
+    ISI: {
         emoji: '😴',
         focus: 'Calidad del sueño',
         tagline: 'Descansar bien es un derecho, no un lujo.',
@@ -508,7 +511,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '7' },
         ],
     },
-    PSS4:    {
+    PSS4: {
         emoji: '🧘',
         focus: 'Estrés percibido',
         tagline: 'Medir el estrés es el primer paso para reducirlo.',
@@ -518,7 +521,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '4' },
         ],
     },
-    PSS10:   {
+    PSS10: {
         emoji: '🧘',
         focus: 'Estrés percibido',
         tagline: 'Conocer tu nivel de estrés te da el control.',
@@ -528,10 +531,10 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '10' },
         ],
     },
-    FATIGUE_ENERGY:     { emoji: '⚡', focus: 'Energía física',     tagline: 'Tu energía importa — escúchala.',                       stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
-    FATIGUE_COGNITIVE:  { emoji: '🔍', focus: 'Concentración',      tagline: 'Un foco claro lleva a mejores resultados.',             stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
-    FATIGUE_EMOTIONAL:  { emoji: '🫀', focus: 'Reserva emocional',  tagline: 'Cuidar tus emociones es también rendimiento.',          stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
-    FATIGUE_MOTIVATION: { emoji: '🚀', focus: 'Motivación',          tagline: 'La motivación se cultiva, no se fuerza.',              stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    FATIGUE_ENERGY: { emoji: '⚡', focus: 'Energía física', tagline: 'Tu energía importa — escúchala.', stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    FATIGUE_COGNITIVE: { emoji: '🔍', focus: 'Concentración', tagline: 'Un foco claro lleva a mejores resultados.', stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    FATIGUE_EMOTIONAL: { emoji: '🫀', focus: 'Reserva emocional', tagline: 'Cuidar tus emociones es también rendimiento.', stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
+    FATIGUE_MOTIVATION: { emoji: '🚀', focus: 'Motivación', tagline: 'La motivación se cultiva, no se fuerza.', stats: [{ label: 'Duración', value: '~2 min' }, { label: 'Área', value: 'Fatiga' }, { label: 'Período', value: 'Última semana' }] },
     // MFI-20 (Inventario Multidimensional de Fatiga) – código principal y variantes del backend
     MFI20: {
         emoji: '🔋',
@@ -543,17 +546,17 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '20' },
         ],
     },
-    MFI20_FATIGA_GENERAL:   { emoji: '🔋', focus: 'Fatiga General',       tagline: 'Reconocer el cansancio es el primer paso.',          stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
-    MFI20_FATIGA_FISICA:    { emoji: '💪', focus: 'Fatiga Física',         tagline: 'Tu cuerpo habla — aprende a escucharlo.',            stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
-    MFI20_FATIGA_MENTAL:    { emoji: '🧠', focus: 'Fatiga Mental',         tagline: 'La mente también necesita descanso.',               stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
-    MFI20_FATIGA_EMOCIONAL: { emoji: '🫀', focus: 'Fatiga Emocional',      tagline: 'Cuidar tus emociones es también rendimiento.',      stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
-    MFI20_DINAMISMO:        { emoji: '⚡', focus: 'Dinamismo',              tagline: 'Tu energía importa — escúchala.',                   stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
-    MFI20_MOTIVACION:       { emoji: '🚀', focus: 'Motivación',             tagline: 'La motivación se cultiva, no se fuerza.',           stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
-    MFI20_ACTIVIDAD_REDUCIDA: { emoji: '📉', focus: 'Actividad Reducida',   tagline: 'Identificar el límite es saber hasta dónde puedes llegar.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
-    CLIMATE_LEADERSHIP:    { emoji: '🏆', focus: 'Liderazgo',        tagline: 'Un buen líder cambia todo el ambiente.',               stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
-    CLIMATE_TEAMWORK:      { emoji: '🤝', focus: 'Trabajo en equipo', tagline: 'Juntos siempre llegan más lejos.',                    stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
-    CLIMATE_COMMUNICATION: { emoji: '💬', focus: 'Comunicación',     tagline: 'Comunicar bien es construir puentes.',                 stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
-    CLIMATE_RECOGNITION:   { emoji: '⭐', focus: 'Reconocimiento',   tagline: 'Ser valorado/a impulsa a dar lo mejor.',               stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    MFI20_FATIGA_GENERAL: { emoji: '🔋', focus: 'Fatiga General', tagline: 'Reconocer el cansancio es el primer paso.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
+    MFI20_FATIGA_FISICA: { emoji: '💪', focus: 'Fatiga Física', tagline: 'Tu cuerpo habla — aprende a escucharlo.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
+    MFI20_FATIGA_MENTAL: { emoji: '🧠', focus: 'Fatiga Mental', tagline: 'La mente también necesita descanso.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
+    MFI20_FATIGA_EMOCIONAL: { emoji: '🫀', focus: 'Fatiga Emocional', tagline: 'Cuidar tus emociones es también rendimiento.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
+    MFI20_DINAMISMO: { emoji: '⚡', focus: 'Dinamismo', tagline: 'Tu energía importa — escúchala.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
+    MFI20_MOTIVACION: { emoji: '🚀', focus: 'Motivación', tagline: 'La motivación se cultiva, no se fuerza.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
+    MFI20_ACTIVIDAD_REDUCIDA: { emoji: '📉', focus: 'Actividad Reducida', tagline: 'Identificar el límite es saber hasta dónde puedes llegar.', stats: [{ label: 'Duración', value: '~5 min' }, { label: 'Dimensiones', value: '5' }, { label: 'Preguntas', value: '20' }] },
+    CLIMATE_LEADERSHIP: { emoji: '🏆', focus: 'Liderazgo', tagline: 'Un buen líder cambia todo el ambiente.', stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    CLIMATE_TEAMWORK: { emoji: '🤝', focus: 'Trabajo en equipo', tagline: 'Juntos siempre llegan más lejos.', stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    CLIMATE_COMMUNICATION: { emoji: '💬', focus: 'Comunicación', tagline: 'Comunicar bien es construir puentes.', stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
+    CLIMATE_RECOGNITION: { emoji: '⭐', focus: 'Reconocimiento', tagline: 'Ser valorado/a impulsa a dar lo mejor.', stats: [{ label: 'Duración', value: '~3 min' }, { label: 'Área', value: 'Clima' }, { label: 'Preguntas', value: '10' }] },
     ECO: {
         emoji: '🏢',
         focus: 'Compromiso Organizacional',
@@ -564,10 +567,10 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
             { label: 'Preguntas', value: '18' },
         ],
     },
-    PSYCHO_DEMANDS:  { emoji: '⚖️', focus: 'Carga laboral',          tagline: 'Identificar la carga es empezar a equilibrarla.',      stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
-    PSYCHO_CONTROL:  { emoji: '🎛️', focus: 'Autonomía',              tagline: 'Tener control hace la diferencia.',                    stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
-    PSYCHO_SUPPORT:  { emoji: '🫂', focus: 'Apoyo social',           tagline: 'Apoyarse es fortaleza, no debilidad.',                 stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
-    PSYCHO_REWARDS:  { emoji: '🎁', focus: 'Recompensas',            tagline: 'Tu esfuerzo merece ser reconocido.',                   stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    PSYCHO_DEMANDS: { emoji: '⚖️', focus: 'Carga laboral', tagline: 'Identificar la carga es empezar a equilibrarla.', stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    PSYCHO_CONTROL: { emoji: '🎛️', focus: 'Autonomía', tagline: 'Tener control hace la diferencia.', stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    PSYCHO_SUPPORT: { emoji: '🫂', focus: 'Apoyo social', tagline: 'Apoyarse es fortaleza, no debilidad.', stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
+    PSYCHO_REWARDS: { emoji: '🎁', focus: 'Recompensas', tagline: 'Tu esfuerzo merece ser reconocido.', stats: [{ label: 'Duración', value: '~4 min' }, { label: 'Área', value: 'Psicosocial' }, { label: 'Período', value: 'Situación actual' }] },
     // Riesgo Psicosocial – Batería real del backend
     INTRA_A: {
         emoji: '🏗️',
@@ -621,6 +624,10 @@ export interface InstrumentCard extends InstrumentDescriptor {
     locked?: boolean;
     /** Razón por la que está bloqueado, para mostrar al usuario */
     lockReason?: string;
+    /** true si esta tarjeta es el consentimiento informado psicosocial (tarjeta sintética) */
+    isConsentCard?: boolean;
+    /** Estado del consentimiento psicosocial para mostrar el badge correcto */
+    consentStatus?: 'accepted' | 'rejected';
 }
 
 @Component({
@@ -651,6 +658,12 @@ export class InstrumentSelectorComponent implements OnInit {
     showWelcomeModal = false;
     /** Controls the consent modal visibility (shown when user picks an instrument) */
     showConsentModal = false;
+    /** Controls the wider psychosocial-specific informed consent modal */
+    showPsychosocialConsentModal = false;
+    /** Controls the rejection informational modal (shown after user chooses "No acepto") */
+    showPsychosocialRejectionModal = false;
+    /** Tracks whether the user has responded to the psychosocial informed consent */
+    psychosocialConsentStatus: 'pending' | 'accepted' | 'rejected' = 'pending';
     /** Controls the instructions modal visibility (shown after consent accepted) */
     showInstructionsModal = false;
     /** Instructions for the pending instrument */
@@ -671,6 +684,14 @@ export class InstrumentSelectorComponent implements OnInit {
 
     /** First name of the current user for the welcome modal greeting */
     userName = '';
+    /** Full name of the current user for the psychosocial consent form */
+    userFullName = '';
+    /** Document number of the current user for the psychosocial consent form */
+    userDocumentNumber = '';
+    /** Signed consent record returned by the API */
+    psychosocialConsentRecord: PsychosocialConsentDto | null = null;
+    /** True while the sign API call is in-flight (prevents double submission) */
+    consentSigning = false;
 
     /** Progress info for displaying next available instruments */
     progressInfo: {
@@ -701,7 +722,9 @@ export class InstrumentSelectorComponent implements OnInit {
         private readonly alert: AlertService,
         private readonly authService: AuthService,
         private readonly pendingClosing: PendingClosingService,
-    ) {}
+        private readonly consentService: PsychosocialConsentService,
+        private readonly usersService: UsersService,
+    ) { }
 
     ngOnInit(): void {
         this.moduleDef = getAssessmentModuleDefinition(this.moduleId);
@@ -714,8 +737,19 @@ export class InstrumentSelectorComponent implements OnInit {
         }
         this.authService.ensureCurrentUserLoaded().pipe(take(1)).subscribe({
             next: (u) => { if (u?.name) this.userName = u.name.split(' ')[0]; },
-            error: () => {},
+            error: () => { },
         });
+
+        // Load full name and document number for psychosocial consent modal
+        if (this.moduleId === 'psychosocial-risk') {
+            this.usersService.getMyProfile().pipe(take(1)).subscribe({
+                next: (profile) => {
+                    if (profile.fullName) this.userFullName = profile.fullName;
+                    this.userDocumentNumber = profile.documentNumber ?? '';
+                },
+                error: () => { },
+            });
+        }
 
         // ── Consumir closing pendiente de cuestionarios especializados ──
         // (ICSP_VC, TMMS24, MFI20 guardan las respuestas aquí antes de navegar de vuelta)
@@ -732,7 +766,7 @@ export class InstrumentSelectorComponent implements OnInit {
             } as any;
             const code = pending.instrumentCode.toUpperCase();
             const closing = INSTRUMENT_CLOSING[code]
-                ?? (code.startsWith('MFI')     ? INSTRUMENT_CLOSING['MFI20'] : null)
+                ?? (code.startsWith('MFI') ? INSTRUMENT_CLOSING['MFI20'] : null)
                 ?? (code.startsWith('FATIGUE') ? INSTRUMENT_CLOSING['FATIGUE_ENERGY'] : null)
                 ?? null;
             this.currentClosing = closing ?? {
@@ -748,7 +782,21 @@ export class InstrumentSelectorComponent implements OnInit {
         // Show welcome modal every time the module page loads
         this.showWelcomeModal = true;
 
-        this._loadInstruments();
+        // For psychosocial-risk, fetch consent status from API before loading instruments
+        if (this.moduleId === 'psychosocial-risk') {
+            this.consentService.getStatus().pipe(take(1)).subscribe({
+                next: (dto) => {
+                    if (dto.hasResponded) {
+                        this.psychosocialConsentStatus = dto.isAccepted ? 'accepted' : 'rejected';
+                        this.psychosocialConsentRecord = dto;
+                    }
+                    this._loadInstruments();
+                },
+                error: () => this._loadInstruments(),
+            });
+        } else {
+            this._loadInstruments();
+        }
     }
 
     private _loadInstruments(): void {
@@ -779,7 +827,7 @@ export class InstrumentSelectorComponent implements OnInit {
                 this.progressInfo = this.moduleId === 'mental-health' ? this._calculateProgressInfo(completedCodes, dass21Scores) : null;
 
                 // Filter instruments based on progressive activation rules (only for mental-health module)
-                const availableDescriptors = this.moduleId === 'mental-health' 
+                const availableDescriptors = this.moduleId === 'mental-health'
                     ? this._getProgressivelyAvailableInstruments(descriptors, completedCodes, dass21Scores)
                     : descriptors; // Other modules show all instruments immediately
 
@@ -789,18 +837,24 @@ export class InstrumentSelectorComponent implements OnInit {
                     const lockInfo = this.moduleId === 'mental-health'
                         ? this._isInstrumentLocked(d.code, dass21Scores)
                         : { locked: false };
-                    
+
                     return {
                         ...d,
                         label: d.label || d.backendName || d.code,
                         description: d.backendDescription || meta?.description || '',
-                        icon:  meta?.icon  ?? this.moduleDef.icon,
+                        icon: meta?.icon ?? this.moduleDef.icon,
                         color: meta?.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
                         completed: isCurrentlyCompleted,
                         locked: lockInfo.locked,
                         lockReason: lockInfo.lockReason,
                     };
                 });
+
+                // For psychosocial-risk, prepend the informed consent card and lock
+                // all other instruments until the consent is accepted
+                if (this.moduleId === 'psychosocial-risk') {
+                    this._injectConsentCard();
+                }
             },
             error: (e) => {
                 this.loadError = true;
@@ -811,7 +865,32 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     selectInstrument(card: InstrumentCard): void {
+        // Consent card is always tappable — routes to the right modal depending on status
+        if (card.isConsentCard) {
+            if (this.psychosocialConsentStatus === 'rejected') {
+                this.showPsychosocialRejectionModal = true;
+            } else {
+                this.showPsychosocialConsentModal = true;
+            }
+            return;
+        }
+
         if (this.loadingQuestions || card.completed || card.locked) return;
+
+        // Si el usuario ya firmó el consentimiento psicosocial, saltar el modal antiguo
+        // de privacidad e ir directamente a las instrucciones del instrumento
+        if (this.psychosocialConsentStatus === 'accepted') {
+            this.pendingInstrument = card;
+            this.currentInstructions =
+                INSTRUMENT_INSTRUCTIONS[card.code] ?? {
+                    heading: card.label,
+                    body: card.description || 'Responde con sinceridad cada pregunta.',
+                    timeframe: 'Selecciona la opción que mejor describa cómo te has sentido.',
+                };
+            this.showInstructionsModal = true;
+            return;
+        }
+
         // Abrir modal de consentimiento primero — el usuario debe autorizar antes de continuar
         this.pendingInstrument = card;
         this.showConsentModal = true;
@@ -903,10 +982,10 @@ export class InstrumentSelectorComponent implements OnInit {
 
         // Busca coincidencia exacta primero, luego por prefijo conocido
         const closing = INSTRUMENT_CLOSING[code]
-            ?? (code.startsWith('MFI')      ? INSTRUMENT_CLOSING['MFI20'] : null)
-            ?? (code.startsWith('FATIGUE')  ? INSTRUMENT_CLOSING['FATIGUE_ENERGY'] : null)
-            ?? (code.startsWith('CLIMATE')  ? INSTRUMENT_CLOSING['CLIMATE_DEFAULT'] : null)
-            ?? (code.startsWith('PSYCHO')   ? INSTRUMENT_CLOSING['PSYCHO_DEFAULT'] : null)
+            ?? (code.startsWith('MFI') ? INSTRUMENT_CLOSING['MFI20'] : null)
+            ?? (code.startsWith('FATIGUE') ? INSTRUMENT_CLOSING['FATIGUE_ENERGY'] : null)
+            ?? (code.startsWith('CLIMATE') ? INSTRUMENT_CLOSING['CLIMATE_DEFAULT'] : null)
+            ?? (code.startsWith('PSYCHO') ? INSTRUMENT_CLOSING['PSYCHO_DEFAULT'] : null)
             ?? null;
 
         this.currentClosing = closing ?? {
@@ -950,7 +1029,7 @@ export class InstrumentSelectorComponent implements OnInit {
         // Pass instrument code AND id so the backend can create a per-instrument
         // evaluation (avoids 409 when the module already has a completed evaluation).
         const instrumentCode = this.selectedInstrument?.code;
-        const instrumentId   = this.selectedInstrument?.instrumentId;
+        const instrumentId = this.selectedInstrument?.instrumentId;
 
         this.assessmentService.submitRich(this.moduleId, richAnswers, instrumentCode, instrumentId).pipe(
             finalize(() => { this.isSubmitting = false; })
@@ -1005,6 +1084,336 @@ export class InstrumentSelectorComponent implements OnInit {
         this.showWelcomeModal = false;
     }
 
+    // ── Psychosocial Informed Consent ────────────────────────────────────────
+
+    /** Builds the synthetic consent card and injects it as the first item in the grid */
+    private _injectConsentCard(): void {
+        const status = this.psychosocialConsentStatus;
+        const consentCard: InstrumentCard = {
+            code: 'PSYCHOSOCIAL_CONSENT',
+            label: 'Consentimiento Informado',
+            backendName: 'Consentimiento Informado',
+            backendDescription:
+                status === 'accepted'
+                    ? 'Has aceptado participar en la Evaluación de Factores de Riesgo Psicosocial.'
+                    : status === 'rejected'
+                        ? 'No aceptaste participar. Los cuestionarios permanecen bloqueados.'
+                        : 'Antes de comenzar debes leer y firmar el consentimiento informado para la evaluación de Riesgo Psicosocial.',
+            instrumentId: 0,
+            index: -1,
+            questionCount: 0,
+            icon: 'icons/Icon (44).svg',
+            description:
+                status === 'accepted'
+                    ? 'Has aceptado participar en la Evaluación de Factores de Riesgo Psicosocial.'
+                    : status === 'rejected'
+                        ? 'No aceptaste participar. Los cuestionarios permanecen bloqueados.'
+                        : 'Antes de comenzar debes leer y firmar el consentimiento informado para la evaluación de Riesgo Psicosocial.',
+            color: '#374151',
+            completed: status !== 'pending',
+            locked: false,
+            isConsentCard: true,
+            consentStatus: status !== 'pending' ? status : undefined,
+        };
+
+        const consentAccepted = status === 'accepted';
+        const instrumentsWithLock = (this.instruments ?? []).map(card => ({
+            ...card,
+            locked: !consentAccepted ? true : card.locked,
+            lockReason: !consentAccepted ? 'Acepta el consentimiento informado para continuar' : card.lockReason,
+        }));
+        this.instruments = [consentCard, ...instrumentsWithLock];
+    }
+
+    /** Refreshes the consent card state and the lock state of the other cards in-place */
+    private _updateConsentCardState(): void {
+        if (!this.instruments) return;
+        const status = this.psychosocialConsentStatus;
+        const consentAccepted = status === 'accepted';
+        this.instruments = this.instruments.map(card => {
+            if (card.isConsentCard) {
+                return {
+                    ...card,
+                    completed: status !== 'pending',
+                    consentStatus: status !== 'pending' ? status : undefined,
+                    description:
+                        status === 'accepted'
+                            ? 'Has aceptado participar en la Evaluación de Factores de Riesgo Psicosocial.'
+                            : 'No aceptaste participar. Los cuestionarios permanecen bloqueados.',
+                    backendDescription:
+                        status === 'accepted'
+                            ? 'Has aceptado participar en la Evaluación de Factores de Riesgo Psicosocial.'
+                            : 'No aceptaste participar. Los cuestionarios permanecen bloqueados.',
+                };
+            }
+            return {
+                ...card,
+                locked: !consentAccepted ? true : false,
+                lockReason: !consentAccepted ? 'Acepta el consentimiento informado para continuar' : undefined,
+            };
+        });
+    }
+
+    /** User tapped "Sí acepto" in the psychosocial consent modal */
+    onPsychosocialConsentAccepted(): void {
+        if (this.consentSigning) return;
+        this.consentSigning = true;
+        this.consentService.sign('ACCEPTED').pipe(take(1)).subscribe({
+            next: (dto) => {
+                this.consentSigning = false;
+                this.psychosocialConsentStatus = 'accepted';
+                this.psychosocialConsentRecord = dto;
+                // Stay in modal to show confirmation + PDF download; modal closes via "Continuar"
+                this._updateConsentCardState();
+            },
+            error: () => {
+                this.consentSigning = false;
+                this.alert.error('No fue posible registrar el consentimiento. Por favor intenta de nuevo.');
+            },
+        });
+    }
+
+    /** User tapped "No acepto" in the psychosocial consent modal */
+    onPsychosocialConsentDenied(): void {
+        if (this.consentSigning) return;
+        this.consentSigning = true;
+        this.consentService.sign('REJECTED').pipe(take(1)).subscribe({
+            next: (dto) => {
+                this.consentSigning = false;
+                this.psychosocialConsentStatus = 'rejected';
+                this.psychosocialConsentRecord = dto;
+                this._updateConsentCardState();
+                this._openRejectionModal();
+            },
+            error: (err) => {
+                this.consentSigning = false;
+                // 409 = already signed — fetch the existing record and show the modal
+                if (err?.status === 409) {
+                    this.consentService.getStatus().pipe(take(1)).subscribe({
+                        next: (dto) => {
+                            this.psychosocialConsentStatus = dto.isAccepted ? 'accepted' : 'rejected';
+                            this.psychosocialConsentRecord = dto;
+                            this._updateConsentCardState();
+                            this._openRejectionModal();
+                        },
+                        error: () => this._openRejectionModal(),
+                    });
+                    return;
+                }
+                // Any other error: still open the rejection modal (informational text
+                // is shown regardless; only the record details section will be absent)
+                this.psychosocialConsentStatus = 'rejected';
+                this._updateConsentCardState();
+                this._openRejectionModal();
+            },
+        });
+    }
+
+    /** Opens the rejection informational modal and closes the consent modal */
+    private _openRejectionModal(): void {
+        this.showPsychosocialConsentModal = false;
+        this.showPsychosocialRejectionModal = true;
+    }
+
+    /** Closes the psychosocial consent modal */
+    closePsychosocialConsentModal(): void {
+        this.showPsychosocialConsentModal = false;
+    }
+
+    /** Closes the rejection informational modal */
+    closePsychosocialRejectionModal(): void {
+        this.showPsychosocialRejectionModal = false;
+    }
+
+    /** Generates and downloads the signed consent as a PDF using jsPDF */
+    downloadConsentPdf(): void {
+        const dto = this.psychosocialConsentRecord;
+        if (!dto) return;
+
+        const isAccepted = dto.isAccepted;
+        const decisionText = isAccepted
+            ? 'SÍ ACEPTA participar voluntariamente en la evaluación'
+            : 'NO ACEPTA participar en la evaluación';
+        const signedDate = dto.signedAt
+            ? new Date(dto.signedAt).toLocaleString('es-CO', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                hour: '2-digit', minute: '2-digit',
+            })
+            : new Date().toLocaleString('es-CO');
+
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const pageW = doc.internal.pageSize.getWidth();
+        const margin = 20;
+        const contentW = pageW - margin * 2;
+        let y = 20;
+
+        const addLine = (h: number = 6) => { y += h; };
+        const checkPage = (needed: number = 10) => {
+            if (y + needed > 270) { doc.addPage(); y = 20; }
+        };
+
+        // ── Header bar ──────────────────────────────────────────────────────
+        doc.setFillColor(249, 115, 22); // orange-500
+        doc.rect(0, 0, pageW, 28, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(255, 255, 255);
+        doc.text('PRIVACIDAD Y PROTECCIÓN DE DATOS', pageW / 2, 11, { align: 'center' });
+        doc.setFontSize(13);
+        doc.text('Consentimiento Informado', pageW / 2, 20, { align: 'center' });
+        y = 38;
+
+        // ── Helper: wrapped text block ───────────────────────────────────
+        const addText = (text: string, size = 9, color = [30, 41, 59] as [number, number, number], bold = false) => {
+            checkPage(10);
+            doc.setFontSize(size);
+            doc.setTextColor(color[0], color[1], color[2]);
+            doc.setFont('helvetica', bold ? 'bold' : 'normal');
+            const lines = doc.splitTextToSize(text, contentW);
+            for (const line of lines) {
+                checkPage(6);
+                doc.text(line, margin, y);
+                y += 5.5;
+            }
+        };
+
+        // ── Helper: inline mixed bold/normal text ─────────────────────────
+        const printMixed = (segments: { text: string; bold?: boolean }[]) => {
+            doc.setFontSize(9);
+            doc.setTextColor(30, 41, 59);
+            const lineH = 5.5;
+            let curX = margin;
+            for (const seg of segments) {
+                doc.setFont('helvetica', seg.bold ? 'bold' : 'normal');
+                const tokens = seg.text.match(/\S+|\s+/g) ?? [];
+                for (const token of tokens) {
+                    const tw = doc.getTextWidth(token);
+                    if (token.trim() === '') {
+                        if (curX + tw <= margin + contentW) curX += tw;
+                    } else {
+                        if (curX + tw > margin + contentW && curX > margin) {
+                            y += lineH;
+                            checkPage(lineH);
+                            curX = margin;
+                        }
+                        doc.text(token, curX, y);
+                        curX += tw;
+                    }
+                }
+            }
+            y += lineH;
+        };
+
+        // ── Legal body ──────────────────────────────────────────────────────
+        const name = dto.fullName || '_______________';
+        const cedula = dto.documentNumber || '_______________';
+
+        printMixed([
+            { text: 'Yo, ' },
+            { text: name, bold: true },
+            { text: ', identificado/a con cédula de ciudadanía No. ' },
+            { text: cedula, bold: true },
+            { text: ', manifiesto de manera libre y voluntaria que he sido informado(a) que el objetivo de esta evaluación es identificar, evaluar y monitorear los factores de riesgo psicosocial (intralaborales, extralaborales y niveles de estrés), así mismo entiendo que esta información es fundamental para el diseño de actividades de promoción y prevención dentro del Sistema de Vigilancia Epidemiológica de la organización según Resolución 2646 de 2008 y 2764 de 2022.' },
+        ]);
+        addLine(3);
+
+        addText(
+            'Acepto participar en el diligenciamiento de la Batería de Instrumentos para la Evaluación de Factores de Riesgo ' +
+            'Psicosocial (Forma A o B según corresponda), a través de la plataforma tecnológica Emocheck, entendiendo que mis ' +
+            'datos serán incorporados a una base de datos con la finalidad exclusiva de gestión de salud ocupacional, manejando ' +
+            'un estricto cumplimiento de la Ley 1581 de 2012 de protección de datos personales y seguridad de la información. ' +
+            'Comprendo que los informes entregados al empleador serán de carácter global y estadístico, asegurando que no se ' +
+            'pueda identificar mi identidad en los resultados grupales. Comprendo que el proceso incluye:'
+        );
+        addLine(2);
+
+        const items = [
+            'Ficha de datos generales (sociodemográficos y ocupacionales).',
+            'Cuestionario de factores de riesgo psicosocial intralaboral A o B.',
+            'Cuestionario de factores de riesgo psicosocial extralaboral.',
+            'Cuestionario para la evaluación del estrés.',
+        ];
+        for (const item of items) {
+            checkPage(7);
+            doc.setFontSize(9);
+            doc.setTextColor(30, 41, 59);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`• ${item}`, margin + 4, y);
+            y += 5.5;
+        }
+        addLine(2);
+
+        addText(
+            'Comprendo que mi participación es voluntaria y que tengo derecho a no responder o retirarme del proceso en ' +
+            'cualquier momento sin que esto afecte mi vínculo laboral. Dado el carácter confidencial de esta evaluación, ' +
+            'esta información será incluida en la historia clínica de cada colaborador.'
+        );
+        addLine(6);
+
+        // ── Decision section ─────────────────────────────────────────────────
+        addText('Diligenciamiento del consentimiento informado', 9, [100, 116, 139], true);
+        addLine(1);
+        addText('Decisión marcada con (X):', 9, [30, 41, 59], true);
+        addLine(4);
+
+        checkPage(30);
+        const boxY = y;
+        const decColor: [number, number, number] = isAccepted ? [22, 101, 52] : [153, 27, 27];
+        const decBg: [number, number, number] = isAccepted ? [220, 252, 231] : [254, 226, 226];
+        doc.setFillColor(decBg[0], decBg[1], decBg[2]);
+        doc.setDrawColor(decColor[0], decColor[1], decColor[2]);
+        doc.roundedRect(margin, boxY, contentW, 14, 3, 3, 'FD');
+        doc.setFontSize(10);
+        doc.setTextColor(decColor[0], decColor[1], decColor[2]);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`[X]  ${decisionText}`, margin + 5, boxY + 9);
+        y = boxY + 20;
+
+        // ── Signature block ──────────────────────────────────────────────────
+        addLine(4);
+        checkPage(45);
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(226, 232, 240);
+        const sigY = y;
+        doc.roundedRect(margin, sigY, contentW, 36, 3, 3, 'FD');
+        y = sigY + 8;
+
+        const sigRow = (label: string, value: string) => {
+            checkPage(8);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text(label, margin + 5, y);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(71, 85, 105);
+            doc.text(value, margin + 55, y);
+            y += 7;
+        };
+
+        sigRow('Nombre completo:', dto.fullName || '');
+        sigRow('Número de cédula:', dto.documentNumber || '');
+        sigRow('Decisión:', decisionText);
+        sigRow('Fecha y hora:', signedDate);
+        sigRow('Firma:', 'Firmado digitalmente por el sistema EmoCheck');
+
+        // ── Footer ───────────────────────────────────────────────────────────
+        const footerY = doc.internal.pageSize.getHeight() - 12;
+        doc.setFontSize(8);
+        doc.setTextColor(156, 163, 175);
+        doc.setFont('helvetica', 'normal');
+        doc.text(
+            `Documento generado por EmoCheck con fines de custodia legal — Versión ${dto.consentVersion || '1.0'}`,
+            pageW / 2, footerY, { align: 'center' }
+        );
+
+        const filename = isAccepted
+            ? `ConsentimientoAceptado_${(dto.fullName || 'usuario').replace(/\s+/g, '_')}.pdf`
+            : `ConsentimientoRechazado_${(dto.fullName || 'usuario').replace(/\s+/g, '_')}.pdf`;
+        doc.save(filename);
+    }
+
+    // ── End Psychosocial Informed Consent ─────────────────────────────────────
+
     /**
      * Formats an instrument code for display, adding hyphens where needed.
      * e.g. DASS21 → DASS-21, PHQ9 → PHQ-9, GAD7 → GAD-7
@@ -1012,10 +1421,10 @@ export class InstrumentSelectorComponent implements OnInit {
     formatCode(code: string): string {
         const map: Record<string, string> = {
             DASS21: 'DASS-21',
-            PHQ9:   'PHQ-9',
-            GAD7:   'GAD-7',
-            PSS4:   'PSS-4',
-            PSS10:  'PSS-10',
+            PHQ9: 'PHQ-9',
+            GAD7: 'GAD-7',
+            PSS4: 'PSS-4',
+            PSS10: 'PSS-10',
             TMMS24: 'TMMS-24',
             ICSP_VC: 'ICSP-VC',
         };
@@ -1052,21 +1461,21 @@ export class InstrumentSelectorComponent implements OnInit {
         dass21Scores: { anxietyScore: number; depressionScore: number }
     ) {
         const coreInstruments = ['TMMS24', 'ICSP_VC', 'DASS21'];
-        
+
         const completedCoreCount = coreInstruments.filter(code => {
             const upper = code.toUpperCase();
-            return completedCodes.has(upper) || 
-                   [...completedCodes].some(dc => dc.startsWith(upper + '_'));
+            return completedCodes.has(upper) ||
+                [...completedCodes].some(dc => dc.startsWith(upper + '_'));
         }).length;
 
         const allCoreCompleted = completedCoreCount >= 3;
         const baiUnlocked = dass21Scores.anxietyScore >= 5;   // Ansiedad moderada, severa o extremadamente severa
         const bdiUnlocked = dass21Scores.depressionScore >= 7; // Depresión moderada, severa o extremadamente severa
-        
+
         const nextUnlockInstruments: string[] = [];
         if (!baiUnlocked) nextUnlockInstruments.push('Inventario de Ansiedad de Beck (requiere resultados DASS-21)');
         if (!bdiUnlocked) nextUnlockInstruments.push('Inventario de Depresión de Beck (requiere resultados DASS-21)');
-        
+
         return {
             completedCoreCount,
             nextUnlockCount: nextUnlockInstruments.length,
@@ -1087,7 +1496,7 @@ export class InstrumentSelectorComponent implements OnInit {
      *   - BDI: DASS-21 Depresión score >= 7  (moderada 7-10, severa 11-13, extremadamente severa 14-21)
      */
     private _getProgressivelyAvailableInstruments(
-        allDescriptors: InstrumentDescriptor[], 
+        allDescriptors: InstrumentDescriptor[],
         completedCodes: Set<string>,
         dass21Scores: { anxietyScore: number; depressionScore: number }
     ): InstrumentDescriptor[] {
@@ -1098,7 +1507,7 @@ export class InstrumentSelectorComponent implements OnInit {
         return allDescriptors.filter(descriptor => {
             const code = descriptor.code.toUpperCase();
             return coreInstruments.some(c => c === code) ||
-                   conditionalInstruments.some(c => c === code);
+                conditionalInstruments.some(c => c === code);
         });
     }
 
@@ -1136,7 +1545,7 @@ export class InstrumentSelectorComponent implements OnInit {
 
     private _navigateToSpecializedQuestionnaire(instrumentCode: string): void {
         let route = '';
-        
+
         switch (instrumentCode) {
             case 'ICSP_VC':
                 route = '/mental-health/sleep-habits';
@@ -1151,7 +1560,7 @@ export class InstrumentSelectorComponent implements OnInit {
                 console.warn(`No specialized route found for instrument: ${instrumentCode}`);
                 return;
         }
-        
+
         this.router.navigate([route]);
     }
 
@@ -1170,9 +1579,9 @@ export class InstrumentSelectorComponent implements OnInit {
     private _timerKeyForCode(code: string): string {
         switch (code) {
             case 'ICSP_VC': return 'exam-timer:sleep-questionnaire';
-            case 'TMMS24':  return 'exam-timer:emotional-intelligence';
-            case 'MFI20':   return 'exam-timer:mfi-questionnaire';
-            default:        return `exam-timer:questionnaire:${code}`;
+            case 'TMMS24': return 'exam-timer:emotional-intelligence';
+            case 'MFI20': return 'exam-timer:mfi-questionnaire';
+            default: return `exam-timer:questionnaire:${code}`;
         }
     }
 }

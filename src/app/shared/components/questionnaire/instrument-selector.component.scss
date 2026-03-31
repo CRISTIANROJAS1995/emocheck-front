@@ -51,6 +51,7 @@
     position: relative;
     overflow: hidden;
     isolation: isolate;
+
     &::before {
         content: '';
         position: absolute;
@@ -113,6 +114,7 @@
     cursor: pointer;
     transition: background 0.15s;
     background: transparent;
+
     &:hover {
         background: rgba(255, 255, 255, .12);
     }
@@ -139,9 +141,11 @@
         gap: 14px;
         padding: 16px 18px;
     }
+
     .is-hero__subtitle {
         padding-left: 0;
     }
+
     .is-hero__back {
         align-self: flex-start;
     }
@@ -151,6 +155,7 @@
 .is-section-title {
     max-width: 1170px;
     margin: 0 auto 24px;
+
     h2 {
         font-family: 'Montserrat', sans-serif;
         font-size: 18px;
@@ -158,6 +163,7 @@
         color: #0f172a;
         margin: 0 0 4px;
     }
+
     p {
         font-size: 13.5px;
         color: #64748b;
@@ -235,19 +241,23 @@
     cursor: pointer;
     text-align: left;
     transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+
     &:hover:not(:disabled) {
         border-color: #c7d2fe;
         box-shadow: 0 10px 32px rgba(37, 99, 235, .10);
         transform: translateY(-3px);
     }
+
     &:focus-visible {
         outline: 2px solid #2563eb;
         outline-offset: 2px;
     }
+
     &:disabled {
         cursor: not-allowed;
         opacity: 0.65;
     }
+
     &--loading {
         opacity: 1 !important;
     }
@@ -351,13 +361,16 @@
     cursor: not-allowed !important;
     background: #f8fafc;
     border-color: #e2e8f0;
+
     &:hover {
         transform: none !important;
         box-shadow: none !important;
     }
+
     .is-card__bar {
         opacity: 0.45;
     }
+
     // El contenedor del badge deja de ser absoluto para fluir con el contenido
     .is-card__arrow {
         position: static;
@@ -395,13 +408,16 @@
     border-color: #e2e8f0;
     border-style: dashed;
     opacity: 0.82;
+
     &:hover {
         transform: none !important;
         box-shadow: none !important;
     }
+
     .is-card__bar {
         background: #cbd5e1 !important;
     }
+
     .is-card__label,
     .is-card__description {
         color: #94a3b8;
@@ -435,6 +451,7 @@
     color: #64748b;
     line-height: 1.45;
     font-style: italic;
+
     svg {
         flex-shrink: 0;
         margin-top: 1px;
@@ -513,6 +530,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -523,6 +541,7 @@
         opacity: 0;
         transform: translateY(28px) scale(0.97);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -556,6 +575,23 @@
     overflow-y: auto;
 }
 
+// ─── Welcome / Module-intro Modal (wider + responsive) ──────────────────────
+.wm-modal--welcome {
+    max-width: 720px;
+    width: 92vw;
+
+    @media (max-width: 800px) {
+        max-width: 600px;
+        width: 96vw;
+    }
+
+    @media (max-width: 640px) {
+        max-width: 100%;
+        width: 98vw;
+        border-radius: 16px;
+    }
+}
+
 // ─── Header ──────────────────────────────────────────────────────────────────
 .wm-header {
     position: relative;
@@ -568,6 +604,7 @@
     position: absolute;
     border-radius: 50%;
     pointer-events: none;
+
     &--1 {
         width: 200px;
         height: 200px;
@@ -575,6 +612,7 @@
         top: -60px;
         right: -50px;
     }
+
     &--2 {
         width: 140px;
         height: 140px;
@@ -665,6 +703,7 @@
     font-size: 17px;
     color: #0f172a;
     margin: 0;
+
     strong {
         font-weight: 700;
         color: #155DFC;
@@ -689,6 +728,7 @@
     line-height: 1.70;
     margin: 0;
     text-align: justify;
+
     &+& {
         padding-top: 4px;
         border-top: 1px dashed #e2e8f0;
@@ -711,6 +751,7 @@
     border-radius: 14px;
     padding: 13px 14px;
     transition: transform 0.18s, box-shadow 0.18s;
+
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
@@ -793,10 +834,12 @@
     transition: filter 0.2s, transform 0.15s;
     box-shadow: 0 6px 20px rgba(43, 127, 255, 0.35);
     margin-top: 4px;
+
     &:hover {
         filter: brightness(1.08);
         transform: translateY(-2px);
     }
+
     &:active {
         transform: translateY(0);
         filter: brightness(0.96);
@@ -808,13 +851,16 @@
     .wm-header {
         padding: 32px 24px 52px;
     }
+
     .wm-header__title {
         font-size: 22px;
     }
+
     .wm-body {
         padding: 22px 20px 28px;
         gap: 16px;
     }
+
     .wm-chips {
         gap: 8px;
     }
@@ -825,8 +871,522 @@
     max-width: 480px;
 }
 
+// ─── Psychosocial Informed Consent Modal (wider + responsive) ────────────────
+.wm-modal--psych-consent {
+    max-width: 980px;
+    width: 92vw;
+
+    @media (max-width: 1100px) {
+        max-width: 860px;
+        width: 94vw;
+    }
+
+    @media (max-width: 900px) {
+        max-width: 700px;
+        width: 96vw;
+    }
+
+    @media (max-width: 640px) {
+        max-width: 100%;
+        width: 98vw;
+        border-radius: 16px;
+    }
+}
+
+.wm-psych-consent__body {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 24px 28px;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+}
+
+// X close button in the consent modal header
+.wm-psych-consent__close-btn {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.32);
+    }
+}
+
+.wm-psych-consent__intro {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: #374151;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+// User fields displayed above the legal text (name + document number)
+.wm-psych-consent__user-fields {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.wm-psych-consent__user-field {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 13px;
+    font-family: 'Montserrat', sans-serif;
+    color: #0c4a6e;
+}
+
+.wm-psych-consent__user-label {
+    font-weight: 700;
+    min-width: 140px;
+    flex-shrink: 0;
+}
+
+.wm-psych-consent__user-value {
+    font-weight: 500;
+}
+
+// Loading spinner while sign API call is in-flight
+.wm-psych-consent__signing {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    padding: 20px 0;
+    font-size: 13px;
+    color: #64748b;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.wm-psych-consent__spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid #e2e8f0;
+    border-top-color: #374151;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// Signed confirmation state
+.wm-psych-consent__signed {
+    text-align: center;
+    padding: 8px 0 20px;
+}
+
+.wm-psych-consent__signed-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+
+    &--accept {
+        background: #dcfce7;
+        color: #16a34a;
+        border: 2px solid #bbf7d0;
+    }
+
+    &--reject {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 2px solid #fca5a5;
+    }
+}
+
+.wm-psych-consent__signed-decision {
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 20px;
+
+    &--accept {
+        color: #166534;
+    }
+
+    &--reject {
+        color: #991b1b;
+    }
+}
+
+.wm-psych-consent__signed-fields {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wm-psych-consent__signed-field {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 13px;
+    font-family: 'Montserrat', sans-serif;
+    color: #334155;
+}
+
+.wm-psych-consent__signed-label {
+    font-weight: 700;
+    min-width: 140px;
+    flex-shrink: 0;
+}
+
+// PDF + close buttons row
+.wm-consent__actions--signed {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.wm-consent__btn--pdf {
+    background: #1e293b !important;
+    color: #ffffff;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    flex: 1;
+    justify-content: center;
+
+    &:hover {
+        background: #0f172a !important;
+    }
+}
+
+.wm-consent__btn--close {
+    background: #f1f5f9 !important;
+    color: #374151;
+    border: 1px solid #e2e8f0;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    flex: 1;
+    justify-content: center;
+
+    &:hover {
+        background: #e2e8f0 !important;
+    }
+}
+
+// ─── Rejection informational modal ───────────────────────────────────────────
+.wm-psych-rejection__header {
+    position: relative;
+    // background comes from [style.background]="heroGradient" binding
+}
+
+.wm-psych-rejection__header-blur {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.wm-psych-rejection__body {
+    padding: 24px 28px 28px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.wm-psych-rejection__salutation {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 12px;
+}
+
+.wm-psych-rejection__text {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: #334155;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 12px;
+}
+
+.wm-psych-rejection__list {
+    margin: 0 0 20px 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    li {
+        display: flex;
+        gap: 10px;
+        font-size: 13px;
+        line-height: 1.65;
+        color: #334155;
+        font-family: 'Montserrat', sans-serif;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px 14px;
+
+        &::before {
+            content: '•';
+            color: #475569;
+            font-size: 18px;
+            line-height: 1.2;
+            flex-shrink: 0;
+        }
+    }
+}
+
+.wm-psych-rejection__record {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12.5px;
+}
+
+.wm-psych-rejection__record-label {
+    font-weight: 700;
+    color: #991b1b;
+}
+
+.wm-psych-rejection__record-value {
+    color: #7f1d1d;
+}
+
+.wm-psych-rejection__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.wm-psych-consent__legal-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+}
+
+.wm-psych-consent__legal-title {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 14px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.wm-psych-consent__legal-text {
+    font-size: 13px;
+    line-height: 1.75;
+    color: #334155;
+    font-family: 'Montserrat', sans-serif;
+    text-align: justify;
+    margin-bottom: 12px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.wm-psych-consent__list {
+    margin: 0 0 12px 18px;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1.75;
+    color: #334155;
+    font-family: 'Montserrat', sans-serif;
+
+    li {
+        margin-bottom: 4px;
+    }
+}
+
+.wm-psych-consent__decision-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 12px;
+}
+
+// Inline name/document placeholders inside the legal text
+.wm-psych-consent__inline-data {
+    color: #1d4ed8;
+    border-bottom: 1.5px solid #93c5fd;
+    padding-bottom: 1px;
+}
+
+// Decision section wrapper
+.wm-psych-consent__decision-section {
+    margin-top: 20px;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 18px;
+}
+
+.wm-psych-consent__decision-heading {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 6px;
+}
+
+// Choice list (the two checkbox-style decision buttons)
+.wm-psych-consent__choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.wm-psych-consent__choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color 0.15s, background 0.15s;
+
+    &--accept {
+        &:hover {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+    }
+
+    &--deny {
+        &:hover {
+            border-color: #dc2626;
+            background: #fff5f5;
+        }
+    }
+}
+
+.wm-psych-consent__choice-box {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #9ca3af;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: transparent; // hidden by default; shown on hover via parent
+    margin-top: 1px;
+    transition: border-color 0.15s, color 0.15s;
+
+    .wm-psych-consent__choice--accept:hover & {
+        border-color: #16a34a;
+        color: #16a34a;
+    }
+
+    .wm-psych-consent__choice--deny:hover & {
+        border-color: #dc2626;
+        color: #dc2626;
+    }
+}
+
+.wm-psych-consent__choice-text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #1e293b;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.wm-psych-consent__choice-note {
+    font-size: 11.5px;
+    color: #64748b;
+    font-style: italic;
+}
+
+// Rejected badge for consent card
+.is-card__done-badge--rejected {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+// ─── Consent card (first card in psychosocial-risk module) ───────────────────
+.is-card--consent {
+    grid-column: 1 / -1; // Full width across the grid
+    border: 1.5px dashed #d1d5db;
+
+    &:not(.is-card--completed):hover {
+        border-color: #374151;
+    }
+}
+
 .wm-header--consent {
     padding-bottom: 40px;
+    position: relative;
 }
 
 .wm-consent__intro {
@@ -883,9 +1443,11 @@
     cursor: pointer;
     transition: opacity 0.15s, filter 0.15s;
     border: none;
+
     &:hover {
         filter: brightness(0.92);
     }
+
     &:active {
         filter: brightness(0.85);
     }
@@ -900,6 +1462,7 @@
     background: #fff;
     color: #64748b;
     border: 1.5px solid #cbd5e1;
+
     &:hover {
         border-color: #94a3b8;
         color: #334155;
@@ -970,6 +1533,7 @@
     gap: 14px;
     position: relative;
     overflow: hidden;
+
     // Decoración de fondo sutil
     &::before {
         content: '';
@@ -1004,13 +1568,16 @@
 }
 
 @keyframes vibe-bounce {
+
     0%,
     100% {
         transform: translateY(0) scale(1);
     }
+
     30% {
         transform: translateY(-6px) scale(1.12);
     }
+
     60% {
         transform: translateY(-2px) scale(1.05);
     }
@@ -1024,11 +1591,13 @@
     border: 2px solid var(--vibe-color);
     transform: translate(-50%, -50%) scale(0.6);
     opacity: 0;
+
     &--1 {
         width: 48px;
         height: 48px;
         animation: vibe-ripple 2.4s ease-out infinite;
     }
+
     &--2 {
         width: 64px;
         height: 64px;
@@ -1041,6 +1610,7 @@
         transform: translate(-50%, -50%) scale(0.6);
         opacity: 0.5;
     }
+
     100% {
         transform: translate(-50%, -50%) scale(1.6);
         opacity: 0;
@@ -1054,17 +1624,21 @@
     grid-template-columns: 56px 1fr;
     gap: 0 12px;
     row-gap: 14px;
+
     >.wm-instr__vibe-emoji-wrap {
         grid-area: emoji;
         align-self: center;
     }
+
     >.wm-instr__vibe-text {
         grid-area: text;
         align-self: center;
     }
+
     >.wm-instr__vibe-stats {
         grid-area: stats;
     }
+
     >.wm-instr__vibe-bar-wrap {
         grid-area: bar;
     }
@@ -1112,6 +1686,7 @@
     min-width: 60px;
     flex: 1;
     transition: transform 0.2s, box-shadow 0.2s;
+
     &:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px color-mix(in srgb, var(--vibe-color) 18%, transparent);
@@ -1147,6 +1722,7 @@
     background: color-mix(in srgb, var(--vibe-color) 15%, #e2e8f0);
     overflow: hidden;
     position: relative;
+
     &::after {
         content: '';
         position: absolute;
@@ -1164,6 +1740,7 @@
     from {
         width: 0%;
     }
+
     to {
         width: 100%;
     }
@@ -1220,10 +1797,12 @@
     transition: filter 0.18s, transform 0.15s;
     margin-bottom: 12px;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+
     &:hover {
         filter: brightness(1.08);
         transform: translateY(-2px);
     }
+
     &:active {
         transform: translateY(0);
         filter: brightness(0.92);
@@ -1243,6 +1822,7 @@
     cursor: pointer;
     text-align: center;
     transition: color 0.15s;
+
     &:hover {
         color: #475569;
     }
@@ -1284,16 +1864,19 @@
     transform: translate(-50%, -50%) scale(1);
     opacity: 0;
     animation: breathe-expand 4s ease-in-out infinite;
+
     &--1 {
         width: 64px;
         height: 64px;
         animation-delay: 0s;
     }
+
     &--2 {
         width: 96px;
         height: 96px;
         animation-delay: 0.6s;
     }
+
     &--3 {
         width: 130px;
         height: 130px;
@@ -1306,10 +1889,12 @@
         opacity: 0.7;
         transform: translate(-50%, -50%) scale(0.4);
     }
+
     80% {
         opacity: 0;
         transform: translate(-50%, -50%) scale(1);
     }
+
     100% {
         opacity: 0;
         transform: translate(-50%, -50%) scale(1);
@@ -1331,10 +1916,12 @@
 }
 
 @keyframes breathe-pulse {
+
     0%,
     100% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.18);
     }
@@ -1354,10 +1941,12 @@
 }
 
 @keyframes breathe-label {
+
     0%,
     100% {
         opacity: 0.5;
     }
+
     50% {
         opacity: 1;
     }
@@ -1383,9 +1972,11 @@
     from {
         transform: rotate(0deg) scale(1);
     }
+
     50% {
         transform: rotate(180deg) scale(1.15);
     }
+
     to {
         transform: rotate(360deg) scale(1);
     }
@@ -1396,18 +1987,21 @@
     color: #f59e0b;
     animation: star-float 3s ease-in-out infinite;
     font-size: 18px;
+
     &--1 {
         top: 20%;
         left: 15%;
         animation-delay: 0s;
         font-size: 14px;
     }
+
     &--2 {
         top: 15%;
         left: 70%;
         animation-delay: 0.5s;
         font-size: 20px;
     }
+
     &--3 {
         top: 60%;
         left: 10%;
@@ -1415,12 +2009,14 @@
         font-size: 12px;
         color: #a78bfa;
     }
+
     &--4 {
         top: 70%;
         left: 75%;
         animation-delay: 0.3s;
         font-size: 16px;
     }
+
     &--5 {
         top: 40%;
         left: 85%;
@@ -1428,6 +2024,7 @@
         font-size: 10px;
         color: #a78bfa;
     }
+
     &--6 {
         top: 80%;
         left: 45%;
@@ -1437,11 +2034,13 @@
 }
 
 @keyframes star-float {
+
     0%,
     100% {
         transform: translateY(0) scale(1);
         opacity: 0.6;
     }
+
     50% {
         transform: translateY(-12px) scale(1.2);
         opacity: 1;
@@ -1463,16 +2062,19 @@
     border-radius: 50%;
     border: 2px solid #8b5cf6;
     animation: ripple-out 2.4s ease-out infinite;
+
     &--1 {
         width: 40px;
         height: 40px;
         animation-delay: 0s;
     }
+
     &--2 {
         width: 80px;
         height: 80px;
         animation-delay: 0.8s;
     }
+
     &--3 {
         width: 120px;
         height: 120px;
@@ -1485,6 +2087,7 @@
         opacity: 0.8;
         transform: scale(0.3);
     }
+
     100% {
         opacity: 0;
         transform: scale(1);
@@ -1516,6 +2119,7 @@
     width: 200px;
     height: 50px;
     overflow: visible;
+
     &--2 {
         margin-top: -8px;
     }
@@ -1541,10 +2145,12 @@
 }
 
 @keyframes wave-shift {
+
     0%,
     100% {
         transform: scaleY(1) translateX(0);
     }
+
     50% {
         transform: scaleY(1.4) translateX(6px);
     }
@@ -1557,11 +2163,13 @@
 }
 
 @keyframes moon-glow {
+
     0%,
     100% {
         transform: scale(1);
         filter: brightness(1);
     }
+
     50% {
         transform: scale(1.15);
         filter: brightness(1.3);
@@ -1582,6 +2190,7 @@
     align-items: center;
     justify-content: center;
     animation: mosaic-pop 0.5s ease backwards;
+
     @for $i from 1 through 9 {
         &--#{$i} {
             animation-delay: #{($i - 1) * 0.12}s;
@@ -1594,10 +2203,12 @@
         transform: scale(0) rotate(-20deg);
         opacity: 0;
     }
+
     70% {
         transform: scale(1.2) rotate(5deg);
         opacity: 1;
     }
+
     100% {
         transform: scale(1) rotate(0);
         opacity: 1;
@@ -1617,10 +2228,12 @@
 }
 
 @keyframes default-bounce {
+
     0%,
     100% {
         transform: translateY(0);
     }
+
     50% {
         transform: translateY(-12px);
     }
@@ -1687,10 +2300,12 @@
     margin-top: 4px;
     transition: filter 0.18s, transform 0.15s;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+
     &:hover {
         filter: brightness(1.08);
         transform: translateY(-2px);
     }
+
     &:active {
         transform: translateY(0);
         filter: brightness(0.92);
@@ -1706,11 +2321,13 @@
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+
     &__header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 16px;
+
         h3 {
             font-family: 'Montserrat', sans-serif;
             font-size: 18px;
@@ -1719,6 +2336,7 @@
             margin: 0;
         }
     }
+
     &__badge {
         background: linear-gradient(135deg, #3b82f6, #1d4ed8);
         color: white;
@@ -1729,6 +2347,7 @@
         font-weight: 600;
         box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
     }
+
     &__content {
         p {
             font-family: 'Montserrat', sans-serif;
@@ -1736,10 +2355,12 @@
             line-height: 1.6;
             color: #475569;
             margin: 0 0 16px;
+
             strong {
                 color: #1e293b;
                 font-weight: 600;
             }
+
             em {
                 color: #3b82f6;
                 font-style: normal;
@@ -1747,6 +2368,7 @@
             }
         }
     }
+
     &__bar {
         width: 100%;
         height: 8px;
@@ -1755,12 +2377,14 @@
         overflow: hidden;
         position: relative;
     }
+
     &__fill {
         height: 100%;
         background: linear-gradient(90deg, #3b82f6, #1d4ed8);
         border-radius: 4px;
         transition: width 0.6s ease-out;
         position: relative;
+
         &::after {
             content: '';
             position: absolute;
@@ -1778,6 +2402,7 @@
     0% {
         transform: translateX(-100%);
     }
+
     100% {
         transform: translateX(100%);
     }
@@ -1795,13 +2420,16 @@
     align-items: center;
     gap: 20px;
     box-shadow: 0 4px 14px rgba(16, 185, 129, 0.15);
+
     &__icon {
         font-size: 48px;
         line-height: 1;
         flex-shrink: 0;
     }
+
     &__content {
         flex: 1;
+
         h3 {
             font-family: 'Montserrat', sans-serif;
             font-size: 20px;
@@ -1809,6 +2437,7 @@
             color: #065f46;
             margin: 0 0 8px;
         }
+
         p {
             font-family: 'Montserrat', sans-serif;
             font-size: 14px;
@@ -1821,27 +2450,33 @@
 
 // ── Responsive adjustments for progress sections ──────────────────────────
 @media (max-width: 560px) {
+
     .is-progress-info,
     .is-success-info {
         margin-left: 16px;
         margin-right: 16px;
         padding: 20px;
     }
+
     .is-progress-info__header {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
+
         h3 {
             font-size: 16px;
         }
     }
+
     .is-success-info {
         flex-direction: column;
         text-align: center;
         gap: 16px;
+
         &__icon {
             font-size: 40px;
         }
+
         &__content h3 {
             font-size: 18px;
         }

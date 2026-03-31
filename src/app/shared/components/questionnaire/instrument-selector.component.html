@@ -13,9 +13,10 @@
                 <div class="wcl-breathe__ring wcl-breathe__ring--2"></div>
                 <div class="wcl-breathe__ring wcl-breathe__ring--1"></div>
                 <div class="wcl-breathe__core">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2a10 10 0 1 0 10 10"/>
-                        <path d="M12 6v6l4 2"/>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a10 10 0 1 0 10 10" />
+                        <path d="M12 6v6l4 2" />
                     </svg>
                 </div>
                 <span class="wcl-breathe__label">Respira</span>
@@ -31,8 +32,12 @@
                 <div class="wcl-stars__particle wcl-stars__particle--6">✦</div>
                 <div class="wcl-stars__center">
                     <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
-                        <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" stroke="currentColor" fill="currentColor" opacity="0.15"/>
-                        <polygon points="12,4 14.47,9.13 20,9.93 16,13.82 16.94,19.33 12,16.77 7.06,19.33 8,13.82 4,9.93 9.53,9.13" stroke="currentColor" fill="currentColor" opacity="0.6"/>
+                        <polygon
+                            points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+                            stroke="currentColor" fill="currentColor" opacity="0.15" />
+                        <polygon
+                            points="12,4 14.47,9.13 20,9.93 16,13.82 16.94,19.33 12,16.77 7.06,19.33 8,13.82 4,9.93 9.53,9.13"
+                            stroke="currentColor" fill="currentColor" opacity="0.6" />
                     </svg>
                 </div>
             </div>
@@ -48,12 +53,20 @@
             <!-- Onda sinusoidal animada (descanso / sueño) -->
             <div class="wcl-wave">
                 <svg viewBox="0 0 200 60" class="wcl-wave__svg" preserveAspectRatio="none">
-                    <path class="wcl-wave__path wcl-wave__path--back" d="M0,30 C30,10 70,50 100,30 C130,10 170,50 200,30" fill="none" stroke-width="3" stroke-linecap="round"/>
-                    <path class="wcl-wave__path wcl-wave__path--front" d="M0,30 C30,10 70,50 100,30 C130,10 170,50 200,30" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+                    <path class="wcl-wave__path wcl-wave__path--back"
+                        d="M0,30 C30,10 70,50 100,30 C130,10 170,50 200,30" fill="none" stroke-width="3"
+                        stroke-linecap="round" />
+                    <path class="wcl-wave__path wcl-wave__path--front"
+                        d="M0,30 C30,10 70,50 100,30 C130,10 170,50 200,30" fill="none" stroke-width="2.5"
+                        stroke-linecap="round" />
                 </svg>
                 <svg viewBox="0 0 200 60" class="wcl-wave__svg wcl-wave__svg--2" preserveAspectRatio="none">
-                    <path class="wcl-wave__path wcl-wave__path--back" d="M0,30 C30,50 70,10 100,30 C130,50 170,10 200,30" fill="none" stroke-width="3" stroke-linecap="round"/>
-                    <path class="wcl-wave__path wcl-wave__path--front" d="M0,30 C30,50 70,10 100,30 C130,50 170,10 200,30" fill="none" stroke-width="2.5" stroke-linecap="round"/>
+                    <path class="wcl-wave__path wcl-wave__path--back"
+                        d="M0,30 C30,50 70,10 100,30 C130,50 170,10 200,30" fill="none" stroke-width="3"
+                        stroke-linecap="round" />
+                    <path class="wcl-wave__path wcl-wave__path--front"
+                        d="M0,30 C30,50 70,10 100,30 C130,50 170,10 200,30" fill="none" stroke-width="2.5"
+                        stroke-linecap="round" />
                 </svg>
                 <div class="wcl-wave__moon">🌙</div>
             </div>
@@ -99,8 +112,11 @@
                 line-height: 1.65;
                 text-align: justify;
             ">
-                Los componentes y cuestionarios de autopercepción aquí presentados no constituyen instrumentos de evaluación clínica ni diagnóstica, ni sustituyen la valoración, diagnóstico o intervención de profesionales de la salud. Su uso se limita a fines informativos
-                y de orientación, como apoyo a la reflexión personal y a la promoción de factores psicosociales protectores en el marco de acciones preventivas en entornos organizacionales.
+                Los componentes y cuestionarios de autopercepción aquí presentados no constituyen instrumentos de
+                evaluación clínica ni diagnóstica, ni sustituyen la valoración, diagnóstico o intervención de
+                profesionales de la salud. Su uso se limita a fines informativos
+                y de orientación, como apoyo a la reflexión personal y a la promoción de factores psicosociales
+                protectores en el marco de acciones preventivas en entornos organizacionales.
             </div>
             <label style="
                 display: flex; align-items: flex-start; gap: 9px;
@@ -108,13 +124,18 @@
                 font-size: 12px; color: #334155;
                 cursor: pointer; text-align: justify; line-height: 1.5;
             ">
-                <input type="checkbox" [(ngModel)]="disclaimerAccepted" style="margin-top: 2px; accent-color: #155DFC; width: 15px; height: 15px; flex-shrink: 0; cursor: pointer;" />
+                <input type="checkbox" [(ngModel)]="disclaimerAccepted"
+                    style="margin-top: 2px; accent-color: #155DFC; width: 15px; height: 15px; flex-shrink: 0; cursor: pointer;" />
                 Declaro que he leído y comprendido la información anteriormente expuesta.
             </label> }
 
-            <button class="wcl-body__cta" (click)="onClosingContinue()" [style.background]="heroGradient" [disabled]="currentClosing.requiresDisclaimer && !disclaimerAccepted" [style.opacity]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? '0.45' : '1'"
-                [style.cursor]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? 'not-allowed' : 'pointer'" type="button">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <button class="wcl-body__cta" (click)="onClosingContinue()" [style.background]="heroGradient"
+                [disabled]="currentClosing.requiresDisclaimer && !disclaimerAccepted"
+                [style.opacity]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? '0.45' : '1'"
+                [style.cursor]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? 'not-allowed' : 'pointer'"
+                type="button">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
                 {{ currentClosing.cta }}
@@ -128,14 +149,15 @@
 
 @if (config) {
 <!-- Fase 2: Cuestionario -->
-<emo-questionnaire [config]="config" [timerKey]="'exam-timer:questionnaire:' + (selectedInstrument?.code ?? 'generic')" (back)="goBack()" (completed)="onCompleted($event)" (completedRich)="onCompletedRich($event)"></emo-questionnaire>
+<emo-questionnaire [config]="config" [timerKey]="'exam-timer:questionnaire:' + (selectedInstrument?.code ?? 'generic')"
+    (back)="goBack()" (completed)="onCompleted($event)" (completedRich)="onCompletedRich($event)"></emo-questionnaire>
 } @else {
 <!-- Fase 1: Selección de instrumento -->
 
 <!-- ── Welcome Modal ────────────────────────────────────────────────── -->
 @if (showWelcomeModal) {
 <div class="wm-overlay">
-    <div class="wm-modal" (click)="$event.stopPropagation()">
+    <div class="wm-modal wm-modal--welcome" (click)="$event.stopPropagation()">
 
         <!-- Modal header with gradient -->
         <div class="wm-header" [style.background]="heroGradient">
@@ -149,9 +171,10 @@
                     background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
                     color: #fff; cursor: pointer; transition: background 0.2s;
                 ">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
             <div class="wm-header__inner">
@@ -162,7 +185,8 @@
                 <h2 class="wm-header__title">{{ moduleDef.title | uppercase }}</h2>
             </div>
             <!-- wave decoration -->
-            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg">
                 <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
             </svg>
         </div>
@@ -198,7 +222,9 @@
             }
 
             <!-- Texto plano (otros módulos) -->
-            @if (!moduleDef.welcomeIntro.infoCards || !moduleDef.welcomeIntro.infoCards.length) { @if (moduleDef.welcomeIntro.secondary) { @for (para of moduleDef.welcomeIntro.secondary.split('\n\n'); track $index) {
+            @if (!moduleDef.welcomeIntro.infoCards || !moduleDef.welcomeIntro.infoCards.length) { @if
+            (moduleDef.welcomeIntro.secondary) { @for (para of moduleDef.welcomeIntro.secondary.split('\n\n'); track
+            $index) {
             <p class="wm-body__secondary">{{ para }}</p>
             } } @else {
             <p class="wm-body__secondary">El contenido de este módulo estará disponible próximamente.</p>
@@ -207,8 +233,8 @@
             <!-- CTA -->
             <button class="wm-cta" (click)="closeWelcomeModal()" [style.background]="heroGradient">
                 <span>Comenzar evaluación</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
             </button>
@@ -230,14 +256,16 @@
             <div class="wm-header__blur wm-header__blur--2"></div>
             <div class="wm-header__inner">
                 <div class="wm-header__icon-wrap">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                 </div>
                 <span class="wm-header__module-tag">Privacidad y protección de datos</span>
                 <h2 class="wm-header__title" style="font-size: 1.1rem;">Consentimiento Informado</h2>
             </div>
-            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg">
                 <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
             </svg>
         </div>
@@ -245,29 +273,39 @@
         <!-- Body -->
         <div class="wm-body">
             <p class="wm-consent__intro">
-                Antes de continuar, te invitamos a aceptar los acuerdos y condiciones relacionados con el manejo, protección y uso responsable de tu información personal. Tu privacidad y seguridad son una prioridad para nosotros:
+                Antes de continuar, te invitamos a aceptar los acuerdos y condiciones relacionados con el manejo,
+                protección y uso responsable de tu información personal. Tu privacidad y seguridad son una prioridad
+                para nosotros:
             </p>
 
             <div class="wm-consent__box">
-                <svg class="wm-consent__box-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="wm-consent__box-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
                 <p class="wm-consent__text">
-                    Autorizo de manera libre, previa e informada a <strong>Emocheck</strong> y a la empresa contratante el tratamiento de mis datos personales y de los resultados de la prueba que responderé, conforme a la <strong>Ley 1581 de 2012</strong>.
-                    La información será tratada con confidencialidad y utilizada únicamente para la elaboración de un plan de intervención orientado a mejorar los componentes evaluados, garantizando el ejercicio de mis derechos sobre los datos personales.
+                    Autorizo de manera libre, previa e informada a <strong>Emocheck</strong> y a la empresa contratante
+                    el tratamiento de mis datos personales y de los resultados de la prueba que responderé, conforme a
+                    la <strong>Ley 1581 de 2012</strong>.
+                    La información será tratada con confidencialidad y utilizada únicamente para la elaboración de un
+                    plan de intervención orientado a mejorar los componentes evaluados, garantizando el ejercicio de mis
+                    derechos sobre los datos personales.
                 </p>
             </div>
 
             <!-- Botones de decisión -->
             <div class="wm-consent__actions">
-                <button class="wm-consent__btn wm-consent__btn--accept" (click)="onConsentAccepted()" [style.background]="heroGradient" type="button">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <button class="wm-consent__btn wm-consent__btn--accept" (click)="onConsentAccepted()"
+                    [style.background]="heroGradient" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Autorizo
                 </button>
                 <button class="wm-consent__btn wm-consent__btn--deny" (click)="onConsentDenied()" type="button">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
@@ -280,6 +318,295 @@
 </div>
 }
 <!-- ── /Consent Modal ─────────────────────────────────────────────── -->
+
+<!-- ── Psychosocial Informed Consent Modal (wider) ──────────────── -->
+@if (showPsychosocialConsentModal) {
+<div class="wm-overlay">
+    <div class="wm-modal wm-modal--psych-consent" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="wm-header wm-header--consent" [style.background]="heroGradient">
+            <div class="wm-header__blur wm-header__blur--1"></div>
+            <div class="wm-header__blur wm-header__blur--2"></div>
+            <!-- X close button -->
+            <button class="wm-psych-consent__close-btn" (click)="closePsychosocialConsentModal()" type="button"
+                aria-label="Cerrar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="wm-header__inner">
+                <div class="wm-header__icon-wrap">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <span class="wm-header__module-tag">Privacidad y Protección de Datos</span>
+                <h2 class="wm-header__title" style="font-size: 1.1rem;">Consentimiento Informado</h2>
+            </div>
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
+            </svg>
+        </div>
+
+        <!-- Body -->
+        <div class="wm-body wm-psych-consent__body">
+
+            @if (!psychosocialConsentRecord) {
+            <!-- ── Pre-sign state ─────────────────────────────────────── -->
+
+            <!-- Documento de consentimiento con nombre/cédula integrados -->
+            <div class="wm-psych-consent__legal-box">
+                <h4 class="wm-psych-consent__legal-title">
+                    CONSENTIMIENTO INFORMADO PARA EVALUACIÓN DE FACTORES DE RIESGO PSICOSOCIAL
+                </h4>
+
+                <p class="wm-psych-consent__legal-text">
+                    Yo, <strong class="wm-psych-consent__inline-data">{{ userFullName || userName || '_______________'
+                        }}</strong>,
+                    identificado/a con cédula de ciudadanía No.&nbsp;<strong class="wm-psych-consent__inline-data">{{
+                        userDocumentNumber || '_______________' }}</strong>,
+                    manifiesto de manera libre y voluntaria que he sido informado(a) que el objetivo de esta evaluación
+                    es identificar, evaluar y monitorear los factores de riesgo psicosocial (intralaborales,
+                    extralaborales y niveles de estrés), así mismo entiendo que esta información es fundamental para el
+                    diseño de actividades de promoción y prevención dentro del Sistema de Vigilancia Epidemiológica de
+                    la organización según Resolución 2646 de 2008 y 2764 de 2022.
+                </p>
+
+                <p class="wm-psych-consent__legal-text">
+                    Acepto participar en el diligenciamiento de la Batería de Instrumentos para la Evaluación de
+                    Factores de Riesgo Psicosocial (Forma A o B según corresponda), a través de la plataforma
+                    tecnológica Emocheck, entendiendo que mis datos serán incorporados a una base de datos con la
+                    finalidad exclusiva de gestión de salud ocupacional, manejando un estricto cumplimiento de la Ley
+                    1581 de 2012 de protección de datos personales y seguridad de la información. Comprendo que los
+                    informes entregados al empleador serán de carácter <strong>global y estadístico</strong>,
+                    asegurando que no se pueda identificar mi identidad en los resultados grupales. Comprendo que el
+                    proceso incluye:
+                </p>
+
+                <ul class="wm-psych-consent__list">
+                    <li>Ficha de datos generales (sociodemográficos y ocupacionales).</li>
+                    <li>Cuestionario de factores de riesgo psicosocial intralaboral A o B.</li>
+                    <li>Cuestionario de factores de riesgo psicosocial extralaboral.</li>
+                    <li>Cuestionario para la evaluación del estrés.</li>
+                </ul>
+
+                <p class="wm-psych-consent__legal-text">
+                    Comprendo que mi participación es voluntaria y que tengo derecho a no responder o retirarme del
+                    proceso en cualquier momento sin que esto afecte mi vínculo laboral. Dado el carácter confidencial
+                    de esta evaluación, esta información será incluida en la historia clínica de cada colaborador.
+                </p>
+            </div>
+
+            <!-- Sección de decisión estilo formulario -->
+            <div class="wm-psych-consent__decision-section">
+                <p class="wm-psych-consent__decision-heading">
+                    Diligenciamiento del consentimiento informado
+                </p>
+                <p class="wm-psych-consent__decision-label">Marque con una (X) su decisión:</p>
+
+                @if (consentSigning) {
+                <div class="wm-psych-consent__signing">
+                    <div class="wm-psych-consent__spinner"></div>
+                    <span>Registrando consentimiento…</span>
+                </div>
+                } @else {
+                <div class="wm-psych-consent__choice-list">
+
+                    <button class="wm-psych-consent__choice wm-psych-consent__choice--accept"
+                        (click)="onPsychosocialConsentAccepted()" type="button">
+                        <span class="wm-psych-consent__choice-box">X</span>
+                        <span class="wm-psych-consent__choice-text">
+                            <strong>SÍ</strong> acepto participar voluntariamente en la evaluación.
+                            <span class="wm-psych-consent__choice-note">El colaborador podrá continuar su
+                                evaluación.</span>
+                        </span>
+                    </button>
+
+                    <button class="wm-psych-consent__choice wm-psych-consent__choice--deny"
+                        (click)="onPsychosocialConsentDenied()" type="button">
+                        <span class="wm-psych-consent__choice-box">X</span>
+                        <span class="wm-psych-consent__choice-text">
+                            <strong>NO</strong> acepto participar en la evaluación.
+                        </span>
+                    </button>
+
+                </div>
+                }
+            </div>
+
+            } @else {
+            <!-- ── Signed confirmation state ──────────────────────────── -->
+            <div class="wm-psych-consent__signed">
+                <div class="wm-psych-consent__signed-icon"
+                    [class.wm-psych-consent__signed-icon--accept]="psychosocialConsentRecord.isAccepted"
+                    [class.wm-psych-consent__signed-icon--reject]="!psychosocialConsentRecord.isAccepted">
+                    @if (psychosocialConsentRecord.isAccepted) {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    } @else {
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    }
+                </div>
+                <p class="wm-psych-consent__signed-decision"
+                    [class.wm-psych-consent__signed-decision--accept]="psychosocialConsentRecord.isAccepted"
+                    [class.wm-psych-consent__signed-decision--reject]="!psychosocialConsentRecord.isAccepted">
+                    {{ psychosocialConsentRecord.isAccepted ? 'Aceptó participar voluntariamente' : 'No aceptó
+                    participar' }}
+                </p>
+
+                <div class="wm-psych-consent__signed-fields">
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Nombre completo:</span>
+                        <span>{{ psychosocialConsentRecord.fullName }}</span>
+                    </div>
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Número de cédula:</span>
+                        <span>{{ psychosocialConsentRecord.documentNumber }}</span>
+                    </div>
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Fecha y hora:</span>
+                        <span>{{ psychosocialConsentRecord.signedAt | date:'dd/MM/yyyy, HH:mm' }}</span>
+                    </div>
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Firma:</span>
+                        <span>Firmado digitalmente por el sistema EmoCheck</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wm-consent__actions wm-consent__actions--signed">
+                <button class="wm-consent__btn wm-consent__btn--pdf" (click)="downloadConsentPdf()" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Descargar PDF
+                </button>
+                <button class="wm-consent__btn wm-consent__btn--close" (click)="closePsychosocialConsentModal()"
+                    type="button">
+                    Continuar
+                </button>
+            </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+}
+<!-- ── /Psychosocial Informed Consent Modal ──────────────────────── -->
+
+<!-- ── Psychosocial Rejection Informational Modal ───────────────── -->
+@if (showPsychosocialRejectionModal) {
+<div class="wm-overlay">
+    <div class="wm-modal wm-modal--psych-consent" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="wm-header wm-psych-rejection__header" [style.background]="heroGradient">
+            <div class="wm-psych-rejection__header-blur"></div>
+            <button class="wm-psych-consent__close-btn" (click)="closePsychosocialRejectionModal()" type="button"
+                aria-label="Cerrar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="wm-header__inner">
+                <div class="wm-header__icon-wrap">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+                <span class="wm-header__module-tag">Privacidad y Protección de Datos</span>
+                <h2 class="wm-header__title" style="font-size: 1.05rem;">Decisión registrada</h2>
+            </div>
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
+            </svg>
+        </div>
+
+        <!-- Body -->
+        <div class="wm-body wm-psych-rejection__body">
+
+            <p class="wm-psych-rejection__salutation">Estimado(a) colaborador(a),</p>
+
+            <p class="wm-psych-rejection__text">
+                Hemos registrado tu elección de no participar en la Evaluación de Riesgo Psicosocial de este año.
+                Respetamos totalmente tu derecho a la autonomía y tu decisión no tendrá ninguna consecuencia negativa
+                ni afectará tu vínculo con la empresa.
+            </p>
+
+            <p class="wm-psych-rejection__text">
+                Antes de finalizar el proceso, quisiéramos recordarte brevemente la importancia de esta actividad:
+            </p>
+
+            <ul class="wm-psych-rejection__list">
+                <li>
+                    <strong>Tu bienestar es el centro:</strong> Esta evaluación es la única herramienta legal que
+                    tenemos para identificar si el trabajo te está generando exceso de carga, estrés o fatiga. Sin tu
+                    opinión, nos será más difícil diseñar planes de bienestar que realmente te beneficien.
+                </li>
+                <li>
+                    <strong>Confidencialidad garantizada:</strong> Reiteramos que tus respuestas son anónimas para la
+                    empresa y están protegidas por el secreto profesional del psicólogo.
+                </li>
+                <li>
+                    <strong>Mejora del entorno:</strong> Tu participación ayuda a que las condiciones de tu área de
+                    trabajo mejoren para ti y tus compañeros.
+                </li>
+            </ul>
+
+            @if (psychosocialConsentRecord) {
+            <div class="wm-psych-rejection__record">
+                <span class="wm-psych-rejection__record-label">Decisión registrada:</span>
+                <span class="wm-psych-rejection__record-value">NO acepta — {{ psychosocialConsentRecord.signedAt |
+                    date:'d/MM/yyyy HH:mm':'':'es' }}</span>
+            </div>
+            }
+
+            <div class="wm-psych-rejection__actions">
+                <button class="wm-consent__btn wm-consent__btn--pdf" (click)="downloadConsentPdf()" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Descargar documento de custodia
+                </button>
+                <button class="wm-consent__btn wm-consent__btn--close" (click)="closePsychosocialRejectionModal()"
+                    type="button">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+}
+<!-- ── /Psychosocial Rejection Informational Modal ───────────────── -->
 
 <!-- ── Instructions Modal ────────────────────────────────────────── -->
 @if (showInstructionsModal && currentInstructions && pendingInstrument) {
@@ -297,7 +624,8 @@
                 <span class="wm-header__module-tag">{{ formatCode(pendingInstrument.code) }}</span>
                 <h2 class="wm-header__title" style="font-size: 1.15rem;">{{ currentInstructions.heading }}</h2>
             </div>
-            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg">
                 <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
             </svg>
         </div>
@@ -307,7 +635,8 @@
 
             <!-- Nombre del instrumento + descripción breve -->
             <div class="wm-instr__label-row">
-                <span class="wm-instr__code-pill" [style.background]="pendingInstrument.color + '18'" [style.color]="pendingInstrument.color">
+                <span class="wm-instr__code-pill" [style.background]="pendingInstrument.color + '18'"
+                    [style.color]="pendingInstrument.color">
                     {{ pendingInstrument.label }}
                 </span>
                 <span class="wm-instr__count">{{ pendingInstrument.questionCount }} preguntas</span>
@@ -353,7 +682,8 @@
 
             <!-- Instrucción de contexto temporal -->
             <div class="wm-instr__timeframe">
-                <svg class="wm-instr__timeframe-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="wm-instr__timeframe-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
@@ -361,8 +691,10 @@
             </div>
 
             <!-- CTA -->
-            <button class="wm-instr__cta" (click)="onInstructionsStart()" [style.background]="pendingInstrument.color" type="button">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <button class="wm-instr__cta" (click)="onInstructionsStart()" [style.background]="pendingInstrument.color"
+                type="button">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
                 Comenzar cuestionario
@@ -429,16 +761,18 @@
         @if (instruments && instruments.length === 0) {
         <div class="is-empty">
             <div class="is-empty__icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="1"/>
-                    <line x1="9" y1="12" x2="15" y2="12"/>
-                    <line x1="9" y1="16" x2="12" y2="16"/>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                    <rect x="9" y="3" width="6" height="4" rx="1" />
+                    <line x1="9" y1="12" x2="15" y2="12" />
+                    <line x1="9" y1="16" x2="12" y2="16" />
                 </svg>
             </div>
             <h3 class="is-empty__title">No hay instrumentos disponibles</h3>
             <p class="is-empty__body">
-                Este módulo aún no tiene instrumentos de evaluación configurados.<br> Comunícate con tu administrador para habilitarlos o intenta más tarde.
+                Este módulo aún no tiene instrumentos de evaluación configurados.<br> Comunícate con tu administrador
+                para habilitarlos o intenta más tarde.
             </p>
             <button class="is-empty__btn" mat-stroked-button [routerLink]="['/home']">
                 <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon>
@@ -448,14 +782,17 @@
         }
 
         <!-- Progress Info Section -->
-        @if (progressInfo && !progressInfo.allCoreCompleted && (progressInfo.baiUnlocked === false || progressInfo.bdiUnlocked === false)) {
+        @if (progressInfo && !progressInfo.allCoreCompleted && (progressInfo.baiUnlocked === false ||
+        progressInfo.bdiUnlocked === false)) {
         <div class="is-progress-info">
             <div class="is-progress-info__header">
                 <h3>🔒 Evaluaciones condicionales</h3>
             </div>
             <div class="is-progress-info__content">
                 <p>
-                    El <strong>BAI</strong> y el <strong>BDI</strong> se activan automáticamente según los resultados del <strong>DASS-21</strong>.<br> Completa primero el DASS-21 para que el sistema evalúe si aplican estas pruebas adicionales.
+                    El <strong>BAI</strong> y el <strong>BDI</strong> se activan automáticamente según los resultados
+                    del <strong>DASS-21</strong>.<br> Completa primero el DASS-21 para que el sistema evalúe si aplican
+                    estas pruebas adicionales.
                 </p>
             </div>
         </div>
@@ -476,14 +813,37 @@
         @if (instruments && instruments.length > 0) {
         <div class="is-grid">
             @for (card of instruments; track card.code) {
-            <button class="is-card" [class.is-card--loading]="loadingQuestions && selectedInstrument?.code === card.code" [class.is-card--completed]="card.completed" [class.is-card--locked]="card.locked && !card.completed" [disabled]="loadingQuestions || card.completed || card.locked"
-                (click)="selectInstrument(card)" type="button">
+            <button class="is-card"
+                [class.is-card--loading]="loadingQuestions && selectedInstrument?.code === card.code"
+                [class.is-card--completed]="card.completed" [class.is-card--locked]="card.locked && !card.completed"
+                [class.is-card--consent]="card.isConsentCard"
+                [disabled]="loadingQuestions || card.completed || card.locked" (click)="selectInstrument(card)"
+                type="button">
 
-                <span class="is-card__bar" [style.background]="card.locked ? '#cbd5e1' : card.color"></span>
+                <span class="is-card__bar"
+                    [style.background]="card.locked ? '#cbd5e1' : card.isConsentCard ? heroGradient : card.color"></span>
 
-                @if (card.completed) {
+                @if (card.isConsentCard && card.consentStatus === 'accepted') {
                 <span class="is-card__done-badge">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Firmado
+                </span>
+                } @else if (card.isConsentCard && card.consentStatus === 'rejected') {
+                <span class="is-card__done-badge is-card__done-badge--rejected">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    No aceptado
+                </span>
+                } @else if (card.completed && !card.isConsentCard) {
+                <span class="is-card__done-badge">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Completado
@@ -492,7 +852,8 @@
 
                 @if (card.locked && !card.completed) {
                 <span class="is-card__lock-badge">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
@@ -500,18 +861,36 @@
                 </span>
                 }
 
-                <span class="is-card__icon" [style.background]="card.locked ? '#f1f5f9' : card.color + '18'">
+                <span class="is-card__icon"
+                    [style.background]="card.locked ? '#f1f5f9' : card.isConsentCard ? heroGradient + '18' : card.color + '18'">
+                    @if (card.isConsentCard) {
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+                        [attr.stroke]="card.locked ? '#94a3b8' : '#374151'" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    } @else {
                     <img [src]="card.icon" [alt]="card.label" width="26" height="26"
                         [class.is-card__icon-img--locked]="card.locked" />
+                    }
                 </span>
 
                 <span class="is-card__body">
-                    <span class="is-card__code" [style.color]="card.locked ? '#94a3b8' : card.color">{{ formatCode(card.code) }}</span>
+                    <span class="is-card__code"
+                        [style.color]="card.locked ? '#94a3b8' : card.isConsentCard ? '#374151' : card.color">
+                        {{ card.isConsentCard ? 'PASO PREVIO' : formatCode(card.code) }}
+                    </span>
                     <span class="is-card__label">{{ card.label }}</span>
-                    <span class="is-card__description">{{ card.description }}</span>
+                    <span class="is-card__description">{{ card.isConsentCard ? card.description :
+                        (card.backendDescription || card.description) }}</span>
                     @if (card.locked && card.lockReason) {
                     <span class="is-card__lock-reason">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -521,7 +900,11 @@
                     }
                     @if (!card.locked) {
                     <span class="is-card__count">
+                        @if (card.isConsentCard) {
+                        Requerido antes de comenzar
+                        } @else {
                         {{ card.questionCount }} pregunta{{ card.questionCount !== 1 ? 's' : '' }}
+                        }
                     </span>
                     }
                 </span>
@@ -530,13 +913,14 @@
                     @if (loadingQuestions && selectedInstrument?.code === card.code) {
                     <span class="is-card__spinner" [style.border-top-color]="card.color"></span>
                     } @else if (card.locked) {
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
                     } @else if (!card.completed) {
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                     }

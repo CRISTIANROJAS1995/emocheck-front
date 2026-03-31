@@ -32,6 +32,7 @@
         "apexcharts": "4.3.0",
         "crypto-js": "4.2.0",
         "highlight.js": "11.11.1",
+        "jspdf": "^4.2.1",
         "lodash-es": "4.17.21",
         "luxon": "3.5.0",
         "mammoth": "^1.12.0",
