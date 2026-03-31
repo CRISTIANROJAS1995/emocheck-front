@@ -408,6 +408,137 @@
                 </p>
             </div>
 
+            <!-- Sección: Selección del Evaluador Psicólogo -->
+            <div class="wm-psych-consent__evaluator-section">
+                <div class="wm-psych-consent__evaluator-header">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Selección del Evaluador Psicólogo/a</span>
+                    <span class="wm-psych-consent__evaluator-required">* Requerido</span>
+                </div>
+                <p class="wm-psych-consent__evaluator-hint">
+                    Seleccione el psicólogo/a que aplicará y custodiará su evaluación de riesgo psicosocial.
+                </p>
+
+                @if (loadingPsychologists) {
+                <div class="wm-psych-consent__evaluator-loading">
+                    <div class="wm-psych-consent__spinner"></div>
+                    <span>Cargando listado de psicólogos…</span>
+                </div>
+                } @else if (psychologists.length === 0) {
+                <div class="wm-psych-consent__evaluator-empty">
+                    No hay psicólogos evaluadores registrados en el sistema.
+                </div>
+                } @else {
+
+                <!-- Buscador -->
+                <div class="wm-psych-consent__evaluator-search-wrap">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input class="wm-psych-consent__evaluator-search" type="text"
+                        placeholder="Buscar por nombre, cédula o tarjeta profesional…" [(ngModel)]="psychologistSearch"
+                        (ngModelChange)="onPsychologistSearchChange()" />
+                    @if (psychologistSearch) {
+                    <button class="wm-psych-consent__evaluator-search-clear" type="button"
+                        (click)="psychologistSearch = ''; onPsychologistSearchChange()">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    }
+                </div>
+
+                @if (filteredPsychologists.length === 0) {
+                <div class="wm-psych-consent__evaluator-empty">
+                    No se encontraron psicólogos con ese criterio de búsqueda.
+                </div>
+                } @else {
+                <div class="wm-psych-consent__evaluator-table-wrap">
+                    <table class="wm-psych-consent__evaluator-table">
+                        <thead>
+                            <tr>
+                                <th style="width:36px"></th>
+                                <th>Nombre completo</th>
+                                <th>Documento</th>
+                                <th>Postgrado</th>
+                                <th>No. Tarjeta Prof.</th>
+                                <th>Lic. Salud Ocup.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (psych of pagedPsychologists; track psych.userID) {
+                            <tr [class.wm-psych-consent__evaluator-row--selected]="selectedPsychologist?.userID === psych.userID"
+                                (click)="togglePsychologist(psych)">
+                                <td class="wm-psych-consent__evaluator-check">
+                                    @if (selectedPsychologist?.userID === psych.userID) {
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1"
+                                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="9 11 12 14 22 4"></polyline>
+                                    </svg>
+                                    } @else {
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                    </svg>
+                                    }
+                                </td>
+                                <td class="wm-psych-consent__evaluator-name">{{ psych.fullName }}</td>
+                                <td class="wm-psych-consent__evaluator-doc">
+                                    <span class="wm-psych-consent__badge">{{ psych.documentType || 'CC' }}</span>
+                                    {{ psych.documentNumber || '—' }}
+                                </td>
+                                <td>{{ psych.postgrado || '—' }}</td>
+                                <td>{{ psych.tarjetaProfesional || '—' }}</td>
+                                <td>{{ psych.licenciaSaludOcupacional || '—' }}</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                @if (totalPsychologistPages > 1) {
+                <div class="wm-psych-consent__evaluator-pagination">
+                    <button class="wm-psych-consent__page-btn" type="button" [disabled]="psychologistPage === 0"
+                        (click)="psychologistPrevPage()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <span class="wm-psych-consent__page-info">
+                        Página {{ psychologistPage + 1 }} de {{ totalPsychologistPages }}
+                        &nbsp;·&nbsp; {{ filteredPsychologists.length }} psicólogo{{ filteredPsychologists.length !== 1
+                        ? 's' : '' }}
+                    </span>
+                    <button class="wm-psych-consent__page-btn" type="button"
+                        [disabled]="psychologistPage >= totalPsychologistPages - 1" (click)="psychologistNextPage()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                }
+                } <!-- end filteredPsychologists.length > 0 -->
+                } <!-- end hasData -->
+
+                @if (psychologistRequired) {
+                <p class="wm-psych-consent__evaluator-error">
+                    Debe seleccionar un psicólogo/a evaluador antes de continuar.
+                </p>
+                }
+            </div>
+
             <!-- Sección de decisión estilo formulario -->
             <div class="wm-psych-consent__decision-section">
                 <p class="wm-psych-consent__decision-heading">
@@ -484,6 +615,25 @@
                         <span class="wm-psych-consent__signed-label">Fecha y hora:</span>
                         <span>{{ psychosocialConsentRecord.signedAt | date:'dd/MM/yyyy, HH:mm' }}</span>
                     </div>
+                    @if (psychosocialConsentRecord.psychologistName) {
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Psicólogo/a evaluador:</span>
+                        <span>{{ psychosocialConsentRecord.psychologistName }}</span>
+                    </div>
+                    @if (selectedPsychologist?.documentNumber) {
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Cédula del evaluador:</span>
+                        <span>{{ selectedPsychologist?.documentType || 'CC' }} {{ selectedPsychologist?.documentNumber
+                            }}</span>
+                    </div>
+                    }
+                    @if (selectedPsychologist?.tarjetaProfesional) {
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">No. Licencia salud ocup.:</span>
+                        <span>{{ selectedPsychologist?.tarjetaProfesional }}</span>
+                    </div>
+                    }
+                    }
                     <div class="wm-psych-consent__signed-field">
                         <span class="wm-psych-consent__signed-label">Firma:</span>
                         <span>Firmado digitalmente por el sistema EmoCheck</span>
@@ -581,10 +731,42 @@
             </ul>
 
             @if (psychosocialConsentRecord) {
-            <div class="wm-psych-rejection__record">
-                <span class="wm-psych-rejection__record-label">Decisión registrada:</span>
-                <span class="wm-psych-rejection__record-value">NO acepta — {{ psychosocialConsentRecord.signedAt |
-                    date:'d/MM/yyyy HH:mm':'':'es' }}</span>
+            <div class="wm-psych-consent__signed-fields">
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Nombre completo:</span>
+                    <span>{{ psychosocialConsentRecord.fullName }}</span>
+                </div>
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Número de cédula:</span>
+                    <span>{{ psychosocialConsentRecord.documentNumber }}</span>
+                </div>
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Fecha y hora:</span>
+                    <span>{{ psychosocialConsentRecord.signedAt | date:'dd/MM/yyyy, HH:mm' }}</span>
+                </div>
+                @if (psychosocialConsentRecord.psychologistName) {
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Psicólogo/a evaluador:</span>
+                    <span>{{ psychosocialConsentRecord.psychologistName }}</span>
+                </div>
+                @if (selectedPsychologist?.documentNumber) {
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Cédula del evaluador:</span>
+                    <span>{{ selectedPsychologist?.documentType || 'CC' }} {{ selectedPsychologist?.documentNumber
+                        }}</span>
+                </div>
+                }
+                @if (selectedPsychologist?.tarjetaProfesional) {
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">No. Licencia salud ocup.:</span>
+                    <span>{{ selectedPsychologist?.tarjetaProfesional }}</span>
+                </div>
+                }
+                }
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Firma:</span>
+                    <span>Firmado digitalmente por el sistema EmoCheck</span>
+                </div>
             </div>
             }
 

@@ -48,6 +48,10 @@ export interface AdminUserListItemDto {
     contractType?: string;
     dailyWorkHours?: number;
     jobSeniority?: number;
+    // Datos profesionales del psicólogo
+    postgrado?: string | null;
+    tarjetaProfesional?: string | null;
+    licenciaSaludOcupacional?: string | null;
 }
 
 export interface BulkUploadResult {
@@ -86,6 +90,10 @@ export interface AdminCreateUserRequestDto {
     contractType?: string | null;
     dailyWorkHours?: number | null;
     jobSeniority?: number | null;
+    // Datos profesionales del psicólogo (opcionales)
+    postgrado?: string | null;
+    tarjetaProfesional?: string | null;
+    licenciaSaludOcupacional?: string | null;
 }
 
 export interface AdminCreateUserResponseDto {
@@ -112,6 +120,10 @@ export interface AdminUpdateUserRequestDto {
     contractType?: string | null;
     dailyWorkHours?: number | null;
     jobSeniority?: number | null;
+    // Datos profesionales del psicólogo (opcionales)
+    postgrado?: string | null;
+    tarjetaProfesional?: string | null;
+    licenciaSaludOcupacional?: string | null;
 }
 
 /** Shape returned by the deployed backend (flat fields, no nested objects) */
@@ -150,6 +162,10 @@ interface BackendUserDto {
     contractType?: string | null;
     dailyWorkHours?: number | null;
     jobSeniority?: number | null;
+    // Datos profesionales del psicólogo
+    postgrado?: string | null;
+    tarjetaProfesional?: string | null;
+    licenciaSaludOcupacional?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -194,6 +210,9 @@ export class AdminUsersService {
             contractType: u.contractType ?? undefined,
             dailyWorkHours: u.dailyWorkHours != null ? Number(u.dailyWorkHours) : undefined,
             jobSeniority: u.jobSeniority != null ? Number(u.jobSeniority) : undefined,
+            postgrado: u.postgrado ?? undefined,
+            tarjetaProfesional: u.tarjetaProfesional ?? undefined,
+            licenciaSaludOcupacional: u.licenciaSaludOcupacional ?? undefined,
         };
     }
 
@@ -348,12 +367,12 @@ export class AdminUsersService {
                     return {
                         totalRows: Number(data?.totalRows ?? 0),
                         created: Number(data?.created ?? 0),
-                        errors: Array.isArray(data?.errors) 
+                        errors: Array.isArray(data?.errors)
                             ? data.errors.map((e: any) => ({
                                 row: Number(e?.row ?? 0),
                                 field: String(e?.field ?? ''),
                                 reason: String(e?.reason ?? '')
-                              }))
+                            }))
                             : []
                     } as BulkUploadResult;
                 })

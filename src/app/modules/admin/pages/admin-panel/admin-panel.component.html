@@ -59,7 +59,8 @@
         <div class="user-modal" (click)="$event.stopPropagation()">
             <div class="user-modal__header">
                 <h3>
-                    <mat-icon>person_add</mat-icon> Crear Nuevo Usuario</h3>
+                    <mat-icon>person_add</mat-icon> Crear Nuevo Usuario
+                </h3>
                 <button type="button" class="user-modal__close" (click)="showCreateForm = false" aria-label="Cerrar">
                     <mat-icon>close</mat-icon>
                 </button>
@@ -119,11 +120,13 @@
                             <label class="editor-panel__field editor-panel__field--full">
                                 <span>Contraseña temporal * (mín. 8 caracteres)</span>
                                 <div style="position:relative;display:flex;align-items:center;">
-                                    <input [type]="showCreatePassword ? 'text' : 'password'" formControlName="password" placeholder="TempPass123!" style="width:100%;padding-right:40px;" />
+                                    <input [type]="showCreatePassword ? 'text' : 'password'" formControlName="password"
+                                        placeholder="TempPass123!" style="width:100%;padding-right:40px;" />
                                     <button type="button" (click)="showCreatePassword = !showCreatePassword"
                                         style="position:absolute;right:8px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;color:#64748b;"
                                         [attr.aria-label]="showCreatePassword ? 'Ocultar contraseña' : 'Ver contraseña'">
-                                        <mat-icon style="font-size:20px;width:20px;height:20px;">{{ showCreatePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                                        <mat-icon style="font-size:20px;width:20px;height:20px;">{{ showCreatePassword ?
+                                            'visibility_off' : 'visibility' }}</mat-icon>
                                     </button>
                                 </div>
                             </label>
@@ -220,10 +223,56 @@
                         </div>
                     </div>
 
+                    <!-- Sección: Datos del evaluador (solo Psychologist) -->
+                    @if (isPsychologistSelected) {
+                    <div class="form-section form-section--psychologist">
+                        <div class="form-section__title">
+                            <mat-icon>psychology</mat-icon>
+                            Datos del Evaluador Psicólogo
+                        </div>
+                        <p class="form-section__description">
+                            Completa los datos profesionales del psicólogo/a evaluador.
+                            Esta información quedará registrada en el sistema para su identificación y trazabilidad.
+                        </p>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Postgrado <span class="form-section__required">*</span></span>
+                                <input formControlName="postgrado"
+                                    placeholder="Ej: Especialización en Psicología Organizacional"
+                                    [class.editor-panel__field--invalid]="createForm.get('postgrado')?.invalid && createForm.get('postgrado')?.touched" />
+                                @if (createForm.get('postgrado')?.invalid && createForm.get('postgrado')?.touched) {
+                                <span class="editor-panel__field-error">El postgrado es requerido</span>
+                                }
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>No. Tarjeta Profesional <span class="form-section__required">*</span></span>
+                                <input formControlName="tarjetaProfesional" placeholder="Ej: T.P. 123456-2024"
+                                    [class.editor-panel__field--invalid]="createForm.get('tarjetaProfesional')?.invalid && createForm.get('tarjetaProfesional')?.touched" />
+                                @if (createForm.get('tarjetaProfesional')?.invalid &&
+                                createForm.get('tarjetaProfesional')?.touched) {
+                                <span class="editor-panel__field-error">La tarjeta profesional es requerida</span>
+                                }
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>No. Licencia en Salud Ocupacional <span
+                                        class="form-section__required">*</span></span>
+                                <input formControlName="licenciaSaludOcupacional" placeholder="Ej: LSO-456789"
+                                    [class.editor-panel__field--invalid]="createForm.get('licenciaSaludOcupacional')?.invalid && createForm.get('licenciaSaludOcupacional')?.touched" />
+                                @if (createForm.get('licenciaSaludOcupacional')?.invalid &&
+                                createForm.get('licenciaSaludOcupacional')?.touched) {
+                                <span class="editor-panel__field-error">La licencia en salud ocupacional es
+                                    requerida</span>
+                                }
+                            </label>
+                        </div>
+                    </div>
+                    }
+
                     <!-- Sección: Datos sociodemográficos -->
                     <div class="form-section">
                         <div class="form-section__title">
-                            <mat-icon>people_alt</mat-icon> Datos Sociodemográficos <span class="form-section__optional">(opcionales)</span>
+                            <mat-icon>people_alt</mat-icon> Datos Sociodemográficos <span
+                                class="form-section__optional">(opcionales)</span>
                         </div>
                         <div class="editor-panel__grid">
                             <label class="editor-panel__field">
@@ -287,7 +336,8 @@
             <div class="user-modal__footer">
                 <button type="button" class="btn btn--ghost" (click)="showCreateForm = false">Cancelar</button>
                 <button type="submit" form="create-user-form" class="btn btn--primary" [disabled]="saving">
-                    @if (saving) { <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner> }
+                    @if (saving) { <mat-spinner diameter="16"
+                        style="display:inline-block;margin-right:6px"></mat-spinner> }
                     <mat-icon>save</mat-icon> Crear Usuario
                 </button>
             </div>
@@ -316,7 +366,8 @@
             </ol>
             <div class="important-note">
                 <mat-icon>check_circle</mat-icon>
-                <span><strong>¡Excel nativo real!</strong> Headers azules, ejemplos grises, filas blancas para completar. Formato profesional garantizado.</span>
+                <span><strong>¡Excel nativo real!</strong> Headers azules, ejemplos grises, filas blancas para
+                    completar. Formato profesional garantizado.</span>
             </div>
         </div>
 
@@ -398,14 +449,16 @@
                 <mat-icon>table_view</mat-icon> Descargar Plantilla Excel (.xlsx)
             </button>
             <p class="section-help">
-                <strong>✨ Excel nativo:</strong> Archivo .xlsx real con formato, colores, anchos de columna optimizados y 15 filas vacías listas para completar.
+                <strong>✨ Excel nativo:</strong> Archivo .xlsx real con formato, colores, anchos de columna optimizados
+                y 15 filas vacías listas para completar.
             </p>
         </div>
         <!-- File Upload -->
         <div class="bulk-upload-section">
             <h4>📂 2. Subir Archivo Excel (.xlsx)</h4>
             <div class="file-upload-area">
-                <input type="file" id="bulk-upload-file" accept=".xlsx" (change)="onFileSelected($event)" style="display: none;" />
+                <input type="file" id="bulk-upload-file" accept=".xlsx" (change)="onFileSelected($event)"
+                    style="display: none;" />
                 <label for="bulk-upload-file" class="file-upload-button">
                     <mat-icon>attach_file</mat-icon>
                     {{ selectedFile ? selectedFile.name : 'Seleccionar archivo .xlsx' }}
@@ -488,7 +541,8 @@
         <div class="user-modal" (click)="$event.stopPropagation()">
             <div class="user-modal__header">
                 <h3>
-                    <mat-icon>edit</mat-icon> Editar Usuario — {{ editingUser.email }}</h3>
+                    <mat-icon>edit</mat-icon> Editar Usuario — {{ editingUser.email }}
+                </h3>
                 <button type="button" class="user-modal__close" (click)="cancelEdit()" aria-label="Cerrar">
                     <mat-icon>close</mat-icon>
                 </button>
@@ -645,17 +699,44 @@
                         </div>
                     </div>
 
+                    <!-- Sección: Datos del evaluador psicólogo (visible solo si tiene rol Psychologist) -->
+                    @if (isPsychologistEditSelected) {
+                    <div class="form-section form-section--psychologist">
+                        <div class="form-section__title">
+                            <mat-icon>psychology</mat-icon> Datos del Evaluador Psicólogo
+                        </div>
+                        <div class="editor-panel__grid">
+                            <label class="editor-panel__field">
+                                <span>Postgrado <span class="form-section__required">*</span></span>
+                                <input formControlName="postgrado"
+                                    placeholder="Ej: Especialización en Psicología Organizacional" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>No. Tarjeta Profesional <span class="form-section__required">*</span></span>
+                                <input formControlName="tarjetaProfesional" placeholder="Ej: 123456-T" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Licencia Salud Ocupacional <span class="form-section__required">*</span></span>
+                                <input formControlName="licenciaSaludOcupacional" placeholder="Ej: LSO-2024-0001" />
+                            </label>
+                        </div>
+                    </div>
+                    }
+
                     <!-- Roles -->
                     <div class="form-section">
                         <div class="form-section__title">
                             <mat-icon>shield</mat-icon> Roles asignados @if (savingRole) {
-                            <mat-progress-spinner diameter="14" mode="indeterminate" style="display:inline-block;margin-left:6px"></mat-progress-spinner>
+                            <mat-progress-spinner diameter="14" mode="indeterminate"
+                                style="display:inline-block;margin-left:6px"></mat-progress-spinner>
                             }
                         </div>
                         <div class="editor-panel__roles-grid">
                             @for (role of roleOptions; track role.id) {
-                            <button type="button" class="role-toggle" [class.role-toggle--active]="hasEditRole(role.id)" [disabled]="savingRole" (click)="toggleEditRole(role.id)">
-                                <mat-icon>{{ hasEditRole(role.id) ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                            <button type="button" class="role-toggle" [class.role-toggle--active]="hasEditRole(role.id)"
+                                [disabled]="savingRole" (click)="toggleEditRole(role.id)">
+                                <mat-icon>{{ hasEditRole(role.id) ? 'check_circle' : 'radio_button_unchecked'
+                                    }}</mat-icon>
                                 {{ role.name }}
                             </button> }
                         </div>
@@ -666,7 +747,8 @@
             <div class="user-modal__footer">
                 <button type="button" class="btn btn--ghost" (click)="cancelEdit()">Cancelar</button>
                 <button type="submit" form="edit-user-form" class="btn btn--primary" [disabled]="saving || savingRole">
-                    @if (saving) { <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner> }
+                    @if (saving) { <mat-spinner diameter="16"
+                        style="display:inline-block;margin-right:6px"></mat-spinner> }
                     <mat-icon>save</mat-icon> Guardar Cambios
                 </button>
             </div>
@@ -677,18 +759,21 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()" placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
+                placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
         </div>
         <div class="admin-filters__actions">
             <span class="admin-filters__count">{{ filteredUsers.length }} de {{ users.length }}</span>
             <button class="btn btn--outline btn--sm" (click)="loadUsers()" [disabled]="loading">
                 <mat-icon>refresh</mat-icon> Actualizar
             </button>
-            <button class="btn btn--secondary btn--sm" (click)="showBulkUpload = !showBulkUpload; showCreateForm = false; showEditForm = false">
+            <button class="btn btn--secondary btn--sm"
+                (click)="showBulkUpload = !showBulkUpload; showCreateForm = false; showEditForm = false">
                 <mat-icon>{{ showBulkUpload ? 'close' : 'upload' }}</mat-icon>
                 {{ showBulkUpload ? 'Cerrar' : 'Carga Masiva' }}
             </button>
-            <button class="btn btn--primary btn--sm" (click)="showCreateForm = !showCreateForm; showEditForm = false; showBulkUpload = false">
+            <button class="btn btn--primary btn--sm"
+                (click)="showCreateForm = !showCreateForm; showEditForm = false; showBulkUpload = false">
                 <mat-icon>{{ showCreateForm ? 'close' : 'person_add' }}</mat-icon>
                 {{ showCreateForm ? 'Cerrar' : 'Nuevo Usuario' }}
             </button>
@@ -734,7 +819,8 @@
                     <td>{{ u.areaName ?? '---' }}</td>
                     <td>
                         @for (role of (u.roles ?? []); track role) {
-                        <span class="badge badge--indigo" style="margin-right:4px;margin-bottom:2px">{{ role }}</span> } @if (!(u.roles ?? []).length) {
+                        <span class="badge badge--indigo" style="margin-right:4px;margin-bottom:2px">{{ role }}</span> }
+                        @if (!(u.roles ?? []).length) {
                         <span class="badge badge--neutral">Sin rol</span> }
                     </td>
                     <td>
@@ -743,16 +829,20 @@
                         </span>
                     </td>
                     <td class="actions-cell">
-                        <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()" title="Editar">
+                        <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()"
+                            title="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()" [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
+                        <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()"
+                            [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
                         </button> @if (isSuperAdmin) {
-                        <button class="btn btn--warning btn--xs" (click)="resetPassword(u);$event.stopPropagation()" [disabled]="saving" title="Restablecer contraseña">
+                        <button class="btn btn--warning btn--xs" (click)="resetPassword(u);$event.stopPropagation()"
+                            [disabled]="saving" title="Restablecer contraseña">
                             <mat-icon>lock_reset</mat-icon>
                         </button> }
-                        <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()" [disabled]="saving" title="Eliminar">
+                        <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()"
+                            [disabled]="saving" title="Eliminar">
                             <mat-icon>delete</mat-icon>
                         </button>
                     </td>

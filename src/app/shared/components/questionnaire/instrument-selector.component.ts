@@ -12,7 +12,7 @@ import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-mod
 import { AlertService } from 'app/core/swal/sweet-alert.service';
 import { AuthService } from 'app/core/services/auth.service';
 import { PendingClosingService } from 'app/core/services/pending-closing.service';
-import { PsychosocialConsentService, PsychosocialConsentDto } from 'app/core/services/psychosocial-consent.service';
+import { PsychosocialConsentService, PsychosocialConsentDto, PsychologistInfoDto } from 'app/core/services/psychosocial-consent.service';
 import { UsersService } from 'app/core/services/users.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { ExamTimerComponent } from 'app/shared/components/ui/exam-timer/exam-timer.component';
@@ -693,6 +693,63 @@ export class InstrumentSelectorComponent implements OnInit {
     /** True while the sign API call is in-flight (prevents double submission) */
     consentSigning = false;
 
+    /** List of available psychologists fetched from the API */
+    psychologists: PsychologistInfoDto[] = [];
+    /** True while loading the psychologist list */
+    loadingPsychologists = false;
+    /** The psychologist selected by the user before signing */
+    selectedPsychologist: PsychologistInfoDto | null = null;
+    /** True if user tried to sign without selecting a psychologist */
+    psychologistRequired = false;
+    /** Search text for filtering the psychologist table */
+    psychologistSearch = '';
+    /** Current page (0-based) of the psychologist table */
+    psychologistPage = 0;
+    /** Items per page in the psychologist table */
+    readonly psychologistPageSize = 5;
+
+    get filteredPsychologists(): PsychologistInfoDto[] {
+        const q = this.psychologistSearch.toLowerCase().trim();
+        if (!q) return this.psychologists;
+        return this.psychologists.filter(p =>
+            p.fullName.toLowerCase().includes(q) ||
+            (p.documentNumber ?? '').toLowerCase().includes(q) ||
+            (p.postgrado ?? '').toLowerCase().includes(q) ||
+            (p.tarjetaProfesional ?? '').toLowerCase().includes(q)
+        );
+    }
+
+    get pagedPsychologists(): PsychologistInfoDto[] {
+        const start = this.psychologistPage * this.psychologistPageSize;
+        return this.filteredPsychologists.slice(start, start + this.psychologistPageSize);
+    }
+
+    get totalPsychologistPages(): number {
+        return Math.ceil(this.filteredPsychologists.length / this.psychologistPageSize);
+    }
+
+    psychologistPrevPage(): void {
+        if (this.psychologistPage > 0) this.psychologistPage--;
+    }
+
+    psychologistNextPage(): void {
+        if (this.psychologistPage < this.totalPsychologistPages - 1) this.psychologistPage++;
+    }
+
+    onPsychologistSearchChange(): void {
+        this.psychologistPage = 0;
+    }
+
+    /** Selects or deselects a psychologist (toggle behavior) */
+    togglePsychologist(psych: PsychologistInfoDto): void {
+        if (this.selectedPsychologist?.userID === psych.userID) {
+            this.selectedPsychologist = null;
+        } else {
+            this.selectedPsychologist = psych;
+            this.psychologistRequired = false;
+        }
+    }
+
     /** Progress info for displaying next available instruments */
     progressInfo: {
         completedCoreCount: number;
@@ -871,6 +928,14 @@ export class InstrumentSelectorComponent implements OnInit {
                 this.showPsychosocialRejectionModal = true;
             } else {
                 this.showPsychosocialConsentModal = true;
+                // Load psychologists list if not yet loaded
+                if (this.psychologists.length === 0 && !this.loadingPsychologists) {
+                    this.loadingPsychologists = true;
+                    this.consentService.getPsychologists().pipe(take(1)).subscribe({
+                        next: (list) => { this.psychologists = list; this.loadingPsychologists = false; },
+                        error: () => { this.loadingPsychologists = false; },
+                    });
+                }
             }
             return;
         }
@@ -1156,9 +1221,14 @@ export class InstrumentSelectorComponent implements OnInit {
 
     /** User tapped "Sí acepto" in the psychosocial consent modal */
     onPsychosocialConsentAccepted(): void {
+        if (!this.selectedPsychologist) {
+            this.psychologistRequired = true;
+            return;
+        }
+        this.psychologistRequired = false;
         if (this.consentSigning) return;
         this.consentSigning = true;
-        this.consentService.sign('ACCEPTED').pipe(take(1)).subscribe({
+        this.consentService.sign('ACCEPTED', this.selectedPsychologist.userID).pipe(take(1)).subscribe({
             next: (dto) => {
                 this.consentSigning = false;
                 this.psychosocialConsentStatus = 'accepted';
@@ -1175,9 +1245,14 @@ export class InstrumentSelectorComponent implements OnInit {
 
     /** User tapped "No acepto" in the psychosocial consent modal */
     onPsychosocialConsentDenied(): void {
+        if (!this.selectedPsychologist) {
+            this.psychologistRequired = true;
+            return;
+        }
+        this.psychologistRequired = false;
         if (this.consentSigning) return;
         this.consentSigning = true;
-        this.consentService.sign('REJECTED').pipe(take(1)).subscribe({
+        this.consentService.sign('REJECTED', this.selectedPsychologist.userID).pipe(take(1)).subscribe({
             next: (dto) => {
                 this.consentSigning = false;
                 this.psychosocialConsentStatus = 'rejected';
@@ -1372,10 +1447,14 @@ export class InstrumentSelectorComponent implements OnInit {
         // ── Signature block ──────────────────────────────────────────────────
         addLine(4);
         checkPage(45);
+        const psychDocExists = !!(dto.psychologistName && this.selectedPsychologist?.documentNumber);
+        const psychLicExists = !!(dto.psychologistName && this.selectedPsychologist?.tarjetaProfesional);
+        const sigRows = 4 + (dto.psychologistName ? 1 : 0) + (psychDocExists ? 1 : 0) + (psychLicExists ? 1 : 0);
+        const sigHeight = 8 + sigRows * 7 + 4;
         doc.setFillColor(248, 250, 252);
         doc.setDrawColor(226, 232, 240);
         const sigY = y;
-        doc.roundedRect(margin, sigY, contentW, 36, 3, 3, 'FD');
+        doc.roundedRect(margin, sigY, contentW, sigHeight, 3, 3, 'FD');
         y = sigY + 8;
 
         const sigRow = (label: string, value: string) => {
@@ -1394,6 +1473,15 @@ export class InstrumentSelectorComponent implements OnInit {
         sigRow('Número de cédula:', dto.documentNumber || '');
         sigRow('Decisión:', decisionText);
         sigRow('Fecha y hora:', signedDate);
+        if (dto.psychologistName) {
+            sigRow('Psicólogo/a evaluador:', dto.psychologistName);
+            if (this.selectedPsychologist?.documentNumber) {
+                sigRow('Cédula del evaluador:', `${this.selectedPsychologist.documentType || 'CC'} ${this.selectedPsychologist.documentNumber}`);
+            }
+            if (this.selectedPsychologist?.tarjetaProfesional) {
+                sigRow('No. Licencia salud ocup.:', this.selectedPsychologist.tarjetaProfesional);
+            }
+        }
         sigRow('Firma:', 'Firmado digitalmente por el sistema EmoCheck');
 
         // ── Footer ───────────────────────────────────────────────────────────

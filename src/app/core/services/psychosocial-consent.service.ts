@@ -14,6 +14,19 @@ export interface PsychosocialConsentDto {
     signedAt: string;
     hasResponded: boolean;
     isAccepted: boolean;
+    psychologistUserID?: number | null;
+    psychologistName?: string | null;
+}
+
+export interface PsychologistInfoDto {
+    userID: number;
+    fullName: string;
+    documentType?: string | null;
+    documentNumber?: string | null;
+    email?: string | null;
+    postgrado?: string | null;
+    tarjetaProfesional?: string | null;
+    licenciaSaludOcupacional?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -31,10 +44,20 @@ export class PsychosocialConsentService {
     }
 
     /**
-     * Signs the consent with decision 'ACCEPTED' or 'REJECTED'.
+     * Returns all active psychologists available as evaluators.
+     */
+    getPsychologists(): Observable<PsychologistInfoDto[]> {
+        return this.http.get<PsychologistInfoDto[]>(`${this.apiUrl}/psychosocial-consent/psychologists`);
+    }
+
+    /**
+     * Signs the consent with decision 'ACCEPTED' or 'REJECTED' and the selected psychologist.
      * Can only be called once; returns 409 if already signed.
      */
-    sign(decision: 'ACCEPTED' | 'REJECTED'): Observable<PsychosocialConsentDto> {
-        return this.http.post<PsychosocialConsentDto>(`${this.apiUrl}/psychosocial-consent/sign`, { decision });
+    sign(decision: 'ACCEPTED' | 'REJECTED', psychologistUserId?: number | null): Observable<PsychosocialConsentDto> {
+        return this.http.post<PsychosocialConsentDto>(`${this.apiUrl}/psychosocial-consent/sign`, {
+            decision,
+            psychologistUserId: psychologistUserId ?? null,
+        });
     }
 }

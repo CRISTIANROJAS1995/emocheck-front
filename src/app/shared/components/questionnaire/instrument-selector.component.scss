@@ -1068,7 +1068,7 @@
 
 .wm-psych-consent__signed-label {
     font-weight: 700;
-    min-width: 140px;
+    min-width: 200px;
     flex-shrink: 0;
 }
 
@@ -2480,5 +2480,257 @@
         &__content h3 {
             font-size: 18px;
         }
+    }
+}
+
+// ── Psychosocial Consent — Evaluator Selector ────────────────────────────────
+.wm-psych-consent {
+
+    &__evaluator-section {
+        margin: 0 0 20px;
+        padding: 18px 20px;
+        background: #f8fafc;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+    }
+
+    &__evaluator-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 6px;
+
+        svg {
+            flex-shrink: 0;
+            color: #6366f1;
+            stroke: #6366f1;
+        }
+    }
+
+    &__evaluator-required {
+        margin-left: auto;
+        font-size: 11px;
+        font-weight: 600;
+        color: #6366f1;
+        text-transform: none;
+        letter-spacing: 0;
+        background: #eef2ff;
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    &__evaluator-hint {
+        font-size: 12.5px;
+        color: #64748b;
+        margin: 0 0 14px;
+        line-height: 1.5;
+    }
+
+    &__evaluator-loading,
+    &__evaluator-empty {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 0;
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    &__evaluator-table-wrap {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    &__evaluator-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+
+        thead tr {
+            background: #f1f5f9;
+        }
+
+        th {
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid #f1f5f9;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background: #f5f3ff;
+            }
+        }
+
+        td {
+            padding: 10px 12px;
+            color: #374151;
+            vertical-align: middle;
+        }
+    }
+
+    &__evaluator-row--selected {
+        background: #eef2ff !important;
+
+        td {
+            color: #3730a3;
+        }
+    }
+
+    &__evaluator-check {
+        width: 36px;
+        text-align: center;
+
+        svg {
+            display: block;
+            margin: 0 auto;
+        }
+    }
+
+    &__evaluator-name {
+        font-weight: 600;
+        color: #1e293b;
+        white-space: nowrap;
+    }
+
+    &__evaluator-error {
+        margin-top: 10px;
+        font-size: 12.5px;
+        color: #dc2626;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        &::before {
+            content: '⚠';
+        }
+    }
+
+    &__evaluator-search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        background: #fff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 7px 12px;
+        transition: border-color 0.2s;
+
+        &:focus-within {
+            border-color: #6366f1;
+        }
+
+        svg {
+            flex-shrink: 0;
+        }
+    }
+
+    &__evaluator-search {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        color: #374151;
+        background: transparent;
+
+        &::placeholder {
+            color: #94a3b8;
+        }
+    }
+
+    &__evaluator-search-clear {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border: none;
+        background: #e2e8f0;
+        border-radius: 50%;
+        cursor: pointer;
+        color: #64748b;
+        flex-shrink: 0;
+        padding: 0;
+
+        &:hover {
+            background: #cbd5e1;
+        }
+    }
+
+    &__evaluator-doc {
+        white-space: nowrap;
+        color: #374151;
+    }
+
+    &__badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+
+    &__evaluator-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 10px 0 2px;
+    }
+
+    &__page-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        color: #6366f1;
+        transition: all 0.15s;
+
+        &:hover:not(:disabled) {
+            border-color: #6366f1;
+            background: #eef2ff;
+        }
+
+        &:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+    }
+
+    &__page-info {
+        font-size: 12.5px;
+        color: #475569;
+        font-weight: 500;
     }
 }

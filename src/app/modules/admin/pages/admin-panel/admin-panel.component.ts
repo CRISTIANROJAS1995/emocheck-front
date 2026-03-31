@@ -110,6 +110,10 @@ export class AdminPanelComponent implements OnInit {
             contractType: [null],
             dailyWorkHours: [null],
             jobSeniority: [null],
+            // Datos profesionales del psicólogo (opcionales, requeridos en front si rol=Psychologist)
+            postgrado: [null],
+            tarjetaProfesional: [null],
+            licenciaSaludOcupacional: [null],
         });
 
         this.editForm = this.fb.group({
@@ -128,6 +132,10 @@ export class AdminPanelComponent implements OnInit {
             contractType: [null],
             dailyWorkHours: [null],
             jobSeniority: [null],
+            // Datos profesionales del psicólogo (opcionales)
+            postgrado: [null],
+            tarjetaProfesional: [null],
+            licenciaSaludOcupacional: [null],
         });
 
         this.loadUsers();
@@ -287,6 +295,9 @@ export class AdminPanelComponent implements OnInit {
                 contractType: v.contractType || null,
                 dailyWorkHours: toOptionalNum(v.dailyWorkHours),
                 jobSeniority: toOptionalNum(v.jobSeniority),
+                postgrado: v.postgrado?.trim() || null,
+                tarjetaProfesional: v.tarjetaProfesional?.trim() || null,
+                licenciaSaludOcupacional: v.licenciaSaludOcupacional?.trim() || null,
             })
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
@@ -307,6 +318,20 @@ export class AdminPanelComponent implements OnInit {
 
     get inactiveCount(): number {
         return this.users.filter((u) => !u.isActive).length;
+    }
+
+    /** Devuelve true si el formulario de creación tiene el rol Psychologist seleccionado (roleID = 3) */
+    get isPsychologistSelected(): boolean {
+        const ids: number[] = this.createForm?.get('roleIDs')?.value ?? [];
+        // Busca por ID o por nombre en roleOptions
+        const psychologistId = this.roleOptions.find(r => r.name.toLowerCase() === 'psychologist')?.id ?? 3;
+        return ids.includes(psychologistId);
+    }
+
+    /** Devuelve true si el usuario en edición tiene el rol Psychologist */
+    get isPsychologistEditSelected(): boolean {
+        const psychologistId = this.roleOptions.find(r => r.name.toLowerCase() === 'psychologist')?.id ?? 3;
+        return this.editRoleIDs.has(psychologistId);
     }
 
     // ── Edit User ──
@@ -341,6 +366,9 @@ export class AdminPanelComponent implements OnInit {
             contractType: user.contractType ?? null,
             dailyWorkHours: user.dailyWorkHours ?? null,
             jobSeniority: user.jobSeniority ?? null,
+            postgrado: user.postgrado ?? null,
+            tarjetaProfesional: user.tarjetaProfesional ?? null,
+            licenciaSaludOcupacional: user.licenciaSaludOcupacional ?? null,
         });
         // Inicializar roles actuales del usuario
         this.editRoleIDs = new Set(
@@ -422,6 +450,9 @@ export class AdminPanelComponent implements OnInit {
             contractType: v.contractType || null,
             dailyWorkHours: toOptionalNum(v.dailyWorkHours),
             jobSeniority: toOptionalNum(v.jobSeniority),
+            postgrado: v.postgrado?.trim() || null,
+            tarjetaProfesional: v.tarjetaProfesional?.trim() || null,
+            licenciaSaludOcupacional: v.licenciaSaludOcupacional?.trim() || null,
         };
 
         this.adminUsers
@@ -524,7 +555,7 @@ export class AdminPanelComponent implements OnInit {
     onFileSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
-        
+
         if (!file) {
             this.selectedFile = null;
             return;
@@ -563,7 +594,7 @@ export class AdminPanelComponent implements OnInit {
                 next: (result) => {
                     this.uploadResult = result;
                     this.selectedFile = null;
-                    
+
                     // Reset file input
                     const fileInput = document.getElementById('bulk-upload-file') as HTMLInputElement;
                     if (fileInput) fileInput.value = '';
@@ -598,9 +629,9 @@ export class AdminPanelComponent implements OnInit {
             ];
 
             const examples = [
-                ['Juan',   'Pérez',  'juan.perez@empresa.com',   'Pass123!', 'CC', '12345678',   '3001234567', 'M', '1990-05-15', '2023-01-10', '1', '1', '1', '1', '6',   'Soltero/a',  'Profesional completo',   '3', 'Arrendada', '0', 'Indefinido', '2', '2'],
-                ['María',  'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321',   '3007654321', 'F', '1992-08-20', '2022-06-01', '1', '1', '2', '2', '6,4', 'Casado/a',   'Técnica/tecnología completa', '2', 'Propia',    '1', 'Temporal',   '2', '1'],
-                ['Carlos', 'López',  'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344',   '3009876543', 'M', '1985-03-10', '2020-09-15', '1', '2', '3', '1', '5',   'Unión libre','Bachillerato completo',   '4', 'Familiar',  '2', 'Prestación de servicios', '3', '3']
+                ['Juan', 'Pérez', 'juan.perez@empresa.com', 'Pass123!', 'CC', '12345678', '3001234567', 'M', '1990-05-15', '2023-01-10', '1', '1', '1', '1', '6', 'Soltero/a', 'Profesional completo', '3', 'Arrendada', '0', 'Indefinido', '2', '2'],
+                ['María', 'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321', '3007654321', 'F', '1992-08-20', '2022-06-01', '1', '1', '2', '2', '6,4', 'Casado/a', 'Técnica/tecnología completa', '2', 'Propia', '1', 'Temporal', '2', '1'],
+                ['Carlos', 'López', 'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344', '3009876543', 'M', '1985-03-10', '2020-09-15', '1', '2', '3', '1', '5', 'Unión libre', 'Bachillerato completo', '4', 'Familiar', '2', 'Prestación de servicios', '3', '3']
             ];
 
             // Crear datos del worksheet: headers + ejemplos + filas vacías
@@ -623,17 +654,17 @@ export class AdminPanelComponent implements OnInit {
                 { wch: 14 }, // DocumentType
                 { wch: 16 }, // DocumentNumber
                 { wch: 14 }, // Phone
-                { wch: 8  }, // Gender
+                { wch: 8 }, // Gender
                 { wch: 13 }, // DateOfBirth
                 { wch: 13 }, // HireDate
                 { wch: 10 }, // CompanyID
-                { wch: 8  }, // SiteID
-                { wch: 8  }, // AreaID
+                { wch: 8 }, // SiteID
+                { wch: 8 }, // AreaID
                 { wch: 10 }, // JobTypeID
                 { wch: 10 }, // RoleIDs
                 { wch: 16 }, // MaritalStatus
                 { wch: 30 }, // EducationLevel
-                { wch: 9  }, // Stratum
+                { wch: 9 }, // Stratum
                 { wch: 14 }, // HousingType
                 { wch: 12 }, // Dependents
                 { wch: 26 }, // ContractType
@@ -644,12 +675,12 @@ export class AdminPanelComponent implements OnInit {
 
             // Aplicar estilos a las celdas
             const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-            
+
             // Estilo para headers (fila 1)
             for (let col = range.s.c; col <= range.e.c; col++) {
                 const cellRef = XLSX.utils.encode_cell({ r: 0, c: col });
                 if (!worksheet[cellRef]) continue;
-                
+
                 worksheet[cellRef].s = {
                     font: { bold: true, color: { rgb: 'FFFFFF' } },
                     fill: { fgColor: { rgb: '4472C4' } },
@@ -668,7 +699,7 @@ export class AdminPanelComponent implements OnInit {
                 for (let col = range.s.c; col <= range.e.c; col++) {
                     const cellRef = XLSX.utils.encode_cell({ r: row, c: col });
                     if (!worksheet[cellRef]) continue;
-                    
+
                     worksheet[cellRef].s = {
                         font: { italic: true, color: { rgb: '666666' } },
                         fill: { fgColor: { rgb: 'F2F2F2' } },
@@ -687,29 +718,29 @@ export class AdminPanelComponent implements OnInit {
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Usuarios');
 
             // Generar y descargar archivo Excel
-            const excelBuffer = XLSX.write(workbook, { 
-                bookType: 'xlsx', 
+            const excelBuffer = XLSX.write(workbook, {
+                bookType: 'xlsx',
                 type: 'array',
                 cellStyles: true
             });
-            
+
             const blob = new Blob([excelBuffer], {
                 type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             });
-            
+
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute('href', url);
             link.setAttribute('download', 'plantilla_usuarios_emocheck.xlsx');
             link.style.visibility = 'hidden';
-            
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
-            
+
             this.alert.success('📊 Plantilla Excel generada correctamente. Elimina los ejemplos (filas 2-4) y completa con tus datos.');
-            
+
         } catch (error) {
             console.error('Error generando Excel:', error);
             this.alert.error('Error al generar Excel. Intenta con la opción CSV.');
@@ -732,9 +763,9 @@ export class AdminPanelComponent implements OnInit {
         ];
 
         const examples = [
-            ['Juan',   'Pérez',  'juan.perez@empresa.com',   'Pass123!', 'CC', '12345678',   '3001234567', 'M', '1990-05-15', '2023-01-10', '1', '1', '1', '1', '6',    'Soltero/a',  'Profesional completo',          '3', 'Arrendada', '0', 'Indefinido',              '2', '2'],
-            ['María',  'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321',   '3007654321', 'F', '1992-08-20', '2022-06-01', '1', '1', '2', '2', '"6,4"','Casado/a',   'Técnica/tecnología completa',   '2', 'Propia',    '1', 'Temporal',                '2', '1'],
-            ['Carlos', 'López',  'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344',   '3009876543', 'M', '1985-03-10', '2020-09-15', '1', '2', '3', '1', '5',    'Unión libre','Bachillerato completo',          '4', 'Familiar',  '2', 'Prestación de servicios', '3', '3']
+            ['Juan', 'Pérez', 'juan.perez@empresa.com', 'Pass123!', 'CC', '12345678', '3001234567', 'M', '1990-05-15', '2023-01-10', '1', '1', '1', '1', '6', 'Soltero/a', 'Profesional completo', '3', 'Arrendada', '0', 'Indefinido', '2', '2'],
+            ['María', 'García', 'maria.garcia@empresa.com', 'Pass456!', 'CC', '87654321', '3007654321', 'F', '1992-08-20', '2022-06-01', '1', '1', '2', '2', '"6,4"', 'Casado/a', 'Técnica/tecnología completa', '2', 'Propia', '1', 'Temporal', '2', '1'],
+            ['Carlos', 'López', 'carlos.lopez@empresa.com', 'Pass789!', 'CE', '11223344', '3009876543', 'M', '1985-03-10', '2020-09-15', '1', '2', '3', '1', '5', 'Unión libre', 'Bachillerato completo', '4', 'Familiar', '2', 'Prestación de servicios', '3', '3']
         ];
 
         // Función para escapar valores CSV
@@ -758,23 +789,23 @@ export class AdminPanelComponent implements OnInit {
         for (let i = 0; i < 15; i++) {
             rows.push(new Array(headers.length).fill('').join(','));
         }
-        
+
         const csvContent = BOM + rows.join('\n');
-        const blob = new Blob([csvContent], { 
-            type: 'text/csv;charset=utf-8;' 
+        const blob = new Blob([csvContent], {
+            type: 'text/csv;charset=utf-8;'
         });
-        
+
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
         link.setAttribute('href', url);
         link.setAttribute('download', 'plantilla_usuarios_emocheck.csv');
         link.style.visibility = 'hidden';
-        
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        
+
         this.alert.info('📄 Plantilla CSV descargada. Excel la abrirá automáticamente. Elimina los ejemplos (filas 2-4) y guarda como .xlsx antes de subir.');
     }
 
