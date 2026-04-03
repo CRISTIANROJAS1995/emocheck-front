@@ -1,0 +1,682 @@
+<div class="flex min-h-screen w-full flex-col bg-slate-50 px-4 py-6">
+    <div class="mx-auto w-full max-w-5xl">
+
+        <!-- Loading -->
+        <div *ngIf="loading()" class="flex flex-col items-center justify-center py-24 gap-4">
+            <div class="h-10 w-10 animate-spin rounded-full border-[3px] border-slate-200 border-t-cyan-600"></div>
+            <p class="text-sm text-slate-500">Cargando formulario...</p>
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="error() && !loading()"
+            class="flex flex-col items-center gap-4 rounded-2xl border border-red-200 bg-red-50 px-6 py-12 text-center">
+            <span class="text-3xl">⚠️</span>
+            <p class="text-sm text-red-600">{{ error() }}</p>
+            <button type="button"
+                class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                (click)="_loadCatalogsAndProfile()">
+                Reintentar
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form *ngIf="!loading() && catalogs" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate
+            class="flex flex-col gap-6">
+
+            <!-- Header card -->
+            <div class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <button type="button"
+                    class="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    (click)="onCancel()">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 5l-7 7 7 7" />
+                    </svg>
+                </button>
+                <div class="flex flex-col gap-1">
+                    <span
+                        class="inline-block rounded bg-cyan-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-cyan-700">
+                        REQUERIDO ANTES DE LOS CUESTIONARIOS
+                    </span>
+                    <h1 class="text-xl font-bold text-slate-900">Ficha de Datos Generales</h1>
+                    <p class="text-sm leading-relaxed text-slate-500">
+                        Las siguientes preguntas hacen referencia a información general sobre usted o su ocupación.
+                        Por favor seleccione una única respuesta para cada pregunta.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ── Section 1: Personal Data ───────────────────────────────────────── -->
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2
+                    class="mb-5 border-b border-slate-100 pb-3 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    Datos Personales
+                </h2>
+
+                <!-- Q1: Date of birth -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">1.</span>
+                        Fecha de Nacimiento
+                    </label>
+                    <input type="date" formControlName="fechaNacimiento" class="w-full rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition
+                   focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                        [class.border-red-400]="isInvalid('fechaNacimiento')"
+                        [class.border-slate-300]="!isInvalid('fechaNacimiento')" max="2010-01-01" />
+                </div>
+
+                <!-- Q2: Age (calculated) -->
+                <div *ngIf="calculatedAge !== null" class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">2.</span>
+                        Edad
+                    </label>
+                    <div class="flex items-center gap-3">
+                        <span
+                            class="rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-sm font-bold text-cyan-700">
+                            {{ calculatedAge }} años
+                        </span>
+                        <span class="text-xs italic text-slate-400">Calculada automáticamente</span>
+                    </div>
+                </div>
+
+                <!-- Q3: Sex (auto from profile) -->
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">3.</span>
+                        Sexo
+                    </label>
+                    <div class="flex items-center gap-3">
+                        <span
+                            class="rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-sm font-bold text-cyan-700">
+                            {{ ctrl('sexo').value || '—' }}
+                        </span>
+                        <span class="text-xs italic text-slate-400">Tomado automáticamente de tu perfil</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Clarification block ──────────────────────────────────────────── -->
+            <div class="overflow-hidden rounded-2xl border-2 border-amber-300 bg-white shadow-sm">
+
+                <!-- Header -->
+                <div class="flex w-full items-center gap-3 bg-amber-50 px-5 py-4">
+                    <span class="text-lg">🔶</span>
+                    <span class="flex-1 text-[15px] font-semibold text-amber-900">Aclaración</span>
+                </div>
+
+                <!-- Notice (always visible below toggle) -->
+                <div class="border-b border-amber-200 bg-amber-50 px-5 py-3">
+                    <p class="text-xs leading-relaxed text-amber-800">
+                        <strong>¡Importante!</strong> Las siguientes preguntas buscan identificar condiciones
+                        específicas
+                        para garantizar un entorno laboral incluyente y libre de discriminación. Sus respuestas son
+                        <strong>voluntarias</strong>, están protegidas por la confidencialidad médica y son útiles para
+                        diseñar
+                        programas de bienestar con enfoque diferencial, en cumplimiento de la
+                        <strong>Ley 2460 de 2025</strong>.
+                    </p>
+                </div>
+
+                <!-- Optional questions (always visible) -->
+                <div class="flex flex-col gap-6 p-5">
+
+                    <!-- Q4: Gender identity -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">
+                            <span class="mr-1 font-bold text-cyan-600">4.</span>
+                            ¿Con qué género se identifica actualmente?
+                            <span class="ml-1 text-xs font-normal text-slate-400">(Opcional)</span>
+                        </label>
+                        <div class="flex flex-col gap-2">
+                            <label *ngFor="let opt of catalogs.identidadGenero"
+                                class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 hover:border-cyan-200 hover:bg-cyan-50">
+                                <input type="radio" formControlName="identidadGenero" [value]="opt"
+                                    class="accent-cyan-600" />
+                                <span class="text-sm text-slate-700">{{ opt }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q5: Ethnic group -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">
+                            <span class="mr-1 font-bold text-cyan-600">5.</span>
+                            ¿Se autoreconoce como parte de un grupo o comunidad étnica?
+                            <span class="ml-1 text-xs font-normal text-slate-400">(Opcional)</span>
+                        </label>
+                        <div class="flex flex-col gap-2">
+                            <label *ngFor="let opt of catalogs.grupoEtnico"
+                                class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 hover:border-cyan-200 hover:bg-cyan-50">
+                                <input type="radio" formControlName="grupoEtnico" [value]="opt"
+                                    class="accent-cyan-600" />
+                                <span class="text-sm text-slate-700">{{ opt }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q6: Disability -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">
+                            <span class="mr-1 font-bold text-cyan-600">6.</span>
+                            ¿Tiene alguna discapacidad o se identifica dentro del espectro de neurodiversidad (ej: TDAH,
+                            Autismo)?
+                            <span class="ml-1 text-xs font-normal text-slate-400">(Opcional)</span>
+                        </label>
+                        <div class="flex flex-col gap-2">
+                            <label *ngFor="let opt of catalogs.discapacidad"
+                                class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 hover:border-cyan-200 hover:bg-cyan-50">
+                                <input type="radio" formControlName="discapacidad" [value]="opt"
+                                    class="accent-cyan-600" />
+                                <span class="text-sm text-slate-700">{{ opt }}</span>
+                            </label>
+                        </div>
+                        <div *ngIf="ctrl('discapacidad').value === 'Sí'" class="mt-3 ml-4">
+                            <label class="mb-1 block text-xs font-semibold text-slate-500">Por favor especifique
+                                (opcional)</label>
+                            <input type="text" formControlName="discapacidadDetalle"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Ej: TDAH, Autismo, Visual..." />
+                        </div>
+                    </div>
+
+                    <!-- Q7: Exclusive caregiver -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">
+                            <span class="mr-1 font-bold text-cyan-600">7.</span>
+                            ¿Es usted el/la cuidador/a exclusivo/a de niños, personas con discapacidad o adultos mayores
+                            fuera de la jornada laboral?
+                            <span class="ml-1 text-xs font-normal text-slate-400">(Opcional)</span>
+                        </label>
+                        <div class="flex flex-col gap-2">
+                            <label
+                                class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 hover:border-cyan-200 hover:bg-cyan-50">
+                                <input type="radio" formControlName="cuidadorExclusivo" value="Si"
+                                    class="accent-cyan-600" />
+                                <span class="text-sm text-slate-700">Sí</span>
+                            </label>
+                            <label
+                                class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 hover:border-cyan-200 hover:bg-cyan-50">
+                                <input type="radio" formControlName="cuidadorExclusivo" value="No"
+                                    class="accent-cyan-600" />
+                                <span class="text-sm text-slate-700">No</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Q8: Special situation (multi-select) -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold text-slate-700">
+                            <span class="mr-1 font-bold text-cyan-600">8.</span>
+                            ¿Se encuentra en alguna de las siguientes situaciones?
+                            <span
+                                class="ml-1.5 rounded border border-green-300 bg-green-50 px-1.5 py-0.5 text-[10px] font-bold uppercase text-green-700">
+                                Selección múltiple
+                            </span>
+                            <span class="ml-1 text-xs font-normal text-slate-400">(Opcional)</span>
+                        </label>
+                        <div class="flex flex-col gap-2">
+                            <label *ngFor="let opt of catalogs.situacionEspecial"
+                                class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-transparent px-3 py-2 hover:border-green-200 hover:bg-green-50">
+                                <input type="checkbox" [checked]="isSituationSelected(opt)"
+                                    (change)="toggleSituation(opt)" class="accent-green-600 h-4 w-4 rounded" />
+                                <span class="text-sm text-slate-700">{{ opt }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ── Section 2: Sociodemographic Data ───────────────────────────────── -->
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2
+                    class="mb-5 border-b border-slate-100 pb-3 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    Datos Sociodemográficos
+                </h2>
+
+                <!-- Q9: Marital status -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">9.</span>
+                        Estado civil:
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        <label *ngFor="let opt of catalogs.estadoCivil" class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition
+                     hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('estadoCivil').value === opt"
+                            [class.bg-cyan-50]="ctrl('estadoCivil').value === opt"
+                            [class.border-slate-200]="ctrl('estadoCivil').value !== opt">
+                            <input type="radio" formControlName="estadoCivil" [value]="opt" class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">{{ opt }}</span>
+                        </label>
+                    </div>
+                    <p *ngIf="isInvalid('estadoCivil')" class="mt-1.5 text-xs text-red-500">Por favor seleccione una
+                        opción</p>
+                </div>
+
+                <!-- Q10: Education level -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">10.</span>
+                        Último nivel de educación alcanzado:
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <label *ngFor="let opt of catalogs.nivelEducacion" class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition
+                     hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('nivelEducacion').value === opt"
+                            [class.bg-cyan-50]="ctrl('nivelEducacion').value === opt"
+                            [class.border-slate-200]="ctrl('nivelEducacion').value !== opt">
+                            <input type="radio" formControlName="nivelEducacion" [value]="opt"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">{{ opt }}</span>
+                        </label>
+                    </div>
+                    <p *ngIf="isInvalid('nivelEducacion')" class="mt-1.5 text-xs text-red-500">Por favor seleccione una
+                        opción</p>
+                </div>
+
+                <!-- Q11: Profession -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">11.</span>
+                        ¿Cuál es su formación o profesión (título profesional, técnico u oficio)?
+                    </label>
+                    <input type="text" formControlName="profesion"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                        placeholder="Ej: Ingeniero de sistemas, Técnico en salud..." />
+                </div>
+
+                <!-- Q12: Place of residence -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">12.</span>
+                        Lugar de residencia actual:
+                    </label>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-slate-500">Ciudad / Municipio</label>
+                            <input type="text" formControlName="lugarResidenciaCiudad"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Ciudad" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-slate-500">Departamento</label>
+                            <input type="text" formControlName="lugarResidenciaDepartamento"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Departamento" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q13: Stratum -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">13.</span>
+                        Estrato de servicios públicos de su vivienda:
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="flex flex-wrap gap-2">
+                        <label *ngFor="let opt of catalogs.estratos" class="flex min-w-[56px] cursor-pointer items-center justify-center rounded-lg border-2 px-3 py-2 text-sm font-semibold transition select-none
+                     hover:border-cyan-400 hover:text-cyan-700" [class.border-cyan-500]="ctrl('estrato').value === opt"
+                            [class.bg-cyan-600]="ctrl('estrato').value === opt"
+                            [class.text-white]="ctrl('estrato').value === opt"
+                            [class.border-slate-300]="ctrl('estrato').value !== opt"
+                            [class.text-slate-700]="ctrl('estrato').value !== opt">
+                            <input type="radio" formControlName="estrato" [value]="opt" class="sr-only" />
+                            {{ opt }}
+                        </label>
+                    </div>
+                    <p *ngIf="isInvalid('estrato')" class="mt-1.5 text-xs text-red-500">Por favor seleccione un estrato
+                    </p>
+                </div>
+
+                <!-- Q14: Housing type -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">14.</span>
+                        Tipo de vivienda:
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <label *ngFor="let opt of catalogs.tipoVivienda" class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                     hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('tipoVivienda').value === opt"
+                            [class.bg-cyan-50]="ctrl('tipoVivienda').value === opt"
+                            [class.border-slate-200]="ctrl('tipoVivienda').value !== opt">
+                            <input type="radio" formControlName="tipoVivienda" [value]="opt" class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">{{ opt }}</span>
+                        </label>
+                    </div>
+                    <p *ngIf="isInvalid('tipoVivienda')" class="mt-1.5 text-xs text-red-500">Por favor seleccione una
+                        opción</p>
+                </div>
+
+                <!-- Q15: Economic dependants -->
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">15.</span>
+                        Número de personas que dependen económicamente de usted (aunque no vivan con usted):
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <input type="number" formControlName="personasACargo" min="0" max="20"
+                        class="w-24 rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-cyan-100"
+                        [class.border-red-400]="isInvalid('personasACargo')"
+                        [class.border-slate-300]="!isInvalid('personasACargo')"
+                        [class.focus:border-cyan-500]="!isInvalid('personasACargo')" placeholder="0" />
+                    <p *ngIf="isInvalid('personasACargo')" class="mt-1.5 text-xs text-red-500">Ingrese un número válido
+                        (0–20)</p>
+                </div>
+            </div>
+
+            <!-- ── Section 3: Occupational Data ──────────────────────────────────── -->
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2
+                    class="mb-5 border-b border-slate-100 pb-3 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    Datos Ocupacionales
+                </h2>
+
+                <!-- Q16: Work location -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">16.</span>
+                        Lugar de trabajo actual:
+                    </label>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-slate-500">Ciudad / Municipio</label>
+                            <input type="text" formControlName="ciudadTrabajo"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Ciudad o municipio" />
+                        </div>
+                        <div>
+                            <label class="mb-1 block text-xs font-medium text-slate-500">Departamento</label>
+                            <input type="text" formControlName="lugarTrabajoDepartamento"
+                                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Departamento" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q17: Company seniority -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">17.</span>
+                        ¿Hace cuántos años trabaja en esta empresa?
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <!-- Opción A: menos de un año -->
+                        <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                         hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('antiguedadTipo').value === 'menosAnio'"
+                            [class.bg-cyan-50]="ctrl('antiguedadTipo').value === 'menosAnio'"
+                            [class.border-slate-200]="ctrl('antiguedadTipo').value !== 'menosAnio'">
+                            <input type="radio" formControlName="antiguedadTipo" value="menosAnio"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">Si lleva menos de un año marque esta opción</span>
+                        </label>
+                        <!-- Opción B: más de un año -->
+                        <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                         hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('antiguedadTipo').value === 'masAnio'"
+                            [class.bg-cyan-50]="ctrl('antiguedadTipo').value === 'masAnio'"
+                            [class.border-slate-200]="ctrl('antiguedadTipo').value !== 'masAnio'">
+                            <input type="radio" formControlName="antiguedadTipo" value="masAnio"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">Si lleva más de un año, anote cuántos años:</span>
+                        </label>
+                        <!-- Input de años (visible solo cuando masAnio) -->
+                        <div *ngIf="ctrl('antiguedadTipo').value === 'masAnio'" class="ml-6 mt-1">
+                            <input type="number" formControlName="antiguedadAnios" min="1" max="99"
+                                class="w-32 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Años" />
+                            <p *ngIf="isInvalid('antiguedadAnios')" class="mt-1 text-xs text-red-500">Ingrese los años
+                                trabajados</p>
+                        </div>
+                    </div>
+                    <p *ngIf="isInvalid('antiguedadTipo')" class="mt-1.5 text-xs text-red-500">Por favor seleccione una
+                        opción</p>
+                </div>
+
+                <!-- Q18: Area / department name -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">18.</span>
+                        Nombre de la dependencia / área donde trabaja actualmente:
+                    </label>
+                    <input type="text" formControlName="areaNombre"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                        placeholder="Ej: Recursos Humanos, Sistemas, Producción..." />
+                </div>
+
+                <!-- Q19: Job title -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">19.</span>
+                        ¿Cuál es su cargo / nombre del puesto de trabajo?
+                    </label>
+                    <input type="text" formControlName="nombreCargo"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                        placeholder="Ej: Analista de sistemas, Coordinador de área..." />
+                </div>
+
+                <!-- Q20: Job / trade name (free text) -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">20.</span>
+                        ¿Cuál es el nombre del oficio / ocupación que desempeña actualmente?
+                    </label>
+                    <input type="text" formControlName="nombreOficio"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                        placeholder="Ej: Analista de sistemas, Operador de máquinas..." />
+                </div>
+
+                <!-- Q21: Job type — DETERMINES FORM A or B -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">21.</span>
+                        Seleccione el tipo de cargo que más se asemeja al que usted desempeña:
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <label *ngFor="let opt of catalogs.tipoCargo; let i = index"
+                            class="flex cursor-pointer items-center gap-3 rounded-lg border-2 px-4 py-3 transition"
+                            [class.border-blue-400]="ctrl('tipoCargo').value === opt && i < 2"
+                            [class.bg-blue-50]="ctrl('tipoCargo').value === opt && i < 2"
+                            [class.border-violet-400]="ctrl('tipoCargo').value === opt && i >= 2"
+                            [class.bg-violet-50]="ctrl('tipoCargo').value === opt && i >= 2"
+                            [class.border-slate-200]="ctrl('tipoCargo').value !== opt"
+                            [class.hover:border-blue-300]="i < 2" [class.hover:bg-blue-50]="i < 2"
+                            [class.hover:border-violet-300]="i >= 2" [class.hover:bg-violet-50]="i >= 2">
+                            <input type="radio" formControlName="tipoCargo" [value]="opt" class="accent-cyan-600" />
+                            <span class="flex-1 text-sm text-slate-700">{{ opt }}</span>
+                            <span *ngIf="i < 2"
+                                class="rounded border border-blue-300 bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-blue-700">
+                                Forma A
+                            </span>
+                            <span *ngIf="i >= 2"
+                                class="rounded border border-violet-300 bg-violet-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-violet-700">
+                                Forma B
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Detected form indicator -->
+                    <div *ngIf="detectedForm"
+                        class="mt-3 inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm"
+                        [class.border-blue-200]="detectedForm === 'A'" [class.bg-blue-50]="detectedForm === 'A'"
+                        [class.text-blue-700]="detectedForm === 'A'" [class.border-violet-200]="detectedForm === 'B'"
+                        [class.bg-violet-50]="detectedForm === 'B'" [class.text-violet-700]="detectedForm === 'B'">
+                        <span>📋</span>
+                        <span>Se aplicará el <strong>Cuestionario Intralaboral Forma {{ detectedForm }}</strong></span>
+                    </div>
+
+                    <p *ngIf="isInvalid('tipoCargo')" class="mt-1.5 text-xs text-red-500">Por favor seleccione su tipo
+                        de cargo</p>
+                </div>
+
+                <!-- Q22: Job seniority in company -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">22.</span>
+                        ¿Hace cuántos años ocupa el cargo actual en esta empresa?
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                         hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('antiguedadCargoTipo').value === 'menosAnio'"
+                            [class.bg-cyan-50]="ctrl('antiguedadCargoTipo').value === 'menosAnio'"
+                            [class.border-slate-200]="ctrl('antiguedadCargoTipo').value !== 'menosAnio'">
+                            <input type="radio" formControlName="antiguedadCargoTipo" value="menosAnio"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">Si lleva menos de un año marque esta opción</span>
+                        </label>
+                        <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                         hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('antiguedadCargoTipo').value === 'masAnio'"
+                            [class.bg-cyan-50]="ctrl('antiguedadCargoTipo').value === 'masAnio'"
+                            [class.border-slate-200]="ctrl('antiguedadCargoTipo').value !== 'masAnio'">
+                            <input type="radio" formControlName="antiguedadCargoTipo" value="masAnio"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">Si lleva más de un año, anote cuántos años:</span>
+                        </label>
+                        <div *ngIf="ctrl('antiguedadCargoTipo').value === 'masAnio'" class="ml-6 mt-1">
+                            <input type="number" formControlName="antiguedadCargoAnios" min="1" max="99"
+                                class="w-32 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Años" />
+                            <p *ngIf="isInvalid('antiguedadCargoAnios')" class="mt-1 text-xs text-red-500">Ingrese los
+                                años trabajados</p>
+                        </div>
+                    </div>
+                    <p *ngIf="isInvalid('antiguedadCargoTipo')" class="mt-1.5 text-xs text-red-500">Por favor seleccione
+                        una opción</p>
+                </div>
+
+                <!-- Q23: Trade / occupation seniority -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">23.</span>
+                        ¿Hace cuántos años desempeña el oficio actual en esta empresa?
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                         hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('antiguedadOficioTipo').value === 'menosAnio'"
+                            [class.bg-cyan-50]="ctrl('antiguedadOficioTipo').value === 'menosAnio'"
+                            [class.border-slate-200]="ctrl('antiguedadOficioTipo').value !== 'menosAnio'">
+                            <input type="radio" formControlName="antiguedadOficioTipo" value="menosAnio"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">Si lleva menos de un año marque esta opción</span>
+                        </label>
+                        <label class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                         hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('antiguedadOficioTipo').value === 'masAnio'"
+                            [class.bg-cyan-50]="ctrl('antiguedadOficioTipo').value === 'masAnio'"
+                            [class.border-slate-200]="ctrl('antiguedadOficioTipo').value !== 'masAnio'">
+                            <input type="radio" formControlName="antiguedadOficioTipo" value="masAnio"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">Si lleva más de un año, anote cuántos años:</span>
+                        </label>
+                        <div *ngIf="ctrl('antiguedadOficioTipo').value === 'masAnio'" class="ml-6 mt-1">
+                            <input type="number" formControlName="antiguedadOficioAnios" min="1" max="99"
+                                class="w-32 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                                placeholder="Años" />
+                            <p *ngIf="isInvalid('antiguedadOficioAnios')" class="mt-1 text-xs text-red-500">Ingrese los
+                                años trabajados</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q24: Contract type -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">24.</span>
+                        Seleccione su tipo de contrato actual:
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <label *ngFor="let opt of catalogs.tipoContrato" class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                     hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('tipoContrato').value === opt"
+                            [class.bg-cyan-50]="ctrl('tipoContrato').value === opt"
+                            [class.border-slate-200]="ctrl('tipoContrato').value !== opt">
+                            <input type="radio" formControlName="tipoContrato" [value]="opt" class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">{{ opt }}</span>
+                        </label>
+                    </div>
+                    <p *ngIf="isInvalid('tipoContrato')" class="mt-1.5 text-xs text-red-500">Por favor seleccione una
+                        opción</p>
+                </div>
+
+                <!-- Q25: Salary type -->
+                <div class="mb-6">
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">25.</span>
+                        Seleccione el tipo de salario que recibe:
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <label *ngFor="let opt of catalogs.tipoSalario" class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                     hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('tipoSalario').value === opt"
+                            [class.bg-cyan-50]="ctrl('tipoSalario').value === opt"
+                            [class.border-slate-200]="ctrl('tipoSalario').value !== opt">
+                            <input type="radio" formControlName="tipoSalario" [value]="opt" class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">{{ opt }}</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q26: Daily working hours -->
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-slate-700">
+                        <span class="mr-1 font-bold text-cyan-600">26.</span>
+                        ¿Cuántas horas diarias de trabajo establece normalmente la empresa para su cargo?
+                        <span class="ml-0.5 text-red-500">*</span>
+                    </label>
+                    <div class="flex flex-col gap-2">
+                        <label *ngFor="let opt of catalogs.horasLaboralesDiarias; let i = index" class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 transition
+                     hover:border-cyan-300 hover:bg-cyan-50"
+                            [class.border-cyan-400]="ctrl('horasLaboralesDiarias').value === (i + 1).toString()"
+                            [class.bg-cyan-50]="ctrl('horasLaboralesDiarias').value === (i + 1).toString()"
+                            [class.border-slate-200]="ctrl('horasLaboralesDiarias').value !== (i + 1).toString()">
+                            <input type="radio" formControlName="horasLaboralesDiarias" [value]="(i + 1).toString()"
+                                class="accent-cyan-600" />
+                            <span class="text-sm text-slate-700">{{ opt }}</span>
+                        </label>
+                    </div>
+                    <p *ngIf="isInvalid('horasLaboralesDiarias')" class="mt-1.5 text-xs text-red-500">Por favor
+                        seleccione una opción</p>
+                </div>
+
+            </div>
+
+            <!-- Submit error -->
+            <div *ngIf="error()" class="rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-600">
+                {{ error() }}
+            </div>
+
+            <!-- Actions bar -->
+            <div
+                class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm">
+                <p class="text-sm italic text-slate-400">Gracias por su tiempo y colaboración</p>
+                <div class="flex gap-3">
+                    <button type="button"
+                        class="rounded-lg border border-slate-300 bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-200 disabled:opacity-60"
+                        (click)="onCancel()" [disabled]="submitting()">
+                        Cancelar
+                    </button>
+                    <button type="submit"
+                        class="rounded-lg bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-cyan-700 disabled:opacity-60"
+                        [disabled]="submitting() || form.invalid">
+                        <span *ngIf="!submitting()">Guardar y continuar</span>
+                        <span *ngIf="submitting()">Guardando...</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

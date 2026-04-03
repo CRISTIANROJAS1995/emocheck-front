@@ -10,6 +10,9 @@ export interface UserProfileDto {
     documentNumber?: string;
     email: string;
     profilePhotoUrl?: string | null;   // ← nuevo campo v2
+    gender?: string;       // 'M' | 'F' | 'O'
+    dateOfBirth?: string;  // ISO date string
+    hireDate?: string;     // ISO date string
     companyId?: number;
     companyName?: string;
     siteId?: number;
@@ -51,6 +54,9 @@ export class UsersService {
             documentNumber: data.documentNumber ?? undefined,
             email: String(data.email ?? ''),
             profilePhotoUrl: data.profilePhotoUrl ?? null,
+            gender: data.gender ?? undefined,
+            dateOfBirth: data.dateOfBirth ?? undefined,
+            hireDate: data.hireDate ?? undefined,
             companyId: data.companyID ?? data.company?.id ?? data.companyId ?? undefined,
             companyName: data.companyName ?? data.company?.name ?? undefined,
             siteId: data.siteID ?? data.site?.id ?? data.siteId ?? undefined,

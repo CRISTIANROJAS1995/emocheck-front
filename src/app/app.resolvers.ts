@@ -18,7 +18,7 @@ export const initialDataResolver = () => {
         switchMap(() =>
             forkJoin([
                 navigationService.get(),
-                userService.get(),
+                userService.get().pipe(catchError(() => of(null))),
             ])
         )
     );

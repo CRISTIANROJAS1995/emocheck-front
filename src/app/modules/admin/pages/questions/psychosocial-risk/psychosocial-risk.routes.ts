@@ -9,6 +9,10 @@ export default [
         component: PsychosocialRiskComponent,
     },
     {
+        path: 'ficha',
+        loadComponent: () => import('./general-data/general-data.component').then(m => m.GeneralDataComponent),
+    },
+    {
         path: 'instrument-results',
         component: InstrumentResultsComponent,
         data: { moduleId: 'psychosocial-risk' },

@@ -115,7 +115,7 @@ export const appRoutes: Route[] = [
                 path: 'home',
                 canActivate: [RoleGuard],
                 data: {
-                    roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'Employee', 'HSE'],
+                    roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'Employee', 'HSE', 'Psychologist'],
                     seo: { title: 'Mis Evaluaciones', canonical: '/home' }
                 },
                 loadChildren: () => import('app/modules/admin/home/home.routes'),

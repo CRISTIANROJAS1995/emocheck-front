@@ -14,6 +14,7 @@ import { AuthService } from 'app/core/services/auth.service';
 import { PendingClosingService } from 'app/core/services/pending-closing.service';
 import { PsychosocialConsentService, PsychosocialConsentDto, PsychologistInfoDto } from 'app/core/services/psychosocial-consent.service';
 import { UsersService } from 'app/core/services/users.service';
+import { PsychosocialDataSheetService } from 'app/core/services/psychosocial-data-sheet.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { ExamTimerComponent } from 'app/shared/components/ui/exam-timer/exam-timer.component';
 import { EmoQuestionnaireComponent, QuestionnaireConfig } from 'app/shared/components/questionnaire';
@@ -628,6 +629,8 @@ export interface InstrumentCard extends InstrumentDescriptor {
     isConsentCard?: boolean;
     /** Estado del consentimiento psicosocial para mostrar el badge correcto */
     consentStatus?: 'accepted' | 'rejected';
+    /** true si esta tarjeta corresponde a la Ficha de Datos Generales */
+    isFichaCard?: boolean;
 }
 
 @Component({
@@ -763,6 +766,9 @@ export class InstrumentSelectorComponent implements OnInit {
     moduleDef = getAssessmentModuleDefinition('mental-health'); // sobrescrito en ngOnInit
     heroGradient = '';
 
+    /** true si el usuario ya registró su Ficha de Datos Generales para el período actual */
+    dataSheetCompleted = false;
+
     private isSubmitting = false;
 
     /** Devuelve los datos visuales ("vibe") del instrumento pendiente */
@@ -781,6 +787,7 @@ export class InstrumentSelectorComponent implements OnInit {
         private readonly pendingClosing: PendingClosingService,
         private readonly consentService: PsychosocialConsentService,
         private readonly usersService: UsersService,
+        private readonly dataSheetService: PsychosocialDataSheetService,
     ) { }
 
     ngOnInit(): void {
@@ -908,9 +915,11 @@ export class InstrumentSelectorComponent implements OnInit {
                 });
 
                 // For psychosocial-risk, prepend the informed consent card and lock
-                // all other instruments until the consent is accepted
+                // all other instruments until the consent is accepted.
+                // After injecting the consent card, also load + inject the ficha card.
                 if (this.moduleId === 'psychosocial-risk') {
                     this._injectConsentCard();
+                    this._loadAndInjectFichaCard();
                 }
             },
             error: (e) => {
@@ -922,6 +931,12 @@ export class InstrumentSelectorComponent implements OnInit {
     }
 
     selectInstrument(card: InstrumentCard): void {
+        // Ficha card navegates to the dedicated ficha form page
+        if (card.isFichaCard) {
+            this.router.navigate(['/psychosocial-risk/ficha']);
+            return;
+        }
+
         // Consent card is always tappable — routes to the right modal depending on status
         if (card.isConsentCard) {
             if (this.psychosocialConsentStatus === 'rejected') {
@@ -1190,6 +1205,72 @@ export class InstrumentSelectorComponent implements OnInit {
         this.instruments = [consentCard, ...instrumentsWithLock];
     }
 
+    /** Fetches the data sheet status for the current period and injects the data sheet card */
+    private _loadAndInjectFichaCard(): void {
+        const period = this.dataSheetService.getCurrentPeriod();
+        this.dataSheetService.getDataSheet(period).pipe(take(1)).subscribe({
+            next: () => {
+                this.dataSheetCompleted = true;
+                this._injectFichaCard(true);
+            },
+            error: () => {
+                this.dataSheetCompleted = false;
+                this._injectFichaCard(false);
+            },
+        });
+    }
+
+    /** Inserts the General Data Sheet card at position 1 (after consent card) */
+    private _injectFichaCard(dataSheetExists: boolean): void {
+        if (!this.instruments) return;
+        const consentAccepted = this.psychosocialConsentStatus === 'accepted';
+        const dataSheetCard: InstrumentCard = {
+            code: 'FICHA_GENERALES',
+            label: 'Ficha de Datos Generales',
+            backendName: 'Ficha de Datos Generales',
+            backendDescription: dataSheetExists
+                ? 'Ya registraste tu ficha de datos para este período. Puedes editarla si lo necesitas.'
+                : 'Antes de responder los cuestionarios, completa tu ficha de datos personales y ocupacionales.',
+            instrumentId: 0,
+            index: -2,
+            questionCount: 0,
+            icon: 'icons/Icon (44).svg',
+            description: dataSheetExists
+                ? 'Ya registraste tu ficha de datos para este período. Puedes editarla si lo necesitas.'
+                : 'Antes de responder los cuestionarios, completa tu ficha de datos personales y ocupacionales.',
+            color: '#0891b2',
+            completed: dataSheetExists,
+            locked: !consentAccepted,
+            lockReason: !consentAccepted ? 'Acepta el consentimiento informado para continuar' : undefined,
+            isFichaCard: true,
+        };
+
+        // Find consent card index (position 0)
+        const consentIdx = this.instruments.findIndex(c => c.isConsentCard);
+        const insertAt = consentIdx >= 0 ? consentIdx + 1 : 0;
+
+        // Remove existing data sheet card if present (re-injection case)
+        const withoutDataSheet = this.instruments.filter(c => !c.isFichaCard);
+
+        // Lock real instrument cards if consent is accepted but data sheet is not done
+        const updatedInstruments = withoutDataSheet.map((card, idx) => {
+            if (card.isConsentCard) return card;
+            if (!consentAccepted) return card; // already locked by _injectConsentCard
+            if (!dataSheetExists) {
+                return {
+                    ...card,
+                    locked: true,
+                    lockReason: 'Completa la Ficha de Datos Generales para continuar',
+                };
+            }
+            return card;
+        });
+
+        // Insert data sheet card after consent
+        updatedInstruments.splice(insertAt, 0, dataSheetCard);
+        this.instruments = updatedInstruments;
+    }
+
     /** Refreshes the consent card state and the lock state of the other cards in-place */
     private _updateConsentCardState(): void {
         if (!this.instruments) return;
@@ -1211,10 +1292,24 @@ export class InstrumentSelectorComponent implements OnInit {
                             : 'No aceptaste participar. Los cuestionarios permanecen bloqueados.',
                 };
             }
+            if (card.isFichaCard) {
+                return {
+                    ...card,
+                    locked: !consentAccepted,
+                    lockReason: !consentAccepted ? 'Acepta el consentimiento informado para continuar' : undefined,
+                };
+            }
+            // Real instrument cards: locked by consent or ficha status
+            const lockedByConsent = !consentAccepted;
+            const lockedByDataSheet = consentAccepted && !this.dataSheetCompleted;
             return {
                 ...card,
-                locked: !consentAccepted ? true : false,
-                lockReason: !consentAccepted ? 'Acepta el consentimiento informado para continuar' : undefined,
+                locked: lockedByConsent || lockedByDataSheet,
+                lockReason: lockedByConsent
+                    ? 'Acepta el consentimiento informado para continuar'
+                    : lockedByDataSheet
+                        ? 'Completa la Ficha de Datos Generales para continuar'
+                        : undefined,
             };
         });
     }
