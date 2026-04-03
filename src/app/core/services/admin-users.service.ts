@@ -49,9 +49,11 @@ export interface AdminUserListItemDto {
     dailyWorkHours?: number;
     jobSeniority?: number;
     // Datos profesionales del psicólogo
-    postgrado?: string | null;
-    tarjetaProfesional?: string | null;
-    licenciaSaludOcupacional?: string | null;
+    graduateDegree?: string | null;
+    professionalCard?: string | null;
+    occupationalHealthLicense?: string | null;
+    profession?: string | null;
+    occupationalLicenseIssueDate?: string | null;
 }
 
 export interface BulkUploadResult {
@@ -91,9 +93,11 @@ export interface AdminCreateUserRequestDto {
     dailyWorkHours?: number | null;
     jobSeniority?: number | null;
     // Datos profesionales del psicólogo (opcionales)
-    postgrado?: string | null;
-    tarjetaProfesional?: string | null;
-    licenciaSaludOcupacional?: string | null;
+    graduateDegree?: string | null;
+    professionalCard?: string | null;
+    occupationalHealthLicense?: string | null;
+    profession?: string | null;
+    occupationalLicenseIssueDate?: string | null;
 }
 
 export interface AdminCreateUserResponseDto {
@@ -121,9 +125,11 @@ export interface AdminUpdateUserRequestDto {
     dailyWorkHours?: number | null;
     jobSeniority?: number | null;
     // Datos profesionales del psicólogo (opcionales)
-    postgrado?: string | null;
-    tarjetaProfesional?: string | null;
-    licenciaSaludOcupacional?: string | null;
+    graduateDegree?: string | null;
+    professionalCard?: string | null;
+    occupationalHealthLicense?: string | null;
+    profession?: string | null;
+    occupationalLicenseIssueDate?: string | null;
 }
 
 /** Shape returned by the deployed backend (flat fields, no nested objects) */
@@ -163,9 +169,11 @@ interface BackendUserDto {
     dailyWorkHours?: number | null;
     jobSeniority?: number | null;
     // Datos profesionales del psicólogo
-    postgrado?: string | null;
-    tarjetaProfesional?: string | null;
-    licenciaSaludOcupacional?: string | null;
+    graduateDegree?: string | null;
+    professionalCard?: string | null;
+    occupationalHealthLicense?: string | null;
+    profession?: string | null;
+    occupationalLicenseIssueDate?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -210,9 +218,11 @@ export class AdminUsersService {
             contractType: u.contractType ?? undefined,
             dailyWorkHours: u.dailyWorkHours != null ? Number(u.dailyWorkHours) : undefined,
             jobSeniority: u.jobSeniority != null ? Number(u.jobSeniority) : undefined,
-            postgrado: u.postgrado ?? undefined,
-            tarjetaProfesional: u.tarjetaProfesional ?? undefined,
-            licenciaSaludOcupacional: u.licenciaSaludOcupacional ?? undefined,
+            graduateDegree: u.graduateDegree ?? undefined,
+            professionalCard: u.professionalCard ?? undefined,
+            occupationalHealthLicense: u.occupationalHealthLicense ?? undefined,
+            profession: u.profession ?? undefined,
+            occupationalLicenseIssueDate: u.occupationalLicenseIssueDate ?? undefined,
         };
     }
 

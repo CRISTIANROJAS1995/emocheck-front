@@ -717,8 +717,9 @@ export class InstrumentSelectorComponent implements OnInit {
         return this.psychologists.filter(p =>
             p.fullName.toLowerCase().includes(q) ||
             (p.documentNumber ?? '').toLowerCase().includes(q) ||
-            (p.postgrado ?? '').toLowerCase().includes(q) ||
-            (p.tarjetaProfesional ?? '').toLowerCase().includes(q)
+            (p.graduateDegree ?? '').toLowerCase().includes(q) ||
+            (p.professionalCard ?? '').toLowerCase().includes(q) ||
+            (p.profession ?? '').toLowerCase().includes(q)
         );
     }
 
@@ -1543,8 +1544,10 @@ export class InstrumentSelectorComponent implements OnInit {
         addLine(4);
         checkPage(45);
         const psychDocExists = !!(dto.psychologistName && this.selectedPsychologist?.documentNumber);
-        const psychLicExists = !!(dto.psychologistName && this.selectedPsychologist?.tarjetaProfesional);
-        const sigRows = 4 + (dto.psychologistName ? 1 : 0) + (psychDocExists ? 1 : 0) + (psychLicExists ? 1 : 0);
+        const psychLicExists = !!(dto.psychologistName && this.selectedPsychologist?.professionalCard);
+        const psychProfessionExists = !!(dto.psychologistName && this.selectedPsychologist?.profession);
+        const psychLicIssueDateExists = !!(dto.psychologistName && this.selectedPsychologist?.occupationalLicenseIssueDate);
+        const sigRows = 4 + (dto.psychologistName ? 1 : 0) + (psychDocExists ? 1 : 0) + (psychLicExists ? 1 : 0) + (psychProfessionExists ? 1 : 0) + (psychLicIssueDateExists ? 1 : 0);
         const sigHeight = 8 + sigRows * 7 + 4;
         doc.setFillColor(248, 250, 252);
         doc.setDrawColor(226, 232, 240);
@@ -1573,8 +1576,15 @@ export class InstrumentSelectorComponent implements OnInit {
             if (this.selectedPsychologist?.documentNumber) {
                 sigRow('Cédula del evaluador:', `${this.selectedPsychologist.documentType || 'CC'} ${this.selectedPsychologist.documentNumber}`);
             }
-            if (this.selectedPsychologist?.tarjetaProfesional) {
-                sigRow('No. Licencia salud ocup.:', this.selectedPsychologist.tarjetaProfesional);
+            if (this.selectedPsychologist?.professionalCard) {
+                sigRow('No. Licencia salud ocup.:', this.selectedPsychologist.professionalCard);
+            }
+            if (this.selectedPsychologist?.profession) {
+                sigRow('Profesión:', this.selectedPsychologist.profession);
+            }
+            if (this.selectedPsychologist?.occupationalLicenseIssueDate) {
+                const d = new Date(this.selectedPsychologist.occupationalLicenseIssueDate);
+                sigRow('Fecha exp. licencia:', d.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }));
             }
         }
         sigRow('Firma:', 'Firmado digitalmente por el sistema EmoCheck');

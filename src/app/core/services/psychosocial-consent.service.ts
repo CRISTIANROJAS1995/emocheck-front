@@ -24,9 +24,11 @@ export interface PsychologistInfoDto {
     documentType?: string | null;
     documentNumber?: string | null;
     email?: string | null;
-    postgrado?: string | null;
-    tarjetaProfesional?: string | null;
-    licenciaSaludOcupacional?: string | null;
+    graduateDegree?: string | null;
+    professionalCard?: string | null;
+    occupationalHealthLicense?: string | null;
+    profession?: string | null;
+    occupationalLicenseIssueDate?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })

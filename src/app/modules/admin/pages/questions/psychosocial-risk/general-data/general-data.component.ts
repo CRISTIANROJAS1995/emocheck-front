@@ -9,6 +9,7 @@ import {
     DataSheetDto,
 } from 'app/core/services/psychosocial-data-sheet.service';
 import { UsersService } from 'app/core/services/users.service';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-general-data',
@@ -56,94 +57,94 @@ export class GeneralDataComponent implements OnInit {
     private _buildForm(): void {
         this.form = this.fb.group({
             // Q1
-            fechaNacimiento: [null],
+            birthDate: [null, Validators.required],
             // Q3 — display only, not editable
-            sexo: [{ value: '', disabled: true }],
+            sex: [{ value: '', disabled: true }],
 
             // Q4-Q8 — Clarification block (optional)
-            identidadGenero: [null],
-            grupoEtnico: [null],
-            discapacidad: [null],
-            discapacidadDetalle: [null],
-            cuidadorExclusivo: [null],
-            // situacionEspecial handled separately via selectedSituations[]
+            genderIdentity: [null],
+            ethnicGroup: [null],
+            disability: [null],
+            disabilityDetail: [null],
+            exclusiveCaregiver: [null],
+            // specialSituation handled separately via selectedSituations[]
 
             // Q9-Q15 — Sociodemographic (required)
-            estadoCivil: [null, Validators.required],
-            nivelEducacion: [null, Validators.required],
-            profesion: [null],
-            lugarResidenciaCiudad: [null],
-            lugarResidenciaDepartamento: [null],
-            estrato: [null, Validators.required],
-            tipoVivienda: [null, Validators.required],
-            personasACargo: [null, [Validators.required, Validators.min(0), Validators.max(20)]],
+            maritalStatus: [null, Validators.required],
+            educationLevel: [null, Validators.required],
+            profession: [null, Validators.required],
+            residenceCity: [null, Validators.required],
+            residenceState: [null, Validators.required],
+            stratum: [null, Validators.required],
+            housingType: [null, Validators.required],
+            dependents: [null, [Validators.required, Validators.min(0), Validators.max(20)]],
 
             // Q16-Q26 — Occupational
-            lugarTrabajoDepartamento: [null],
-            nombreOficio: [null],
-            tipoCargo: [null, Validators.required],
-            antiguedadCargoTipo: [null, Validators.required],  // 'menosAnio' | 'masAnio'
-            antiguedadCargoAnios: [null],
-            antiguedadOficioTipo: [null],                       // optional, same pattern
-            antiguedadOficioAnios: [null],
-            tipoContrato: [null, Validators.required],
-            tipoSalario: [null],
-            horasLaboralesDiarias: [null, Validators.required],
+            workState: [null, Validators.required],
+            jobRole: [null, Validators.required],
+            positionType: [null, Validators.required],
+            positionSeniorityType: [null, Validators.required],  // 'menosAnio' | 'masAnio'
+            positionSeniorityYears: [null],
+            roleSeniorityType: [null, Validators.required],
+            roleSeniorityYears: [null],
+            contractType: [null, Validators.required],
+            salaryType: [null, Validators.required],
+            dailyWorkHours: [null, Validators.required],
 
             // Q16a, Q17, Q18, Q19 — user-filled
-            ciudadTrabajo: [null],
-            antiguedadTipo: [null, Validators.required],  // 'menosAnio' | 'masAnio'
-            antiguedadAnios: [null],                       // number of years (shown when masAnio)
-            areaNombre: [null],
-            nombreCargo: [null],
+            workCity: [null, Validators.required],
+            companySeniorityType: [null, Validators.required],  // 'menosAnio' | 'masAnio'
+            companySeniorityYears: [null],
+            areaName: [null, Validators.required],
+            jobTitle: [null, Validators.required],
         });
 
         // Clear disability detail when switching away from "Sí"
-        this.form.get('discapacidad')!.valueChanges.subscribe((v) => {
+        this.form.get('disability')!.valueChanges.subscribe((v) => {
             if (v !== 'Sí') {
-                this.form.get('discapacidadDetalle')!.setValue(null);
+                this.form.get('disabilityDetail')!.setValue(null);
             }
         });
 
         // Recalculate age whenever birth date changes
-        this.form.get('fechaNacimiento')!.valueChanges.subscribe((v) => {
+        this.form.get('birthDate')!.valueChanges.subscribe((v) => {
             this.calculatedAge = v ? this._calculateAge(v) : null;
         });
 
-        // Toggle required validator on antiguedadAnios based on selection
-        this.form.get('antiguedadTipo')!.valueChanges.subscribe((tipo) => {
-            const aniosCtrl = this.form.get('antiguedadAnios')!;
+        // Q17 — company seniority
+        this.form.get('companySeniorityType')!.valueChanges.subscribe((tipo) => {
+            const yearsCtrl = this.form.get('companySeniorityYears')!;
             if (tipo === 'masAnio') {
-                aniosCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
+                yearsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
             } else {
-                aniosCtrl.clearValidators();
-                aniosCtrl.setValue(null);
+                yearsCtrl.clearValidators();
+                yearsCtrl.setValue(null);
             }
-            aniosCtrl.updateValueAndValidity();
+            yearsCtrl.updateValueAndValidity();
         });
 
-        // Q22 — cargo seniority
-        this.form.get('antiguedadCargoTipo')!.valueChanges.subscribe((tipo) => {
-            const aniosCtrl = this.form.get('antiguedadCargoAnios')!;
+        // Q22 — position seniority
+        this.form.get('positionSeniorityType')!.valueChanges.subscribe((tipo) => {
+            const yearsCtrl = this.form.get('positionSeniorityYears')!;
             if (tipo === 'masAnio') {
-                aniosCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
+                yearsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
             } else {
-                aniosCtrl.clearValidators();
-                aniosCtrl.setValue(null);
+                yearsCtrl.clearValidators();
+                yearsCtrl.setValue(null);
             }
-            aniosCtrl.updateValueAndValidity();
+            yearsCtrl.updateValueAndValidity();
         });
 
-        // Q23 — oficio seniority
-        this.form.get('antiguedadOficioTipo')!.valueChanges.subscribe((tipo) => {
-            const aniosCtrl = this.form.get('antiguedadOficioAnios')!;
+        // Q23 — role seniority
+        this.form.get('roleSeniorityType')!.valueChanges.subscribe((tipo) => {
+            const yearsCtrl = this.form.get('roleSeniorityYears')!;
             if (tipo === 'masAnio') {
-                aniosCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
+                yearsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
             } else {
-                aniosCtrl.clearValidators();
-                aniosCtrl.setValue(null);
+                yearsCtrl.clearValidators();
+                yearsCtrl.setValue(null);
             }
-            aniosCtrl.updateValueAndValidity();
+            yearsCtrl.updateValueAndValidity();
         });
     }
 
@@ -168,15 +169,15 @@ export class GeneralDataComponent implements OnInit {
     private _loadUserProfile(period: string): void {
         this.usersService.getMyProfile().pipe(take(1)).subscribe({
             next: (profile) => {
-                const sexo = profile.gender === 'M' ? 'Masculino'
+                const sex = profile.gender === 'M' ? 'Masculino'
                     : profile.gender === 'F' ? 'Femenino' : (profile.gender ? 'Otro' : '');
                 const birthDate = profile.dateOfBirth
                     ? new Date(profile.dateOfBirth).toISOString().split('T')[0]
                     : null;
 
                 this.form.patchValue({
-                    sexo,
-                    fechaNacimiento: birthDate,
+                    sex,
+                    birthDate,
                 });
 
                 if (birthDate) {
@@ -205,57 +206,57 @@ export class GeneralDataComponent implements OnInit {
 
     private _patchFromDataSheet(dataSheet: DataSheetDto): void {
         this.form.patchValue({
-            fechaNacimiento: dataSheet.fechaNacimiento ?? null,
-            identidadGenero: dataSheet.identidadGenero ?? null,
-            grupoEtnico: dataSheet.grupoEtnico ?? null,
-            discapacidad: dataSheet.discapacidad ?? null,
-            discapacidadDetalle: dataSheet.discapacidadDetalle ?? null,
-            cuidadorExclusivo: dataSheet.cuidadorExclusivo?.trim() ?? null,
-            estadoCivil: dataSheet.estadoCivil,
-            nivelEducacion: dataSheet.nivelEducacion,
-            profesion: dataSheet.profesion ?? null,
-            lugarResidenciaCiudad: dataSheet.lugarResidenciaCiudad ?? null,
-            lugarResidenciaDepartamento: dataSheet.lugarResidenciaDepartamento ?? null,
-            estrato: dataSheet.estrato,
-            tipoVivienda: dataSheet.tipoVivienda,
-            personasACargo: dataSheet.personasACargo,
-            lugarTrabajoDepartamento: dataSheet.lugarTrabajoDepartamento ?? null,
-            nombreOficio: dataSheet.nombreOficio ?? null,
-            tipoCargo: dataSheet.tipoCargo ?? null,
+            birthDate: dataSheet.fechaNacimiento ?? null,
+            genderIdentity: dataSheet.identidadGenero ?? null,
+            ethnicGroup: dataSheet.grupoEtnico ?? null,
+            disability: dataSheet.discapacidad ?? null,
+            disabilityDetail: dataSheet.discapacidadDetalle ?? null,
+            exclusiveCaregiver: dataSheet.cuidadorExclusivo?.trim() ?? null,
+            maritalStatus: dataSheet.estadoCivil,
+            educationLevel: dataSheet.nivelEducacion,
+            profession: dataSheet.profesion ?? null,
+            residenceCity: dataSheet.lugarResidenciaCiudad ?? null,
+            residenceState: dataSheet.lugarResidenciaDepartamento ?? null,
+            stratum: dataSheet.estrato,
+            housingType: dataSheet.tipoVivienda,
+            dependents: dataSheet.personasACargo,
+            workState: dataSheet.lugarTrabajoDepartamento ?? null,
+            jobRole: dataSheet.nombreOficio ?? null,
+            positionType: dataSheet.tipoCargo ?? null,
         });
 
-        // Restore Q22 cargo seniority
-        const ac = dataSheet.antiguedadCargo;
-        if (ac === 0) {
-            this.form.patchValue({ antiguedadCargoTipo: 'menosAnio', antiguedadCargoAnios: null });
-        } else if (ac) {
-            this.form.patchValue({ antiguedadCargoTipo: 'masAnio', antiguedadCargoAnios: ac });
+        // Restore Q22 position seniority
+        const posSeniority = dataSheet.antiguedadCargo;
+        if (posSeniority === 0) {
+            this.form.patchValue({ positionSeniorityType: 'menosAnio', positionSeniorityYears: null });
+        } else if (posSeniority) {
+            this.form.patchValue({ positionSeniorityType: 'masAnio', positionSeniorityYears: posSeniority });
         }
 
-        // Restore Q23 oficio seniority
-        const ao = dataSheet.antiguedadOficio;
-        if (ao === 0) {
-            this.form.patchValue({ antiguedadOficioTipo: 'menosAnio', antiguedadOficioAnios: null });
-        } else if (ao) {
-            this.form.patchValue({ antiguedadOficioTipo: 'masAnio', antiguedadOficioAnios: ao });
+        // Restore Q23 role seniority
+        const roleSeniority = dataSheet.antiguedadOficio;
+        if (roleSeniority === 0) {
+            this.form.patchValue({ roleSeniorityType: 'menosAnio', roleSeniorityYears: null });
+        } else if (roleSeniority) {
+            this.form.patchValue({ roleSeniorityType: 'masAnio', roleSeniorityYears: roleSeniority });
         }
 
         this.form.patchValue({
-            tipoContrato: dataSheet.tipoContrato,
-            tipoSalario: dataSheet.tipoSalario ?? null,
-            horasLaboralesDiarias: String(dataSheet.horasLaboralesDiarias),
-            ciudadTrabajo: dataSheet.ciudadTrabajo ?? null,
-            areaNombre: dataSheet.areaNombre ?? null,
-            nombreCargo: dataSheet.nombreCargo ?? null,
+            contractType: dataSheet.tipoContrato,
+            salaryType: dataSheet.tipoSalario ?? null,
+            dailyWorkHours: String(dataSheet.horasLaboralesDiarias),
+            workCity: dataSheet.ciudadTrabajo ?? null,
+            areaName: dataSheet.areaNombre ?? null,
+            jobTitle: dataSheet.nombreCargo ?? null,
         });
 
-        // Restore Q17 seniority
-        const ae = dataSheet.antiguedadEmpresa;
-        if (ae !== null && ae !== undefined) {
-            if (ae === 0) {
-                this.form.patchValue({ antiguedadTipo: 'menosAnio', antiguedadAnios: null });
+        // Restore Q17 company seniority
+        const companySeniority = dataSheet.antiguedadEmpresa;
+        if (companySeniority !== null && companySeniority !== undefined) {
+            if (companySeniority === 0) {
+                this.form.patchValue({ companySeniorityType: 'menosAnio', companySeniorityYears: null });
             } else {
-                this.form.patchValue({ antiguedadTipo: 'masAnio', antiguedadAnios: ae });
+                this.form.patchValue({ companySeniorityType: 'masAnio', companySeniorityYears: companySeniority });
             }
         }
 
@@ -303,7 +304,7 @@ export class GeneralDataComponent implements OnInit {
     // ── Detected psychosocial form (A or B) from Q21 ─────────────────────────
 
     get detectedForm(): 'A' | 'B' | null {
-        const jobType = this.form.get('tipoCargo')?.value;
+        const jobType = this.form.get('positionType')?.value;
         if (!jobType) return null;
         return this.JOB_TYPE_FORM_A.includes(jobType) ? 'A' : 'B';
     }
@@ -324,41 +325,53 @@ export class GeneralDataComponent implements OnInit {
 
         const payload = {
             period,
-            fechaNacimiento: v.fechaNacimiento ?? null,
-            identidadGenero: v.identidadGenero ?? null,
-            grupoEtnico: v.grupoEtnico ?? null,
-            discapacidad: v.discapacidad ?? null,
-            discapacidadDetalle: v.discapacidadDetalle ?? null,
-            cuidadorExclusivo: v.cuidadorExclusivo ?? null,
+            // Form controls (English) mapped to backend DTO fields (Spanish contract)
+            fechaNacimiento: v.birthDate ?? null,
+            identidadGenero: v.genderIdentity ?? null,
+            grupoEtnico: v.ethnicGroup ?? null,
+            discapacidad: v.disability ?? null,
+            discapacidadDetalle: v.disabilityDetail ?? null,
+            cuidadorExclusivo: v.exclusiveCaregiver ?? null,
             situacionEspecial: this.selectedSituations.length > 0
                 ? this.selectedSituations.join(',')
                 : null,
-            estadoCivil: v.estadoCivil,
-            nivelEducacion: v.nivelEducacion,
-            profesion: v.profesion ?? null,
-            lugarResidenciaCiudad: v.lugarResidenciaCiudad ?? null,
-            lugarResidenciaDepartamento: v.lugarResidenciaDepartamento ?? null,
-            estrato: v.estrato,
-            tipoVivienda: v.tipoVivienda,
-            personasACargo: Number(v.personasACargo),
-            lugarTrabajoDepartamento: v.lugarTrabajoDepartamento ?? null,
-            nombreOficio: v.nombreOficio ?? null,
-            tipoCargo: v.tipoCargo ?? null,
-            antiguedadCargo: v.antiguedadCargoTipo === 'menosAnio' ? 0 : (v.antiguedadCargoAnios ? Number(v.antiguedadCargoAnios) : null),
-            antiguedadOficio: v.antiguedadOficioTipo === 'menosAnio' ? 0 : (v.antiguedadOficioAnios ? Number(v.antiguedadOficioAnios) : null),
-            tipoContrato: v.tipoContrato,
-            tipoSalario: v.tipoSalario ?? null,
-            horasLaboralesDiarias: Number(v.horasLaboralesDiarias),
-            ciudadTrabajo: v.ciudadTrabajo ?? null,
-            antiguedadEmpresa: v.antiguedadTipo === 'menosAnio' ? 0 : (v.antiguedadAnios ? Number(v.antiguedadAnios) : null),
-            areaNombre: v.areaNombre ?? null,
-            nombreCargo: v.nombreCargo ?? null,
+            estadoCivil: v.maritalStatus,
+            nivelEducacion: v.educationLevel,
+            profesion: v.profession ?? null,
+            lugarResidenciaCiudad: v.residenceCity ?? null,
+            lugarResidenciaDepartamento: v.residenceState ?? null,
+            estrato: v.stratum,
+            tipoVivienda: v.housingType,
+            personasACargo: Number(v.dependents),
+            lugarTrabajoDepartamento: v.workState ?? null,
+            nombreOficio: v.jobRole ?? null,
+            tipoCargo: v.positionType ?? null,
+            antiguedadCargo: v.positionSeniorityType === 'menosAnio' ? 0 : (v.positionSeniorityYears ? Number(v.positionSeniorityYears) : null),
+            antiguedadOficio: v.roleSeniorityType === 'menosAnio' ? 0 : (v.roleSeniorityYears ? Number(v.roleSeniorityYears) : null),
+            tipoContrato: v.contractType,
+            tipoSalario: v.salaryType ?? null,
+            horasLaboralesDiarias: Number(v.dailyWorkHours),
+            ciudadTrabajo: v.workCity ?? null,
+            antiguedadEmpresa: v.companySeniorityType === 'menosAnio' ? 0 : (v.companySeniorityYears ? Number(v.companySeniorityYears) : null),
+            areaNombre: v.areaName ?? null,
+            nombreCargo: v.jobTitle ?? null,
         };
 
         this.dataSheetService.saveDataSheet(payload).pipe(take(1)).subscribe({
             next: () => {
                 this.submitting.set(false);
-                this.router.navigate(['/psychosocial-risk']);
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Ficha guardada exitosamente!',
+                    text: 'Tus datos han sido registrados correctamente. Ya puedes realizar los cuestionarios del módulo de riesgo psicosocial.',
+                    confirmButtonText: 'Ir a cuestionarios',
+                    confirmButtonColor: '#3085d6',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cerrar',
+                    cancelButtonColor: '#6c757d',
+                }).then(() => {
+                    this.router.navigate(['/psychosocial-risk']);
+                });
             },
             error: (e) => {
                 this.submitting.set(false);

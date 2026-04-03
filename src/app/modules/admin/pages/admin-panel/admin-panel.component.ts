@@ -110,10 +110,28 @@ export class AdminPanelComponent implements OnInit {
             contractType: [null],
             dailyWorkHours: [null],
             jobSeniority: [null],
-            // Datos profesionales del psicólogo (opcionales, requeridos en front si rol=Psychologist)
-            postgrado: [null],
-            tarjetaProfesional: [null],
-            licenciaSaludOcupacional: [null],
+            // Psychologist professional data (required only when Psychologist role is selected)
+            graduateDegree: [null],
+            professionalCard: [null],
+            occupationalHealthLicense: [null],
+            profession: [null],
+            occupationalLicenseIssueDate: [null],
+        });
+
+        // Activate/deactivate required validators based on Psychologist role selection (create form)
+        this.createForm.get('roleIDs')!.valueChanges.subscribe((ids: number[]) => {
+            const psychId = this.roleOptions.find(r => r.name.toLowerCase() === 'psychologist')?.id ?? 3;
+            const isPsych = (ids ?? []).includes(psychId);
+            ['graduateDegree', 'professionalCard', 'occupationalHealthLicense', 'profession', 'occupationalLicenseIssueDate'].forEach(field => {
+                const ctrl = this.createForm.get(field)!;
+                if (isPsych) {
+                    ctrl.setValidators(Validators.required);
+                } else {
+                    ctrl.clearValidators();
+                    ctrl.setValue(null);
+                }
+                ctrl.updateValueAndValidity();
+            });
         });
 
         this.editForm = this.fb.group({
@@ -133,9 +151,11 @@ export class AdminPanelComponent implements OnInit {
             dailyWorkHours: [null],
             jobSeniority: [null],
             // Datos profesionales del psicólogo (opcionales)
-            postgrado: [null],
-            tarjetaProfesional: [null],
-            licenciaSaludOcupacional: [null],
+            graduateDegree: [null],
+            professionalCard: [null],
+            occupationalHealthLicense: [null],
+            profession: [null],
+            occupationalLicenseIssueDate: [null],
         });
 
         this.loadUsers();
@@ -295,9 +315,11 @@ export class AdminPanelComponent implements OnInit {
                 contractType: v.contractType || null,
                 dailyWorkHours: toOptionalNum(v.dailyWorkHours),
                 jobSeniority: toOptionalNum(v.jobSeniority),
-                postgrado: v.postgrado?.trim() || null,
-                tarjetaProfesional: v.tarjetaProfesional?.trim() || null,
-                licenciaSaludOcupacional: v.licenciaSaludOcupacional?.trim() || null,
+                graduateDegree: v.graduateDegree?.trim() || null,
+                professionalCard: v.professionalCard?.trim() || null,
+                occupationalHealthLicense: v.occupationalHealthLicense?.trim() || null,
+                profession: v.profession?.trim() || null,
+                occupationalLicenseIssueDate: v.occupationalLicenseIssueDate || null,
             })
             .pipe(finalize(() => (this.saving = false)))
             .subscribe({
@@ -366,9 +388,11 @@ export class AdminPanelComponent implements OnInit {
             contractType: user.contractType ?? null,
             dailyWorkHours: user.dailyWorkHours ?? null,
             jobSeniority: user.jobSeniority ?? null,
-            postgrado: user.postgrado ?? null,
-            tarjetaProfesional: user.tarjetaProfesional ?? null,
-            licenciaSaludOcupacional: user.licenciaSaludOcupacional ?? null,
+            graduateDegree: user.graduateDegree ?? null,
+            professionalCard: user.professionalCard ?? null,
+            occupationalHealthLicense: user.occupationalHealthLicense ?? null,
+            profession: user.profession ?? null,
+            occupationalLicenseIssueDate: user.occupationalLicenseIssueDate ?? null,
         });
         // Inicializar roles actuales del usuario
         this.editRoleIDs = new Set(
@@ -450,9 +474,11 @@ export class AdminPanelComponent implements OnInit {
             contractType: v.contractType || null,
             dailyWorkHours: toOptionalNum(v.dailyWorkHours),
             jobSeniority: toOptionalNum(v.jobSeniority),
-            postgrado: v.postgrado?.trim() || null,
-            tarjetaProfesional: v.tarjetaProfesional?.trim() || null,
-            licenciaSaludOcupacional: v.licenciaSaludOcupacional?.trim() || null,
+            graduateDegree: v.graduateDegree?.trim() || null,
+            professionalCard: v.professionalCard?.trim() || null,
+            occupationalHealthLicense: v.occupationalHealthLicense?.trim() || null,
+            profession: v.profession?.trim() || null,
+            occupationalLicenseIssueDate: v.occupationalLicenseIssueDate || null,
         };
 
         this.adminUsers

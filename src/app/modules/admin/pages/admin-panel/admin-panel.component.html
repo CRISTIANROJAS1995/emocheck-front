@@ -237,31 +237,50 @@
                         <div class="editor-panel__grid">
                             <label class="editor-panel__field">
                                 <span>Postgrado <span class="form-section__required">*</span></span>
-                                <input formControlName="postgrado"
+                                <input formControlName="graduateDegree"
                                     placeholder="Ej: Especialización en Psicología Organizacional"
-                                    [class.editor-panel__field--invalid]="createForm.get('postgrado')?.invalid && createForm.get('postgrado')?.touched" />
-                                @if (createForm.get('postgrado')?.invalid && createForm.get('postgrado')?.touched) {
+                                    [class.editor-panel__field--invalid]="createForm.get('graduateDegree')?.invalid && createForm.get('graduateDegree')?.touched" />
+                                @if (createForm.get('graduateDegree')?.invalid &&
+                                createForm.get('graduateDegree')?.touched) {
                                 <span class="editor-panel__field-error">El postgrado es requerido</span>
                                 }
                             </label>
                             <label class="editor-panel__field">
                                 <span>No. Tarjeta Profesional <span class="form-section__required">*</span></span>
-                                <input formControlName="tarjetaProfesional" placeholder="Ej: T.P. 123456-2024"
-                                    [class.editor-panel__field--invalid]="createForm.get('tarjetaProfesional')?.invalid && createForm.get('tarjetaProfesional')?.touched" />
-                                @if (createForm.get('tarjetaProfesional')?.invalid &&
-                                createForm.get('tarjetaProfesional')?.touched) {
+                                <input formControlName="professionalCard" placeholder="Ej: T.P. 123456-2024"
+                                    [class.editor-panel__field--invalid]="createForm.get('professionalCard')?.invalid && createForm.get('professionalCard')?.touched" />
+                                @if (createForm.get('professionalCard')?.invalid &&
+                                createForm.get('professionalCard')?.touched) {
                                 <span class="editor-panel__field-error">La tarjeta profesional es requerida</span>
                                 }
                             </label>
                             <label class="editor-panel__field">
                                 <span>No. Licencia en Salud Ocupacional <span
                                         class="form-section__required">*</span></span>
-                                <input formControlName="licenciaSaludOcupacional" placeholder="Ej: LSO-456789"
-                                    [class.editor-panel__field--invalid]="createForm.get('licenciaSaludOcupacional')?.invalid && createForm.get('licenciaSaludOcupacional')?.touched" />
-                                @if (createForm.get('licenciaSaludOcupacional')?.invalid &&
-                                createForm.get('licenciaSaludOcupacional')?.touched) {
+                                <input formControlName="occupationalHealthLicense" placeholder="Ej: LSO-456789"
+                                    [class.editor-panel__field--invalid]="createForm.get('occupationalHealthLicense')?.invalid && createForm.get('occupationalHealthLicense')?.touched" />
+                                @if (createForm.get('occupationalHealthLicense')?.invalid &&
+                                createForm.get('occupationalHealthLicense')?.touched) {
                                 <span class="editor-panel__field-error">La licencia en salud ocupacional es
                                     requerida</span>
+                                }
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Profesión <span class="form-section__required">*</span></span>
+                                <input formControlName="profession" placeholder="Ej: Psicólogo/a Organizacional"
+                                    [class.editor-panel__field--invalid]="createForm.get('profession')?.invalid && createForm.get('profession')?.touched" />
+                                @if (createForm.get('profession')?.invalid && createForm.get('profession')?.touched) {
+                                <span class="editor-panel__field-error">La profesión es requerida</span>
+                                }
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Fecha de expedición de la licencia en salud ocupacional <span
+                                        class="form-section__required">*</span></span>
+                                <input type="date" formControlName="occupationalLicenseIssueDate"
+                                    [class.editor-panel__field--invalid]="createForm.get('occupationalLicenseIssueDate')?.invalid && createForm.get('occupationalLicenseIssueDate')?.touched" />
+                                @if (createForm.get('occupationalLicenseIssueDate')?.invalid &&
+                                createForm.get('occupationalLicenseIssueDate')?.touched) {
+                                <span class="editor-panel__field-error">La fecha de expedición es requerida</span>
                                 }
                             </label>
                         </div>
@@ -708,16 +727,25 @@
                         <div class="editor-panel__grid">
                             <label class="editor-panel__field">
                                 <span>Postgrado <span class="form-section__required">*</span></span>
-                                <input formControlName="postgrado"
+                                <input formControlName="graduateDegree"
                                     placeholder="Ej: Especialización en Psicología Organizacional" />
                             </label>
                             <label class="editor-panel__field">
                                 <span>No. Tarjeta Profesional <span class="form-section__required">*</span></span>
-                                <input formControlName="tarjetaProfesional" placeholder="Ej: 123456-T" />
+                                <input formControlName="professionalCard" placeholder="Ej: 123456-T" />
                             </label>
                             <label class="editor-panel__field">
                                 <span>Licencia Salud Ocupacional <span class="form-section__required">*</span></span>
-                                <input formControlName="licenciaSaludOcupacional" placeholder="Ej: LSO-2024-0001" />
+                                <input formControlName="occupationalHealthLicense" placeholder="Ej: LSO-2024-0001" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Profesión <span class="form-section__required">*</span></span>
+                                <input formControlName="profession" placeholder="Ej: Psicólogo/a Organizacional" />
+                            </label>
+                            <label class="editor-panel__field">
+                                <span>Fecha de expedición de la licencia en salud ocupacional <span
+                                        class="form-section__required">*</span></span>
+                                <input type="date" formControlName="occupationalLicenseIssueDate" />
                             </label>
                         </div>
                     </div>

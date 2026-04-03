@@ -471,6 +471,8 @@
                                 <th>Postgrado</th>
                                 <th>No. Tarjeta Prof.</th>
                                 <th>Lic. Salud Ocup.</th>
+                                <th>Profesión</th>
+                                <th>Fecha Exp. Licencia</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -496,9 +498,12 @@
                                     <span class="wm-psych-consent__badge">{{ psych.documentType || 'CC' }}</span>
                                     {{ psych.documentNumber || '—' }}
                                 </td>
-                                <td>{{ psych.postgrado || '—' }}</td>
-                                <td>{{ psych.tarjetaProfesional || '—' }}</td>
-                                <td>{{ psych.licenciaSaludOcupacional || '—' }}</td>
+                                <td>{{ psych.graduateDegree || '—' }}</td>
+                                <td>{{ psych.professionalCard || '—' }}</td>
+                                <td>{{ psych.occupationalHealthLicense || '—' }}</td>
+                                <td>{{ psych.profession || '—' }}</td>
+                                <td>{{ psych.occupationalLicenseIssueDate ? (psych.occupationalLicenseIssueDate |
+                                    date:'dd/MM/yyyy') : '—' }}</td>
                             </tr>
                             }
                         </tbody>
@@ -627,10 +632,22 @@
                             }}</span>
                     </div>
                     }
-                    @if (selectedPsychologist?.tarjetaProfesional) {
+                    @if (selectedPsychologist?.professionalCard) {
                     <div class="wm-psych-consent__signed-field">
                         <span class="wm-psych-consent__signed-label">No. Licencia salud ocup.:</span>
-                        <span>{{ selectedPsychologist?.tarjetaProfesional }}</span>
+                        <span>{{ selectedPsychologist?.professionalCard }}</span>
+                    </div>
+                    }
+                    @if (selectedPsychologist?.profession) {
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Profesión:</span>
+                        <span>{{ selectedPsychologist?.profession }}</span>
+                    </div>
+                    }
+                    @if (selectedPsychologist?.occupationalLicenseIssueDate) {
+                    <div class="wm-psych-consent__signed-field">
+                        <span class="wm-psych-consent__signed-label">Fecha exp. licencia:</span>
+                        <span>{{ selectedPsychologist?.occupationalLicenseIssueDate | date:'dd/MM/yyyy' }}</span>
                     </div>
                     }
                     }
@@ -756,10 +773,22 @@
                         }}</span>
                 </div>
                 }
-                @if (selectedPsychologist?.tarjetaProfesional) {
+                @if (selectedPsychologist?.professionalCard) {
                 <div class="wm-psych-consent__signed-field">
                     <span class="wm-psych-consent__signed-label">No. Licencia salud ocup.:</span>
-                    <span>{{ selectedPsychologist?.tarjetaProfesional }}</span>
+                    <span>{{ selectedPsychologist?.professionalCard }}</span>
+                </div>
+                }
+                @if (selectedPsychologist?.profession) {
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Profesión:</span>
+                    <span>{{ selectedPsychologist?.profession }}</span>
+                </div>
+                }
+                @if (selectedPsychologist?.occupationalLicenseIssueDate) {
+                <div class="wm-psych-consent__signed-field">
+                    <span class="wm-psych-consent__signed-label">Fecha exp. licencia:</span>
+                    <span>{{ selectedPsychologist?.occupationalLicenseIssueDate | date:'dd/MM/yyyy' }}</span>
                 </div>
                 }
                 }
