@@ -79,40 +79,148 @@
             </div>
         </section>
 
-        <!-- State + mini chart -->
+        <!-- Estado actual — Face ID / Análisis emocional -->
         <section class="tracking-state">
             <div class="tracking-state__left">
+
+                <!-- Loading skeleton -->
+                @if (faceIdLoading) {
                 <div class="tracking-state__body">
-                    <div class="tracking-state__bigicon" [ngClass]="'tracking-state__bigicon--' + stateCard.tone">
+                    <div class="tracking-state__bigicon tracking-state__bigicon--unknown">
                         <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
                     </div>
-
                     <div class="tracking-state__score">
                         <div class="tracking-state__headline">
                             <span class="tracking-state__headline-icon" aria-hidden="true"></span>
-                            <span>{{ stateCard.headline }}</span>
+                            <span>Calibración ecomocional</span>
                         </div>
-                        <div class="tracking-state__score-main">
-                            <span class="tracking-state__score-value">{{ stateCard.scoreOutOfTen }}</span>
-                            <mat-icon class="tracking-state__score-up" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+                        <div class="faceid-loading">
+                            <span class="faceid-loading__dot"></span>
+                            <span class="faceid-loading__dot"></span>
+                            <span class="faceid-loading__dot"></span>
                         </div>
-                        <p class="tracking-state__desc">
-                            {{ stateCard.description }}
-                        </p>
+                    </div>
+                </div>
+                }
 
+                <!-- Empty state: no Face ID readings yet -->
+                @if (!faceIdLoading && faceIdTotalReadings === 0) {
+                <div class="tracking-state__body">
+                    <div class="tracking-state__bigicon tracking-state__bigicon--unknown">
+                        <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                    </div>
+                    <div class="tracking-state__score">
+                        <div class="tracking-state__headline">
+                            <span class="tracking-state__headline-icon" aria-hidden="true"></span>
+                            <span>Calibración emocional</span>
+                        </div>
                         <button class="tracking-state__cta" type="button" (click)="goToEmotionalAnalysis()">
                             <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
                             <span>¿Cuéntanos cómo te sientes hoy?</span>
                         </button>
                     </div>
                 </div>
+                }
+
+                <!-- Data state: Face ID readings available — promedio del día más reciente -->
+                @if (!faceIdLoading && faceIdDayAverage) {
+                <div class="tracking-state__body tracking-state__body--faceid">
+                    <!-- Emotion icon -->
+                    <div class="faceid-emotion-icon">
+                        <span class="faceid-emotion-icon__emoji">{{ emotionIcon(faceIdDayAverage.dominantEmotion) }}</span>
+                    </div>
+
+                    <div class="faceid-data">
+                        <div class="tracking-state__headline">
+                            <span class="tracking-state__headline-icon" aria-hidden="true"></span>
+                            <span>Calibración emocional</span>
+                            <span class="tracking-state__score-value">{{ (faceIdAvgScore(faceIdDayAverage) / 10).toFixed(1) }}/10</span>
+                            <mat-icon class="tracking-state__score-up" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+                        </div>
+
+                        <!-- Dominant emotion badge + reading count -->
+                        <div class="faceid-emotion-badge">
+                            <span class="faceid-emotion-badge__label">{{ emotionLabel(faceIdDayAverage.dominantEmotion) }}</span>
+                            <span class="faceid-emotion-badge__sub">
+                                {{ faceIdDayAverage.readingsCount }} lectura{{ faceIdDayAverage.readingsCount === 1 ? '' : 's' }} hoy
+                                &nbsp;·&nbsp;
+                                {{ faceIdTotalReadings }} en 30 días
+                            </span>
+                        </div>
+
+                        <!-- Score indicators (promedio del día más reciente) -->
+                        <div class="faceid-scores">
+                            <div class="faceid-score-row">
+                                <span class="faceid-score-row__label">Atención</span>
+                                <div class="faceid-score-row__bar">
+                                    <div class="faceid-score-row__fill" [style.width.%]="faceIdDayAverage.attention"></div>
+                                </div>
+                                <span class="faceid-score-row__value">{{ faceIdDayAverage.attention }}</span>
+                            </div>
+                            <div class="faceid-score-row">
+                                <span class="faceid-score-row__label">Concentración</span>
+                                <div class="faceid-score-row__bar">
+                                    <div class="faceid-score-row__fill" [style.width.%]="faceIdDayAverage.concentration"></div>
+                                </div>
+                                <span class="faceid-score-row__value">{{ faceIdDayAverage.concentration }}</span>
+                            </div>
+                            <div class="faceid-score-row">
+                                <span class="faceid-score-row__label">Equilibrio</span>
+                                <div class="faceid-score-row__bar">
+                                    <div class="faceid-score-row__fill" [style.width.%]="faceIdDayAverage.balance"></div>
+                                </div>
+                                <span class="faceid-score-row__value">{{ faceIdDayAverage.balance }}</span>
+                            </div>
+                            <div class="faceid-score-row">
+                                <span class="faceid-score-row__label">Positividad</span>
+                                <div class="faceid-score-row__bar">
+                                    <div class="faceid-score-row__fill" [style.width.%]="faceIdDayAverage.positivity"></div>
+                                </div>
+                                <span class="faceid-score-row__value">{{ faceIdDayAverage.positivity }}</span>
+                            </div>
+                            <div class="faceid-score-row">
+                                <span class="faceid-score-row__label">Calma</span>
+                                <div class="faceid-score-row__bar">
+                                    <div class="faceid-score-row__fill" [style.width.%]="faceIdDayAverage.calm"></div>
+                                </div>
+                                <span class="faceid-score-row__value">{{ faceIdDayAverage.calm }}</span>
+                            </div>
+                            <div class="faceid-score-row faceid-score-row--fatigue">
+                                <span class="faceid-score-row__label">Fatiga</span>
+                                <div class="faceid-score-row__bar">
+                                    <div class="faceid-score-row__fill faceid-score-row__fill--fatigue" [style.width.%]="fatiguePercent(faceIdDayAverage.fatigueScore)"></div>
+                                </div>
+                                <span class="faceid-score-row__value">{{ fatiguePercent(faceIdDayAverage.fatigueScore) }}%</span>
+                            </div>
+                        </div>
+
+                        <!-- CTA: scan again -->
+                        <button class="tracking-state__cta tracking-state__cta--small" type="button" (click)="goToEmotionalAnalysis()">
+                            <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                            <span>Nueva calibración emocional</span>
+                        </button>
+                    </div>
+                </div>
+                }
+
             </div>
 
             <div class="tracking-state__right">
                 <p class="tracking-state__chart-title">Seguimiento de tu estado de ánimo (Último mes)</p>
 
-                <apx-chart class="tracking-state__chart" [series]="moodTrackingChart.series" [chart]="moodTrackingChart.chart" [xaxis]="moodTrackingChart.xaxis" [yaxis]="moodTrackingChart.yaxis" [stroke]="moodTrackingChart.stroke" [grid]="moodTrackingChart.grid" [dataLabels]="moodTrackingChart.dataLabels"
-                    [markers]="moodTrackingChart.markers" [tooltip]="moodTrackingChart.tooltip" [colors]="moodTrackingChart.colors"></apx-chart>
+                @if (!faceIdLoading && faceIdTotalReadings > 0) {
+                <apx-chart class="tracking-state__chart" [series]="faceIdChart.series" [chart]="faceIdChart.chart" [xaxis]="faceIdChart.xaxis" [yaxis]="faceIdChart.yaxis" [stroke]="faceIdChart.stroke" [grid]="faceIdChart.grid" [dataLabels]="faceIdChart.dataLabels" [markers]="faceIdChart.markers"
+                    [tooltip]="faceIdChart.tooltip" [colors]="faceIdChart.colors">
+                </apx-chart>
+                <p class="faceid-chart-hint">
+                    <mat-icon class="faceid-chart-hint__icon" svgIcon="heroicons_outline:cursor-arrow-rays"></mat-icon>
+                    Pasa el mouse sobre cada punto para ver el detalle de las lecturas de ese día.
+                </p>
+                } @else if (!faceIdLoading) {
+                <div class="faceid-chart-empty">
+                    <p class="faceid-chart-empty__text">Realiza tu primer análisis facial para ver tu evolución aquí.</p>
+                </div>
+                }
             </div>
         </section>
 
@@ -139,16 +247,13 @@
                         <div class="module-row__top">
                             <div class="module-row__name">{{ m.title }}</div>
                             <div class="module-row__right">
-                                @if (m.isCompleted && m.percent > 0) { @if (m.badgeLabel) {
-                                <span class="module-row__badge" [ngClass]="'module-row__badge--' + m.badgeTone">{{
-                                    m.badgeLabel }}</span> }
-                                <span class="module-row__pct" [ngClass]="'module-row__pct--' + m.tone">{{ m.percent
-                                    }}%</span> }
+                                @if (m.isCompleted) {
+                                <span class="module-row__pct" [ngClass]="'module-row__pct--' + m.tone">100%</span> }
                             </div>
                         </div>
                         <div class="module-row__bar">
-                            @if (m.isCompleted && m.percent > 0) {
-                            <div class="module-row__bar-fill" [ngClass]="'module-row__bar-fill--' + m.tone" [style.width.%]="m.percent"></div>
+                            @if (m.isCompleted) {
+                            <div class="module-row__bar-fill" [ngClass]="'module-row__bar-fill--' + m.tone" style="width:100%"></div>
                             }
                         </div>
 
@@ -159,58 +264,20 @@
             </div>
         </section>
 
-        <!-- Small stats cards -->
-        <section class="tracking-stats">
-            <div class="stat-card stat-card--teal">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (42).svg" alt="" aria-hidden="true" /></div>
-                <div class="stat-card__value">{{ stats.completedCount }}/4</div>
-                <div class="stat-card__label">
-                    Módulos completados<br /> @if (stats.pendingCount === 0) {
-                    <span class="stat-card__label-all">¡Todos completos!</span> } @else {
-                    <span class="stat-card__label-all">{{ stats.pendingCount }} {{ stats.pendingCount === 1 ?
-                        'pendiente' : 'pendientes' }}</span> }
-                </div>
-                <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:calendar"></mat-icon>
-            </div>
-
-            <div class="stat-card stat-card--blue">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (43).svg" alt="" aria-hidden="true" /></div>
-                <div class="stat-card__value">{{ stats.averageWellbeingPercent }}%</div>
-                <div class="stat-card__label">Bienestar promedio<br /><span class="stat-card__label-accent">Tu
-                        puntuación general</span></div>
-                <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
-            </div>
-
-            <div class="stat-card stat-card--lime">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (44).svg" alt="" aria-hidden="true" /></div>
-                <div class="stat-card__value">{{ vsPromedioLabel }}</div>
-                <div class="stat-card__label">Comparación organizacional<br /><span class="stat-card__label-accent">{{ vsPromedioSubtitle }}</span></div>
-            </div>
-
-            <div class="stat-card stat-card--purple">
-                <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (45).svg" alt="" aria-hidden="true" /></div>
-                <div class="stat-card__value">{{ memberSinceLabel }}</div>
-                <div class="stat-card__label">Tiempo en EmoCheck<br /><span class="stat-card__label-accent">Mejora
-                        sostenida</span></div>
-                <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
-            </div>
-        </section>
-
-
-        <!-- Evolution + radar comparison -->
+        <!-- Evolution chart + stats side by side -->
         <section class="tracking-charts">
             <div class="chart-card">
                 <div class="chart-card__title">Mi Evolución en el Tiempo</div>
                 <div class="chart-card__subtitle">Progreso de tus puntajes en los últimos 6 meses</div>
                 @if (hasChartData) {
-                <apx-chart [series]="moodTrackingChart.series" [chart]="moodTrackingChart.chart" [colors]="moodTrackingChart.colors" [stroke]="moodTrackingChart.stroke" [dataLabels]="moodTrackingChart.dataLabels" [markers]="moodTrackingChart.markers" [grid]="moodTrackingChart.grid"
-                    [xaxis]="moodTrackingChart.xaxis" [yaxis]="moodTrackingChart.yaxis" [tooltip]="moodTrackingChart.tooltip">
+                <apx-chart [series]="moodTrackingChart.series" [chart]="moodTrackingChart.chart" [colors]="moodTrackingChart.colors" [stroke]="moodTrackingChart.stroke" [plotOptions]="moodTrackingChart.plotOptions" [dataLabels]="moodTrackingChart.dataLabels" [markers]="moodTrackingChart.markers"
+                    [grid]="moodTrackingChart.grid" [xaxis]="moodTrackingChart.xaxis" [yaxis]="moodTrackingChart.yaxis" [tooltip]="moodTrackingChart.tooltip">
                 </apx-chart>
                 <div class="chart-card__legend">
-                    <span class="lg-item lg-item--teal">Clima Org.</span>
-                    <span class="lg-item lg-item--lime">Fatiga Laboral</span>
-                    <span class="lg-item lg-item--orange">Riesgo Psico.</span>
                     <span class="lg-item lg-item--purple">Salud Mental</span>
+                    <span class="lg-item lg-item--lime">Fatiga Laboral</span>
+                    <span class="lg-item lg-item--teal">Clima Org.</span>
+                    <span class="lg-item lg-item--orange">Psicosocial</span>
                 </div>
                 } @else if (!loading) {
                 <div class="chart-empty">
@@ -219,12 +286,40 @@
                 }
             </div>
 
+            <!-- Stats column -->
+            <div class="tracking-stats mt-15">
+                <div class="stat-card stat-card--teal">
+                    <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (42).svg" alt="" aria-hidden="true" /></div>
+                    <div class="stat-card__value">{{ stats.completedCount }}/4</div>
+                    <div class="stat-card__label">
+                        Módulos completados<br /> @if (stats.pendingCount === 0) {
+                        <span class="stat-card__label-all">¡Todos completos!</span> } @else {
+                        <span class="stat-card__label-all">{{ stats.pendingCount }} {{ stats.pendingCount === 1 ? 'pendiente' : 'pendientes' }}</span> }
+                    </div>
+                    <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:calendar"></mat-icon>
+                </div>
+                <!-- 
+                <div class="stat-card stat-card--blue">
+                    <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (43).svg" alt="" aria-hidden="true" /></div>
+                    <div class="stat-card__value">{{ stats.averageWellbeingPercent }}%</div>
+                    <div class="stat-card__label">Bienestar promedio<br /><span class="stat-card__label-accent">Tu puntuación general</span></div>
+                    <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+                </div> -->
+
+                <div class="stat-card stat-card--purple">
+                    <div class="stat-card__icon"><img class="stat-card__icon-img" src="icons/Icon (45).svg" alt="" aria-hidden="true" /></div>
+                    <div class="stat-card__value">{{ memberSinceLabel }}</div>
+                    <div class="stat-card__label">Tiempo en EmoCheck<br /><span class="stat-card__label-accent">Mejora sostenida</span></div>
+                    <mat-icon class="stat-card__corner" svgIcon="heroicons_outline:arrow-trending-up"></mat-icon>
+                </div>
+            </div>
+            <!-- 
             <div class="chart-card">
                 <div class="chart-card__title">Comparación con Promedio Organizacional</div>
                 <div class="chart-card__subtitle">Tu desempeño vs. promedio de la organización</div>
                 <apx-chart [series]="radarComparisonChart.series" [chart]="radarComparisonChart.chart" [xaxis]="radarComparisonChart.xaxis" [yaxis]="radarComparisonChart.yaxis" [stroke]="radarComparisonChart.stroke" [fill]="radarComparisonChart.fill" [markers]="radarComparisonChart.markers"
                     [dataLabels]="radarComparisonChart.dataLabels" [tooltip]="radarComparisonChart.tooltip" [colors]="radarComparisonChart.colors" [legend]="radarComparisonChart.legend" [plotOptions]="radarComparisonChart.plotOptions"></apx-chart>
-            </div>
+            </div> -->
         </section>
 
         <!-- Follow-ups -->
@@ -281,76 +376,103 @@
 
         <!-- Detailed modules (only completed) -->
         @if (moduleDetailCards.length > 0) {
+        <div class="tracking-detail-intro">
+            <div class="tracking-detail-intro__title">Resultados Detallados por Módulo</div>
+            <div class="tracking-detail-intro__subtitle">Cada módulo puede incluir uno o más instrumentos de medición. Los hallazgos se agrupan por instrumento para que puedas identificar fácilmente a qué área corresponde cada resultado.</div>
+        </div>
         <section class="tracking-detail-list">
             @for (card of moduleDetailCards; track card.moduleId) {
             <div class="tracking-detail" [ngClass]="'tracking-detail--' + card.moduleId">
+
+                <!-- Module header bar -->
                 <div class="tracking-detail__head">
-                    <div class="tracking-detail__title">
-                        <img class="tracking-detail__module-icon" [src]="moduleIcon(card.moduleId)" alt="" aria-hidden="true" />
-                        <span>{{ card.title }}</span>
+                    <div class="tracking-detail__head-left">
+                        <div class="tracking-detail__icon-wrap">
+                            <img class="tracking-detail__module-icon" [src]="moduleIcon(card.moduleId)" alt="" aria-hidden="true" />
+                        </div>
+                        <div>
+                            <div class="tracking-detail__title">{{ card.title }}</div>
+                            <div class="tracking-detail__meta">Completado el {{ card.completedAtLabel }}</div>
+                        </div>
                     </div>
-                    <div class="tracking-detail__meta">Evaluación completada el {{ card.completedAtLabel }}</div>
+                    <div class="tracking-detail__head-pill">
+                        <span class="td-pill td-pill--done">
+                            <mat-icon svgIcon="heroicons_outline:check-circle" class="td-pill__icon"></mat-icon>
+                            Completado
+                        </span>
+                        <button class="td-detail-btn" (click)="openModuleResults(card.moduleId)">
+                            Ver resultados
+                            <mat-icon svgIcon="heroicons_outline:arrow-right" class="td-detail-btn__icon"></mat-icon>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="tracking-detail__card">
-                    <div class="tracking-detail__progress">
-                        <div class="tracking-detail__progress-title">Progreso de Evaluación</div>
-                        <div class="tracking-detail__progress-grid">
-                            <div class="pd-item">
-                                <div class="pd-item__value pd-item__value--module">{{ card.progress.answered }}</div>
-                                <div class="pd-item__label">Preguntas respondidas</div>
-                            </div>
-                            <div class="pd-item">
-                                <div class="pd-item__value">{{ card.progress.missing }}</div>
-                                <div class="pd-item__label">Preguntas faltantes</div>
-                            </div>
-                            <div class="pd-item pd-item--right">
-                                <div class="pd-item__value pd-item__value--green">{{ card.progress.progressPercent }}%
-                                </div>
-                                <div class="pd-item__label">Avance total</div>
-                            </div>
-                            <div class="pd-pill">{{ card.progress.completedLabel }}</div>
+                <!-- Findings section -->
+                <div class="tracking-detail__findings-wrap">
+                    <div class="tracking-detail__findings-header">
+                        <mat-icon svgIcon="heroicons_outline:information-circle" class="tracking-detail__findings-icon"></mat-icon>
+                        <div class="tracking-detail__findings-header-text">
+                            <span class="tracking-detail__findings-title">Hallazgos por Instrumento</span>
+                            <span class="tracking-detail__findings-note">Los valores (%) representan el puntaje obtenido en cada dimensión de la prueba, escalado sobre 100.</span>
                         </div>
                     </div>
 
-                    <div class="tracking-detail__section-title">
-                        <mat-icon svgIcon="heroicons_outline:information-circle"></mat-icon>
-                        <span>Hallazgos</span>
-                    </div>
-
+                    @if ((card.findingGroups ?? []).length === 0) {
+                    <div class="tracking-empty">No hay hallazgos disponibles para este resultado.</div>
+                    } @else {
                     <div class="tracking-findings">
-                        @for (f of card.findings; track f.label) {
-                        <div class="finding-row" [ngClass]="'finding-row--' + f.tone">
-                            <div class="finding-row__top">
-                                <span class="finding-row__label">{{ f.label }}</span>
-                                <span class="finding-row__badge">{{ f.badge }}</span>
-                                <span class="finding-row__pct">{{ f.value }}%</span>
+                        @for (group of card.findingGroups; track group.instrumentName; let gi = $index) {
+                        <div class="finding-group-block" [style.border-color]="instrumentGroupColor(gi).border">
+                            @if (group.instrumentName) {
+                            <div class="finding-group-block__header" [style.background]="instrumentGroupColor(gi).bg" [style.border-bottom-color]="instrumentGroupColor(gi).border">
+                                <span class="finding-group-block__code" [style.color]="instrumentGroupColor(gi).color">{{ group.instrumentName }}</span>
                             </div>
-                            <div class="finding-row__bar">
-                                <div class="finding-row__bar-fill" [style.width.%]="f.value"></div>
+                            } @if (group.questionCount) {
+                            <div class="fgb-stats-mini">
+                                <div class="fgb-stat-mini">
+                                    <div class="fgb-stat-mini__val" [style.color]="instrumentGroupColor(gi).color">{{ group.questionCount }}</div>
+                                    <div class="fgb-stat-mini__lbl">Preguntas<br>respondidas</div>
+                                </div>
+                                <div class="fgb-stat-mini__sep"></div>
+                                <div class="fgb-stat-mini">
+                                    <div class="fgb-stat-mini__val">0</div>
+                                    <div class="fgb-stat-mini__lbl">Preguntas<br>faltantes</div>
+                                </div>
+                                <div class="fgb-stat-mini__sep"></div>
+                                <div class="fgb-stat-mini">
+                                    <div class="fgb-stat-mini__val fgb-stat-mini__val--green">100%</div>
+                                    <div class="fgb-stat-mini__lbl">Avance<br>total</div>
+                                </div>
+                            </div>
+                            }
+                            <div class="finding-group-block__items">
+                                @for (f of group.items; track f.label) {
+                                <div class="finding-row">
+                                    <div class="finding-row__top">
+                                        <span class="finding-row__label">{{ f.label }}</span>
+                                        <div class="finding-row__right">
+                                            @if (f.score > 0 && f.maxScore > 0) {
+                                            <span class="finding-row__score" [style.color]="instrumentGroupColor(gi).color">
+                                                {{ f.score }}<span class="finding-row__score-sep">/{{ f.maxScore }}</span>
+                                            </span>
+                                            } @else {
+                                            <span class="finding-row__pct" [style.color]="instrumentGroupColor(gi).color">{{ f.value }}<span class="finding-row__pct-unit">%</span></span>
+                                            }
+                                            <span class="finding-row__score-note">{{ f.score > 0 && f.maxScore > 0 ? f.value + '% de la prueba' : 'Puntaje de la prueba' }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="finding-row__bar">
+                                        <div class="finding-row__bar-fill" [style.width.%]="f.value" [style.background]="instrumentGroupColor(gi).color" [style.opacity]="'0.75'"></div>
+                                    </div>
+                                </div>
+                                }
                             </div>
                         </div>
-                        } @if ((card.findings ?? []).length === 0) {
-                        <div class="tracking-empty">No hay hallazgos disponibles para este resultado.</div>
                         }
                     </div>
-
-                    <div class="tracking-detail__section-title">
-                        <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
-                        <span>Recomendaciones</span>
-                    </div>
-
-                    <div class="tracking-recs">
-                        @for (r of card.recommendations; track r) {
-                        <div class="rec-item">
-                            <span class="rec-item__dot"></span>
-                            <span class="rec-item__text">{{ r }}</span>
-                        </div>
-                        } @if ((card.recommendations ?? []).length === 0) {
-                        <div class="tracking-empty">No hay recomendaciones disponibles para este resultado.</div>
-                        }
-                    </div>
+                    }
                 </div>
+
             </div>
             }
         </section>
@@ -360,25 +482,35 @@
         <section class="tracking-personal">
             <div class="tracking-personal__inner">
                 <div class="tracking-personal__head">
-                    <div class="tracking-personal__title">
-                        <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
-                        <span>Recomendaciones Personalizadas para Ti</span>
+                    <div class="tracking-personal__head-left">
+                        <div class="tracking-personal__title-icon">
+                            <mat-icon svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                        </div>
+                        <div>
+                            <div class="tracking-personal__title">Recomendaciones Personalizadas</div>
+                            <div class="tracking-personal__subtitle">Basadas en tus resultados actuales</div>
+                        </div>
                     </div>
-                    <div class="tracking-personal__subtitle">Basadas en tus resultados actuales</div>
                 </div>
 
                 <div class="tracking-personal__list">
-                    @for (p of personalizedCards; track p.moduleId) {
+                    @for (p of personalizedCards; track p.moduleId; let i = $index) {
                     <div class="personal-card" [ngClass]="'personal-card--' + p.moduleId">
-                        <div class="personal-card__header">
-                            <div class="personal-card__icon">
-                                <img class="personal-card__icon-img" [src]="moduleIcon(p.moduleId)" alt="" aria-hidden="true" />
+                        <div class="personal-card__accent"></div>
+                        <div class="personal-card__content">
+                            <div class="personal-card__header">
+                                <div class="personal-card__icon">
+                                    <img class="personal-card__icon-img" [src]="moduleIcon(p.moduleId)" alt="" aria-hidden="true" />
+                                </div>
+                                <div class="personal-card__meta">
+                                    <span class="personal-card__num">{{ i + 1 }}</span>
+                                    <span class="personal-card__title">{{ p.title }}</span>
+                                </div>
                             </div>
-                            <div class="personal-card__title">{{ p.title }}</div>
-                        </div>
-                        <div class="personal-card__body">
-                            <div class="personal-card__text">{{ p.text }}</div>
-                            <button class="personal-card__btn" mat-button (click)="openPersonalizedAction(p.moduleId)">{{ p.buttonLabel }}</button>
+                            <div class="personal-card__body">
+                                <p class="personal-card__text">{{ p.text }}</p>
+                                <button class="personal-card__btn" mat-button (click)="openPersonalizedAction(p.moduleId)">{{ p.buttonLabel }}</button>
+                            </div>
                         </div>
                     </div>
                     }
@@ -386,7 +518,7 @@
             </div>
         </section>
 
-        <div class="tracking-personal__footer">
+        <!-- <div class="tracking-personal__footer">
             <button class="footer-btn footer-btn--teal" mat-button (click)="exportReport()">
                 <span class="footer-btn__content">
                     <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
@@ -405,6 +537,6 @@
                     <span class="footer-btn__text">Contactar Apoyo Profesional</span>
                 </span>
             </button>
-        </div>
+        </div> -->
     </div>
 </div>
