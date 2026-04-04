@@ -770,6 +770,9 @@ export class InstrumentSelectorComponent implements OnInit {
     /** true si el usuario ya registró su Ficha de Datos Generales para el período actual */
     dataSheetCompleted = false;
 
+    /** 'A' | 'B' según la Q21 de la ficha guardada; null si aún no hay ficha */
+    psychosocialForm: 'A' | 'B' | null = null;
+
     private isSubmitting = false;
 
     /** Devuelve los datos visuales ("vibe") del instrumento pendiente */
@@ -1210,12 +1213,15 @@ export class InstrumentSelectorComponent implements OnInit {
     private _loadAndInjectFichaCard(): void {
         const period = this.dataSheetService.getCurrentPeriod();
         this.dataSheetService.getDataSheet(period).pipe(take(1)).subscribe({
-            next: () => {
+            next: (dataSheet) => {
                 this.dataSheetCompleted = true;
+                const forma = dataSheet?.psicosocialForma?.toUpperCase();
+                this.psychosocialForm = forma === 'A' ? 'A' : forma === 'B' ? 'B' : null;
                 this._injectFichaCard(true);
             },
             error: () => {
                 this.dataSheetCompleted = false;
+                this.psychosocialForm = null;
                 this._injectFichaCard(false);
             },
         });
@@ -1251,7 +1257,17 @@ export class InstrumentSelectorComponent implements OnInit {
         const insertAt = consentIdx >= 0 ? consentIdx + 1 : 0;
 
         // Remove existing data sheet card if present (re-injection case)
-        const withoutDataSheet = this.instruments.filter(c => !c.isFichaCard);
+        // Also hide the INTRA form that does NOT correspond to the saved data sheet:
+        //   psicosocialForma = 'A' → hide INTRA_B
+        //   psicosocialForma = 'B' → hide INTRA_A
+        //   null (no data sheet yet) → show both so the user sees what awaits
+        const formToHide = this.psychosocialForm === 'A' ? 'INTRA_B'
+            : this.psychosocialForm === 'B' ? 'INTRA_A'
+                : null;
+
+        const withoutDataSheet = this.instruments.filter(
+            c => !c.isFichaCard && !(formToHide && c.code === formToHide)
+        );
 
         // Lock real instrument cards if consent is accepted but data sheet is not done
         const updatedInstruments = withoutDataSheet.map((card, idx) => {

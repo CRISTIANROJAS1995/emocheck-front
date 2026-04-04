@@ -51,7 +51,8 @@
         @if (!isLoading && cards.length > 0) {
         <div class="ir-grid">
             @for (card of cards; track card.code) {
-            <button class="ir-card" [class.ir-card--completed]="card.completed" [class.ir-card--locked]="!card.completed" [disabled]="!card.completed" (click)="openResult(card)" type="button">
+            <button class="ir-card" [class.ir-card--completed]="card.completed"
+                [class.ir-card--pending]="!card.completed" (click)="openResult(card)" type="button">
 
                 <span class="ir-card__bar" [style.background]="card.color"></span>
 
@@ -81,8 +82,16 @@
                 @if (card.completed) {
                 <span class="ir-card__view-btn">
                     Ver resultados
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </span>
+                } @else {
+                <span class="ir-card__view-btn">
+                    Completar
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </span>

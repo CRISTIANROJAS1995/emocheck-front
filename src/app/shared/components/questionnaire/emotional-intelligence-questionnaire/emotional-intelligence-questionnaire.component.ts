@@ -20,7 +20,7 @@ interface EmotionalIntelligenceQuestion {
 @Component({
   selector: 'app-emotional-intelligence-questionnaire',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ExamTimerComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="questionnaire-page">
       <div class="blur-circle blur-circle--green-top-right"></div>
@@ -43,7 +43,6 @@ interface EmotionalIntelligenceQuestion {
                   <div class="header-subtitle">Pregunta {{ currentQuestionIndex() + 1 }} de {{ questions.length }}</div>
                 </div>
               </div>
-              <app-exam-timer storageKey="exam-timer:emotional-intelligence" (timeUp)="onTimeUp()"></app-exam-timer>
             </div>
             <div class="progress-wrap">
               <div class="progress-track">
@@ -112,7 +111,7 @@ interface EmotionalIntelligenceQuestion {
   styleUrl: './emotional-intelligence-questionnaire.component.scss'
 })
 export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
-  
+
   form: FormGroup;
   currentQuestionIndex = signal(0);
   isCompleted = signal(false);
@@ -120,7 +119,7 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
 
   private backendQuestions: AssessmentQuestion[] = [];
   private tmmsInstrumentId: number | undefined;
-  
+
   readonly likertOptions = [
     { value: 1, label: 'Nada de acuerdo' },
     { value: 2, label: 'Algo de acuerdo' },
@@ -128,7 +127,7 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
     { value: 4, label: 'Muy de acuerdo' },
     { value: 5, label: 'Totalmente de acuerdo' }
   ];
-  
+
   readonly questions: EmotionalIntelligenceQuestion[] = [
     // Atención a los sentimientos (1-8)
     { id: 'q1', text: 'Presto mucha atención a los sentimientos.', category: 'attention' },
@@ -139,7 +138,7 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
     { id: 'q6', text: 'Pienso en mi estado de ánimo constantemente.', category: 'attention' },
     { id: 'q7', text: 'A menudo pienso en mis sentimientos.', category: 'attention' },
     { id: 'q8', text: 'Presto mucha atención a cómo me siento.', category: 'attention' },
-    
+
     // Claridad emocional (9-16)
     { id: 'q9', text: 'Tengo claros mis sentimientos.', category: 'clarity' },
     { id: 'q10', text: 'Frecuentemente puedo definir mis sentimientos.', category: 'clarity' },
@@ -149,7 +148,7 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
     { id: 'q14', text: 'Siempre puedo decir cómo me siento.', category: 'clarity' },
     { id: 'q15', text: 'A veces puedo decir cuáles son mis emociones.', category: 'clarity' },
     { id: 'q16', text: 'Puedo llegar a comprender mis sentimientos.', category: 'clarity' },
-    
+
     // Reparación de las emociones (17-24)
     { id: 'q17', text: 'Aunque a veces me siento triste, suelo tener una visión optimista.', category: 'repair' },
     { id: 'q18', text: 'Aunque me sienta mal, procuro pensar en cosas agradables.', category: 'repair' },
@@ -215,7 +214,7 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
   isCurrentQuestionValid(): boolean {
     const currentQ = this.currentQuestion();
     if (!currentQ) return false;
-    
+
     const control = this.form.get(currentQ.id);
     return control ? control.valid : false;
   }
@@ -330,25 +329,25 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
 
   private calculateScores() {
     const formValues = this.form.value;
-    
+
     // Calculate scores for each dimension
     const attentionQuestions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8'];
     const clarityQuestions = ['q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16'];
     const repairQuestions = ['q17', 'q18', 'q19', 'q20', 'q21', 'q22', 'q23', 'q24'];
-    
+
     const attentionScore = attentionQuestions.reduce((sum, q) => sum + (formValues[q] || 0), 0);
     const clarityScore = clarityQuestions.reduce((sum, q) => sum + (formValues[q] || 0), 0);
     const repairScore = repairQuestions.reduce((sum, q) => sum + (formValues[q] || 0), 0);
-    
+
     return { attentionScore, clarityScore, repairScore };
   }
 
   getResultClass(dimension: string): string {
     const scores = this.calculateScores();
-    
+
     let score = 0;
     let threshold = 0;
-    
+
     switch (dimension) {
       case 'attention':
         score = scores.attentionScore;
@@ -363,16 +362,16 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
         threshold = 24; // Midpoint for 8 questions * 1-5 scale
         break;
     }
-    
+
     return score >= threshold ? 'ei-result--positive' : 'ei-result--negative';
   }
 
   getResultLabel(dimension: string): string {
     const scores = this.calculateScores();
-    
+
     let score = 0;
     let threshold = 24;
-    
+
     switch (dimension) {
       case 'attention':
         score = scores.attentionScore;
@@ -384,7 +383,7 @@ export class EmotionalIntelligenceQuestionnaireComponent implements OnInit {
         score = scores.repairScore;
         break;
     }
-    
+
     return score >= threshold ? 'Adecuada' : 'Debe mejorar';
   }
 

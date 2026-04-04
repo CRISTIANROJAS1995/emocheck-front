@@ -29,7 +29,7 @@ interface SleepQuestion {
 @Component({
   selector: 'app-sleep-questionnaire',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ExamTimerComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="questionnaire-page">
       <div class="blur-circle blur-circle--green-top-right"></div>
@@ -52,7 +52,6 @@ interface SleepQuestion {
                   <div class="header-subtitle">Pregunta {{ currentQuestionIndex() + 1 }} de {{ totalQuestions }}</div>
                 </div>
               </div>
-              <app-exam-timer storageKey="exam-timer:sleep-questionnaire" (timeUp)="onTimeUp()"></app-exam-timer>
             </div>
             <div class="progress-wrap">
               <div class="progress-track">
@@ -185,7 +184,7 @@ interface SleepQuestion {
   styleUrl: './sleep-questionnaire.component.scss'
 })
 export class SleepQuestionnaireComponent implements OnInit {
-  
+
   form: FormGroup;
   currentQuestionIndex = signal(0);
   isCompleted = signal(false);
@@ -196,9 +195,9 @@ export class SleepQuestionnaireComponent implements OnInit {
   private backendQuestions: AssessmentQuestion[] = [];
   /** ICSP_VC instrumentId from backend — passed to submitRich for per-instrument tracking */
   private icspInstrumentId: number | undefined;
-  
+
   readonly totalQuestions = 11; // 10 base steps + partner matrix (conditional)
-  
+
   private readonly questions: SleepQuestion[] = [
     {
       id: 'bedtime',
@@ -335,7 +334,7 @@ export class SleepQuestionnaireComponent implements OnInit {
     }
   ];
 
-  readonly timeOptions = Array.from({length: 24}, (_, i) => ({
+  readonly timeOptions = Array.from({ length: 24 }, (_, i) => ({
     value: `${i.toString().padStart(2, '0')}:00`,
     label: `${i.toString().padStart(2, '0')}:00`
   }));
@@ -636,7 +635,7 @@ export class SleepQuestionnaireComponent implements OnInit {
 
   showResults() {
     // Navigate to specialized results with sleep context
-    this.router.navigate(['/mental-health/specialized-results'], { 
+    this.router.navigate(['/mental-health/specialized-results'], {
       queryParams: { instrument: 'sleep' }
     });
   }

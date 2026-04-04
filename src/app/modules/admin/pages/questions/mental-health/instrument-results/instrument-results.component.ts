@@ -5,28 +5,29 @@ import { AssessmentModuleId } from 'app/core/models/assessment.model';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
 import { AssessmentService, InstrumentDescriptor } from 'app/core/services/assessment.service';
+import { PsychosocialDataSheetService } from 'app/core/services/psychosocial-data-sheet.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 
 const INSTRUMENT_META: Record<string, { icon: string; description: string; color: string }> = {
     // Salud Mental
-    GAD7:    { icon: 'icons/Icon (37).svg', description: 'Trastorno de Ansiedad Generalizada',        color: '#3b82f6' },
-    PHQ9:    { icon: 'icons/Icon (28).svg', description: 'Cuestionario de Salud del Paciente',        color: '#8b5cf6' },
-    ISI:     { icon: 'icons/Icon (29).svg', description: 'Índice de Severidad del Insomnio',          color: '#06b6d4' },
-    PSS4:    { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido',                color: '#f59e0b' },
-    PSS10:   { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido (Completa)',     color: '#f59e0b' },
-    DASS21:  { icon: 'icons/Icon (37).svg', description: 'Escala de Depresión, Ansiedad y Estrés',    color: '#3b82f6' },
-    BAI:     { icon: 'icons/Icon (28).svg', description: 'Inventario de Ansiedad de Beck',            color: '#8b5cf6' },
-    BDI:     { icon: 'icons/Icon (29).svg', description: 'Inventario de Depresión de Beck',           color: '#06b6d4' },
+    GAD7: { icon: 'icons/Icon (37).svg', description: 'Trastorno de Ansiedad Generalizada', color: '#3b82f6' },
+    PHQ9: { icon: 'icons/Icon (28).svg', description: 'Cuestionario de Salud del Paciente', color: '#8b5cf6' },
+    ISI: { icon: 'icons/Icon (29).svg', description: 'Índice de Severidad del Insomnio', color: '#06b6d4' },
+    PSS4: { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido', color: '#f59e0b' },
+    PSS10: { icon: 'icons/Icon (30).svg', description: 'Escala de Estrés Percibido (Completa)', color: '#f59e0b' },
+    DASS21: { icon: 'icons/Icon (37).svg', description: 'Escala de Depresión, Ansiedad y Estrés', color: '#3b82f6' },
+    BAI: { icon: 'icons/Icon (28).svg', description: 'Inventario de Ansiedad de Beck', color: '#8b5cf6' },
+    BDI: { icon: 'icons/Icon (29).svg', description: 'Inventario de Depresión de Beck', color: '#06b6d4' },
     ICSP_VC: { icon: 'icons/icon-sleep.svg', description: 'Índice de Calidad del Sueño de Pittsburgh', color: '#f59e0b' },
-    TMMS24:  { icon: 'icons/Icon (31).svg', description: 'Escala de Inteligencia Emocional',          color: '#FF5722' },
-    MFI20:   { icon: 'icons/Icon (32).svg', description: 'Inventario de Fatiga Multidimensional',     color: '#9C27B0' },
+    TMMS24: { icon: 'icons/Icon (31).svg', description: 'Escala de Inteligencia Emocional', color: '#FF5722' },
+    MFI20: { icon: 'icons/Icon (32).svg', description: 'Inventario de Fatiga Multidimensional', color: '#9C27B0' },
     // Riesgo Psicosocial
-    INTRA_A:      { icon: 'icons/Icon (40).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma A',  color: '#f97316' },
-    INTRA_B:      { icon: 'icons/Icon (41).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma B',  color: '#ef4444' },
-    EXTRALABORAL: { icon: 'icons/Icon (42).svg', description: 'Factores de Riesgo Psicosocial Extralaboral',            color: '#8b5cf6' },
-    ESTRES:       { icon: 'icons/Icon (43).svg', description: 'Síntomas de Estrés',                                     color: '#ec4899' },
+    INTRA_A: { icon: 'icons/Icon (40).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma A', color: '#f97316' },
+    INTRA_B: { icon: 'icons/Icon (41).svg', description: 'Factores de Riesgo Psicosocial Intralaboral – Forma B', color: '#ef4444' },
+    EXTRALABORAL: { icon: 'icons/Icon (42).svg', description: 'Factores de Riesgo Psicosocial Extralaboral', color: '#8b5cf6' },
+    ESTRES: { icon: 'icons/Icon (43).svg', description: 'Síntomas de Estrés', color: '#ec4899' },
 };
 
 const FALLBACK_COLORS = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444'];
@@ -62,7 +63,8 @@ export class InstrumentResultsComponent implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly hydration: AssessmentHydrationService,
         private readonly assessmentService: AssessmentService,
-    ) {}
+        private readonly dataSheetService: PsychosocialDataSheetService,
+    ) { }
 
     ngOnInit(): void {
         // Get moduleId from route data or infer from current route path
@@ -72,18 +74,29 @@ export class InstrumentResultsComponent implements OnInit {
         this.isLoading = true;
 
         // Load the real instrument list AND the completed codes from the backend in parallel.
+        // For psychosocial-risk, also load the data sheet to determine INTRA_A / INTRA_B visibility.
         forkJoin({
             _hydrate: this.hydration.hydrateModuleResultFromCompletedEvaluations(this.moduleId).pipe(catchError(() => of(undefined))),
             descriptors: this.assessmentService.getModuleInstruments(this.moduleId),
             completedCodes: this.hydration.getCompletedInstrumentCodes(this.moduleId).pipe(catchError(() => of(new Set<string>()))),
+            dataSheet: this.moduleId === 'psychosocial-risk'
+                ? this.dataSheetService.getDataSheet(this.dataSheetService.getCurrentPeriod()).pipe(catchError(() => of(null)))
+                : of(null),
         })
-        .pipe(finalize(() => { this.isLoading = false; }))
-        .subscribe({
-            next: ({ descriptors, completedCodes }) => this._buildCards(descriptors, completedCodes),
-            error: () => {
-                this.hasError = true;
-            },
-        });
+            .pipe(finalize(() => { this.isLoading = false; }))
+            .subscribe({
+                next: ({ descriptors, completedCodes, dataSheet }) => {
+                    const forma = (dataSheet as any)?.psicosocialForma?.toUpperCase?.() ?? null;
+                    const formToHide = forma === 'A' ? 'INTRA_B' : forma === 'B' ? 'INTRA_A' : null;
+                    const filteredDescriptors = formToHide
+                        ? descriptors.filter(d => d.code !== formToHide)
+                        : descriptors;
+                    this._buildCards(filteredDescriptors, completedCodes);
+                },
+                error: () => {
+                    this.hasError = true;
+                },
+            });
     }
 
     private _buildCards(descriptors: InstrumentDescriptor[], completedCodes: Set<string>): void {
@@ -101,7 +114,7 @@ export class InstrumentResultsComponent implements OnInit {
                 ...d,
                 label: d.label || d.backendName || d.code,
                 description: d.backendDescription || meta?.description || '',
-                icon:  meta?.icon  ?? this.moduleDef.icon,
+                icon: meta?.icon ?? this.moduleDef.icon,
                 color: meta?.color ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
                 completed: isCompleted(d.code),
             };
@@ -109,7 +122,11 @@ export class InstrumentResultsComponent implements OnInit {
     }
 
     openResult(card: InstrumentResultCard): void {
-        if (!card.completed) return;
+        if (!card.completed) {
+            // Navigate to selector so the user can complete the pending questionnaire
+            this.router.navigate([`/${this.moduleId}`]);
+            return;
+        }
         this.router.navigate([`/${this.moduleId}/results`], {
             queryParams: { instrumentCode: card.code },
         });
