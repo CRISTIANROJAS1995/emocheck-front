@@ -36,6 +36,18 @@ export class GeneralDataComponent implements OnInit {
     /** Age calculated in real time from the birth date */
     calculatedAge: number | null = null;
 
+    /** Maximum allowed birth date: Dec 31, 2012 */
+    readonly maxBirthDate = '2012-12-31';
+
+    private _maxBirthDateValidator() {
+        return (control: AbstractControl) => {
+            if (!control.value) return null;
+            const selected = new Date(control.value);
+            const max = new Date('2012-12-31');
+            return selected > max ? { birthDateMax: true } : null;
+        };
+    }
+
     /** Job type options (Q21) that map to Form A */
     readonly JOB_TYPE_FORM_A = [
         'Jefatura - tiene personal a cargo',
@@ -57,7 +69,7 @@ export class GeneralDataComponent implements OnInit {
     private _buildForm(): void {
         this.form = this.fb.group({
             // Q1
-            birthDate: [null, Validators.required],
+            birthDate: [null, [Validators.required, this._maxBirthDateValidator()]],
             // Q3 — display only, not editable
             sex: [{ value: '', disabled: true }],
 
@@ -116,11 +128,12 @@ export class GeneralDataComponent implements OnInit {
             const yearsCtrl = this.form.get('companySeniorityYears')!;
             if (tipo === 'masAnio') {
                 yearsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
+                yearsCtrl.updateValueAndValidity();
             } else {
                 yearsCtrl.clearValidators();
                 yearsCtrl.setValue(null);
+                yearsCtrl.setErrors(null);
             }
-            yearsCtrl.updateValueAndValidity();
         });
 
         // Q22 — position seniority
@@ -128,11 +141,12 @@ export class GeneralDataComponent implements OnInit {
             const yearsCtrl = this.form.get('positionSeniorityYears')!;
             if (tipo === 'masAnio') {
                 yearsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
+                yearsCtrl.updateValueAndValidity();
             } else {
                 yearsCtrl.clearValidators();
                 yearsCtrl.setValue(null);
+                yearsCtrl.setErrors(null);
             }
-            yearsCtrl.updateValueAndValidity();
         });
 
         // Q23 — role seniority
@@ -140,11 +154,12 @@ export class GeneralDataComponent implements OnInit {
             const yearsCtrl = this.form.get('roleSeniorityYears')!;
             if (tipo === 'masAnio') {
                 yearsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
+                yearsCtrl.updateValueAndValidity();
             } else {
                 yearsCtrl.clearValidators();
                 yearsCtrl.setValue(null);
+                yearsCtrl.setErrors(null);
             }
-            yearsCtrl.updateValueAndValidity();
         });
     }
 
@@ -311,9 +326,45 @@ export class GeneralDataComponent implements OnInit {
 
     // ── Submit ────────────────────────────────────────────────────────────────
 
+    /** Ensures the years sub-fields have the correct validators at submit time.
+     *  Called just before form validity is checked so edge cases
+     *  (load-existing + change radio) cannot leave stale validators behind.
+     */
+    private _syncSeniorityValidators(): void {
+        const pairs: Array<[string, string]> = [
+            ['companySeniorityType', 'companySeniorityYears'],
+            ['positionSeniorityType', 'positionSeniorityYears'],
+            ['roleSeniorityType', 'roleSeniorityYears'],
+        ];
+        for (const [typeKey, yearsKey] of pairs) {
+            const type = this.form.get(typeKey)?.value;
+            const yearsCtrl = this.form.get(yearsKey)!;
+            if (type === 'masAnio') {
+                yearsCtrl.setValidators([Validators.required, Validators.min(1), Validators.max(99)]);
+                yearsCtrl.updateValueAndValidity({ emitEvent: false });
+            } else {
+                // clearValidators removes the validator function but Angular may still
+                // have cached errors from a previous masAnio state. setErrors(null)
+                // force-clears those cached errors so the control (and parent form)
+                // is immediately marked VALID for this field.
+                yearsCtrl.clearValidators();
+                yearsCtrl.setValue(null, { emitEvent: false });
+                yearsCtrl.setErrors(null);  // ← key: bypasses stale cached validation errors
+            }
+        }
+    }
+
     onSubmit(): void {
+        // Re-apply conditional validators before validating the form.
+        this._syncSeniorityValidators();
+
         if (this.form.invalid) {
             this.form.markAllAsTouched();
+            // Log which controls are invalid to diagnose the issue
+            const invalidControls = Object.entries(this.form.controls)
+                .filter(([, ctrl]) => ctrl.invalid)
+                .map(([name]) => name);
+            console.warn('[GeneralData] Form invalid — controls:', invalidControls);
             return;
         }
 

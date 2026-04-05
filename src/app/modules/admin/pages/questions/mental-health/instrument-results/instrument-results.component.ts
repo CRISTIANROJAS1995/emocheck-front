@@ -127,7 +127,9 @@ export class InstrumentResultsComponent implements OnInit {
             this.router.navigate([`/${this.moduleId}`]);
             return;
         }
-        this.router.navigate([`/${this.moduleId}/results`], {
+        const isPsychosocial = this.moduleId === 'psychosocial-risk';
+        const resultsPath = isPsychosocial ? `/${this.moduleId}/psych-results` : `/${this.moduleId}/results`;
+        this.router.navigate([resultsPath], {
             queryParams: { instrumentCode: card.code },
         });
     }

@@ -61,9 +61,9 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         // Only entries that map a technical instrumentCode to a friendly UI label.
         // Any dimension NOT listed here will display its dimensionName from the backend directly.
         dimensionLabels: [
-            { id: 'dass21_anxiety',    instrumentCode: 'DASS21_ANXIETY',    label: 'Ansiedad' },
+            { id: 'dass21_anxiety', instrumentCode: 'DASS21_ANXIETY', label: 'Ansiedad' },
             { id: 'dass21_depression', instrumentCode: 'DASS21_DEPRESSION', label: 'Depresión' },
-            { id: 'dass21_stress',     instrumentCode: 'DASS21_STRESS',     label: 'Estrés' },
+            { id: 'dass21_stress', instrumentCode: 'DASS21_STRESS', label: 'Estrés' },
         ],
     },
     {
@@ -87,13 +87,13 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             questionCardBackground: '#F7FCE8',
         },
         dimensionLabels: [
-            { id: 'fatiga_general',    instrumentCode: 'MFI20_FATIGA_GENERAL',    label: 'Fatiga General' },
-            { id: 'fatiga_fisica',     instrumentCode: 'MFI20_FATIGA_FISICA',     label: 'Fatiga Física' },
-            { id: 'fatiga_mental',     instrumentCode: 'MFI20_FATIGA_MENTAL',     label: 'Fatiga Mental' },
-            { id: 'fatiga_emocional',  instrumentCode: 'MFI20_FATIGA_EMOCIONAL',  label: 'Fatiga Emocional' },
-            { id: 'dinamismo',         instrumentCode: 'MFI20_DINAMISMO',         label: 'Dinamismo' },
-            { id: 'motivacion',        instrumentCode: 'MFI20_MOTIVACION',        label: 'Motivación' },
-            { id: 'actividad_reducida',instrumentCode: 'MFI20_ACTIVIDAD_REDUCIDA',label: 'Actividad Reducida' },
+            { id: 'fatiga_general', instrumentCode: 'MFI20_FATIGA_GENERAL', label: 'Fatiga General' },
+            { id: 'fatiga_fisica', instrumentCode: 'MFI20_FATIGA_FISICA', label: 'Fatiga Física' },
+            { id: 'fatiga_mental', instrumentCode: 'MFI20_FATIGA_MENTAL', label: 'Fatiga Mental' },
+            { id: 'fatiga_emocional', instrumentCode: 'MFI20_FATIGA_EMOCIONAL', label: 'Fatiga Emocional' },
+            { id: 'dinamismo', instrumentCode: 'MFI20_DINAMISMO', label: 'Dinamismo' },
+            { id: 'motivacion', instrumentCode: 'MFI20_MOTIVACION', label: 'Motivación' },
+            { id: 'actividad_reducida', instrumentCode: 'MFI20_ACTIVIDAD_REDUCIDA', label: 'Actividad Reducida' },
         ],
     },
     {
@@ -117,10 +117,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             questionCardBackground: '#F0FDFA',
         },
         dimensionLabels: [
-            { id: 'leadership',    instrumentCode: 'CLIMATE_LEADERSHIP',     label: 'Liderazgo y Dirección' },
-            { id: 'teamwork',      instrumentCode: 'CLIMATE_TEAMWORK',        label: 'Trabajo en Equipo' },
-            { id: 'communication', instrumentCode: 'CLIMATE_COMMUNICATION',   label: 'Comunicación' },
-            { id: 'recognition',   instrumentCode: 'CLIMATE_RECOGNITION',     label: 'Reconocimiento' },
+            { id: 'leadership', instrumentCode: 'CLIMATE_LEADERSHIP', label: 'Liderazgo y Dirección' },
+            { id: 'teamwork', instrumentCode: 'CLIMATE_TEAMWORK', label: 'Trabajo en Equipo' },
+            { id: 'communication', instrumentCode: 'CLIMATE_COMMUNICATION', label: 'Comunicación' },
+            { id: 'recognition', instrumentCode: 'CLIMATE_RECOGNITION', label: 'Reconocimiento' },
         ],
     },
     {
@@ -134,7 +134,7 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
         questionnaireTitle: 'Evaluación de Riesgo Psicosocial',
         resultsTitle: 'Resultados de Riesgo Psicosocial',
         welcomeIntro: {
-            lead: '¡Bienvenido/a al Módulo de Riesgo Psicosocial! Este espacio evalúa los factores del entorno laboral que pueden impactar tu salud y bienestar.',
+            lead: '¡Bienvenido/a al Módulo de Riesgo Psicosocial! Un espacio diseñado para evaluar, intervenir y prevenir los factores de riesgo que impactan tu bienestar y salud en el trabajo.',
             secondary: '',
             infoCards: [
                 {
@@ -166,10 +166,10 @@ export const ASSESSMENT_MODULES: AssessmentModuleDefinition[] = [
             questionCardBackground: '#FFF7ED',
         },
         dimensionLabels: [
-            { id: 'demands',  instrumentCode: 'PSYCHO_DEMANDS',  label: 'Demandas del Trabajo' },
-            { id: 'control',  instrumentCode: 'PSYCHO_CONTROL',  label: 'Control sobre el Trabajo' },
-            { id: 'support',  instrumentCode: 'PSYCHO_SUPPORT',  label: 'Apoyo Social y Liderazgo' },
-            { id: 'rewards',  instrumentCode: 'PSYCHO_REWARDS',  label: 'Recompensas' },
+            { id: 'demands', instrumentCode: 'PSYCHO_DEMANDS', label: 'Demandas del Trabajo' },
+            { id: 'control', instrumentCode: 'PSYCHO_CONTROL', label: 'Control sobre el Trabajo' },
+            { id: 'support', instrumentCode: 'PSYCHO_SUPPORT', label: 'Apoyo Social y Liderazgo' },
+            { id: 'rewards', instrumentCode: 'PSYCHO_REWARDS', label: 'Recompensas' },
         ],
     },
 ];

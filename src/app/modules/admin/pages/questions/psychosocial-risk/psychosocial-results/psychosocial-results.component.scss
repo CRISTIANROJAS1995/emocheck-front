@@ -1,0 +1,589 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Psychosocial Results – Document-style report
+// ─────────────────────────────────────────────────────────────────────────────
+
+:host {
+    display: block;
+    width: 100%;
+}
+
+// ── Tone palette ─────────────────────────────────────────────────────────────
+$tone-colors: (
+    'sin-riesgo': #16a34a,
+    'bajo': #65a30d,
+    'medio': #ca8a04,
+    'alto': #ea580c,
+    'muy-alto': #dc2626,
+);
+
+$tone-bgs: (
+    'sin-riesgo': #f0fdf4,
+    'bajo': #f7fee7,
+    'medio': #fefce8,
+    'alto': #fff7ed,
+    'muy-alto': #fef2f2,
+);
+
+$tone-borders: (
+    'sin-riesgo': #bbf7d0,
+    'bajo': #d9f99d,
+    'medio': #fef08a,
+    'alto': #fed7aa,
+    'muy-alto': #fecaca,
+);
+
+// Sage green palette (Word format colours)
+$sage-dark: #728e62;
+$sage-hdr: #8fae80;
+$sage-label: #b0cca4;
+$sage-pale: #eef5ea;
+$sage-border: #c4d9bc;
+$sage-text: #2d4826;
+
+// ── Page shell ────────────────────────────────────────────────────────────────
+.psr-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    background: #eef2ea;
+}
+
+// ── Sticky navigation (app-style) ────────────────────────────────────────────
+.psr-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgb(0 0 0 / .05);
+
+    &__inner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 12px 24px;
+    }
+
+    &__back {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 10px;
+        background: #f1f5f9;
+        color: #475569;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background .15s;
+
+        &:hover {
+            background: #e2e8f0;
+        }
+    }
+
+    &__title {
+        flex: 1;
+        font-size: .9rem;
+        font-weight: 600;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    &__btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 10px;
+        background: #f1f5f9;
+        color: #64748b;
+        cursor: pointer;
+        transition: background .15s;
+
+        &:hover {
+            background: #e2e8f0;
+        }
+    }
+}
+
+// ── Loading state ─────────────────────────────────────────────────────────────
+.psr-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 80px 20px;
+    color: #64748b;
+    font-size: .9rem;
+
+    &__spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid #e2e8f0;
+        border-top-color: $sage-dark;
+        border-radius: 50%;
+        animation: psr-spin .8s linear infinite;
+    }
+}
+
+@keyframes psr-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ── Main content area ─────────────────────────────────────────────────────────
+.psr-main {
+    flex: 1;
+    padding: 32px 24px 60px;
+    max-width: 1140px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+// ── Document paper card ───────────────────────────────────────────────────────
+.psr-doc {
+    background: white;
+    border: 1px solid $sage-border;
+    box-shadow: 0 2px 8px rgb(0 0 0 / .08);
+
+    // 1. Title banner
+    &__banner {
+        background: $sage-dark;
+        color: white;
+        text-align: center;
+        padding: 16px 24px;
+    }
+
+    // Plain title for ESTRES (no banner)
+    &__estres-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: $sage-text;
+        padding: 20px 24px 12px;
+    }
+
+    &__banner-prefix {
+        font-size: .72rem;
+        font-weight: 600;
+        letter-spacing: .06em;
+        margin: 0 0 4px;
+        text-transform: uppercase;
+        opacity: .85;
+    }
+
+    &__banner-title {
+        font-size: .92rem;
+        font-weight: 700;
+        margin: 0;
+        text-transform: uppercase;
+        line-height: 1.45;
+    }
+
+    // Section wrapper
+    &__section {
+        border-bottom: 2px solid $sage-border;
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+    }
+
+    // Section header bar
+    &__sec-hdr {
+        background: $sage-label;
+        color: $sage-text;
+        text-align: center;
+        padding: 7px 16px;
+        font-size: .74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    // Field list container
+    &__fields {
+        display: flex;
+        flex-direction: column;
+    }
+
+    // Legal note
+    &__note {
+        padding: 7px 12px;
+        font-size: .74rem;
+        color: #475569;
+        margin: 0;
+        border-top: 1px solid $sage-border;
+
+        em {
+            font-style: italic;
+        }
+    }
+
+    // Text areas (interpretación / observaciones / recomendaciones)
+    &__content-area {
+        min-height: 100px;
+        border: 1px solid #94a3b8;
+        margin: 12px;
+
+        &--tinted {
+            background: $sage-pale;
+            min-height: 200px;
+            border: 1px solid $sage-border;
+        }
+    }
+
+    // Document footer
+    &__footer {
+        padding: 20px 20px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        border-top: 1px solid $sage-border;
+    }
+
+    &__footer-elaboracion {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    &__footer-elab-label {
+        font-size: .79rem;
+        font-weight: 600;
+        color: #334155;
+        white-space: nowrap;
+    }
+
+    &__footer-date-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    &__footer-date-boxes {
+        display: flex;
+        gap: 4px;
+    }
+
+    &__footer-date-box {
+        border: 1px solid #94a3b8;
+        min-width: 46px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .78rem;
+        color: #334155;
+    }
+
+    &__footer-date-sub {
+        display: flex;
+        gap: 4px;
+
+        span {
+            min-width: 46px;
+            text-align: center;
+            font-size: .68rem;
+            color: #94a3b8;
+            font-style: italic;
+        }
+    }
+
+    &__footer-firma {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    &__footer-firma-lbl {
+        background: $sage-label;
+        color: $sage-text;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: 5px 10px;
+        white-space: nowrap;
+    }
+
+    &__footer-firma-line {
+        flex: 1;
+        border-bottom: 1px solid #334155;
+        max-width: 280px;
+        height: 26px;
+    }
+}
+
+// ── Form fields ───────────────────────────────────────────────────────────────
+.psr-field {
+    display: flex;
+    border-bottom: 1px solid $sage-border;
+
+    &--last {
+        border-bottom: none;
+    }
+
+    &--no-label {
+        border-bottom: 1px solid $sage-border;
+
+        .psr-field__plain-lbl {
+            flex: 0 0 42%;
+            padding: 7px 10px;
+            font-size: .78rem;
+            font-weight: 600;
+            color: $sage-text;
+            border-right: 1px solid $sage-border;
+            display: flex;
+            align-items: center;
+        }
+    }
+
+    &__lbl {
+        flex: 0 0 42%;
+        background: $sage-label;
+        padding: 7px 10px;
+        font-size: .78rem;
+        font-weight: 600;
+        color: $sage-text;
+        border-right: 1px solid $sage-border;
+        display: flex;
+        align-items: center;
+        line-height: 1.35;
+    }
+
+    &__val {
+        flex: 1;
+        padding: 7px 10px;
+        font-size: .78rem;
+        color: #334155;
+        background: white;
+        display: flex;
+        align-items: center;
+        min-height: 34px;
+    }
+}
+
+// ── Results table ─────────────────────────────────────────────────────────────
+.psr-rtable-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.psr-rtable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .8rem;
+
+    &__th {
+        background: $sage-label;
+        color: $sage-text;
+        font-weight: 700;
+        padding: 8px 10px;
+        border: 1px solid $sage-border;
+        text-align: center;
+        font-size: .74rem;
+        text-transform: uppercase;
+        letter-spacing: .03em;
+
+        small {
+            display: block;
+            font-size: .65rem;
+            font-weight: 400;
+            opacity: .75;
+        }
+
+        &--domain {
+            width: 15%;
+            min-width: 100px;
+        }
+
+        &--dim {
+            width: 55%;
+            text-align: left;
+        }
+
+        &--dim-flat {
+            width: 70%;
+            text-align: left;
+        }
+
+        &--score {
+            width: 15%;
+            min-width: 80px;
+        }
+
+        &--risk {
+            width: 15%;
+            min-width: 100px;
+        }
+    }
+
+    &__td {
+        padding: 7px 10px;
+        border: 1px solid $sage-border;
+        color: #334155;
+        vertical-align: middle;
+
+        &--domain {
+            background: #f8fdf6;
+            vertical-align: middle;
+            text-align: center;
+            font-size: .78rem;
+            font-weight: 500;
+            color: $sage-text;
+            line-height: 1.35;
+        }
+
+        &--dim {
+            text-align: left;
+            background: $sage-pale;
+        }
+
+        &--center {
+            text-align: center;
+        }
+
+        &--sub-lbl {
+            background: $sage-label;
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: $sage-text;
+            letter-spacing: .05em;
+        }
+
+        &--total-lbl {
+            background: $sage-dark;
+            color: white;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+    }
+
+    &__dim-row:hover td {
+        background: #f4faf2;
+    }
+
+    &__total-row td {
+        border-top: 2px solid $sage-dark;
+    }
+}
+
+// ── Score value (tone-coloured number) ───────────────────────────────────────
+.psr-score {
+    display: inline-block;
+    font-weight: 700;
+    font-size: .8rem;
+
+    @each $tone, $color in $tone-colors {
+        &--#{$tone} {
+            color: $color;
+        }
+    }
+}
+
+// ── Risk badge ────────────────────────────────────────────────────────────────
+.psr-risk {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+
+    @each $tone, $color in $tone-colors {
+        &--#{$tone} {
+            color: $color;
+            background: map-get($tone-bgs, $tone);
+            border: 1px solid map-get($tone-borders, $tone);
+        }
+    }
+}
+
+// ── Empty cell placeholder ────────────────────────────────────────────────────
+.psr-cell-empty {
+    color: #94a3b8;
+    font-size: .78rem;
+
+    &--inv {
+        color: rgba(255 255 255 / .5);
+    }
+}
+
+// ── Bottom back button ────────────────────────────────────────────────────────
+.psr-page-actions {
+    display: flex;
+    justify-content: center;
+
+    &__btn {
+        padding: 10px 24px;
+        border: 1px solid $sage-border;
+        border-radius: 8px;
+        background: white;
+        color: $sage-dark;
+        font-size: .85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background .15s;
+
+        &:hover {
+            background: $sage-pale;
+        }
+    }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 600px) {
+    .psr-main {
+        padding: 12px 0 32px;
+    }
+
+    .psr-doc__banner {
+        padding: 14px 16px;
+    }
+
+    .psr-doc__banner-title {
+        font-size: .82rem;
+    }
+
+    .psr-field__lbl {
+        flex: 0 0 50%;
+        font-size: .75rem;
+    }
+
+    .psr-field__val {
+        font-size: .75rem;
+    }
+
+    .psr-rtable__th--domain {
+        min-width: 80px;
+    }
+
+    .psr-rtable__th--dim {
+        min-width: 120px;
+    }
+
+    .psr-nav__title {
+        font-size: .8rem;
+    }
+}

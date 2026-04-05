@@ -22,4 +22,8 @@ export default [
         component: AssessmentResultsComponent,
         data: { moduleId: 'psychosocial-risk' },
     },
+    {
+        path: 'psych-results',
+        loadComponent: () => import('./psychosocial-results/psychosocial-results.component').then(m => m.PsychosocialResultsComponent),
+    },
 ] as Routes;

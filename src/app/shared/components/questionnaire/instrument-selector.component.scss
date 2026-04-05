@@ -564,8 +564,8 @@
 
 .wm-modal {
     position: relative;
-    width: 100%;
-    max-width: 480px;
+    width: 92vw;
+    max-width: 680px;
     background: #fff;
     border-radius: 24px;
     overflow: hidden;
@@ -573,6 +573,17 @@
     animation: wm-modal-in 0.32s cubic-bezier(.34, 1.36, .64, 1) forwards;
     max-height: calc(100vh - 48px);
     overflow-y: auto;
+
+    @media (max-width: 740px) {
+        max-width: 560px;
+        width: 96vw;
+    }
+
+    @media (max-width: 600px) {
+        max-width: 100%;
+        width: 98vw;
+        border-radius: 16px;
+    }
 }
 
 // ─── Welcome / Module-intro Modal (wider + responsive) ──────────────────────
@@ -1472,7 +1483,15 @@
 
 // ─── Instructions Modal ───────────────────────────────────────────────────────
 .wm-modal--instructions {
-    max-width: 460px;
+    max-width: 680px;
+
+    @media (max-width: 740px) {
+        max-width: 560px;
+    }
+
+    @media (max-width: 600px) {
+        max-width: 100%;
+    }
 }
 
 .wm-header--instructions {
@@ -1518,6 +1537,34 @@
     font-family: 'Montserrat', sans-serif;
     margin-bottom: 18px;
     text-align: justify;
+}
+
+// ── Instrucciones en viñetas ──────────────────────────────────────────────────
+.wm-instr__bullets {
+    margin-bottom: 18px;
+
+    &-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+        font-family: 'Montserrat', sans-serif;
+        margin-bottom: 8px;
+    }
+
+    &-list {
+        list-style: disc;
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        li {
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: #475569;
+            font-family: 'Montserrat', sans-serif;
+        }
+    }
 }
 
 // ── Bloque visual interactivo (vibe) ──────────────────────────────────────────
@@ -1833,6 +1880,135 @@
     max-width: 420px;
     overflow-y: auto;
 }
+
+// ─── Psychosocial Legal Disclaimer Modal ─────────────────────────────────────
+.wm-modal--psych-disclaimer {
+    max-width: 640px;
+
+    @media (max-width: 700px) {
+        max-width: 560px;
+    }
+
+    @media (max-width: 600px) {
+        max-width: 100%;
+        border-radius: 16px;
+    }
+}
+
+.pld-header {
+    position: relative;
+    padding: 28px 32px 48px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    &__icon {
+        opacity: 0.9;
+    }
+
+    &__title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #fff;
+        font-family: 'Montserrat', sans-serif;
+        margin: 0;
+    }
+}
+
+.pld-body {
+    padding: 24px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.pld-clause {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+
+    &__toggle {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+        background: #f8fafc;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        font-family: 'Montserrat', sans-serif;
+        text-align: left;
+
+        svg:first-child {
+            color: #f97316;
+            flex-shrink: 0;
+        }
+
+        span {
+            flex: 1;
+        }
+    }
+
+    &__chevron {
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+        color: #64748b;
+
+        &--open {
+            transform: rotate(180deg);
+        }
+    }
+
+    &__content {
+        padding: 16px;
+        font-size: 12px;
+        line-height: 1.7;
+        color: #475569;
+        font-family: 'Montserrat', sans-serif;
+        text-align: justify;
+        border-top: 1px solid #e2e8f0;
+
+        p {
+            margin: 0 0 10px;
+        }
+
+        ul,
+        ol {
+            padding-left: 20px;
+            margin: 6px 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        strong {
+            color: #334155;
+        }
+    }
+}
+
+.pld-accept {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #334155;
+    font-family: 'Montserrat', sans-serif;
+    text-align: justify;
+    padding: 14px 16px;
+    background: #fafbff;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+}
+
+// ─── /Psychosocial Legal Disclaimer Modal ────────────────────────────────────
 
 // Visual container
 .wcl-visual {

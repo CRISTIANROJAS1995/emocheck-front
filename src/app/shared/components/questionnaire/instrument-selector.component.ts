@@ -67,6 +67,8 @@ export interface InstrumentInstructions {
     body: string;
     /** Texto de la instrucción de tiempo / contexto de las preguntas */
     timeframe: string;
+    /** Lista de instrucciones en viñetas para mostrar debajo de la tarjeta de stats */
+    instructions?: string[];
 }
 
 // ── Cierre por instrumento (modal post-cuestionario) ─────────────────────────
@@ -399,23 +401,44 @@ const INSTRUMENT_INSTRUCTIONS: Record<string, InstrumentInstructions> = {
     // Riesgo Psicosocial – Batería Ministerio del Trabajo
     INTRA_A: {
         heading: 'Riesgo Psicosocial Intralaboral – Forma A',
-        body: 'Este cuestionario evalúa los factores de riesgo psicosocial en el entorno intralaboral que pueden afectar tanto la salud del trabajador como su desempeño. Dirigido a trabajadores que ocupan cargos de jefatura y profesionales, analistas, técnicos o tecnólogos.',
+        body: '',
         timeframe: 'Selecciona la opción que mejor describa cómo te has sentido.',
+        instructions: [
+            'Este cuestionario no te evalúa a ti como trabajador, sino que busca conocer tu opinión sobre algunos aspectos de tu trabajo.',
+            'No hay respuestas buenas ni malas: Lo importante es que reflejen tu manera de pensar sobre tu trabajo.',
+            'Lee cuidadosamente cada pregunta, luego piensa en cómo han sido las cosas en tu trabajo y selecciona la opción de respuesta que más se acerque a tu situación cotidiana.',
+            'Si tiene duda sobre alguna pregunta, solicite mayor información al profesional encargado de la evaluación.',
+        ],
     },
     INTRA_B: {
         heading: 'Riesgo Psicosocial Intralaboral – Forma B',
-        body: 'Este cuestionario evalúa los factores de riesgo psicosocial en el entorno intralaboral. Dirigido a trabajadores auxiliares, operarios y personal de nivel operativo. Responde con base en tu experiencia real en el trabajo.',
+        body: '',
         timeframe: 'Selecciona la opción que mejor describa cómo te has sentido.',
+        instructions: [
+            'Este cuestionario no te evalúa a ti como trabajador, sino que busca conocer tu opinión sobre algunos aspectos de tu trabajo.',
+            'No hay respuestas buenas ni malas: Lo importante es que reflejen tu manera de pensar sobre tu trabajo.',
+            'Lee cuidadosamente cada pregunta, luego piensa en cómo han sido las cosas en tu trabajo y selecciona la opción de respuesta que más se acerque a tu situación cotidiana.',
+            'Si tiene duda sobre alguna pregunta, solicite mayor información al profesional encargado de la evaluación.',
+        ],
     },
     EXTRALABORAL: {
         heading: 'Factores de Riesgo Extralaboral',
-        body: 'Este cuestionario evalúa los factores externos al trabajo (familia, vivienda, economía, entorno social) que pueden influir en tu bienestar y desempeño laboral. Responde con sinceridad según tu situación actual.',
+        body: '',
         timeframe: 'Selecciona la opción que mejor describa tu situación fuera del trabajo.',
+        instructions: [
+            'Este cuestionario de factores psicosociales busca conocer tu opinión sobre algunos aspectos de tu vida familiar y personal.',
+            'Responde con total sinceridad: Tus respuestas serán manejadas de forma absolutamente confidencial.',
+            'Lee cuidadosamente cada pregunta y selecciona la opción de respuesta que mejor se ajuste a tu modo de pensar.',
+            'Si tiene duda sobre alguna pregunta, solicite mayor información al profesional encargado de la evaluación.',
+        ],
     },
     ESTRES: {
         heading: 'Síntomas de Estrés',
-        body: 'Este cuestionario identifica síntomas físicos, emocionales y de comportamiento asociados al estrés. Reconocer cómo el estrés se manifiesta en tu cuerpo y mente es clave para poder gestionarlo.',
+        body: '',
         timeframe: 'Selecciona la opción que mejor describa cómo te has sentido en el último mes.',
+        instructions: [
+            'Señale la casilla que indique la frecuencia con que se le han presentado los siguientes malestares en los últimos tres meses.',
+        ],
     },
 };
 
@@ -578,8 +601,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
         focus: 'Riesgo Intralaboral – Forma A',
         tagline: 'Tu percepción transforma los entornos de trabajo.',
         stats: [
-            { label: 'Duración', value: '~35 min' },
-            { label: 'Dominios', value: '4' },
+            { label: 'Duración', value: '60 minutos aprox' },
             { label: 'Preguntas', value: '123' },
         ],
     },
@@ -588,8 +610,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
         focus: 'Riesgo Intralaboral – Forma B',
         tagline: 'Tu opinión construye espacios de trabajo más sanos.',
         stats: [
-            { label: 'Duración', value: '~25 min' },
-            { label: 'Dominios', value: '4' },
+            { label: 'Duración', value: '60 minutos aprox' },
             { label: 'Preguntas', value: '97' },
         ],
     },
@@ -598,8 +619,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
         focus: 'Factores Extralaborales',
         tagline: 'El bienestar fuera del trabajo también cuenta.',
         stats: [
-            { label: 'Duración', value: '~10 min' },
-            { label: 'Área', value: 'Extralaboral' },
+            { label: 'Duración', value: '10 minutos aprox' },
             { label: 'Preguntas', value: '31' },
         ],
     },
@@ -608,8 +628,7 @@ const INSTRUMENT_VIBE: Record<string, InstrumentVibeData> = {
         focus: 'Síntomas de Estrés',
         tagline: 'Reconocer el estrés es el primer paso para gestionarlo.',
         stats: [
-            { label: 'Duración', value: '~10 min' },
-            { label: 'Área', value: 'Estrés' },
+            { label: 'Duración', value: '10 minutos aprox' },
             { label: 'Preguntas', value: '31' },
         ],
     },
@@ -680,6 +699,15 @@ export class InstrumentSelectorComponent implements OnInit {
     currentClosing: InstrumentClosing | null = null;
     /** Whether the user has checked the disclaimer checkbox in the closing modal */
     disclaimerAccepted = false;
+
+    /** Controls the psychosocial legal disclaimer modal (shown after closing modal for psicosocial-risk) */
+    showPsychosocialDisclaimerModal = false;
+    /** Whether the user has accepted the psychosocial legal clause */
+    psychosocialDisclaimerAccepted = false;
+    /** Whether the collapsible clause text is expanded */
+    psychosocialDisclaimerExpanded = false;
+    /** ISO timestamp logged when user accepts the psychosocial clause */
+    psychosocialDisclaimerAcceptedAt: string | null = null;
     /** Rich answers held until user dismisses closing modal */
     private pendingRichAnswers: RichAnswer[] | null = null;
     /** True when answers were already submitted by a specialized component (ICSP_VC, TMMS24, MFI20) — prevents double submit */
@@ -1104,6 +1132,24 @@ export class InstrumentSelectorComponent implements OnInit {
         this.pendingRichAnswers = null;
         if (!richAnswers) return;
         this._submitRichAnswers(richAnswers);
+    }
+
+    /** Called when "Continuar" is clicked in the closing modal for psychosocial-risk instruments */
+    onClosingToDisclaimer(): void {
+        this.showClosingModal = false;
+        this.psychosocialDisclaimerAccepted = false;
+        this.psychosocialDisclaimerExpanded = false;
+        this.showPsychosocialDisclaimerModal = true;
+    }
+
+    /** Called when user accepts the psychosocial legal clause and clicks "Ver mis resultados" */
+    onPsychosocialDisclaimerAccept(): void {
+        this.psychosocialDisclaimerAcceptedAt = new Date().toISOString();
+        console.log('[EmoCheck] Cláusula de exoneración de responsabilidad médica aceptada:', this.psychosocialDisclaimerAcceptedAt);
+        this.showPsychosocialDisclaimerModal = false;
+        this.psychosocialDisclaimerAccepted = false;
+        this.currentClosing = null;
+        this.onClosingContinue();
     }
 
     private _submitRichAnswers(richAnswers: RichAnswer[]): void {

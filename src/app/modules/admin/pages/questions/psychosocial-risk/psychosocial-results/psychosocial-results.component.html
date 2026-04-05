@@ -1,0 +1,367 @@
+<div class="psr-page">
+
+    <!-- ── Navigation ──────────────────────────────────────── -->
+    <header class="psr-nav">
+        <div class="psr-nav__inner">
+            <button class="psr-nav__back" type="button" (click)="goBack()" aria-label="Volver">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" width="18" height="18">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <span class="psr-nav__title">{{ pageTitle }}</span>
+            <div class="psr-nav__actions">
+                <button class="psr-nav__btn" type="button" aria-label="Imprimir">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" width="18" height="18">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                </button>
+                <button class="psr-nav__btn" type="button" aria-label="Descargar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" width="18" height="18">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Loading ─────────────────────────────────────────── -->
+    @if (isHydrating && !result) {
+    <div class="psr-loading">
+        <div class="psr-loading__spinner"></div>
+        <span>Cargando resultados...</span>
+    </div>
+    }
+
+    <!-- ── Document ─────────────────────────────────────────── -->
+    @if (result) {
+    <main class="psr-main">
+
+        <article class="psr-doc">
+
+            <!-- 1. ── Title banner (INTRA_A / INTRA_B / EXTRALABORAL) ──── -->
+            @if (!isEstres) {
+            <div class="psr-doc__banner">
+                <p class="psr-doc__banner-prefix">INFORME DE RESULTADOS</p>
+                <p class="psr-doc__banner-title">{{ instrumentReportTitle }}</p>
+            </div>
+            } @else {
+            <div class="psr-doc__estres-title">Resultados de estrés</div>
+            }
+
+            <!-- 2. ── Datos Generales del Trabajador (no ESTRES) ────── -->
+            @if (!isEstres) {
+            <section class="psr-doc__section">
+                <div class="psr-doc__sec-hdr">DATOS GENERALES DEL TRABAJADOR</div>
+                <div class="psr-doc__fields">
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Nombre del trabajador:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Número de identificación (ID):</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Cargo:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Departamento o sección:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Edad:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Sexo:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Fecha de aplicación del cuestionario:</div>
+                        <div class="psr-field__val">{{ result.evaluatedAt | date:'dd/MM/yyyy' }}</div>
+                    </div>
+                    <div class="psr-field psr-field--last">
+                        <div class="psr-field__lbl">Nombre de la empresa:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                </div>
+            </section>
+            } <!-- /!isEstres Datos Generales -->
+
+            <!-- 3. ── Datos del Evaluador (no ESTRES) ─────────────── -->
+            @if (!isEstres) {
+            <section class="psr-doc__section">
+                <div class="psr-doc__sec-hdr">DATOS DEL EVALUADOR</div>
+                <div class="psr-doc__fields">
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Nombre del evaluador:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Número de identificación (c.c.):</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Profesión:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Postgrado:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">No Tarjeta profesional*:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">No. Licencia en salud ocupacional*:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                    <div class="psr-field psr-field--last">
+                        <div class="psr-field__lbl">Fecha de expedición de la licencia en salud ocupacional*:</div>
+                        <div class="psr-field__val">—</div>
+                    </div>
+                </div>
+                <p class="psr-doc__note">* Todo informe que carezca de estos datos <em>no será válido</em>.</p>
+            </section>
+            } <!-- /!isEstres Datos Evaluador -->
+
+            <!-- 4. ── Resultados del Cuestionario ──────────────────────── -->
+            <section class="psr-doc__section">
+                <div class="psr-doc__sec-hdr">RESULTADOS DEL CUESTIONARIO</div>
+                <div class="psr-rtable-wrap">
+
+                    @if (hasDomainColumn) {
+                    <!-- ── Table WITH Dominios column (INTRA_A / INTRA_B) ── -->
+                    <table class="psr-rtable">
+                        <thead>
+                            <tr>
+                                <th class="psr-rtable__th psr-rtable__th--domain">Dominios</th>
+                                <th class="psr-rtable__th psr-rtable__th--dim">Dimensiones</th>
+                                <th class="psr-rtable__th psr-rtable__th--score">
+                                    Puntaje<br><small>(transformado)</small></th>
+                                <th class="psr-rtable__th psr-rtable__th--risk">Nivel de riesgo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (group of displayGroups; track group.domain) {
+                            @for (dim of group.dimensions; track dim.id; let first = $first) {
+                            <tr class="psr-rtable__dim-row">
+                                @if (first) {
+                                <td class="psr-rtable__td psr-rtable__td--domain"
+                                    [attr.rowspan]="group.dimensions.length">{{ group.domain }}</td>
+                                }
+                                <td class="psr-rtable__td psr-rtable__td--dim">{{ dim.friendlyLabel }}</td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (dim.percent != null && !isPreview) {
+                                    <span class="psr-score psr-score--{{ dim.tone }}">{{ dim.percent | number:'1.0-1'
+                                        }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty">—</span>
+                                    }
+                                </td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (dim.riskLevel && !isPreview) {
+                                    <span class="psr-risk psr-risk--{{ dim.tone }}">{{ getToneLabel(dim.tone) }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty">—</span>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                            <!-- Domain subtotal -->
+                            <tr class="psr-rtable__sub-row">
+                                <td colspan="2" class="psr-rtable__td psr-rtable__td--sub-lbl">
+                                    {{ group.domain | uppercase }}
+                                </td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (group.domainScore != null && !isPreview) {
+                                    <span class="psr-score psr-score--{{ group.domainTone }}">{{ group.domainScore |
+                                        number:'1.0-1' }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty">—</span>
+                                    }
+                                </td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (group.domainRiskLevel && !isPreview) {
+                                    <span class="psr-risk psr-risk--{{ group.domainTone }}">{{
+                                        getToneLabel(group.domainTone) }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty">—</span>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                            <!-- Total General -->
+                            <tr class="psr-rtable__total-row">
+                                <td colspan="2" class="psr-rtable__td psr-rtable__td--total-lbl">{{ totalLabel }}</td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (totalDimension) {
+                                    <span class="psr-score psr-score--{{ totalDimension.tone }}">{{
+                                        totalDimension.percent | number:'1.0-1' }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty psr-cell-empty--inv">—</span>
+                                    }
+                                </td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (totalDimension) {
+                                    <span class="psr-risk psr-risk--{{ totalDimension.tone }}">{{
+                                        getToneLabel(totalDimension.tone) }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty psr-cell-empty--inv">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    } @else if (isEstres) {
+                    <!-- ── Table ESTRES: only TOTAL row, Nivel de estrés column ── -->
+                    <table class="psr-rtable psr-rtable--flat">
+                        <thead>
+                            <tr>
+                                <th class="psr-rtable__th psr-rtable__th--dim-flat"></th>
+                                <th class="psr-rtable__th psr-rtable__th--score">
+                                    Puntaje<br><small>(transformado)</small></th>
+                                <th class="psr-rtable__th psr-rtable__th--risk">Nivel de<br>estrés</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="psr-rtable__total-row">
+                                <td class="psr-rtable__td psr-rtable__td--total-lbl">{{ totalLabel }}</td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (totalDimension) {
+                                    <span class="psr-score psr-score--{{ totalDimension.tone }}">{{
+                                        totalDimension.percent | number:'1.0-1' }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty psr-cell-empty--inv">—</span>
+                                    }
+                                </td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (totalDimension) {
+                                    <span class="psr-risk psr-risk--{{ totalDimension.tone }}">{{
+                                        getToneLabel(totalDimension.tone) }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty psr-cell-empty--inv">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    } @else {
+                    <!-- ── Table WITHOUT Dominios column (EXTRALABORAL) ── -->
+                    <table class="psr-rtable psr-rtable--flat">
+                        <thead>
+                            <tr>
+                                <th class="psr-rtable__th psr-rtable__th--dim-flat">Dimensiones</th>
+                                <th class="psr-rtable__th psr-rtable__th--score">
+                                    Puntaje<br><small>(transformado)</small></th>
+                                <th class="psr-rtable__th psr-rtable__th--risk">Nivel de riesgo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (dim of flatDisplayDimensions; track dim.id) {
+                            <tr class="psr-rtable__dim-row">
+                                <td class="psr-rtable__td psr-rtable__td--dim">{{ dim.friendlyLabel }}</td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (dim.percent != null && !isPreview) {
+                                    <span class="psr-score psr-score--{{ dim.tone }}">{{ dim.percent | number:'1.0-1'
+                                        }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty">—</span>
+                                    }
+                                </td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (dim.riskLevel && !isPreview) {
+                                    <span class="psr-risk psr-risk--{{ dim.tone }}">{{ getToneLabel(dim.tone) }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty">—</span>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                            <!-- Total General -->
+                            <tr class="psr-rtable__total-row">
+                                <td class="psr-rtable__td psr-rtable__td--total-lbl">{{ totalLabel }}</td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (totalDimension) {
+                                    <span class="psr-score psr-score--{{ totalDimension.tone }}">{{
+                                        totalDimension.percent | number:'1.0-1' }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty psr-cell-empty--inv">—</span>
+                                    }
+                                </td>
+                                <td class="psr-rtable__td psr-rtable__td--center">
+                                    @if (totalDimension) {
+                                    <span class="psr-risk psr-risk--{{ totalDimension.tone }}">{{
+                                        getToneLabel(totalDimension.tone) }}</span>
+                                    } @else {
+                                    <span class="psr-cell-empty psr-cell-empty--inv">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    }
+
+                </div>
+            </section>
+
+            <!-- 5. ── Interpretación ────────────────────────────────── -->
+            <section class="psr-doc__section">
+                <div class="psr-doc__sec-hdr">{{ interpretationTitle }}</div>
+                <div class="psr-doc__content-area psr-doc__content-area--tinted"></div>
+            </section>
+
+            <!-- 6. ── Observaciones y Comentarios ────────────────────── -->
+            <section class="psr-doc__section">
+                <div class="psr-doc__sec-hdr">OBSERVACIONES Y COMENTARIOS DEL EVALUADOR</div>
+                <div class="psr-doc__content-area"></div>
+            </section>
+
+            <!-- 7. ── Recomendaciones Particulares ───────────────────── -->
+            <section class="psr-doc__section">
+                <div class="psr-doc__sec-hdr">RECOMENDACIONES PARTICULARES</div>
+                <div class="psr-doc__content-area"></div>
+            </section>
+
+            <!-- 8. ── Footer: Fecha + Firma ──────────────────────────── -->
+            <div class="psr-doc__footer">
+                <div class="psr-doc__footer-elaboracion">
+                    <span class="psr-doc__footer-elab-label">Fecha de elaboración del informe:</span>
+                    <div class="psr-doc__footer-date-wrap">
+                        <div class="psr-doc__footer-date-boxes">
+                            <div class="psr-doc__footer-date-box">{{ result.evaluatedAt | date:'dd' }}</div>
+                            <div class="psr-doc__footer-date-box">{{ result.evaluatedAt | date:'MM' }}</div>
+                            <div class="psr-doc__footer-date-box">{{ result.evaluatedAt | date:'yyyy' }}</div>
+                        </div>
+                        <div class="psr-doc__footer-date-sub">
+                            <span>Dd</span><span>mm</span><span>aaaa</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="psr-doc__footer-firma">
+                    <span class="psr-doc__footer-firma-lbl">Firma del evaluador:</span>
+                    <div class="psr-doc__footer-firma-line"></div>
+                </div>
+            </div>
+
+        </article>
+
+        <!-- Back button -->
+        <div class="psr-page-actions">
+            <button class="psr-page-actions__btn" (click)="goBack()" type="button">
+                Volver al panel de instrumentos
+            </button>
+        </div>
+    </main>
+    }
+
+</div>

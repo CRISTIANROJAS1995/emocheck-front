@@ -62,9 +62,14 @@
                     <input type="date" formControlName="birthDate" class="w-full rounded-lg border px-3 py-2.5 text-sm text-slate-900 outline-none transition
                    focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
                         [class.border-red-400]="isInvalid('birthDate')"
-                        [class.border-slate-300]="!isInvalid('birthDate')" max="2010-01-01" />
-                    <p *ngIf="isInvalid('birthDate')" class="mt-1.5 text-xs text-red-500">Por favor ingrese su fecha de
-                        nacimiento</p>
+                        [class.border-slate-300]="!isInvalid('birthDate')" [max]="maxBirthDate" />
+                    @if (form.get('birthDate')?.hasError('required') && isInvalid('birthDate')) {
+                    <p class="mt-1.5 text-xs text-red-500">Por favor ingrese su fecha de nacimiento.</p>
+                    }
+                    @if (form.get('birthDate')?.hasError('birthDateMax')) {
+                    <p class="mt-1.5 text-xs text-red-500">La fecha de nacimiento no puede ser posterior al 31/12/2012.
+                    </p>
+                    }
                 </div>
 
                 <!-- Q2: Age (calculated) -->
