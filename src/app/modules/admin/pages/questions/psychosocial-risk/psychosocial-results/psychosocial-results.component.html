@@ -39,100 +39,107 @@
     </div>
     }
 
+    <!-- ── Error ───────────────────────────────────────────── -->
+    @if (!isHydrating && hasError) {
+    <div class="psr-loading">
+        <span>No se encontraron resultados para este período. Asegúrate de haber completado al menos un
+            cuestionario.</span>
+    </div>
+    }
+
     <!-- ── Document ─────────────────────────────────────────── -->
     @if (result) {
     <main class="psr-main">
 
         <article class="psr-doc">
 
-            <!-- 1. ── Title banner (INTRA_A / INTRA_B / EXTRALABORAL) ──── -->
-            @if (!isEstres) {
+            <!-- 1. ── Title banner ─────────────────────────────────────── -->
             <div class="psr-doc__banner">
                 <p class="psr-doc__banner-prefix">INFORME DE RESULTADOS</p>
                 <p class="psr-doc__banner-title">{{ instrumentReportTitle }}</p>
             </div>
-            } @else {
-            <div class="psr-doc__estres-title">Resultados de estrés</div>
-            }
 
-            <!-- 2. ── Datos Generales del Trabajador (no ESTRES) ────── -->
-            @if (!isEstres) {
+            <!-- 2. ── Datos Generales del Trabajador ───────────────────── -->
             <section class="psr-doc__section">
                 <div class="psr-doc__sec-hdr">DATOS GENERALES DEL TRABAJADOR</div>
                 <div class="psr-doc__fields">
                     <div class="psr-field">
                         <div class="psr-field__lbl">Nombre del trabajador:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__val">{{ trabajador?.nombreCompleto || '—' }}</div>
                     </div>
                     <div class="psr-field">
-                        <div class="psr-field__lbl">Número de identificación (ID):</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__lbl">Número de identificación ({{ trabajador?.tipoDocumento || 'ID' }}):
+                        </div>
+                        <div class="psr-field__val">{{ trabajador?.identificacion || '—' }}</div>
                     </div>
                     <div class="psr-field">
-                        <div class="psr-field__lbl">Cargo:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__lbl">Cargo (oficio u ocupación):</div>
+                        <div class="psr-field__val">{{ trabajador?.cargo || '—' }}</div>
                     </div>
                     <div class="psr-field">
-                        <div class="psr-field__lbl">Departamento o sección:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__lbl">Área, departamento o sección:</div>
+                        <div class="psr-field__val">{{ trabajador?.departamento || '—' }}</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Nombre de la empresa:</div>
+                        <div class="psr-field__val">{{ trabajador?.empresa || '—' }}</div>
+                    </div>
+                    <div class="psr-field">
+                        <div class="psr-field__lbl">Ciudad:</div>
+                        <div class="psr-field__val">{{ trabajador?.ciudad || '—' }}</div>
                     </div>
                     <div class="psr-field">
                         <div class="psr-field__lbl">Edad:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__val">{{ trabajador?.edad != null ? trabajador!.edad + ' años' : '—' }}
+                        </div>
                     </div>
                     <div class="psr-field">
                         <div class="psr-field__lbl">Sexo:</div>
-                        <div class="psr-field__val">—</div>
-                    </div>
-                    <div class="psr-field">
-                        <div class="psr-field__lbl">Fecha de aplicación del cuestionario:</div>
-                        <div class="psr-field__val">{{ result.evaluatedAt | date:'dd/MM/yyyy' }}</div>
+                        <div class="psr-field__val">{{ sexoLabel }}</div>
                     </div>
                     <div class="psr-field psr-field--last">
-                        <div class="psr-field__lbl">Nombre de la empresa:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__lbl">Fecha de aplicación del cuestionario:</div>
+                        <div class="psr-field__val">{{ (trabajador?.fechaAplicacion | date:'dd/MM/yyyy') || '—' }}</div>
                     </div>
                 </div>
             </section>
-            } <!-- /!isEstres Datos Generales -->
 
-            <!-- 3. ── Datos del Evaluador (no ESTRES) ─────────────── -->
-            @if (!isEstres) {
+            <!-- 3. ── Datos del Evaluador ──────────────────────────────── -->
             <section class="psr-doc__section">
                 <div class="psr-doc__sec-hdr">DATOS DEL EVALUADOR</div>
                 <div class="psr-doc__fields">
                     <div class="psr-field">
                         <div class="psr-field__lbl">Nombre del evaluador:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__val">{{ evaluador?.nombreCompleto || '—' }}</div>
                     </div>
                     <div class="psr-field">
                         <div class="psr-field__lbl">Número de identificación (c.c.):</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__val">{{ evaluador?.identificacion || '—' }}</div>
                     </div>
                     <div class="psr-field">
                         <div class="psr-field__lbl">Profesión:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__val">{{ evaluador?.profesion || '—' }}</div>
                     </div>
                     <div class="psr-field">
-                        <div class="psr-field__lbl">Postgrado:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__lbl">Postgrado en Seguridad y Salud en el Trabajo:</div>
+                        <div class="psr-field__val">{{ evaluador?.posgrado || '—' }}</div>
                     </div>
                     <div class="psr-field">
-                        <div class="psr-field__lbl">No Tarjeta profesional*:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__lbl">No. Tarjeta profesional*:</div>
+                        <div class="psr-field__val">{{ evaluador?.tarjetaProfesional || '—' }}</div>
                     </div>
                     <div class="psr-field">
                         <div class="psr-field__lbl">No. Licencia en salud ocupacional*:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__val">{{ evaluador?.licenciaSaludOcupacional || '—' }}</div>
                     </div>
                     <div class="psr-field psr-field--last">
-                        <div class="psr-field__lbl">Fecha de expedición de la licencia en salud ocupacional*:</div>
-                        <div class="psr-field__val">—</div>
+                        <div class="psr-field__lbl">Fecha de expedición de la licencia*:</div>
+                        <div class="psr-field__val">{{ (evaluador?.fechaExpedicionLicencia | date:'dd/MM/yyyy') || '—'
+                            }}</div>
                     </div>
                 </div>
                 <p class="psr-doc__note">* Todo informe que carezca de estos datos <em>no será válido</em>.</p>
             </section>
-            } <!-- /!isEstres Datos Evaluador -->
 
             <!-- 4. ── Resultados del Cuestionario ──────────────────────── -->
             <section class="psr-doc__section">
@@ -256,14 +263,14 @@
                         </tbody>
                     </table>
                     } @else {
-                    <!-- ── Table WITHOUT Dominios column (EXTRALABORAL) ── -->
+                    <!-- ── Table flat: EXTRALABORAL y ESTRES ─────────────── -->
                     <table class="psr-rtable psr-rtable--flat">
                         <thead>
                             <tr>
-                                <th class="psr-rtable__th psr-rtable__th--dim-flat">Dimensiones</th>
+                                <th class="psr-rtable__th psr-rtable__th--dim-flat">{{ dimensionColumnLabel }}</th>
                                 <th class="psr-rtable__th psr-rtable__th--score">
                                     Puntaje<br><small>(transformado)</small></th>
-                                <th class="psr-rtable__th psr-rtable__th--risk">Nivel de riesgo</th>
+                                <th class="psr-rtable__th psr-rtable__th--risk">{{ riskColumnLabel }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -317,20 +324,60 @@
             <!-- 5. ── Interpretación ────────────────────────────────── -->
             <section class="psr-doc__section">
                 <div class="psr-doc__sec-hdr">{{ interpretationTitle }}</div>
-                <div class="psr-doc__content-area psr-doc__content-area--tinted"></div>
+                <div class="psr-doc__content-area psr-doc__content-area--tinted">
+                    @if (totalDimension?.scoreRangeDescription) {
+                    <p class="psr-doc__interpretation-text">{{ totalDimension!.scoreRangeDescription }}</p>
+                    }
+                </div>
             </section>
 
-            <!-- 6. ── Observaciones y Comentarios ────────────────────── -->
+            <!-- 5.5 ── Interpretación de Dimensiones ─────────────────── -->
+            @if (!isEstres) {
             <section class="psr-doc__section">
-                <div class="psr-doc__sec-hdr">OBSERVACIONES Y COMENTARIOS DEL EVALUADOR</div>
-                <div class="psr-doc__content-area"></div>
+                <div class="psr-doc__sec-hdr">INTERPRETACIÓN DE DIMENSIONES</div>
+                <div class="psr-doc__content-area">
+                    @for (group of domainGroups; track group.domain) {
+                    @for (dim of group.dimensions; track dim.id) {
+                    @if (dim.interpretacion) {
+                    <div class="psr-doc__dim-text-block">
+                        <p class="psr-doc__dim-text-label">{{ dim.friendlyLabel }}</p>
+                        <p class="psr-doc__dim-text-body">{{ dim.interpretacion }}</p>
+                    </div>
+                    }
+                    }
+                    }
+                </div>
             </section>
+            }
 
             <!-- 7. ── Recomendaciones Particulares ───────────────────── -->
             <section class="psr-doc__section">
                 <div class="psr-doc__sec-hdr">RECOMENDACIONES PARTICULARES</div>
-                <div class="psr-doc__content-area"></div>
+                <div class="psr-doc__content-area psr-doc__content-area--tinted">
+                    @if (recomendacion) {
+                    <p class="psr-doc__interpretation-text">{{ recomendacion }}</p>
+                    }
+                </div>
             </section>
+
+            <!-- 7.5 ── Recomendaciones por Dimensión ─────────────────── -->
+            @if (!isEstres) {
+            <section class="psr-doc__section">
+                <div class="psr-doc__sec-hdr">RECOMENDACIONES POR DIMENSIÓN</div>
+                <div class="psr-doc__content-area">
+                    @for (group of domainGroups; track group.domain) {
+                    @for (dim of group.dimensions; track dim.id) {
+                    @if (dim.recomendacion) {
+                    <div class="psr-doc__dim-text-block">
+                        <p class="psr-doc__dim-text-label">{{ dim.friendlyLabel }}</p>
+                        <p class="psr-doc__dim-text-body">{{ dim.recomendacion }}</p>
+                    </div>
+                    }
+                    }
+                    }
+                </div>
+            </section>
+            }
 
             <!-- 8. ── Footer: Fecha + Firma ──────────────────────────── -->
             <div class="psr-doc__footer">
@@ -338,9 +385,9 @@
                     <span class="psr-doc__footer-elab-label">Fecha de elaboración del informe:</span>
                     <div class="psr-doc__footer-date-wrap">
                         <div class="psr-doc__footer-date-boxes">
-                            <div class="psr-doc__footer-date-box">{{ result.evaluatedAt | date:'dd' }}</div>
-                            <div class="psr-doc__footer-date-box">{{ result.evaluatedAt | date:'MM' }}</div>
-                            <div class="psr-doc__footer-date-box">{{ result.evaluatedAt | date:'yyyy' }}</div>
+                            <div class="psr-doc__footer-date-box">{{ today | date:'dd' }}</div>
+                            <div class="psr-doc__footer-date-box">{{ today | date:'MM' }}</div>
+                            <div class="psr-doc__footer-date-box">{{ today | date:'yyyy' }}</div>
                         </div>
                         <div class="psr-doc__footer-date-sub">
                             <span>Dd</span><span>mm</span><span>aaaa</span>

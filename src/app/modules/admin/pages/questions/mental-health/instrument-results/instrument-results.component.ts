@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AssessmentModuleId } from 'app/core/models/assessment.model';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
@@ -42,7 +43,7 @@ export interface InstrumentResultCard extends InstrumentDescriptor {
 @Component({
     selector: 'app-instrument-results',
     standalone: true,
-    imports: [CommonModule, RouterModule, BackgroundCirclesComponent],
+    imports: [CommonModule, RouterModule, FormsModule, BackgroundCirclesComponent],
     templateUrl: './instrument-results.component.html',
     styleUrl: './instrument-results.component.scss',
 })
@@ -53,6 +54,12 @@ export class InstrumentResultsComponent implements OnInit {
     cards: InstrumentResultCard[] = [];
     isLoading = true;
     hasError = false;
+
+    // ── Disclaimer modal (psychosocial-risk only) ─────────────────────────
+    showDisclaimerModal = false;
+    disclaimerAccepted = false;
+    disclaimerExpanded = false;
+    private pendingCard: InstrumentResultCard | null = null;
 
     get heroGradient(): string {
         return this.moduleDef.theme.badgeGradient;
@@ -127,11 +134,35 @@ export class InstrumentResultsComponent implements OnInit {
             this.router.navigate([`/${this.moduleId}`]);
             return;
         }
+        if (this.moduleId === 'psychosocial-risk') {
+            // Show disclaimer modal before navigating to results
+            this.pendingCard = card;
+            this.disclaimerAccepted = false;
+            this.disclaimerExpanded = false;
+            this.showDisclaimerModal = true;
+            return;
+        }
+        this._navigateToResult(card);
+    }
+
+    onDisclaimerAccept(): void {
+        this.showDisclaimerModal = false;
+        this.disclaimerAccepted = false;
+        const card = this.pendingCard;
+        this.pendingCard = null;
+        if (card) {
+            this._navigateToResult(card);
+        }
+    }
+
+    private _navigateToResult(card: InstrumentResultCard): void {
         const isPsychosocial = this.moduleId === 'psychosocial-risk';
         const resultsPath = isPsychosocial ? `/${this.moduleId}/psych-results` : `/${this.moduleId}/results`;
-        this.router.navigate([resultsPath], {
-            queryParams: { instrumentCode: card.code },
-        });
+        const queryParams: Record<string, string> = { instrumentCode: card.code };
+        if (isPsychosocial) {
+            queryParams['period'] = this.dataSheetService.getCurrentPeriod();
+        }
+        this.router.navigate([resultsPath], { queryParams });
     }
 
     goBack(): void {

@@ -131,9 +131,8 @@
                 Declaro que he leído y comprendido la información anteriormente expuesta.
             </label> }
 
-            <button class="wcl-body__cta"
-                (click)="moduleId === 'psychosocial-risk' ? onClosingToDisclaimer() : onClosingContinue()"
-                [style.background]="heroGradient" [disabled]="currentClosing.requiresDisclaimer && !disclaimerAccepted"
+            <button class="wcl-body__cta" (click)="onClosingContinue()" [style.background]="heroGradient"
+                [disabled]="currentClosing.requiresDisclaimer && !disclaimerAccepted"
                 [style.opacity]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? '0.45' : '1'"
                 [style.cursor]="currentClosing.requiresDisclaimer && !disclaimerAccepted ? 'not-allowed' : 'pointer'"
                 type="button">
@@ -141,7 +140,7 @@
                     stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
-                {{ moduleId === 'psychosocial-risk' ? 'Continuar' : currentClosing.cta }}
+                {{ currentClosing.cta }}
             </button>
         </div>
 
@@ -171,6 +170,17 @@
         <!-- Body -->
         <div class="pld-body">
 
+            <!-- Indicación para desplegar la cláusula -->
+            <p class="pld-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Haz clic en el recuadro a continuación para desplegar y leer la cláusula antes de aceptarla.
+            </p>
+
             <!-- Cláusula desplegable -->
             <div class="pld-clause">
                 <button class="pld-clause__toggle"
@@ -181,7 +191,7 @@
                     </svg>
                     <span>Cláusula de Exoneración de Responsabilidad Médica</span>
                     <svg class="pld-clause__chevron" [class.pld-clause__chevron--open]="psychosocialDisclaimerExpanded"
-                        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
@@ -1007,16 +1017,6 @@
                 </ul>
             </div>
             }
-
-            <!-- Instrucción de contexto temporal -->
-            <div class="wm-instr__timeframe">
-                <svg class="wm-instr__timeframe-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span>{{ currentInstructions.timeframe }}</span>
-            </div>
 
             <!-- CTA -->
             <button class="wm-instr__cta" (click)="onInstructionsStart()" [style.background]="pendingInstrument.color"

@@ -121,6 +121,77 @@ export interface GeneralDataCatalogsDto {
     tipoSalario: string[];
 }
 
+// ── Result Report DTOs ────────────────────────────────────────────────────────
+
+export interface PsychosocialDimensionResult {
+    dimensionCode: string;
+    label: string;
+    puntajeTransformado: number | null;
+    nivelRiesgo: string | null;
+    colorHex: string | null;
+    interpretacion: string | null;
+    recomendacion: string | null;
+}
+
+export interface PsychosocialDomainResult {
+    domainCode: string;
+    dominio: string;
+    puntajeTransformado: number | null;
+    nivelRiesgo: string | null;
+    colorHex: string | null;
+    dimensiones: PsychosocialDimensionResult[];
+}
+
+export interface PsychosocialTotalResult {
+    puntajeTransformado: number;
+    nivelRiesgo: string;
+    colorHex: string | null;
+    interpretacion: string | null;
+    recomendacion: string | null;
+}
+
+export interface PsychosocialInstrumentReport {
+    instrumentCode: string;
+    titulo: string;
+    evaluationID: number;
+    status: string;
+    completedAt: string | null;
+    dominios: PsychosocialDomainResult[] | null;
+    dimensiones: PsychosocialDimensionResult[] | null;
+    totalGeneral: PsychosocialTotalResult | null;
+}
+
+export interface PsychosocialWorkerReport {
+    nombreCompleto: string;
+    identificacion: string;
+    tipoDocumento: string;
+    cargo: string;
+    departamento: string;
+    empresa: string | null;
+    ciudad: string | null;
+    edad: number | null;
+    sexo: string;
+    fechaAplicacion: string | null;
+}
+
+export interface PsychosocialEvaluadorReport {
+    nombreCompleto: string | null;
+    identificacion: string | null;
+    profesion: string | null;
+    posgrado: string | null;
+    tarjetaProfesional: string | null;
+    licenciaSaludOcupacional: string | null;
+    fechaExpedicionLicencia: string | null;
+}
+
+export interface PsychosocialReport {
+    period: string;
+    formA: boolean;
+    trabajador: PsychosocialWorkerReport;
+    evaluador: PsychosocialEvaluadorReport;
+    cuestionarios: PsychosocialInstrumentReport[];
+}
+
 // ── Service ───────────────────────────────────────────────────────────────────
 
 @Injectable({ providedIn: 'root' })
@@ -153,5 +224,15 @@ export class PsychosocialDataSheetService {
     getCurrentPeriod(): string {
         const now = new Date();
         return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    /** Retrieves the full psychosocial result report for the given period */
+    getReport(period: string): Observable<PsychosocialReport> {
+        return this.http.get<PsychosocialReport>(`${this.base}/resultado/${period}`);
+    }
+
+    /** Lists all periods for which the user has a psychosocial result */
+    getResultPeriods(): Observable<string[]> {
+        return this.http.get<string[]>(`${this.base}/resultado/periodos`);
     }
 }

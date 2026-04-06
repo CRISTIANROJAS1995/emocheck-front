@@ -1,3 +1,109 @@
+<!-- ── Psychosocial Legal Disclaimer Modal ───────────────────────── -->
+@if (showDisclaimerModal) {
+<div class="wm-overlay">
+    <div class="wm-modal wm-modal--psych-disclaimer" (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="pld-header" [style.background]="heroGradient">
+            <svg class="pld-header__icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" width="28" height="28">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <h2 class="pld-header__title">Antes de ver tus resultados</h2>
+            <svg class="wm-header__wave" viewBox="0 0 1440 60" preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,30 C360,70 1080,-10 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
+            </svg>
+        </div>
+
+        <!-- Body -->
+        <div class="pld-body">
+
+            <p class="pld-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:2px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Haz clic en el recuadro a continuación para desplegar y leer la cláusula antes de aceptarla.
+            </p>
+
+            <!-- Cláusula desplegable -->
+            <div class="pld-clause">
+                <button class="pld-clause__toggle" (click)="disclaimerExpanded = !disclaimerExpanded" type="button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span>Cláusula de Exoneración de Responsabilidad Médica</span>
+                    <svg class="pld-clause__chevron" [class.pld-clause__chevron--open]="disclaimerExpanded" width="22"
+                        height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+
+                @if (disclaimerExpanded) {
+                <div class="pld-clause__content">
+                    <p>El usuario comprende y acepta que <strong>Emocheck</strong> es una plataforma de monitoreo
+                        psicosocial y preventivo. Los resultados, interpretaciones y descripciones de síntomas que aquí
+                        se presentan tienen un carácter <strong>exclusivamente informativo y orientador</strong>.</p>
+                    <p>El usuario reconoce que:</p>
+                    <ul>
+                        <li><strong>Emocheck no es un servicio de diagnóstico clínico:</strong> Los síntomas descritos
+                            en los reportes (ej. fatiga, insomnio, tensión muscular) se mencionan como posibles efectos
+                            asociados a los niveles de riesgo detectados en el entorno laboral.</li>
+                        <li><strong>No sustituye la consulta profesional:</strong> El uso de esta plataforma no
+                            reemplaza la evaluación de un médico, psiquiatra o psicólogo clínico. Ninguna interpretación
+                            generada por el sistema debe utilizarse para automedicarse o tomar decisiones clínicas sin
+                            supervisión profesional.</li>
+                    </ul>
+                    <p>El sistema Emocheck cumple con su función preventiva al alertar sobre el riesgo y sugerir
+                        acciones (Ciclo PHVA). Sin embargo, es responsabilidad del usuario:</p>
+                    <ol>
+                        <li>Reportar cualquier síntoma persistente o grave a su EPS o a la oficina de Seguridad y Salud
+                            en el Trabajo (SST).</li>
+                        <li>Seguir las recomendaciones de autogestión proporcionadas.</li>
+                        <li>Acudir a las asesorías psicológicas o remisiones a la ARL que el sistema o la empresa
+                            dispongan como consecuencia de un riesgo Alto.</li>
+                    </ol>
+                    <p>La empresa (institución) utiliza estos reportes para la mejora continua del entorno de trabajo.
+                        El usuario acepta que la descripción de síntomas es una herramienta técnica para la gestión del
+                        riesgo y no constituye, por sí sola, una prueba de enfermedad laboral sin el debido proceso de
+                        calificación ante las juntas regionales o nacionales de calificación de invalidez.</p>
+                </div>
+                }
+            </div>
+
+            <!-- Checkbox de aceptación -->
+            <label class="pld-accept">
+                <input type="checkbox" [(ngModel)]="disclaimerAccepted"
+                    style="accent-color: #155DFC; width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; margin-top: 2px;" />
+                <span>Confirmo que he leído y acepto la cláusula de exoneración. Comprendo que este reporte es de
+                    carácter informativo y preventivo, que no constituye un diagnóstico clínico ni sustituye la consulta
+                    con un profesional de la salud (médico, psicólogo o psiquiatra). Entiendo que estos resultados son
+                    una herramienta técnica para la gestión de mi bienestar y no una prueba de enfermedad laboral sin el
+                    debido proceso de calificación legal.</span>
+            </label>
+
+            <!-- CTA -->
+            <button class="wcl-body__cta" (click)="onDisclaimerAccept()" [disabled]="!disclaimerAccepted"
+                [style.background]="heroGradient" [style.opacity]="!disclaimerAccepted ? '0.45' : '1'"
+                [style.cursor]="!disclaimerAccepted ? 'not-allowed' : 'pointer'" type="button">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+                Ver mis resultados
+            </button>
+        </div>
+
+    </div>
+</div>
+}
+<!-- ── /Psychosocial Legal Disclaimer Modal ──────────────────────── -->
+
 <div class="ir-page">
     <app-background-circles></app-background-circles>
 

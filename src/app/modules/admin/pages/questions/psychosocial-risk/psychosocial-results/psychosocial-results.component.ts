@@ -1,11 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, finalize, switchMap } from 'rxjs';
+import { Subscription, finalize } from 'rxjs';
 import { AssessmentModuleDefinition, getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
-import { AssessmentDimensionBreakdown, AssessmentResult } from 'app/core/models/assessment.model';
-import { AssessmentStateService } from 'app/core/services/assessment-state.service';
-import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
+import { AssessmentDimensionBreakdown } from 'app/core/models/assessment.model';
+import {
+    PsychosocialDataSheetService,
+    PsychosocialReport,
+    PsychosocialWorkerReport,
+    PsychosocialEvaluadorReport,
+} from 'app/core/services/psychosocial-data-sheet.service';
 
 // ── Domain map für INTRA_A ────────────────────────────────────────────────────
 export interface PsychoDimension {
@@ -83,6 +87,8 @@ export interface EnrichedDimension extends AssessmentDimensionBreakdown {
     domainLabel: string;
     friendlyLabel: string;
     tone: 'sin-riesgo' | 'bajo' | 'medio' | 'alto' | 'muy-alto';
+    interpretacion?: string;
+    recomendacion?: string;
 }
 
 export interface DomainGroup {
@@ -128,21 +134,32 @@ export class PsychosocialResultsComponent implements OnInit, OnDestroy {
     instrumentCode = '';
     instrumentColor = '#f97316';
     instrumentTitle = '';
+    period = '';
 
-    result?: AssessmentResult;
+    report?: PsychosocialReport;
+    trabajador?: PsychosocialWorkerReport;
+    evaluador?: PsychosocialEvaluadorReport;
+
+    /** Minimal result object so the template `@if (result)` guard passes. */
+    result?: { evaluatedAt: string };
     domainGroups: DomainGroup[] = [];
     totalDimension?: EnrichedDimension;
 
+    /** Recomendaciones generales del Excel (columna D), según condición + nivel de riesgo total. */
+    recomendacion?: string;
+
+    /** Local date when the report is viewed/printed — used in the footer. */
+    readonly today = new Date();
+
     isHydrating = false;
-    hydrationAttempted = false;
+    hasError = false;
 
     private readonly subscriptions = new Subscription();
 
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly state: AssessmentStateService,
-        private readonly assessmentHydration: AssessmentHydrationService,
+        private readonly dataSheetService: PsychosocialDataSheetService,
     ) { }
 
     ngOnInit(): void {
@@ -151,29 +168,24 @@ export class PsychosocialResultsComponent implements OnInit, OnDestroy {
         this.instrumentColor = INSTRUMENT_COLORS[this.instrumentCode] ?? '#f97316';
         this.instrumentTitle = INSTRUMENT_TITLES[this.instrumentCode] ?? '';
 
-        this.subscriptions.add(
-            this.state.results$.subscribe(() => {
-                this._processResult();
-            })
-        );
-        this._processResult();
+        const rawPeriod = this.route.snapshot.queryParamMap.get('period');
+        this.period = rawPeriod?.trim() || this.dataSheetService.getCurrentPeriod();
 
         this.isHydrating = true;
-        this.hydrationAttempted = true;
         this.subscriptions.add(
-            this.assessmentHydration
-                .hydrateModuleResultFromCompletedEvaluations(this.moduleId)
-                .pipe(
-                    switchMap(() => this.assessmentHydration.hydrateRecommendationsIfMissing(this.moduleId)),
-                    finalize(() => { this.isHydrating = false; })
-                )
-                .subscribe({
-                    next: () => this._processResult(),
-                    error: () => {
-                        this.isHydrating = false;
-                        if (!this.result) this.router.navigate(['/psychosocial-risk/instrument-results']);
-                    },
-                })
+            this.dataSheetService.getReport(this.period).pipe(
+                finalize(() => { this.isHydrating = false; })
+            ).subscribe({
+                next: (rpt) => {
+                    this.report = rpt;
+                    this.trabajador = rpt.trabajador;
+                    this.evaluador = rpt.evaluador;
+                    this._buildFromReport(rpt);
+                },
+                error: () => {
+                    this.hasError = true;
+                },
+            })
         );
     }
 
@@ -181,76 +193,93 @@ export class PsychosocialResultsComponent implements OnInit, OnDestroy {
         this.subscriptions.unsubscribe();
     }
 
-    private _processResult(): void {
-        const raw = this.state.getResult(this.moduleId);
-        if (!raw) return;
-
-        const code = this.instrumentCode;
-        const filtered = raw.dimensions.filter(
-            d => (d.instrumentCode ?? '').toUpperCase() === code ||
-                (d.instrumentCode ?? '').toUpperCase().startsWith(code + '_')
+    private _buildFromReport(rpt: PsychosocialReport): void {
+        const cuestionario = rpt.cuestionarios.find(
+            c => c.instrumentCode.toUpperCase() === this.instrumentCode
         );
+        if (!cuestionario || cuestionario.status !== 'COMPLETED') {
+            // Show the shell so the user sees the "pending" state
+            this.result = { evaluatedAt: new Date().toISOString() };
+            return;
+        }
 
-        this.result = { ...raw, dimensions: filtered };
+        this.result = { evaluatedAt: cuestionario.completedAt ?? new Date().toISOString() };
 
-        const dimMap = INSTRUMENT_DIMENSION_MAP[code] ?? [];
-
-        // Enrich dimensions
-        const enriched: EnrichedDimension[] = filtered
-            .filter(d => (d.instrumentCode ?? '').toUpperCase() !== code) // exclude global score row
-            .map(d => {
-                const dimCode = (d.instrumentCode ?? '').toUpperCase().replace(code + '_', '');
-                const meta = dimMap.find(m => m.code === dimCode);
-                return {
-                    ...d,
-                    domainLabel: meta?.domain ?? 'General',
-                    friendlyLabel: meta?.label ?? d.label,
-                    tone: this._getTone(d.riskLevel, d.percent),
-                };
-            });
-
-        // Find global/total row
-        const globalDim = filtered.find(d =>
-            (d.instrumentCode ?? '').toUpperCase() === code ||
-            d.label?.toLowerCase().includes('total') ||
-            d.label?.toLowerCase().includes('general')
-        );
-        if (globalDim) {
+        // ── Total row ────────────────────────────────────────────────────────
+        if (cuestionario.totalGeneral) {
+            const t = cuestionario.totalGeneral;
             this.totalDimension = {
-                ...globalDim,
+                id: `${this.instrumentCode}_TOTAL`,
+                label: 'Total General',
+                instrumentCode: this.instrumentCode,
+                percent: t.puntajeTransformado,
+                score: t.puntajeTransformado,
+                maxScore: 100,
+                riskLevel: t.nivelRiesgo,
+                scoreRangeLabel: t.nivelRiesgo,
+                scoreRangeColor: t.colorHex ?? '',
+                scoreRangeDescription: t.interpretacion ?? '',
                 domainLabel: 'Total',
-                friendlyLabel: 'Total General Factores de Riesgo',
-                tone: this._getTone(globalDim.riskLevel, globalDim.percent),
-            };
+                friendlyLabel: 'Total General',
+                tone: this._getTone(t.nivelRiesgo),
+            }; this.recomendacion = t.recomendacion ?? undefined;
         }
 
-        // Group by domain
-        const domainOrder = [...new Set(dimMap.map(d => d.domain))];
-        const groups = new Map<string, EnrichedDimension[]>();
-        for (const d of enriched) {
-            const existing = groups.get(d.domainLabel) ?? [];
-            existing.push(d);
-            groups.set(d.domainLabel, existing);
-        }
-
-        this.domainGroups = domainOrder
-            .filter(domain => groups.has(domain))
-            .map(domain => {
-                const dims = groups.get(domain)!;
-                const worst = dims.reduce((prev, cur) =>
-                    this._toneWeight(cur.tone) > this._toneWeight(prev.tone) ? cur : prev
-                );
+        // ── INTRA_A / INTRA_B: domains ────────────────────────────────────
+        if (cuestionario.dominios && cuestionario.dominios.length > 0) {
+            this.domainGroups = cuestionario.dominios.map(dom => {
+                const dims: EnrichedDimension[] = dom.dimensiones.map(dim => ({
+                    id: dim.dimensionCode,
+                    label: dim.label,
+                    instrumentCode: `${this.instrumentCode}_${dim.dimensionCode}`,
+                    percent: dim.puntajeTransformado ?? (undefined as unknown as number),
+                    score: dim.puntajeTransformado ?? 0,
+                    maxScore: 100,
+                    riskLevel: dim.nivelRiesgo ?? '',
+                    scoreRangeLabel: dim.nivelRiesgo ?? '',
+                    scoreRangeColor: dim.colorHex ?? '',
+                    scoreRangeDescription: '',
+                    domainLabel: dom.dominio,
+                    friendlyLabel: dim.label,
+                    tone: this._getTone(dim.nivelRiesgo),
+                    interpretacion: dim.interpretacion ?? undefined,
+                    recomendacion: dim.recomendacion ?? undefined,
+                }));
                 return {
-                    domain,
+                    domain: dom.dominio,
                     dimensions: dims,
-                    domainTone: worst.tone,
-                    domainScore: worst.percent,
-                    domainRiskLevel: worst.riskLevel,
+                    domainTone: this._getTone(dom.nivelRiesgo),
+                    domainScore: dom.puntajeTransformado ?? undefined,
+                    domainRiskLevel: dom.nivelRiesgo ?? '',
                 };
             });
+            return;
+        }
+
+        // ── EXTRALABORAL / ESTRES: flat dimensions ────────────────────────
+        if (cuestionario.dimensiones && cuestionario.dimensiones.length > 0) {
+            const dims: EnrichedDimension[] = cuestionario.dimensiones.map(dim => ({
+                id: dim.dimensionCode,
+                label: dim.label,
+                instrumentCode: `${this.instrumentCode}_${dim.dimensionCode}`,
+                percent: dim.puntajeTransformado ?? (undefined as unknown as number),
+                score: dim.puntajeTransformado ?? 0,
+                maxScore: 100,
+                riskLevel: dim.nivelRiesgo ?? '',
+                scoreRangeLabel: dim.nivelRiesgo ?? '',
+                scoreRangeColor: dim.colorHex ?? '',
+                scoreRangeDescription: '',
+                domainLabel: 'General',
+                friendlyLabel: dim.label,
+                tone: this._getTone(dim.nivelRiesgo),
+                interpretacion: dim.interpretacion ?? undefined,
+                recomendacion: dim.recomendacion ?? undefined,
+            }));
+            this.domainGroups = [{ domain: 'General', dimensions: dims, domainTone: 'sin-riesgo' }];
+        }
     }
 
-    private _getTone(riskLevel?: string, percent?: number): 'sin-riesgo' | 'bajo' | 'medio' | 'alto' | 'muy-alto' {
+    private _getTone(riskLevel?: string | null): 'sin-riesgo' | 'bajo' | 'medio' | 'alto' | 'muy-alto' {
         if (riskLevel) {
             const v = riskLevel.toLowerCase();
             if (v.includes('sin riesgo') || v.includes('sin_riesgo') || v.includes('no risk') || v.includes('sin-riesgo')) return 'sin-riesgo';
@@ -259,11 +288,6 @@ export class PsychosocialResultsComponent implements OnInit, OnDestroy {
             if (v.includes('medio') || v.includes('moderado') || v.includes('moderate') || v.includes('medium')) return 'medio';
             if (v.includes('bajo') || v.includes('low') || v.includes('leve')) return 'bajo';
         }
-        const p = percent ?? 0;
-        if (p >= 80) return 'muy-alto';
-        if (p >= 60) return 'alto';
-        if (p >= 40) return 'medio';
-        if (p >= 20) return 'bajo';
         return 'sin-riesgo';
     }
 
@@ -284,39 +308,23 @@ export class PsychosocialResultsComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Always builds from the full dimension map, merging real backend data where available.
-     * Dimensions missing from the backend show as empty (—) placeholders.
+     * Returns domain groups for the template.
+     * When real backend data is available, uses it directly (codes come from the backend).
+     * In preview mode (no data yet), falls back to the hardcoded frontend map so the
+     * table still renders with expected dimension labels and — placeholders.
      */
     get displayGroups(): DomainGroup[] {
+        if (!this.isPreview) {
+            return this.domainGroups;
+        }
+
+        // Preview: build placeholder rows from hardcoded frontend constants
         const dimMap = INSTRUMENT_DIMENSION_MAP[this.instrumentCode] ?? [];
-        if (dimMap.length === 0) return this.domainGroups;
-
-        // Build lookup of real enriched dimensions by short code (e.g. "CL", "RST")
-        const realByCode = new Map<string, EnrichedDimension>();
-        const prefix = this.instrumentCode + '_';
-        for (const group of this.domainGroups) {
-            for (const dim of group.dimensions) {
-                const raw = (dim.instrumentCode ?? '').toUpperCase();
-                const code = raw.startsWith(prefix) ? raw.slice(prefix.length) : raw;
-                realByCode.set(code, dim);
-            }
-        }
-
-        // Build lookup of real domain groups by domain name
-        const realGroupByDomain = new Map<string, DomainGroup>();
-        for (const g of this.domainGroups) {
-            realGroupByDomain.set(g.domain, g);
-        }
-
         const domainOrder = [...new Set(dimMap.map(d => d.domain))];
         return domainOrder.map(domain => {
-            const mapDims = dimMap.filter(d => d.domain === domain);
-            const realGroup = realGroupByDomain.get(domain);
-
-            const dimensions = mapDims.map(d => {
-                const real = realByCode.get(d.code);
-                if (real) return real;
-                return {
+            const dimensions = dimMap
+                .filter(d => d.domain === domain)
+                .map(d => ({
                     id: d.code,
                     label: d.label,
                     instrumentCode: `${this.instrumentCode}_${d.code}`,
@@ -330,16 +338,8 @@ export class PsychosocialResultsComponent implements OnInit, OnDestroy {
                     domainLabel: domain,
                     friendlyLabel: d.label,
                     tone: 'sin-riesgo' as const,
-                };
-            });
-
-            return {
-                domain,
-                dimensions,
-                domainTone: realGroup?.domainTone ?? ('sin-riesgo' as const),
-                domainScore: realGroup?.domainScore,
-                domainRiskLevel: realGroup?.domainRiskLevel ?? '',
-            };
+                }));
+            return { domain, dimensions, domainTone: 'sin-riesgo' as const, domainScore: undefined, domainRiskLevel: '' };
         });
     }
 
@@ -401,6 +401,25 @@ export class PsychosocialResultsComponent implements OnInit, OnDestroy {
 
     get heroGradient(): string {
         return this.moduleDef.theme.badgeGradient;
+    }
+
+    /** Displays 'Masculino' / 'Femenino' / raw value / '—' from the single-char code stored in DB. */
+    get sexoLabel(): string {
+        const s = this.trabajador?.sexo?.toUpperCase();
+        if (!s) return '—';
+        if (s === 'M') return 'Masculino';
+        if (s === 'F') return 'Femenino';
+        return this.trabajador!.sexo;
+    }
+
+    /** Column header for the flat results table dimension column. */
+    get dimensionColumnLabel(): string {
+        return this.instrumentCode === 'ESTRES' ? 'Categorías de síntomas' : 'Dimensiones';
+    }
+
+    /** Column header for the flat results table risk level column. */
+    get riskColumnLabel(): string {
+        return this.instrumentCode === 'ESTRES' ? 'Nivel de estrés' : 'Nivel de riesgo';
     }
 
     goBack(): void {

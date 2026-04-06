@@ -1924,6 +1924,20 @@
     gap: 18px;
 }
 
+.pld-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 14px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1e40af;
+    line-height: 1.5;
+}
+
 .pld-clause {
     border: 1px solid #e2e8f0;
     border-radius: 12px;
@@ -1957,7 +1971,7 @@
     &__chevron {
         flex-shrink: 0;
         transition: transform 0.2s ease;
-        color: #64748b;
+        color: #ea580c;
 
         &--open {
             transform: rotate(180deg);

@@ -251,6 +251,42 @@ $sage-text: #2d4826;
         }
     }
 
+    &__interpretation-text {
+        padding: 16px 20px;
+        font-size: 13px;
+        line-height: 1.7;
+        color: #374151;
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
+    // Per-dimension interpretation / recommendation blocks
+    &__dim-text-block {
+        padding: 14px 20px;
+        border-bottom: 1px solid #e5e7eb;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    &__dim-text-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #1e40af;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin: 0 0 6px;
+    }
+
+    &__dim-text-body {
+        font-size: 13px;
+        line-height: 1.7;
+        color: #374151;
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
     // Document footer
     &__footer {
         padding: 20px 20px 28px;

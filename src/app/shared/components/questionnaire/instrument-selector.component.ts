@@ -1286,7 +1286,7 @@ export class InstrumentSelectorComponent implements OnInit {
                 : 'Antes de responder los cuestionarios, completa tu ficha de datos personales y ocupacionales.',
             instrumentId: 0,
             index: -2,
-            questionCount: 0,
+            questionCount: 26,
             icon: 'icons/Icon (44).svg',
             description: dataSheetExists
                 ? 'Ya registraste tu ficha de datos para este período. Puedes editarla si lo necesitas.'
