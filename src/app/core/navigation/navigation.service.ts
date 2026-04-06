@@ -182,7 +182,7 @@ export class NavigationService {
                     title: 'Mi Plan',
                     type: 'basic',
                     icon: 'emocheck:mi-plan',
-                    link: '/home',
+                    link: '/my-plan',
                     classes: baseItemClasses,
                 });
             }

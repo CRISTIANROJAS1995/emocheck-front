@@ -145,6 +145,15 @@ export const appRoutes: Route[] = [
                 loadChildren: () => import('app/modules/admin/pages/resources/resources.routes'),
             },
             {
+                path: 'my-plan',
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'Employee', 'HSE', 'Psychologist'],
+                    seo: { title: 'Mi Plan de Acción', canonical: '/my-plan' }
+                },
+                loadChildren: () => import('app/modules/admin/pages/my-plan/my-plan.routes'),
+            },
+            {
                 path: 'admin',
                 canActivate: [RoleGuard],
                 data: {

@@ -1,0 +1,681 @@
+<div class="my-plan-page">
+    <app-background-circles></app-background-circles>
+
+    <div class="my-plan-shell">
+
+        <!-- ── Hero header ──────────────────────────────────────────────── -->
+        <section class="plan-hero">
+            <div class="plan-hero__left">
+                <div class="plan-hero__title-row">
+                    <img class="plan-hero__logo" src="icons/Icon.svg" alt="" />
+                    <h1 class="plan-hero__title">Mi Plan de Acción</h1>
+                </div>
+                <p class="plan-hero__subtitle">Tu plan de intervención personalizado por módulos</p>
+            </div>
+            @if (view() === 'intro') {
+            <a class="plan-hero__back" [routerLink]="['/home']">
+                <span class="plan-hero__back-content">
+                    <mat-icon class="plan-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                    <span class="plan-hero__back-text">Volver</span>
+                </span>
+            </a>
+            }
+            @if (view() === 'module-intro' || view() === 'module') {
+            <button class="plan-hero__back" type="button" (click)="backToIntro()">
+                <span class="plan-hero__back-content">
+                    <mat-icon class="plan-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                    <span class="plan-hero__back-text">Volver</span>
+                </span>
+            </button>
+            }
+        </section>
+
+        <!-- ── Pantalla 1: Intro ────────────────────────────────────────── -->
+        @if (view() === 'intro') {
+        <div class="plan-intro">
+
+            <div class="plan-intro__left">
+                <mat-icon class="plan-float plan-float--1" svgIcon="heroicons_outline:heart"></mat-icon>
+                <mat-icon class="plan-float plan-float--2" svgIcon="heroicons_outline:sparkles"></mat-icon>
+                <mat-icon class="plan-float plan-float--3" svgIcon="heroicons_outline:face-smile"></mat-icon>
+                <mat-icon class="plan-float plan-float--4" svgIcon="heroicons_outline:bolt"></mat-icon>
+
+                <div class="plan-intro__header">
+                    <img src="icons/Icon.svg" class="plan-intro__logo" alt="EmoCheck" />
+                    <h2 class="plan-intro__heading">Planes de Intervención</h2>
+                </div>
+                <p class="plan-intro__quote">
+                    "Darnos el tiempo para observar nuestras emociones, hábitos y relaciones es un acto de cuidado
+                    personal que nos permite entender qué está influyendo en nuestro bienestar y en la forma en que
+                    afrontamos cada día. A partir de esta conciencia, es posible tomar decisiones más alineadas con lo
+                    que necesitamos. Por eso, te invitamos a realizar estas actividades de la mano de EMOCHECK, un
+                    espacio pensado para acompañarte, donde podrás detenerte, escucharte sin juicio y dar pequeños pasos
+                    que fortalezcan tu bienestar de manera cercana y respetuosa con tu propio proceso"
+                </p>
+                <p class="plan-intro__tagline">— Acompáñanos</p>
+                <div class="plan-intro__tags">
+                    <span class="plan-intro__tag">Autoconocimiento</span>
+                    <span class="plan-intro__tag">Empatía</span>
+                    <span class="plan-intro__tag">Autocuidado</span>
+                </div>
+            </div>
+
+            <div class="plan-intro__modules">
+                <p class="plan-intro__modules-label">Selecciona un módulo para comenzar</p>
+                @for (module of modules; track module.id) {
+                <div class="plan-module-row" (click)="openModule(module)">
+                    <div class="plan-module-row__icon" [style.background]="module.gradient">
+                        <mat-icon class="plan-module-row__icon-mat" [svgIcon]="module.icon"></mat-icon>
+                    </div>
+                    <div class="plan-module-row__info">
+                        <h3 class="plan-module-row__title">{{ module.title }}</h3>
+                        <p class="plan-module-row__desc">{{ module.description }}</p>
+                        <!-- <p class="plan-module-row__meta">{{ module.sections.length }} secciones</p> -->
+                    </div>
+                    <div class="plan-module-row__cta">
+                        Iniciar
+                        <mat-icon svgIcon="heroicons_outline:arrow-right" class="plan-module-row__arrow"></mat-icon>
+                    </div>
+                </div>
+                }
+            </div>
+
+        </div>
+        }
+
+        <!-- ── Pantalla 2: Intro de módulo ───────────────────────────────── -->
+        @if (view() === 'module-intro' && activeModule) {
+        <div class="p2-shell">
+
+            <div class="p2-banner" [style.background]="activeModule.gradient">
+                <mat-icon class="p2-banner__icon" [svgIcon]="activeModule.icon"></mat-icon>
+                <div>
+                    <p class="p2-banner__label">Módulo seleccionado</p>
+                    <h2 class="p2-banner__title">{{ activeModule.title }}</h2>
+                </div>
+            </div>
+
+            <div class="p2-body">
+                <div class="p2-left" [style.--mod-color]="activeModule.color">
+                    <div class="p2-left__accent" [style.background]="activeModule.gradient"></div>
+                    @for (text of activeModule.introTexts; track $index) {
+                    <p class="p2-left__para">{{ text }}</p>
+                    }
+                </div>
+                <div class="p2-right">
+                    <div class="p2-img-wrap">
+                        <img [src]="activeModule.image" [alt]="activeModule.title" class="p2-img"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+                        <div class="p2-img__placeholder">
+                            <div class="p2-img__placeholder-inner">
+                                <span class="p2-img__placeholder-icon">&#x1F5BC;&#xFE0F;</span>
+                                <p class="p2-img__placeholder-text">Imagen del módulo</p>
+                                <p class="p2-img__placeholder-sub">{{ activeModule.title }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="p2-cta" type="button" (click)="continueModule()"
+                        [style.background]="activeModule.gradient">
+                        <mat-icon svgIcon="heroicons_outline:play-circle"></mat-icon>
+                        Continuar el curso
+                    </button>
+                </div>
+            </div>
+
+            <div class="p2-stats">
+                <div class="p2-stat">
+                    <mat-icon class="p2-stat__icon" svgIcon="heroicons_outline:clock"></mat-icon>
+                    <div>
+                        <p class="p2-stat__label">Duración</p>
+                        <p class="p2-stat__value">{{ activeModule.duration }}</p>
+                    </div>
+                </div>
+                <div class="p2-stat">
+                    <mat-icon class="p2-stat__icon" svgIcon="heroicons_outline:book-open"></mat-icon>
+                    <div>
+                        <p class="p2-stat__label">Temas</p>
+                        <p class="p2-stat__value">{{ activeModule.topicsCount }}</p>
+                    </div>
+                </div>
+                <div class="p2-stat">
+                    <mat-icon class="p2-stat__icon" svgIcon="heroicons_outline:archive-box"></mat-icon>
+                    <div>
+                        <p class="p2-stat__label">Recursos</p>
+                        <p class="p2-stat__value">{{ activeModule.resourcesCount }}</p>
+                    </div>
+                </div>
+                <div class="p2-stat">
+                    <mat-icon class="p2-stat__icon" svgIcon="heroicons_outline:academic-cap"></mat-icon>
+                    <div>
+                        <p class="p2-stat__label">Certificación</p>
+                        <p class="p2-stat__value">{{ activeModule.hasCertification ? 'Sí' : 'No' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p2-materials">
+                <p class="p2-materials__label">Materiales disponibles en este módulo</p>
+                <div class="p2-materials__pills">
+                    @for (mat of activeModule.materials; track $index) {
+                    <span class="p2-material-pill" [style.border-color]="activeModule.color"
+                        [style.color]="activeModule.color">
+                        {{ mat }}
+                    </span>
+                    }
+                </div>
+            </div>
+
+        </div>
+        }
+
+        <!-- ── Pantalla 3: Vista de módulo ─────────────────────────────── -->
+        @if (view() === 'module') {
+        <div class="plan-layout">
+
+            <!-- LEFT sidebar -->
+            <aside class="plan-sidebar">
+                <div class="sidebar-inner">
+                    <p class="sidebar-label">Módulos</p>
+
+                    @for (module of modules; track module.id) {
+                    @if (isModuleActive(module.id)) {
+                    <div class="sidebar-module sidebar-module--active">
+
+                        <button class="sidebar-module__header" type="button" (click)="toggleModule(module)">
+                            <span class="sidebar-module__dot" [style.background]="module.color"></span>
+                            <span class="sidebar-module__name">{{ module.title }}</span>
+                            <mat-icon class="sidebar-module__chevron"
+                                [class.sidebar-module__chevron--open]="module.expanded"
+                                svgIcon="heroicons_outline:chevron-down">
+                            </mat-icon>
+                        </button>
+
+                        @if (isModuleActive(module.id)) {
+                        <div class="sidebar-progress">
+                            <div class="sidebar-progress__bar">
+                                <div class="sidebar-progress__fill" [style.width.%]="moduleProgress"></div>
+                            </div>
+                            <span class="sidebar-progress__label">{{ moduleProgress }}% completado</span>
+                        </div>
+                        }
+
+                        @if (module.expanded) {
+                        <ul class="sidebar-sections">
+                            @for (section of module.sections; track section.id) {
+                            <li class="si-group">
+                                <button type="button" class="si-btn"
+                                    [class.si-btn--active]="isSectionActive(section.id)"
+                                    [class.si-btn--done]="section.isCompleted"
+                                    (click)="selectSection(module, section)">
+                                    @if (section.isCompleted) {
+                                        <mat-icon class="si-check" svgIcon="heroicons_outline:check-circle"></mat-icon>
+                                    } @else {
+                                        <span class="si-dot" [class.si-dot--on]="isSectionActive(section.id)"></span>
+                                    }
+                                    <span class="si-text">{{ section.title }}</span>
+                                </button>
+                            </li>
+                            }
+                        </ul>
+                        }
+                    </div>
+                    }
+                    }
+
+                    <button type="button" class="sidebar-back-btn" (click)="view.set('intro')">
+                        <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                        Cambiar módulo
+                    </button>
+
+                </div>
+            </aside>
+
+            <!-- RIGHT content panel -->
+            <main class="plan-content">
+                <div class="content-card">
+
+                    @if (activeModule) {
+                    <div class="content-header" [style.background]="activeModule.gradient">
+                        <div class="content-header__inner">
+                            <mat-icon class="content-header__icon" [svgIcon]="activeModule.icon"></mat-icon>
+                            <div>
+                                <p class="content-header__module">{{ activeModule.title }}</p>
+                                <h2 class="content-header__section">{{ activeSection?.title }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    }
+
+                    <div class="content-body">
+
+                        <!-- MH: Bienvenida -->
+                        @if (activeSectionId() === 'mh-bienvenida') {
+                        <div class="section-content">
+                            <div class="section-content__head-row">
+                                <img class="section-content__banner" src="icons/Icon.svg" alt="EmoCheck" />
+                                <h3 class="section-content__title">Bienvenida</h3>
+                            </div>
+                            <p class="section-content__lead">
+                                Te damos la bienvenida a este módulo de salud mental, un espacio diseñado para el
+                                fortalecimiento de herramientas para nuestro sistema nervioso central. Aquí encontrarás
+                                ejercicios de psicoeducación, técnicas de regulación emocional y estrategias prácticas
+                                orientadas a mejorar la gestión de situaciones cotidianas. Este módulo busca el
+                                desarrollo de tus habilidades internas, fomentando el autocontrol, la toma de decisiones
+                                y el bienestar integral.
+                            </p>
+                            <div class="bw-stats">
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:clock"></mat-icon>
+                                    <p class="bw-stat__label">Duración</p>
+                                    <p class="bw-stat__value">{{ activeModule?.duration }}</p>
+                                </div>
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:book-open"></mat-icon>
+                                    <p class="bw-stat__label">Temas</p>
+                                    <p class="bw-stat__value">{{ activeModule?.topicsCount }}</p>
+                                </div>
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:archive-box"></mat-icon>
+                                    <p class="bw-stat__label">Recursos</p>
+                                    <p class="bw-stat__value">{{ activeModule?.resourcesCount }}</p>
+                                </div>
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:academic-cap"></mat-icon>
+                                    <p class="bw-stat__label">Certificación</p>
+                                    <p class="bw-stat__value">{{ activeModule?.hasCertification ? 'Sí' : 'No' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- MH: Aprende -->
+                        @if (activeSectionId() === 'mh-aprende') {
+                        <div class="section-content">
+                            <p class="section-content__tag">Psicoeducación</p>
+                            <h3 class="section-content__title">Conoce tu control de mando</h3>
+                            <p class="section-content__lead">
+                                Nuestro cuerpo funciona como un sistema integrado, donde cada órgano cumple una función
+                                coordinada bajo la dirección de un centro de control que mantiene el equilibrio y el
+                                adecuado funcionamiento. Este centro es el sistema nervioso central, formado por el
+                                cerebro y la médula espinal, encargado de procesar la información y coordinar las
+                                respuestas del organismo. Por su parte, el sistema nervioso periférico conecta este
+                                centro con el resto del cuerpo, permitiendo percibir estímulos, generar respuestas y
+                                regular funciones como el movimiento, las emociones y los procesos automáticos.
+                            </p>
+                            <div class="two-col-cards">
+                                <div class="def-card def-card--blue">
+                                    <h4>Sistema Nervioso Central (SNC)</h4>
+                                    <p class="def-card__sub">Cerebro y médula espinal</p>
+                                    <ul class="def-card__list">
+                                        <li>Procesa la información.</li>
+                                        <li>Coordina y dirige las funciones del cuerpo.</li>
+                                        <li>Regula respuestas voluntarias e involuntarias.</li>
+                                    </ul>
+                                </div>
+                                <div class="def-card def-card--teal">
+                                    <h4>Sistema Nervioso Periférico (SNP)</h4>
+                                    <p class="def-card__sub">Nervios que conectan el SNC con el resto del cuerpo</p>
+                                    <ul class="def-card__list">
+                                        <li>Transmite estímulos sensoriales al SNC.</li>
+                                        <li>Lleva respuestas motoras a músculos y órganos.</li>
+                                        <li>Participa en funciones automáticas como la respiración, el ritmo cardíaco y la digestión.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- MH: Conecta -->
+                        @if (activeSectionId() === 'mh-conecta') {
+                        <div class="section-content">
+                            <p class="section-content__tag">Multimedia</p>
+                            <h3 class="section-content__title">Infografía: Sistema Nervioso</h3>
+                            <p class="section-content__lead">
+                                Observa cómo se organiza nuestro sistema nervioso y el papel que desempeña en el
+                                equilibrio de nuestro cuerpo y emociones.
+                            </p>
+                            <div class="infographic-block">
+                                <img src="images/planaccion/sistema-nervioso.jpeg"
+                                    alt="Infografía del Sistema Nervioso"
+                                    class="infographic-img" />
+                            </div>
+                        </div>
+                        }
+
+                        <!-- MH: Actúa -->
+                        @if (activeSectionId() === 'mh-actua') {
+                        <div class="section-content">
+                            <p class="section-content__tag">Tarea de la semana</p>
+                            <h3 class="section-content__title">Sistema Nervioso</h3>
+                            <div class="actua-card">
+                                <p>Escucharte es el primer paso para mantener tu bienestar. Tu sistema nervioso cumple
+                                un papel fundamental al brindarte información sobre cómo te sientes. Cuando sientas que
+                                está bloqueado o que no logras identificar lo que ocurre, detente un momento, toma una
+                                pausa y presta atención a las señales que tu cuerpo y emociones están transmitiendo.</p>
+                            </div>
+                            <div class="actua-prompt">
+                                <mat-icon svgIcon="heroicons_outline:pencil-square"></mat-icon>
+                                <p><strong>Esta semana te invitamos a:</strong> Dedica 5 minutos al día a hacer una
+                                pausa consciente. Cierra los ojos, respira profundo y nota qué sensaciones físicas y
+                                emocionales están presentes en tu cuerpo.</p>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- MH: Cierre -->
+                        @if (activeSectionId() === 'mh-cierre') {
+                        <div class="section-content section-content--closing">
+                            <div class="closing-icon">
+                                <mat-icon svgIcon="heroicons_outline:academic-cap"></mat-icon>
+                            </div>
+                            <h3 class="section-content__title">¡Has finalizado este proceso!</h3>
+                            <p class="section-content__lead">
+                                Queremos agradecerte por cada actividad realizada y por tu compromiso a lo largo de este
+                                recorrido. Esperamos que esta experiencia te haya brindado aprendizajes significativos,
+                                herramientas prácticas y conceptos valiosos que puedas aplicar en tu vida diaria.
+                            </p>
+                            <div class="info-box info-box--green">
+                                <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                                <p>Recuerda que cuidarte, escucharte y priorizar tu bienestar no es un acto de egoísmo,
+                                sino una forma consciente de valorarte y reconocer que tu salud y tu vida son
+                                importantes hoy y siempre.</p>
+                            </div>
+                            <div class="certificate-card">
+                                <div class="certificate-card__body">
+                                    <p class="certificate-card__label">RECONOCIMIENTO EN HABILIDADES DE SALUD MENTAL</p>
+                                    <p class="certificate-card__name">{{ userName() }}</p>
+                                    <p class="certificate-card__text">
+                                        Reconocemos tu esfuerzo y dedicación en el desarrollo de habilidades junto a Emocheck.
+                                    </p>
+                                    <p class="certificate-card__date">{{ today | date:'dd/MM/yyyy' }}</p>
+                                    <p class="certificate-card__desc">
+                                        Has aprobado este proceso, fortaleciendo recursos personales que te permiten
+                                        evaluar, comprender y aplicar estrategias adecuadas frente a situaciones que
+                                        puedan impactar tu bienestar y tu estilo de vida.
+                                    </p>
+                                </div>
+                                <div class="certificate-card__footer">
+                                    <button class="cert-download-btn" type="button" (click)="openCertificate()">
+                                        <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+                                        Descargar reconocimiento
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- FL: Bienvenida -->
+                        @if (activeSectionId() === 'fl-bienvenida') {
+                        <div class="section-content">
+                            <div class="section-content__head-row">
+                                <img class="section-content__banner" src="icons/Icon.svg" alt="EmoCheck" />
+                                <h3 class="section-content__title">Bienvenida</h3>
+                            </div>
+                            <p class="section-content__lead">
+                                Te damos la bienvenida a este módulo sobre <strong>fatiga laboral</strong>, un espacio
+                                diseñado para fortalecer herramientas que favorezcan la recuperación y el equilibrio del
+                                organismo frente a las demandas del trabajo. La fatiga laboral puede afectar el
+                                funcionamiento físico y mental, impactando la energía, la concentración, el estado de
+                                ánimo y la capacidad de respuesta del sistema nervioso.
+                            </p>
+                            <p class="section-content__lead">
+                                Aquí encontrarás ejercicios de psicoeducación, técnicas de regulación y estrategias
+                                prácticas orientadas a reconocer las señales de fatiga y mejorar la gestión de las
+                                exigencias cotidianas. Este módulo busca potenciar tus habilidades de autocuidado,
+                                facilitando la toma de decisiones y promoviendo un bienestar integral y sostenible.
+                                Por cada actividad se darán tres espacios.
+                            </p>
+                            <div class="bw-stats">
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:clock"></mat-icon>
+                                    <p class="bw-stat__label">Duración</p>
+                                    <p class="bw-stat__value">{{ activeModule?.duration }}</p>
+                                </div>
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:book-open"></mat-icon>
+                                    <p class="bw-stat__label">Temas</p>
+                                    <p class="bw-stat__value">{{ activeModule?.topicsCount }}</p>
+                                </div>
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:archive-box"></mat-icon>
+                                    <p class="bw-stat__label">Recursos</p>
+                                    <p class="bw-stat__value">{{ activeModule?.resourcesCount }}</p>
+                                </div>
+                                <div class="bw-stat">
+                                    <mat-icon class="bw-stat__ico" svgIcon="heroicons_outline:academic-cap"></mat-icon>
+                                    <p class="bw-stat__label">Certificación</p>
+                                    <p class="bw-stat__value">{{ activeModule?.hasCertification ? 'Sí' : 'No' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- FL: Aprende -->
+                        @if (activeSectionId() === 'fl-aprende') {
+                        <div class="section-content">
+                            <p class="section-content__tag">Psicoeducación</p>
+                            <h3 class="section-content__title">Armando el cansancio</h3>
+                            <p class="section-content__lead">
+                                La fatiga laboral no aparece de un momento a otro; se va construyendo, pieza a pieza,
+                                como si fuéramos armando el cansancio sin darnos cuenta.
+                            </p>
+                            <div class="three-col-cards">
+                                <div class="def-card def-card--blue">
+                                    <h4>A nivel mental</h4>
+                                    <p>Se evidencia en la dificultad para concentrarse, olvidos frecuentes y sensación
+                                    de saturación, como si la mente estuviera constantemente llena.</p>
+                                </div>
+                                <div class="def-card def-card--teal">
+                                    <h4>A nivel físico</h4>
+                                    <p>Se manifiesta en el cuerpo a través de tensión muscular, cansancio persistente,
+                                    somnolencia o falta de energía, incluso después de descansar.</p>
+                                </div>
+                                <div class="def-card def-card--green">
+                                    <h4>A nivel emocional</h4>
+                                    <p>Aparece en forma de irritabilidad, desmotivación, frustración o sensación de
+                                    desgaste frente a las tareas diarias.</p>
+                                </div>
+                            </div>
+                            <div class="info-box info-box--teal">
+                                <mat-icon svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                                <p>Reconocer cómo se va armando este cansancio es clave para intervenir a tiempo y
+                                recuperar el equilibrio.</p>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- FL: Conecta -->
+                        @if (activeSectionId() === 'fl-conecta') {
+                        <div class="section-content">
+                            <p class="section-content__tag">Multimedia</p>
+                            <h3 class="section-content__title">Armando el cansancio</h3>
+                            <p class="section-content__lead">
+                                La fatiga laboral se construye de muchas piezas. Identificar cuáles están presentes en
+                                tu caso es el primer paso para actuar.
+                            </p>
+                            <div class="infographic-block">
+                                <img src="images/planaccion/armando-cansancio.jpeg"
+                                    alt="Armando el cansancio"
+                                    class="infographic-img" />
+                            </div>
+                        </div>
+                        }
+
+                        <!-- FL: Actúa -->
+                        @if (activeSectionId() === 'fl-actua') {
+                        <div class="section-content">
+                            <p class="section-content__tag">Tarea de la semana</p>
+                            <h3 class="section-content__title">Fatiga Laboral</h3>
+                            <div class="actua-card">
+                                <p>Reconocer lo que está sintiendo tu cuerpo y cómo manifiesta el agotamiento es una
+                                señal para hacer una pausa consciente e identificar qué necesitas para recargar tu
+                                energía interna, toma una caminata que te permita recargar y organizar todas las fichas
+                                que están sueltas o en el lugar equivocado.</p>
+                            </div>
+                            <div class="actua-prompt">
+                                <mat-icon svgIcon="heroicons_outline:pencil-square"></mat-icon>
+                                <p><strong>Esta semana te invitamos a:</strong> Escoge una estrategia de recuperación
+                                de las presentadas y comprométete a aplicarla de forma consistente durante los próximos
+                                7 días. Registra los cambios que observas en tu energía y estado emocional.</p>
+                            </div>
+                        </div>
+                        }
+
+                        <!-- FL: Cierre -->
+                        @if (activeSectionId() === 'fl-cierre') {
+                        <div class="section-content section-content--closing">
+                            <div class="closing-icon closing-icon--teal">
+                                <mat-icon svgIcon="heroicons_outline:academic-cap"></mat-icon>
+                            </div>
+                            <h3 class="section-content__title">¡Has finalizado este proceso!</h3>
+                            <p class="section-content__lead">
+                                Queremos agradecerte por cada actividad realizada y por tu compromiso a lo largo de
+                                este recorrido. Esperamos que esta experiencia te haya brindado herramientas prácticas
+                                y aprendizajes significativos para reconocer y gestionar la fatiga laboral en tu vida
+                                diaria.
+                            </p>
+                            <div class="info-box info-box--teal">
+                                <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                                <p>Recuerda que atender las señales de cansancio, hacer pausas y priorizar tu bienestar
+                                no es un acto de debilidad, sino una decisión consciente para cuidar tu salud y
+                                mantener un equilibrio sostenible en tu entorno laboral y personal.</p>
+                            </div>
+                            <div class="certificate-card">
+                                <div class="certificate-card__body">
+                                    <p class="certificate-card__label">RECONOCIMIENTO EN GESTIÓN DE FATIGA LABORAL</p>
+                                    <p class="certificate-card__name">{{ userName() }}</p>
+                                    <p class="certificate-card__text">
+                                        Reconocemos tu esfuerzo y dedicación en el fortalecimiento de habilidades junto a Emocheck.
+                                    </p>
+                                    <p class="certificate-card__date">{{ today | date:'dd/MM/yyyy' }}</p>
+                                    <p class="certificate-card__desc">
+                                        Has aprobado este proceso, desarrollando recursos personales que te permiten
+                                        identificar señales de fatiga, comprender su impacto y aplicar estrategias
+                                        efectivas para gestionarla de manera consciente y sostenible.
+                                    </p>
+                                </div>
+                                <div class="certificate-card__footer">
+                                    <button class="cert-download-btn" type="button" (click)="openCertificate()">
+                                        <mat-icon svgIcon="heroicons_outline:arrow-down-tray"></mat-icon>
+                                        Descargar reconocimiento
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        }
+
+                    </div><!-- /content-body -->
+
+                    <!-- Content footer with navigation -->
+                    <div class="content-footer">
+                        <button class="nav-btn nav-btn--prev" type="button"
+                            (click)="navigateSection('prev')"
+                            [disabled]="activeModule?.sections[0]?.id === activeSectionId()">
+                            <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                            Anterior
+                        </button>
+                        <span class="content-footer__counter">
+                            {{ (activeModule?.sections?.indexOf(activeSection!) ?? -1) + 1 }}
+                            /
+                            {{ activeModule?.sections?.length }}
+                        </span>
+                        @if (!isLastSection) {
+                        <button class="nav-btn nav-btn--next" type="button"
+                            (click)="navigateSection('next')">
+                            Siguiente
+                            <mat-icon svgIcon="heroicons_outline:arrow-right"></mat-icon>
+                        </button>
+                        } @else {
+                        <button class="nav-btn nav-btn--next" type="button"
+                            [disabled]="activeSection?.isCompleted"
+                            (click)="completeLastSection()">
+                            Finalizar
+                            <mat-icon svgIcon="heroicons_outline:check"></mat-icon>
+                        </button>
+                        }
+                    </div>
+
+                </div><!-- /content-card -->
+            </main>
+
+        </div><!-- /plan-layout -->
+        }<!-- /view module -->
+    </div><!-- /plan-shell -->
+</div><!-- /my-plan-page -->
+
+<!-- ── Certificate overlay ──────────────────────────────────────────────── -->
+@if (showCertificate()) {
+<div class="cert-overlay" (click)="closeCertificate()">
+    <div class="cert-paper" (click)="$event.stopPropagation()">
+
+        <!-- Watermark -->
+        <div class="cert-watermark" aria-hidden="true"></div>
+
+        <!-- Top gradient band -->
+        <div class="cert-band"></div>
+
+        <!-- Header -->
+        <header class="cert-header">
+            <img src="images/logo/emocheck-logo.png" class="cert-logo" alt="EmoCheck" />
+            <div class="cert-header__org">
+                <p class="cert-header__org-name">EmoCheck</p>
+                <p class="cert-header__org-tagline">Personas sanas, organizaciones fuertes</p>
+            </div>
+        </header>
+
+        <!-- Title -->
+        <div class="cert-title-block">
+            <p class="cert-title-pre">Otorga el presente</p>
+            <h1 class="cert-title">Reconocimiento</h1>
+            <p class="cert-title-sub">{{ certModuleSubtitle }}</p>
+        </div>
+
+        <!-- Divider -->
+        <div class="cert-divider">
+            <span class="cert-divider__line"></span>
+            <mat-icon class="cert-divider__icon" svgIcon="heroicons_outline:academic-cap"></mat-icon>
+            <span class="cert-divider__line"></span>
+        </div>
+
+        <!-- Recipient -->
+        <div class="cert-recipient">
+            <p class="cert-recipient__pre">Se otorga a</p>
+            <p class="cert-recipient__name">{{ userName() }}</p>
+        </div>
+
+        <!-- Body text -->
+        <p class="cert-body">{{ certBodyText }}</p>
+
+        <!-- Module badge -->
+        <div class="cert-badge">
+            <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+            <span>{{ certModuleBadge }}</span>
+        </div>
+
+        <!-- Footer: date + signature -->
+        <footer class="cert-footer">
+            <div class="cert-footer__sig">
+                <span class="cert-footer__sig-line"></span>
+                <p class="cert-footer__sig-name">EmoCheck</p>
+                <p class="cert-footer__sig-role">Plataforma de Bienestar</p>
+            </div>
+            <div class="cert-footer__date">
+                <p class="cert-footer__date-label">Fecha de emisión</p>
+                <p class="cert-footer__date-value">{{ today | date:'dd/MM/yyyy' }}</p>
+            </div>
+        </footer>
+
+        <!-- Bottom band -->
+        <div class="cert-band cert-band--bottom"></div>
+
+        <!-- Print button (screen only) -->
+        <div class="cert-actions">
+            <button class="cert-print-btn" type="button" (click)="printCertificate()">
+                <mat-icon svgIcon="heroicons_outline:printer"></mat-icon>
+                Imprimir / Guardar como PDF
+            </button>
+        </div>
+
+    </div>
+</div>
+}
