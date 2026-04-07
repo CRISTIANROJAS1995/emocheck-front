@@ -105,6 +105,12 @@ export class AdminAlertsService {
         return this.auth.isHRManager();
     }
 
+    private get isPsychologist(): boolean {
+        const roles = (this.auth.getCurrentUser()?.roles ?? []).map(r => r.trim().toLowerCase());
+        const isSuper = roles.some(r => r === 'superadmin' || r === 'systemadmin');
+        return !isSuper && roles.some(r => r === 'psychologist');
+    }
+
     private mapAlert(row: BackendAlertDto): AdminAlertDto {
         return {
             alertId: Number(row.alertID ?? 0),
@@ -129,9 +135,9 @@ export class AdminAlertsService {
         };
     }
 
-    /** Get all alerts — auto-routes to /alert/my-company for HRManager */
+    /** Get all alerts — auto-routes to /alert/my-company for HRManager, CompanyAdmin and Psychologist */
     list(query?: AdminAlertsQuery): Observable<AdminAlertDto[]> {
-        const url = this.isHRManager
+        const url = (this.isHRManager || this.isPsychologist)
             ? `${this.apiUrl}/alert/my-company`
             : `${this.apiUrl}/alert`;
         return this.http

@@ -116,11 +116,11 @@
                     <td>{{ alert.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td><span [class]="statusBadgeClass(alert.status)">{{ statusLabel(alert.status) }}</span></td>
                     <td class="actions-cell">
-                        @if (alert.status === 'OPEN') {
+                        @if (alert.status === 'OPEN' && !isCompanyAdmin) {
                         <button class="btn btn--primary btn--xs" (click)="openAcknowledgeModal(alert, $event)">
                             <mat-icon>assignment_turned_in</mat-icon> Reconocer
                         </button> }
-                        <button class="btn btn--outline btn--xs" title="Ver detalle y caso" (click)="openDetailModal(alert, $event)">
+                        <button class="btn btn--outline btn--xs" title="Ver detalle" (click)="openDetailModal(alert, $event)">
                             <mat-icon>visibility</mat-icon>
                         </button>
                     </td>
@@ -165,12 +165,14 @@
             <button class="dm__tab" [class.dm__tab--active]="detailTab === 'alert'" (click)="setDetailTab('alert')">
                 <mat-icon>notifications</mat-icon> Alerta
             </button>
+            @if (!isCompanyAdmin) {
             <button class="dm__tab" [class.dm__tab--active]="detailTab === 'case'" (click)="setDetailTab('case')">
                 <mat-icon>folder_open</mat-icon> Caso
                 @if (detailCase) { <span class="dm__tab-badge">{{ caseStatusLabel(detailCase.status) }}</span> }
                 @else if (!detailCaseLoading) { <span class="dm__tab-badge dm__tab-badge--warn">Sin caso</span> }
             </button>
-            <button class="dm__tab" [class.dm__tab--active]="detailTab === 'followups'" (click)="setDetailTab('followups')" [disabled]="!detailCase">
+            }
+            <button class="dm__tab" [class.dm__tab--active]="detailTab === 'followups'" (click)="setDetailTab('followups')" [disabled]="isCompanyAdmin ? detailCaseLoading : !detailCase">
                 <mat-icon>event_note</mat-icon> Seguimientos
                 @if (followUps.length > 0) { <span class="dm__tab-badge">{{ followUps.length }}</span> }
             </button>
@@ -227,7 +229,7 @@
                 }
 
                 <!-- Resolver alerta -->
-                @if (detailAlert.status !== 'RESOLVED' && detailAlert.status !== 'DISMISSED') {
+                @if (!isCompanyAdmin && detailAlert.status !== 'RESOLVED' && detailAlert.status !== 'DISMISSED') {
                 <div class="dm__resolve-block">
                     <h4>
                         <mat-icon>check_circle</mat-icon> Marcar como resuelta</h4>
@@ -356,9 +358,20 @@
             } }
 
             <!-- ───── TAB: SEGUIMIENTOS ───── -->
-            @if (detailTab === 'followups' && detailCase) {
+            @if (detailTab === 'followups') {
             <div class="dm__section">
-                <!-- Agregar seguimiento -->
+                @if (detailCaseLoading) {
+                <div class="dm__loading">
+                    <mat-spinner diameter="32"></mat-spinner><span>Cargando caso...</span>
+                </div>
+                } @else if (!detailCase) {
+                <div class="dm__empty-followups">
+                    <mat-icon>event_busy</mat-icon>
+                    <p>Esta alerta no tiene un caso de seguimiento asociado.</p>
+                </div>
+                } @else {
+                <!-- Agregar seguimiento — solo para no-CompanyAdmin -->
+                @if (!isCompanyAdmin) {
                 <div class="dm__followup-add">
                     <h4>
                         <mat-icon>add_circle</mat-icon> Agregar seguimiento</h4>
@@ -369,6 +382,7 @@
                         </button>
                     </div>
                 </div>
+                }
 
                 <!-- Lista de seguimientos -->
                 @if (followUpsLoading) {
@@ -400,8 +414,9 @@
                     }
                 </div>
                 }
+                } <!-- /@else detailCase -->
             </div>
-            }
+            } <!-- /@if detailTab === 'followups' -->
 
         </div>
         <!-- /dm__body -->
@@ -452,7 +467,10 @@
                 <textarea class="ack-modal__textarea" rows="2" [(ngModel)]="modalForm.actionTaken" placeholder="Ej: Contactaré al empleado hoy, Agendaré cita con psicólogo..."></textarea>
             </div>
             <div class="ack-modal__field">
-                <label class="ack-modal__label">Psicólogo asignado <span class="ack-modal__required">*</span></label> @if (psychologistsLoading) {
+                <label class="ack-modal__label">Psicólogo asignado <span class="ack-modal__required">*</span></label>
+                @if (isPsychologist) {
+                <input class="ack-modal__select" type="text" [value]="authService.getCurrentUser()?.name" disabled />
+                } @else if (psychologistsLoading) {
                 <div class="ack-modal__loading">
                     <mat-spinner diameter="20"></mat-spinner> <span>Cargando psicólogos...</span></div>
                 } @else {

@@ -33,7 +33,7 @@ export class SignedInRedirectComponent implements OnInit {
                     // Admin roles
                     if (isSystemAdmin || isAdmin) return of('/admin');
                     if (isCompanyAdmin || isHRManager) return of('/admin/company-tracking');
-                    if (isPsychologist) return of('/admin');
+                    if (isPsychologist) return of('/admin/alerts');
 
                     // Everyone else: Consent -> (Employee => Instructions) else Home.
                     // Profile is completed by admin during user creation, no need to check here.

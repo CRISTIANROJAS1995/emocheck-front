@@ -16,7 +16,7 @@ function hasAnyRole(userRoles: string[] | null | undefined, requiredRoles: strin
 
 function getFallbackUrl(roles: string[] | null | undefined): string {
     const r = roles ?? [];
-    if (r.some(x => normalizeRole(x) === 'psychologist')) return '/admin';
+    if (r.some(x => normalizeRole(x) === 'psychologist')) return '/admin/alerts';
     if (r.some(x => ['admin', 'companyadmin', 'systemadmin', 'superadmin', 'hrmanager'].includes(normalizeRole(x)))) return '/admin';
     return '/home';
 }

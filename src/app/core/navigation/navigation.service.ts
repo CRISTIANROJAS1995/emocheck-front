@@ -214,14 +214,6 @@ export class NavigationService {
                 classes: baseItemClasses,
                 children: [
                     {
-                        id: 'psych-cases',
-                        title: 'Seguimiento a Casos',
-                        type: 'basic',
-                        icon: 'heroicons_outline:clipboard-document-list',
-                        link: '/admin/cases',
-                        classes: baseItemClasses,
-                    },
-                    {
                         id: 'psych-alerts',
                         title: 'Alertas',
                         type: 'basic',

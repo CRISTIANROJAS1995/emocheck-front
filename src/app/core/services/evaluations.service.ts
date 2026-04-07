@@ -132,15 +132,15 @@ export class EvaluationsService {
         );
     }
 
-    /** GET /api/evaluation/results/user/{userId} — Resultados completados de un usuario (Admin/Psic.) */
+    /** GET /api/evaluation/user/{userId}/completed — Evaluaciones completadas con resultado (CompanyAdmin/SuperAdmin) */
     getUserCompletedEvaluationsWithResult(userId: number): Observable<CompletedEvaluationWithResultDto[]> {
-        return this.http.get<unknown>(`${this.apiUrl}/evaluation/results/user/${userId}`).pipe(
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/user/${userId}/completed`).pipe(
             map((res) => this.unwrapArray<CompletedEvaluationWithResultDto>(res) ?? []),
             catchError(() => of([] as CompletedEvaluationWithResultDto[]))
         );
     }
 
-    /** GET /api/evaluation/user/{userId} — Evaluaciones de un usuario (Admin/Psic.) */
+    /** GET /api/evaluation/user/{userId} — Lista de evaluaciones de un usuario (CompanyAdmin/SuperAdmin) */
     getUserEvaluations(userId: number): Observable<MyEvaluationDto[]> {
         return this.http.get<unknown>(`${this.apiUrl}/evaluation/user/${userId}`).pipe(
             map((res) => {

@@ -39,6 +39,7 @@ export class ClassicLayoutComponent implements OnInit, AfterViewInit, OnDestroy 
     get homeLink(): string {
         if (this._authService.isCompanyScoped()) return '/admin/company-tracking';
         const roles = this._authService.getCurrentUser()?.roles ?? [];
+        if (roles.some(r => r.toLowerCase() === 'psychologist')) return '/admin/alerts';
         if (roles.some(r => ['admin', 'systemadmin', 'superadmin'].includes(r.toLowerCase()))) return '/admin';
         return '/home';
     }

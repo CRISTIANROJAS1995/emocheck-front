@@ -15,7 +15,12 @@ import { CompanyTrackingComponent } from './features/company-tracking/company-tr
 import { RoleGuard } from 'app/core/auth/guards/role.guard';
 
 export default [
-    { path: '', component: AdminWorkspaceComponent },
+    {
+        path: '',
+        component: AdminWorkspaceComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'HRManager'] },
+    },
     { path: 'alerts', component: AdminAlertsComponent },
     { path: 'reports', component: AdminReportsComponent },
     { path: 'modules', component: AdminModulesComponent },
@@ -38,6 +43,11 @@ export default [
     { path: 'catalogs', component: AdminCatalogsComponent },
     { path: 'recommendations', component: AdminRecommendationsComponent },
     { path: 'evaluations', component: AdminEvaluationsComponent },
-    { path: 'cases', component: AdminCasesComponent },
+    {
+        path: 'cases',
+        component: AdminCasesComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'HRManager'] },
+    },
     { path: 'company-tracking', component: CompanyTrackingComponent },
 ] as Routes;

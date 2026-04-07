@@ -88,6 +88,18 @@ export class AdminAlertsComponent implements OnInit {
         private readonly authService: AuthService,
     ) { }
 
+    get isCompanyAdmin(): boolean {
+        const roles = (this.authService.getCurrentUser()?.roles ?? []).map(r => r.trim().toLowerCase());
+        const isSuper = roles.some(r => r === 'superadmin' || r === 'systemadmin');
+        return !isSuper && roles.some(r => r === 'companyadmin');
+    }
+
+    get isPsychologist(): boolean {
+        const roles = (this.authService.getCurrentUser()?.roles ?? []).map(r => r.trim().toLowerCase());
+        const isSuper = roles.some(r => r === 'superadmin' || r === 'systemadmin');
+        return !isSuper && roles.some(r => r === 'psychologist');
+    }
+
     ngOnInit(): void {
         this.load();
     }
@@ -98,9 +110,9 @@ export class AdminAlertsComponent implements OnInit {
         const currentUser = this.authService.getCurrentUser();
         const roles = (currentUser?.roles ?? []).map(r => r.trim().toLowerCase());
         const isSuper = roles.some(r => r === 'superadmin' || r === 'systemadmin');
-        const isCompanyScoped = !isSuper && roles.some(r => r === 'companyadmin' || r === 'hrmanager');
+        const isCompanyScoped = !isSuper && roles.some(r => r === 'companyadmin' || r === 'hrmanager' || r === 'psychologist');
 
-        // CompanyAdmin & HRManager: use /alert/my-company (company derived from JWT)
+        // CompanyAdmin, HRManager & Psychologist: use /alert/my-company (company derived from JWT)
         if (isCompanyScoped) {
             this.service.list()
                 .pipe(
@@ -265,6 +277,10 @@ export class AdminAlertsComponent implements OnInit {
                 this.editCaseStatus = found.status ?? 'OPEN';
                 this.editCasePriority = found.priority ?? 'MEDIUM';
                 this.closeReason = '';
+                // If CompanyAdmin already switched to the followups tab while the case was loading, load them now
+                if (this.detailTab === 'followups' && this.followUps.length === 0) {
+                    this.loadFollowUps(found.caseTrackingId);
+                }
             }
         });
     }
@@ -385,15 +401,19 @@ export class AdminAlertsComponent implements OnInit {
     openAcknowledgeModal(alert: AdminAlertDto, event: Event): void {
         event.stopPropagation();
         this.modalAlert = alert;
+        const currentUser = this.authService.getCurrentUser();
         this.modalForm = {
             actionTaken: '',
-            assignedToUserID: null,
+            assignedToUserID: this.isPsychologist ? (currentUser?.id ?? null) : null,
             priority: alert.alertLevel === 'CRITICAL' ? 'CRITICAL' : alert.alertLevel === 'HIGH' ? 'HIGH' : 'MEDIUM',
             description: alert.description
                 ? `${alert.title ? alert.title + '. ' : ''}${alert.description}`
                 : (alert.title ?? ''),
         };
         this.showAcknowledgeModal = true;
+
+        // Si es psicólogo ya queda auto-asignado, no necesita cargar lista
+        if (this.isPsychologist) return;
 
         // Cargar psicólogos si aún no están cargados
         if (this.psychologists.length === 0) {

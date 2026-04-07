@@ -25,6 +25,7 @@ import { UsersService } from 'app/core/services/users.service';
 import { CompletedEvaluationWithResultDto, EvaluationsService, MyEvaluationDto } from 'app/core/services/evaluations.service';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
 import { RecommendationsService } from 'app/core/services/recommendations.service';
+import { AuthService } from 'app/core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { catchError, forkJoin, of, switchMap, tap } from 'rxjs';
@@ -204,7 +205,7 @@ export class MyTrackingComponent implements OnInit {
     set selectedTimeRange(value: TimeRangeId) {
         this._selectedTimeRange = value;
         this.applyCharts();
-        this.loadFaceIdData();
+        this.loadFaceIdData(this.viewUserId ?? undefined);
     }
 
     get selectedTimeRangeLabel(): string {
@@ -653,6 +654,7 @@ export class MyTrackingComponent implements OnInit {
         private readonly usersService: UsersService,
         private readonly evaluationsService: EvaluationsService,
         private readonly recommendationsService: RecommendationsService,
+        private readonly authService: AuthService,
         private readonly router: Router,
         private readonly route: ActivatedRoute,
         private readonly http: HttpClient
@@ -690,6 +692,8 @@ export class MyTrackingComponent implements OnInit {
 
         if (this.viewingAsAdmin) {
             this.loadAdminView(this.viewUserId!);
+            this.loadFaceIdData(this.viewUserId!);
+            this.loadFollowUps(this.viewUserId!);
             return;
         }
 
@@ -713,6 +717,7 @@ export class MyTrackingComponent implements OnInit {
 
         this.evaluationsService
             .getMyCompletedEvaluationsWithResult()
+
             .pipe(
                 tap((items) => {
                     this.completedEvaluations = items ?? [];
@@ -759,19 +764,20 @@ export class MyTrackingComponent implements OnInit {
             });
     }
 
-    private loadFaceIdData(): void {
+    private loadFaceIdData(userId?: number): void {
         this.faceIdLoading = true;
+        const url = userId
+            ? `${environment.apiUrl}/evaluation/emotional-analysis/history/${userId}?days=${this.timeRangeDays()}`
+            : `${environment.apiUrl}/evaluation/emotional-analysis/history?days=${this.timeRangeDays()}`;
         this.http
-            .get<unknown>(`${environment.apiUrl}/evaluation/emotional-analysis/history?days=${this.timeRangeDays()}`)
+            .get<unknown>(url)
             .pipe(catchError(() => of([])))
             .subscribe((res) => {
-                console.log('[FaceID] Raw API response:', res);
                 const items: FaceIdHistoryItem[] = Array.isArray(res)
                     ? res
                     : Array.isArray((res as any)?.data)
                         ? (res as any).data
                         : [];
-                console.log('[FaceID] Items parsed:', items.length, items);
                 this.faceIdTotalReadings = items.length;
                 this.faceIdDayAverage = this.computeLatestDayAverage(items);
                 this.applyFaceIdChart(items);
@@ -865,8 +871,11 @@ export class MyTrackingComponent implements OnInit {
         };
     }
 
-    private loadFollowUps(): void {
-        this.http.get<unknown>(`${environment.apiUrl}/support/my-requests`).pipe(
+    private loadFollowUps(userId?: number): void {
+        const url = userId
+            ? `${environment.apiUrl}/support/user/${userId}`
+            : `${environment.apiUrl}/support/my-requests`;
+        this.http.get<unknown>(url).pipe(
             catchError(() => of([]))
         ).subscribe((res: unknown) => {
             const arr: any[] = Array.isArray(res) ? res
@@ -1046,7 +1055,8 @@ export class MyTrackingComponent implements OnInit {
 
                 // Merge dimension scores from ALL evaluations for this module
                 // so multi-instrument modules (DASS-21 + BAI + BDI) show every instrument
-                const mergedDimsMap = new Map<string, typeof all[0]['result']['dimensionScores'][0]>();
+                type DimScore = NonNullable<CompletedEvaluationWithResultDto['result']['dimensionScores']>[number];
+                const mergedDimsMap = new Map<string, DimScore>();
                 // Process oldest-first so latest evaluation wins on conflicts
                 for (const ev of [...all].reverse()) {
                     for (const d of ev.result?.dimensionScores ?? []) {
@@ -1066,7 +1076,7 @@ export class MyTrackingComponent implements OnInit {
                         ? Math.round(Math.max(0, Math.min(100, Number((d as any).percentageScore))))
                         : this.safePercent(rawScore, rawMax);
                     return {
-                        label: this.resolveDimensionLabel(moduleId, (d as any)?.instrumentCode, d?.dimensionName),
+                        label: this.resolveDimensionLabel(moduleId, (d as any)?.instrumentCode, d?.dimensionName ?? undefined),
                         value: pct,
                         score: rawScore,
                         maxScore: rawMax,
