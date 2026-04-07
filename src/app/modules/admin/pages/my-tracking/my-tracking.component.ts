@@ -207,6 +207,10 @@ export class MyTrackingComponent implements OnInit {
         this.loadFaceIdData();
     }
 
+    get selectedTimeRangeLabel(): string {
+        return this.timeRanges.find(r => r.id === this._selectedTimeRange)?.label ?? 'Último mes';
+    }
+
     private timeRangeDays(): number {
         switch (this._selectedTimeRange) {
             case 'last-3-months': return 90;
@@ -758,10 +762,16 @@ export class MyTrackingComponent implements OnInit {
     private loadFaceIdData(): void {
         this.faceIdLoading = true;
         this.http
-            .get<FaceIdHistoryItem[]>(`${environment.apiUrl}/evaluation/emotional-analysis/history?days=${this.timeRangeDays()}`)
-            .pipe(catchError(() => of([] as FaceIdHistoryItem[])))
-            .subscribe((history) => {
-                const items = history ?? [];
+            .get<unknown>(`${environment.apiUrl}/evaluation/emotional-analysis/history?days=${this.timeRangeDays()}`)
+            .pipe(catchError(() => of([])))
+            .subscribe((res) => {
+                console.log('[FaceID] Raw API response:', res);
+                const items: FaceIdHistoryItem[] = Array.isArray(res)
+                    ? res
+                    : Array.isArray((res as any)?.data)
+                        ? (res as any).data
+                        : [];
+                console.log('[FaceID] Items parsed:', items.length, items);
                 this.faceIdTotalReadings = items.length;
                 this.faceIdDayAverage = this.computeLatestDayAverage(items);
                 this.applyFaceIdChart(items);

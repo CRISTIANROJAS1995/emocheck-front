@@ -221,7 +221,7 @@
             </div>
 
             <div class="tracking-state__right">
-                <p class="tracking-state__chart-title">Seguimiento de tu estado de ánimo (Último mes)</p>
+                <p class="tracking-state__chart-title">Seguimiento de tu estado de ánimo ({{ selectedTimeRangeLabel }})</p>
 
                 @if (!faceIdLoading && faceIdTotalReadings > 0) {
                 <apx-chart class="tracking-state__chart" [series]="faceIdChart.series" [chart]="faceIdChart.chart" [xaxis]="faceIdChart.xaxis" [yaxis]="faceIdChart.yaxis" [stroke]="faceIdChart.stroke" [grid]="faceIdChart.grid" [dataLabels]="faceIdChart.dataLabels" [markers]="faceIdChart.markers"
