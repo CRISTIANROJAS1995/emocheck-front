@@ -42,57 +42,10 @@
         </div>
     </div>
 
-    <!-- Risk Distribution -->
-    <div class="risk-section">
-        <h2 class="section-title">Distribución de Riesgo</h2>
-        <div class="risk-bars">
-            <div class="risk-bar risk-bar--green">
-                <div class="risk-bar__label">
-                    <span class="risk-bar__dot risk-bar__dot--green"></span>
-                    Bajo riesgo
-                </div>
-                <div class="risk-bar__track">
-                    <div class="risk-bar__fill risk-bar__fill--green"
-                        [style.width.%]="riskDist.greenPercentage"></div>
-                </div>
-                <span class="risk-bar__pct">{{ riskDist.greenCount }} ({{ riskDist.greenPercentage | number:'1.0-0' }}%)</span>
-            </div>
-            <div class="risk-bar risk-bar--yellow">
-                <div class="risk-bar__label">
-                    <span class="risk-bar__dot risk-bar__dot--yellow"></span>
-                    Riesgo moderado
-                </div>
-                <div class="risk-bar__track">
-                    <div class="risk-bar__fill risk-bar__fill--yellow"
-                        [style.width.%]="riskDist.yellowPercentage"></div>
-                </div>
-                <span class="risk-bar__pct">{{ riskDist.yellowCount }} ({{ riskDist.yellowPercentage | number:'1.0-0' }}%)</span>
-            </div>
-            <div class="risk-bar risk-bar--red">
-                <div class="risk-bar__label">
-                    <span class="risk-bar__dot risk-bar__dot--red"></span>
-                    Alto riesgo
-                </div>
-                <div class="risk-bar__track">
-                    <div class="risk-bar__fill risk-bar__fill--red"
-                        [style.width.%]="riskDist.redPercentage"></div>
-                </div>
-                <span class="risk-bar__pct">{{ riskDist.redCount }} ({{ riskDist.redPercentage | number:'1.0-0' }}%)</span>
-            </div>
-        </div>
-    </div>
-
     <!-- Filters -->
     <div class="filters-row">
         <input class="search-input" [(ngModel)]="searchText" (ngModelChange)="applyFilters()"
             placeholder="Buscar por nombre, email, área o sede..." />
-
-        <select class="filter-select" [(ngModel)]="riskFilter" (ngModelChange)="applyFilters()">
-            <option value="all">Todos los riesgos</option>
-            <option value="green">Bajo</option>
-            <option value="yellow">Moderado</option>
-            <option value="red">Alto</option>
-        </select>
 
         <select class="filter-select" [(ngModel)]="activeFilter" (ngModelChange)="applyFilters()">
             <option value="all">Todos</option>
@@ -120,7 +73,6 @@
                     <th class="th-module" title="Riesgo Psicosocial">
                         <span class="mod-label mod-label--orange">RP</span>
                     </th>
-                    <th [class]="sortClass('riskLabel')" (click)="toggleSort('riskLabel')">Riesgo General</th>
                     <th [class]="sortClass('lastEvaluationDate')" (click)="toggleSort('lastEvaluationDate')">Última Eval.</th>
                     <th [class]="sortClass('isActive')" (click)="toggleSort('isActive')">Estado</th>
                     <th></th>
@@ -128,8 +80,8 @@
             </thead>
             <tbody>
                 @for (row of filteredRows; track row.userID) {
-                <tr class="tracking-row" [class.tracking-row--open]="expandedUserId === row.userID"
-                    (click)="toggleDetail(row.userID)">
+                <tr class="tracking-row tracking-row--clickable"
+                    (click)="viewUserTracking(row)">
                     <td class="td-user">
                         <div class="user-info">
                             <div class="user-avatar">{{ row.fullName.charAt(0).toUpperCase() }}</div>
@@ -173,9 +125,6 @@
                             <mat-icon>{{ row.psychosocial.completed ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
                         </div>
                     </td>
-                    <td>
-                        <span class="risk-badge risk-badge--{{ row.riskTone }}">{{ row.riskLabel }}</span>
-                    </td>
                     <td class="td-muted">
                         {{ row.lastEvaluationDate ? (row.lastEvaluationDate | date:'dd/MM/yyyy') : '—' }}
                     </td>
@@ -186,79 +135,9 @@
                         </span>
                     </td>
                     <td class="td-expand">
-                        <mat-icon class="expand-icon" [class.expand-icon--open]="expandedUserId === row.userID">expand_more</mat-icon>
+                        <mat-icon class="expand-icon">arrow_forward</mat-icon>
                     </td>
                 </tr>
-                <!-- Detail row -->
-                @if (expandedUserId === row.userID) {
-                <tr class="detail-row">
-                    <td colspan="10">
-                        <div class="detail-panel">
-                            <div class="detail-panel__header">
-                                <mat-icon>assignment</mat-icon>
-                                <span>Seguimiento de <strong>{{ row.fullName }}</strong></span>
-                            </div>
-                            <!-- Module progress summary -->
-                            <div class="detail-panel__modules">
-                                <div class="module-summary" [class.module-summary--completed]="row.mentalHealth.completed">
-                                    <div class="module-summary__dot module-summary__dot--blue"></div>
-                                    <span class="module-summary__name">Salud Mental</span>
-                                    @if (row.mentalHealth.completed) {
-                                    <span class="risk-badge risk-badge--{{ row.mentalHealth.riskTone }}">{{ row.mentalHealth.riskLabel }}</span>
-                                    <span class="module-summary__date">{{ row.mentalHealth.completedAt | date:'dd/MM/yyyy' }}</span>
-                                    } @else {
-                                    <span class="module-summary__pending">Pendiente</span>
-                                    }
-                                </div>
-                                <div class="module-summary" [class.module-summary--completed]="row.workFatigue.completed">
-                                    <div class="module-summary__dot module-summary__dot--green"></div>
-                                    <span class="module-summary__name">Fatiga Laboral</span>
-                                    @if (row.workFatigue.completed) {
-                                    <span class="risk-badge risk-badge--{{ row.workFatigue.riskTone }}">{{ row.workFatigue.riskLabel }}</span>
-                                    <span class="module-summary__date">{{ row.workFatigue.completedAt | date:'dd/MM/yyyy' }}</span>
-                                    } @else {
-                                    <span class="module-summary__pending">Pendiente</span>
-                                    }
-                                </div>
-                                <div class="module-summary" [class.module-summary--completed]="row.climateOrg.completed">
-                                    <div class="module-summary__dot module-summary__dot--teal"></div>
-                                    <span class="module-summary__name">Clima Organizacional</span>
-                                    @if (row.climateOrg.completed) {
-                                    <span class="risk-badge risk-badge--{{ row.climateOrg.riskTone }}">{{ row.climateOrg.riskLabel }}</span>
-                                    <span class="module-summary__date">{{ row.climateOrg.completedAt | date:'dd/MM/yyyy' }}</span>
-                                    } @else {
-                                    <span class="module-summary__pending">Pendiente</span>
-                                    }
-                                </div>
-                                <div class="module-summary" [class.module-summary--completed]="row.psychosocial.completed">
-                                    <div class="module-summary__dot module-summary__dot--orange"></div>
-                                    <span class="module-summary__name">Riesgo Psicosocial</span>
-                                    @if (row.psychosocial.completed) {
-                                    <span class="risk-badge risk-badge--{{ row.psychosocial.riskTone }}">{{ row.psychosocial.riskLabel }}</span>
-                                    <span class="module-summary__date">{{ row.psychosocial.completedAt | date:'dd/MM/yyyy' }}</span>
-                                    } @else {
-                                    <span class="module-summary__pending">Pendiente</span>
-                                    }
-                                </div>
-                            </div>
-                            <!-- Evaluation history -->
-                            <div class="detail-panel__body">
-                                <p class="detail-panel__sub">Historial de evaluaciones completadas</p>
-                                @for (ev of getUserEvalHistory(row.userID); track ev.moduleName + ev.completedAt) {
-                                <div class="eval-item">
-                                    <mat-icon class="eval-item__icon">fact_check</mat-icon>
-                                    <span class="eval-item__name">{{ ev.moduleName }}</span>
-                                    <span class="risk-badge risk-badge--{{ ev.riskTone }}">{{ ev.riskLabel }}</span>
-                                    <span class="eval-item__date">{{ ev.completedAt ? (ev.completedAt | date:'dd/MM/yyyy') : '—' }}</span>
-                                </div>
-                                } @empty {
-                                <p class="detail-empty">Este usuario no tiene evaluaciones completadas.</p>
-                                }
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                }
                 } @empty {
                 <tr>
                     <td colspan="10" class="td-empty">No se encontraron usuarios con los filtros aplicados.</td>

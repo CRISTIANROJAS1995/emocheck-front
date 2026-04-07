@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { DashboardService, DashboardIndicatorsDto, RiskDistributionDto } from 'app/core/services/dashboard.service';
 import { AdminUsersService, AdminUserListItemDto } from 'app/core/services/admin-users.service';
 import { AdminAlertsService } from 'app/core/services/admin-alerts.service';
 import { EvaluationsService } from 'app/core/services/evaluations.service';
+import { AdminOrganizationService, SiteDto, AreaDto } from 'app/core/services/admin-organization.service';
 
 type RiskTone = 'green' | 'yellow' | 'red' | 'none';
 
@@ -75,6 +76,10 @@ export class CompanyTrackingComponent implements OnInit {
     rows: UserTrackingRow[] = [];
     filteredRows: UserTrackingRow[] = [];
 
+    // Lookup maps for sede/area names
+    private sitesById = new Map<number, string>();
+    private areasById = new Map<number, string>();
+
     searchText = '';
     riskFilter: 'all' | 'green' | 'yellow' | 'red' = 'all';
     activeFilter: 'all' | 'active' | 'inactive' = 'all';
@@ -87,6 +92,8 @@ export class CompanyTrackingComponent implements OnInit {
         private readonly usersService: AdminUsersService,
         private readonly alertsService: AdminAlertsService,
         private readonly evaluationsService: EvaluationsService,
+        private readonly orgService: AdminOrganizationService,
+        private readonly router: Router,
     ) { }
 
     ngOnInit(): void {
@@ -95,13 +102,20 @@ export class CompanyTrackingComponent implements OnInit {
             users: this.usersService.listUsers().pipe(catchError(() => of([]))),
             alerts: this.alertsService.list().pipe(catchError(() => of([]))),
             evals: this.evaluationsService.listMyCompanyEvaluations().pipe(catchError(() => of([]))),
+            sites: this.orgService.getSites().pipe(catchError(() => of([]))),
+            areas: this.orgService.getAreas().pipe(catchError(() => of([]))),
         })
         .pipe(finalize(() => (this.loading = false)))
-        .subscribe(({ indicators, users, alerts, evals }) => {
+        .subscribe(({ indicators, users, alerts, evals, sites, areas }) => {
             this.indicators = indicators;
             this.unattendedAlertsCount = (alerts as any[]).filter((a: any) => !a.isAttended).length;
             this.users = users as AdminUserListItemDto[];
             this.companyEvals = evals as any[];
+            // Build lookup maps
+            this.sitesById.clear();
+            (sites as SiteDto[]).forEach(s => this.sitesById.set(s.siteID, s.name));
+            this.areasById.clear();
+            (areas as AreaDto[]).forEach(a => this.areasById.set(a.areaID, a.name));
             this.indexEvalsByUser();
             this.buildRows();
             this.applyFilters();
@@ -124,12 +138,16 @@ export class CompanyTrackingComponent implements OnInit {
             const completed = allEvals.filter(e =>
                 (e.status ?? '').toLowerCase().includes('complet') || !!e.isCompleted
             );
+            const siteId = u.siteID ?? 0;
+            const areaId = u.areaID ?? 0;
+            const siteName = u.siteName ?? this.sitesById.get(siteId) ?? '—';
+            const areaName = u.areaName ?? this.areasById.get(areaId) ?? '—';
             return {
                 userID: u.userId ?? 0,
                 fullName: u.fullName ?? '—',
                 email: u.email ?? '—',
-                areaName: u.areaName ?? '—',
-                siteName: u.siteName ?? '—',
+                areaName,
+                siteName,
                 isActive: u.isActive ?? false,
                 evaluationsCompleted: completed.length || (u.evaluationsCompleted ?? 0),
                 riskTone: this.resolveRiskTone(u.lastRiskLevel ?? ''),
@@ -184,8 +202,10 @@ export class CompanyTrackingComponent implements OnInit {
         return '—';
     }
 
-    toggleDetail(userId: number): void {
-        this.expandedUserId = this.expandedUserId === userId ? null : userId;
+    viewUserTracking(row: UserTrackingRow): void {
+        this.router.navigate(['/my-tracking'], {
+            queryParams: { viewUserId: row.userID, viewUserName: row.fullName },
+        });
     }
 
     getUserEvalHistory(userId: number): EvalHistoryItem[] {

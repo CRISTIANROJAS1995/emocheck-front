@@ -132,6 +132,33 @@ export class EvaluationsService {
         );
     }
 
+    /** GET /api/evaluation/results/user/{userId} — Resultados completados de un usuario (Admin/Psic.) */
+    getUserCompletedEvaluationsWithResult(userId: number): Observable<CompletedEvaluationWithResultDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/results/user/${userId}`).pipe(
+            map((res) => this.unwrapArray<CompletedEvaluationWithResultDto>(res) ?? []),
+            catchError(() => of([] as CompletedEvaluationWithResultDto[]))
+        );
+    }
+
+    /** GET /api/evaluation/user/{userId} — Evaluaciones de un usuario (Admin/Psic.) */
+    getUserEvaluations(userId: number): Observable<MyEvaluationDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/user/${userId}`).pipe(
+            map((res) => {
+                const items = this.unwrapArray<SwaggerEvaluationDto>(res);
+                return (items ?? []).map((e) => ({
+                    evaluationId: e.evaluationID,
+                    assessmentModuleId: e.assessmentModuleID,
+                    moduleName: e.assessmentModuleName ?? '',
+                    status: (e.status as any) ?? (e.isCompleted ? 'Completed' : 'InProgress'),
+                    startedAt: e.startedAt,
+                    completedAt: e.completedAt ?? undefined,
+                    hasResult: !!e.isCompleted,
+                })) as MyEvaluationDto[];
+            }),
+            catchError(() => of([] as MyEvaluationDto[]))
+        );
+    }
+
     /** GET /api/evaluation/my-company — all evaluations for the HRManager's company */
     listMyCompanyEvaluations(): Observable<any[]> {
         return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-company`).pipe(

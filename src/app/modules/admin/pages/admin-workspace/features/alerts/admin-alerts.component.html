@@ -95,6 +95,7 @@
                     <th (click)="toggleSort('alertLevel')" [class]="sortClass('alertLevel')">Nivel</th>
                     <th (click)="toggleSort('alertType')" [class]="sortClass('alertType')">Tipo</th>
                     <th (click)="toggleSort('userName')" [class]="sortClass('userName')">Usuario</th>
+                    <th (click)="toggleSort('companyName')" [class]="sortClass('companyName')">Empresa</th>
                     <th (click)="toggleSort('createdAt')" [class]="sortClass('createdAt')">Fecha</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -111,6 +112,7 @@
                         <span class="user-name">{{ alert.userName }}</span> @if (alert.userDocumentNumber) {
                         <span class="user-doc">{{ alert.userDocumentNumber }}</span> } } @else { {{ alert.userIdAnonymized || alert.userId || '-' }} }
                     </td>
+                    <td>{{ alert.companyName || alert.userCompany || '-' }}</td>
                     <td>{{ alert.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td><span [class]="statusBadgeClass(alert.status)">{{ statusLabel(alert.status) }}</span></td>
                     <td class="actions-cell">

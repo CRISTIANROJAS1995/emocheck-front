@@ -95,8 +95,13 @@ export class AdminAlertsComponent implements OnInit {
     load(): void {
         this.loading = true;
 
-        // For CompanyAdmin/HRManager: fetch only my-company alerts and derive stats client-side
-        if (this.authService.isHRManager()) {
+        const currentUser = this.authService.getCurrentUser();
+        const roles = (currentUser?.roles ?? []).map(r => r.trim().toLowerCase());
+        const isSuper = roles.some(r => r === 'superadmin' || r === 'systemadmin');
+        const isCompanyScoped = !isSuper && roles.some(r => r === 'companyadmin' || r === 'hrmanager');
+
+        // CompanyAdmin & HRManager: use /alert/my-company (company derived from JWT)
+        if (isCompanyScoped) {
             this.service.list()
                 .pipe(
                     finalize(() => (this.loading = false)),
@@ -112,6 +117,7 @@ export class AdminAlertsComponent implements OnInit {
             return;
         }
 
+        // SuperAdmin: full list + statistics
         forkJoin({
             alerts: this.service.list().pipe(catchError((err) => {
                 console.error('[AdminAlerts] GET /alert error:', err?.status, err?.error ?? err?.message);

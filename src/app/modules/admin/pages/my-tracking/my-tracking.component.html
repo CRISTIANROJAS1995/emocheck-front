@@ -8,17 +8,32 @@
             <div class="tracking-hero__left">
                 <div class="tracking-hero__title-row">
                     <img class="tracking-hero__logo" src="icons/Icon.svg" alt="" />
-                    <h1 class="tracking-hero__title">Mi Seguimiento</h1>
+                    <h1 class="tracking-hero__title">
+                        @if (viewingAsAdmin) { Seguimiento: {{ userFullName }} }
+                        @else { Mi Seguimiento }
+                    </h1>
                 </div>
-                <p class="tracking-hero__subtitle">Aquí puedes ver tu evolución personal y resultados individuales</p>
+                <p class="tracking-hero__subtitle">
+                    @if (viewingAsAdmin) { Vista del seguimiento personal del colaborador }
+                    @else { Aquí puedes ver tu evolución personal y resultados individuales }
+                </p>
             </div>
 
+            @if (viewingAsAdmin) {
+            <button class="tracking-hero__back" mat-button [routerLink]="['/admin/company-tracking']">
+                <span class="tracking-hero__back-content">
+                    <mat-icon class="tracking-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                    <span class="tracking-hero__back-text">Volver al seguimiento de empresa</span>
+                </span>
+            </button>
+            } @else {
             <button class="tracking-hero__back" mat-button [routerLink]="['/home']">
                 <span class="tracking-hero__back-content">
                     <mat-icon class="tracking-hero__back-icon" svgIcon="heroicons_outline:arrow-left"></mat-icon>
                     <span class="tracking-hero__back-text">Volver a mis evaluaciones</span>
                 </span>
             </button>
+            }
         </section>
 
         <!-- Thank you card -->

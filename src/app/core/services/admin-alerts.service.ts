@@ -25,6 +25,9 @@ export interface AdminAlertDto {
     userEmail?: string;
     userCompany?: string;
     userArea?: string;
+    // Company fields from API response
+    companyID?: number;
+    companyName?: string;
     evaluationResultId?: number;
     alertLevel?: string;
     alertType?: string;
@@ -71,6 +74,8 @@ type BackendAlertDto = {
     actionTaken?: string;
     notes?: string;
     createdAt?: string;
+    companyID?: number;
+    companyName?: string;
 };
 
 export interface CreateAlertPayload {
@@ -119,6 +124,8 @@ export class AdminAlertsService {
             actionTaken: row.actionTaken ?? null,
             notes: row.notes ?? null,
             createdAt: row.createdAt,
+            companyID: row.companyID,
+            companyName: row.companyName || undefined,
         };
     }
 

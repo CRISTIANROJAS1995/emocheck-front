@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
     ApexAxisChartSeries,
     ApexChart,
@@ -170,6 +170,10 @@ interface FollowUpVm {
 })
 export class MyTrackingComponent implements OnInit {
     userFullName = 'Usuario';
+
+    /** When set, the component shows data for this userId using admin endpoints */
+    viewUserId: number | null = null;
+    viewingAsAdmin = false;
 
     loading = true;
     loadError: string | null = null;
@@ -646,10 +650,12 @@ export class MyTrackingComponent implements OnInit {
         private readonly evaluationsService: EvaluationsService,
         private readonly recommendationsService: RecommendationsService,
         private readonly router: Router,
+        private readonly route: ActivatedRoute,
         private readonly http: HttpClient
     ) { }
 
     openModuleResults(moduleId: ModuleProgressId): void {
+        if (this.viewingAsAdmin) return;   // admin view — navegation not applicable
         const card = (this.moduleResults ?? []).find((c) => c.id === moduleId);
         if (!card?.isCompleted) return;
 
@@ -664,12 +670,25 @@ export class MyTrackingComponent implements OnInit {
     }
 
     openPersonalizedAction(moduleId: ModuleProgressId): void {
-        // Figma shows module-specific labels; route can be refined later.
-        // Keep behavior minimal: take user to resources.
+        if (this.viewingAsAdmin) return;   // admin view — navegation not applicable
         this.router.navigate(['/resources'], { queryParams: { moduleId } });
     }
 
     ngOnInit(): void {
+        // Read admin-view query params (set by company-tracking navigation)
+        const qp = this.route.snapshot.queryParams;
+        const rawId = Number(qp['viewUserId'] ?? 0);
+        if (rawId > 0) {
+            this.viewUserId = rawId;
+            this.viewingAsAdmin = true;
+            this.userFullName = String(qp['viewUserName'] ?? 'Usuario');
+        }
+
+        if (this.viewingAsAdmin) {
+            this.loadAdminView(this.viewUserId!);
+            return;
+        }
+
         this.userService.user$.subscribe((u) => {
             this.userFullName = u?.name || 'Usuario';
         });
@@ -704,15 +723,36 @@ export class MyTrackingComponent implements OnInit {
                 })
             )
             .subscribe({
-                next: () => {
-                    this.loading = false;
-                },
-                error: () => {
-                    this.loading = false;
-                },
+                next: () => { this.loading = false; },
+                error: () => { this.loading = false; },
             });
 
         this.loadFollowUps();
+    }
+
+    private loadAdminView(userId: number): void {
+        this.loading = true;
+        this.loadError = null;
+
+        this.evaluationsService
+            .getUserCompletedEvaluationsWithResult(userId)
+            .pipe(
+                tap((items) => {
+                    this.completedEvaluations = items ?? [];
+                    this.applyCompletedEvaluations(items ?? []);
+                    this.applyCharts();
+                }),
+                switchMap(() => this.evaluationsService.getUserEvaluations(userId)),
+                tap((evaluations) => this.applyEvaluationProgress(evaluations)),
+                catchError((err) => {
+                    this.loadError = err?.message || 'No fue posible cargar las evaluaciones del usuario';
+                    return of([] as MyEvaluationDto[]);
+                })
+            )
+            .subscribe({
+                next: () => { this.loading = false; },
+                error: () => { this.loading = false; },
+            });
     }
 
     private loadFaceIdData(): void {
