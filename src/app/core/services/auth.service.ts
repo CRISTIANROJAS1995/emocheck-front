@@ -37,6 +37,7 @@ export class AuthService {
             if (k === 'company admin') return 'CompanyAdmin';
             if (k === 'hse leader') return 'HSE';
             if (k === 'arl admin') return 'Admin';
+            if (k === 'hr manager' || k === 'hrmanager') return 'HRManager';
 
             // Para nombres ya compatibles (Employee, Psychologist, HSE, Admin, CompanyAdmin)
             return v;
@@ -363,5 +364,20 @@ export class AuthService {
         return this.currentUserSubject.value;
     }
 
+    /** Verdadero si el usuario autenticado tiene el rol HRManager (y NO SuperAdmin/SystemAdmin) */
+    isHRManager(): boolean {
+        return this.isCompanyScoped();
+    }
+
+    /**
+     * Verdadero si el usuario debe usar los endpoints `/my-company` (scoped a su empresa).
+     * Aplica a HRManager y CompanyAdmin, excluye SuperAdmin/SystemAdmin.
+     */
+    isCompanyScoped(): boolean {
+        const roles = (this.currentUserSubject.value?.roles ?? []).map(r => r.trim().toLowerCase());
+        const isSuper = roles.some(r => r === 'superadmin' || r === 'systemadmin');
+        if (isSuper) return false;
+        return roles.some(r => r === 'hrmanager' || r === 'companyadmin');
+    }
 
 }

@@ -14,6 +14,7 @@ import {
     JobTypeDto, CreateJobTypeDto,
 } from '../../../../../../core/services/admin-organization.service';
 import { AdminCatalogService, CountryDto, StateDto, CityDto } from '../../../../../../core/services/admin-catalog.service';
+import { AuthService } from '../../../../../../core/auth/auth.service';
 
 type OrgTab = 'companies' | 'sites' | 'areas' | 'jobtypes';
 
@@ -82,10 +83,13 @@ export class AdminConfigComponent implements OnInit {
     editJobTypeId: number | null = null;
     editJobTypeForm: CreateJobTypeDto = this.emptyJobType();
 
+    get isCompanyScoped(): boolean { return this.authService.isHRManager(); }
+
     constructor(
         private readonly orgService: AdminOrganizationService,
         private readonly catalogService: AdminCatalogService,
         private readonly alert: AlertService,
+        private readonly authService: AuthService,
     ) { }
 
     ngOnInit(): void {
@@ -110,12 +114,13 @@ export class AdminConfigComponent implements OnInit {
             case 'companies':
                 this.orgService.getCompanies().subscribe(data => {
                     this.companies = data;
+                    this.autoFillCompanyForScoped();
                     this.applyFilter();
                     this.loading = false;
                 });
                 break;
             case 'sites':
-                this.orgService.getCompanies().subscribe(c => this.companies = c);
+                this.orgService.getCompanies().subscribe(c => { this.companies = c; this.autoFillCompanyForScoped(); });
                 this.orgService.getSites(this.siteCompanyFilter || undefined).subscribe(data => {
                     this.sites = data;
                     this.applyFilter();
@@ -123,7 +128,7 @@ export class AdminConfigComponent implements OnInit {
                 });
                 break;
             case 'areas':
-                this.orgService.getCompanies().subscribe(c => this.companies = c);
+                this.orgService.getCompanies().subscribe(c => { this.companies = c; this.autoFillCompanyForScoped(); });
                 this.orgService.getAreas(this.areaCompanyFilter || undefined).subscribe(data => {
                     this.areas = data;
                     this.applyFilter();
@@ -188,6 +193,15 @@ export class AdminConfigComponent implements OnInit {
         }
     }
 
+    private autoFillCompanyForScoped(): void {
+        if (!this.isCompanyScoped || !this.companies.length) return;
+        const companyId = this.companies[0].companyID;
+        this.siteForm.companyID = companyId;
+        this.areaForm.companyID = companyId;
+        if (this.editSiteForm) this.editSiteForm.companyID = companyId;
+        if (this.editAreaForm) this.editAreaForm.companyID = companyId;
+    }
+
     // ── Counts ──
     get activeCompanies(): number { return this.companies.filter(c => c.isActive).length; }
     get activeSites(): number { return this.sites.filter(s => s.isActive).length; }
@@ -216,6 +230,7 @@ export class AdminConfigComponent implements OnInit {
     }
 
     async createCompany(): Promise<void> {
+        if (this.isCompanyScoped) return;
         if (!this.companyForm.name?.trim()) { this.alert.error('El nombre es requerido'); return; }
         this.saving = true;
         this.orgService.createCompany(this.companyForm).subscribe({
@@ -256,7 +271,7 @@ export class AdminConfigComponent implements OnInit {
 
     async createSite(): Promise<void> {
         if (!this.siteForm.name?.trim()) { this.alert.error('El nombre es requerido'); return; }
-        if (!this.siteForm.companyID) { this.alert.error('La empresa es requerida'); return; }
+        if (!this.isCompanyScoped && !this.siteForm.companyID) { this.alert.error('La empresa es requerida'); return; }
         this.saving = true;
         this.orgService.createSite(this.siteForm).subscribe({
             next: () => {
@@ -276,7 +291,7 @@ export class AdminConfigComponent implements OnInit {
 
     async createArea(): Promise<void> {
         if (!this.areaForm.name?.trim()) { this.alert.error('El nombre es requerido'); return; }
-        if (!this.areaForm.companyID) { this.alert.error('La empresa es requerida'); return; }
+        if (!this.isCompanyScoped && !this.areaForm.companyID) { this.alert.error('La empresa es requerida'); return; }
         this.saving = true;
         this.orgService.createArea(this.areaForm).subscribe({
             next: () => { this.alert.success('Área creada exitosamente'); this.areaForm = this.emptyArea(); this.showForm = false; this.loadTab(); },
@@ -297,6 +312,7 @@ export class AdminConfigComponent implements OnInit {
 
     // ── Edit ──
     startEditCompany(c: CompanyDto): void {
+        if (this.isCompanyScoped) return;
         this.editCompanyId = c.companyID;
         this.editCompanyForm = { name: c.name, tradeName: c.tradeName ?? c.name, businessName: c.businessName ?? '', taxID: c.taxID ?? '', email: c.email ?? '', phone: c.phone ?? '', address: c.address ?? '', website: c.website ?? '', industry: c.industry ?? '' };
         this.showEditForm = true;
@@ -366,6 +382,7 @@ export class AdminConfigComponent implements OnInit {
 
     // ── Toggle ──
     async toggleCompany(c: CompanyDto): Promise<void> {
+        if (this.isCompanyScoped) return;
         const ok = await this.alert.confirm(`¿${c.isActive ? 'Desactivar' : 'Activar'} "${c.name}"?`, 'Confirmar cambio');
         if (!ok) return;
         this.orgService.toggleCompany(c.companyID, c.isActive).subscribe({

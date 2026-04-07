@@ -8,9 +8,10 @@ import { RouterModule } from '@angular/router';
 import { AdminAlertDto, AdminAlertsService, AlertStatisticsDto } from 'app/core/services/admin-alerts.service';
 import { AdminCaseTrackingService, CaseTrackingDto, CreateCaseTrackingDto, FollowUpDto } from 'app/core/services/admin-case-tracking.service';
 import { AdminUserListItemDto, AdminUsersService } from 'app/core/services/admin-users.service';
+import { AuthService } from 'app/core/auth/auth.service';
 import { AlertService } from 'app/core/swal/sweet-alert.service';
 import { forkJoin, of } from 'rxjs';
-import { catchError, finalize, switchMap } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 
 type DetailTab = 'alert' | 'case' | 'followups';
 
@@ -84,6 +85,7 @@ export class AdminAlertsComponent implements OnInit {
         private readonly usersService: AdminUsersService,
         private readonly caseService: AdminCaseTrackingService,
         private readonly notify: AlertService,
+        private readonly authService: AuthService,
     ) { }
 
     ngOnInit(): void {
@@ -92,6 +94,24 @@ export class AdminAlertsComponent implements OnInit {
 
     load(): void {
         this.loading = true;
+
+        // For CompanyAdmin/HRManager: fetch only my-company alerts and derive stats client-side
+        if (this.authService.isHRManager()) {
+            this.service.list()
+                .pipe(
+                    finalize(() => (this.loading = false)),
+                    catchError((err) => {
+                        console.error('[AdminAlerts] GET /alert/my-company error:', err?.status, err?.error ?? err?.message);
+                        return of([]);
+                    })
+                )
+                .subscribe((alerts) => {
+                    this.stats = this.service.computeStatsFromAlerts(alerts);
+                    this.enrichAndSet(alerts);
+                });
+            return;
+        }
+
         forkJoin({
             alerts: this.service.list().pipe(catchError((err) => {
                 console.error('[AdminAlerts] GET /alert error:', err?.status, err?.error ?? err?.message);
@@ -104,54 +124,53 @@ export class AdminAlertsComponent implements OnInit {
         }).pipe(finalize(() => (this.loading = false)))
             .subscribe(({ alerts, stats }) => {
                 this.stats = stats as AlertStatisticsDto;
-
-                // Collect unique userIds to enrich with user names
-                const uniqueUserIds = [...new Set(alerts.map(a => a.userId).filter((id): id is number => !!id))];
-
-                if (uniqueUserIds.length === 0) {
-                    this.alerts = alerts;
-                    this.applyFilter();
-                    return;
-                }
-
-                // Fetch user data for each unique userId in parallel
-                const userRequests = uniqueUserIds.map(id =>
-                    this.usersService.getUserById(id).pipe(catchError(() => of(null)))
-                );
-
-                forkJoin(userRequests).subscribe(users => {
-                    // Build a lookup map: userId → user data
-                    const userMap = new Map<number, { fullName: string; documentNumber?: string; email?: string; companyName?: string; areaName?: string }>();
-                    users.forEach((u, i) => {
-                        if (u) {
-                            userMap.set(uniqueUserIds[i], {
-                                fullName: u.fullName,
-                                documentNumber: u.documentNumber,
-                                email: u.email,
-                                companyName: u.companyName,
-                                areaName: u.areaName,
-                            });
-                        }
-                    });
-
-                    // Enrich each alert with user info
-                    this.alerts = alerts.map(a => {
-                        if (a.userId && userMap.has(a.userId)) {
-                            const u = userMap.get(a.userId)!;
-                            return {
-                                ...a,
-                                userName: u.fullName,
-                                userDocumentNumber: u.documentNumber,
-                                userEmail: u.email,
-                                userCompany: u.companyName,
-                                userArea: u.areaName,
-                            };
-                        }
-                        return a;
-                    });
-                    this.applyFilter();
-                });
+                this.enrichAndSet(alerts);
             });
+    }
+
+    private enrichAndSet(alerts: AdminAlertDto[]): void {
+        const uniqueUserIds = [...new Set(alerts.map(a => a.userId).filter((id): id is number => !!id))];
+
+        if (uniqueUserIds.length === 0) {
+            this.alerts = alerts;
+            this.applyFilter();
+            return;
+        }
+
+        const userRequests = uniqueUserIds.map(id =>
+            this.usersService.getUserById(id).pipe(catchError(() => of(null)))
+        );
+
+        forkJoin(userRequests).subscribe(users => {
+            const userMap = new Map<number, { fullName: string; documentNumber?: string; email?: string; companyName?: string; areaName?: string }>();
+            users.forEach((u, i) => {
+                if (u) {
+                    userMap.set(uniqueUserIds[i], {
+                        fullName: u.fullName,
+                        documentNumber: u.documentNumber,
+                        email: u.email,
+                        companyName: u.companyName,
+                        areaName: u.areaName,
+                    });
+                }
+            });
+
+            this.alerts = alerts.map(a => {
+                if (a.userId && userMap.has(a.userId)) {
+                    const u = userMap.get(a.userId)!;
+                    return {
+                        ...a,
+                        userName: u.fullName,
+                        userDocumentNumber: u.documentNumber,
+                        userEmail: u.email,
+                        userCompany: u.companyName,
+                        userArea: u.areaName,
+                    };
+                }
+                return a;
+            });
+            this.applyFilter();
+        });
     }
 
     applyFilter(): void {

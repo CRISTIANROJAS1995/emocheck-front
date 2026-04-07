@@ -132,6 +132,14 @@ export class EvaluationsService {
         );
     }
 
+    /** GET /api/evaluation/my-company — all evaluations for the HRManager's company */
+    listMyCompanyEvaluations(): Observable<any[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/evaluation/my-company`).pipe(
+            map((res) => this.unwrapArray<any>(res)),
+            catchError(() => of([]))
+        );
+    }
+
     getEvaluationResponsesCount(evaluationId: number): Observable<number> {
         if (!evaluationId || evaluationId <= 0) return of(0);
 

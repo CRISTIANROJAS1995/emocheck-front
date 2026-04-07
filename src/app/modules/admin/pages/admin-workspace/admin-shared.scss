@@ -980,6 +980,28 @@ table.admin-table {
         &--full {
             grid-column: 1 / -1;
         }
+        &--invalid {
+            > span:first-child {
+                color: #ef4444;
+            }
+            input,
+            select,
+            textarea {
+                border-color: #ef4444;
+                background: #fff5f5;
+                &:focus {
+                    border-color: #ef4444;
+                    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+                }
+            }
+        }
+    }
+    &__field-error,
+    .error-hint {
+        font-size: 11px;
+        color: #ef4444;
+        font-weight: 500;
+        margin-top: -2px;
     }
     &__actions {
         margin-top: 22px;

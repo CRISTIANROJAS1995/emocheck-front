@@ -55,7 +55,7 @@
 
     <!-- Create User Modal -->
     @if (showCreateForm) {
-    <div class="user-modal-overlay" (click)="showCreateForm = false">
+    <div class="user-modal-overlay">
         <div class="user-modal" (click)="$event.stopPropagation()">
             <div class="user-modal__header">
                 <h3>
@@ -74,15 +74,21 @@
                             <mat-icon>person</mat-icon> Datos Personales
                         </div>
                         <div class="editor-panel__grid">
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('firstName')?.invalid && createForm.get('firstName')?.touched">
                                 <span>Nombre *</span>
                                 <input formControlName="firstName" placeholder="Juan" />
+                                @if (createForm.get('firstName')?.invalid && createForm.get('firstName')?.touched) {
+                                <span class="editor-panel__field-error">El nombre es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('lastName')?.invalid && createForm.get('lastName')?.touched">
                                 <span>Apellido *</span>
                                 <input formControlName="lastName" placeholder="Pérez" />
+                                @if (createForm.get('lastName')?.invalid && createForm.get('lastName')?.touched) {
+                                <span class="editor-panel__field-error">El apellido es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('documentType')?.invalid && createForm.get('documentType')?.touched">
                                 <span>Tipo de Documento *</span>
                                 <select formControlName="documentType">
                                     <option value="CC">Cédula de Ciudadanía (CC)</option>
@@ -91,12 +97,18 @@
                                     <option value="TI">Tarjeta de Identidad (TI)</option>
                                     <option value="NIT">NIT</option>
                                 </select>
+                                @if (createForm.get('documentType')?.invalid && createForm.get('documentType')?.touched) {
+                                <span class="editor-panel__field-error">El tipo de documento es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('documentNumber')?.invalid && createForm.get('documentNumber')?.touched">
                                 <span>Número de Documento *</span>
                                 <input formControlName="documentNumber" placeholder="1234567890" />
+                                @if (createForm.get('documentNumber')?.invalid && createForm.get('documentNumber')?.touched) {
+                                <span class="editor-panel__field-error">El número de documento es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('gender')?.invalid && createForm.get('gender')?.touched">
                                 <span>Género *</span>
                                 <select formControlName="gender">
                                     <option value="">-- Seleccionar --</option>
@@ -104,20 +116,35 @@
                                     <option value="F">Femenino</option>
                                     <option value="O">Otro</option>
                                 </select>
+                                @if (createForm.get('gender')?.invalid && createForm.get('gender')?.touched) {
+                                <span class="editor-panel__field-error">El género es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('dateOfBirth')?.invalid && createForm.get('dateOfBirth')?.touched">
                                 <span>Fecha de Nacimiento *</span>
-                                <input type="date" formControlName="dateOfBirth" />
+                                <input type="date" formControlName="dateOfBirth" [max]="todayDate" />
+                                @if (createForm.get('dateOfBirth')?.invalid && createForm.get('dateOfBirth')?.touched) {
+                                <span class="editor-panel__field-error">La fecha de nacimiento es requerida</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('phone')?.invalid && createForm.get('phone')?.touched">
                                 <span>Teléfono *</span>
                                 <input formControlName="phone" placeholder="3001234567" />
+                                @if (createForm.get('phone')?.invalid && createForm.get('phone')?.touched) {
+                                <span class="editor-panel__field-error">El teléfono es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('email')?.invalid && createForm.get('email')?.touched">
                                 <span>Email *</span>
                                 <input type="email" formControlName="email" placeholder="correo@empresa.com" />
+                                @if (createForm.get('email')?.hasError('required') && createForm.get('email')?.touched) {
+                                <span class="editor-panel__field-error">El email es requerido</span>
+                                }
+                                @if (createForm.get('email')?.hasError('email') && createForm.get('email')?.touched) {
+                                <span class="editor-panel__field-error">El email no tiene un formato válido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field editor-panel__field--full">
+                            <label class="editor-panel__field editor-panel__field--full" [class.editor-panel__field--invalid]="createForm.get('password')?.invalid && createForm.get('password')?.touched">
                                 <span>Contraseña temporal * (mín. 8 caracteres)</span>
                                 <div style="position:relative;display:flex;align-items:center;">
                                     <input [type]="showCreatePassword ? 'text' : 'password'" formControlName="password"
@@ -129,6 +156,12 @@
                                             'visibility_off' : 'visibility' }}</mat-icon>
                                     </button>
                                 </div>
+                                @if (createForm.get('password')?.hasError('required') && createForm.get('password')?.touched) {
+                                <span class="editor-panel__field-error">La contraseña es requerida</span>
+                                }
+                                @if (createForm.get('password')?.hasError('minlength') && createForm.get('password')?.touched) {
+                                <span class="editor-panel__field-error">Debe tener al menos 8 caracteres</span>
+                                }
                             </label>
                         </div>
                     </div>
@@ -139,38 +172,52 @@
                             <mat-icon>work</mat-icon> Información Laboral
                         </div>
                         <div class="editor-panel__grid">
-                            <label class="editor-panel__field">
-                                <span>Fecha de Contratación *</span>
-                                <input type="date" formControlName="hireDate" />
-                            </label>
-                            <label class="editor-panel__field">
-                                <span>Empresa</span>
+                            @if (!isCompanyScoped) {
+                            <label class="editor-panel__field editor-panel__field--required editor-panel__field--full" [class.editor-panel__field--invalid]="createForm.get('companyID')?.invalid && createForm.get('companyID')?.touched">
+                                <span>Empresa *</span>
                                 <select formControlName="companyID">
                                     <option [ngValue]="null">-- Seleccionar --</option>
                                     @for (c of companies; track c.companyID) {
                                     <option [ngValue]="c.companyID">{{ c.name }}</option>
                                     }
                                 </select>
+                                @if (createForm.get('companyID')?.invalid && createForm.get('companyID')?.touched) {
+                                <span class="editor-panel__field-error">La empresa es requerida</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
-                                <span>Sede</span>
+                            }
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('siteID')?.invalid && createForm.get('siteID')?.touched">
+                                <span>Sede *</span>
                                 <select formControlName="siteID">
                                     <option [ngValue]="null">-- Seleccionar --</option>
                                     @for (s of filteredCreateSites; track s.siteID) {
                                     <option [ngValue]="s.siteID">{{ s.name }}</option>
                                     }
                                 </select>
+                                @if (createForm.get('siteID')?.invalid && createForm.get('siteID')?.touched) {
+                                <span class="editor-panel__field-error">La sede es requerida</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
-                                <span>Área</span>
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('areaID')?.invalid && createForm.get('areaID')?.touched">
+                                <span>Área *</span>
                                 <select formControlName="areaID">
                                     <option [ngValue]="null">-- Seleccionar --</option>
                                     @for (a of filteredCreateAreas; track a.areaID) {
                                     <option [ngValue]="a.areaID">{{ a.name }}</option>
                                     }
                                 </select>
+                                @if (createForm.get('areaID')?.invalid && createForm.get('areaID')?.touched) {
+                                <span class="editor-panel__field-error">El área es requerida</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('hireDate')?.invalid && createForm.get('hireDate')?.touched">
+                                <span>Fecha de Contratación *</span>
+                                <input type="date" formControlName="hireDate" />
+                                @if (createForm.get('hireDate')?.invalid && createForm.get('hireDate')?.touched) {
+                                <span class="editor-panel__field-error">La fecha de contratación es requerida</span>
+                                }
+                            </label>
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('jobTypeID')?.invalid && createForm.get('jobTypeID')?.touched">
                                 <span>Tipo de Cargo *</span>
                                 <select formControlName="jobTypeID">
                                     <option [ngValue]="null">-- Seleccionar --</option>
@@ -178,9 +225,12 @@
                                     <option [ngValue]="j.jobTypeID">{{ j.name }}</option>
                                     }
                                 </select>
+                                @if (createForm.get('jobTypeID')?.invalid && createForm.get('jobTypeID')?.touched) {
+                                <span class="editor-panel__field-error">El tipo de cargo es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
-                                <span>Tipo de Contrato</span>
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('contractType')?.invalid && createForm.get('contractType')?.touched">
+                                <span>Tipo de Contrato *</span>
                                 <select formControlName="contractType">
                                     <option [ngValue]="null">-- Seleccionar --</option>
                                     <option value="Indefinido">Indefinido</option>
@@ -189,18 +239,24 @@
                                     <option value="Aprendizaje">Aprendizaje</option>
                                     <option value="Otro">Otro</option>
                                 </select>
+                                @if (createForm.get('contractType')?.invalid && createForm.get('contractType')?.touched) {
+                                <span class="editor-panel__field-error">El tipo de contrato es requerido</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
-                                <span>Horas laborales diarias</span>
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('dailyWorkHours')?.invalid && createForm.get('dailyWorkHours')?.touched">
+                                <span>Horas laborales diarias *</span>
                                 <select formControlName="dailyWorkHours">
                                     <option [ngValue]="null">-- Seleccionar --</option>
                                     <option [ngValue]="1">Menos de 8 horas</option>
                                     <option [ngValue]="2">8 horas</option>
                                     <option [ngValue]="3">Más de 8 horas</option>
                                 </select>
+                                @if (createForm.get('dailyWorkHours')?.invalid && createForm.get('dailyWorkHours')?.touched) {
+                                <span class="editor-panel__field-error">Las horas laborales son requeridas</span>
+                                }
                             </label>
-                            <label class="editor-panel__field">
-                                <span>Antigüedad en el cargo</span>
+                            <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('jobSeniority')?.invalid && createForm.get('jobSeniority')?.touched">
+                                <span>Antigüedad en el cargo *</span>
                                 <select formControlName="jobSeniority">
                                     <option [ngValue]="null">-- Seleccionar --</option>
                                     <option [ngValue]="1">Menos de 1 año</option>
@@ -209,8 +265,11 @@
                                     <option [ngValue]="4">Entre 11 y 20 años</option>
                                     <option [ngValue]="5">Más de 20 años</option>
                                 </select>
+                                @if (createForm.get('jobSeniority')?.invalid && createForm.get('jobSeniority')?.touched) {
+                                <span class="editor-panel__field-error">La antigüedad en el cargo es requerida</span>
+                                }
                             </label>
-                            <div class="editor-panel__field editor-panel__field--full">
+                            <div class="editor-panel__field editor-panel__field--full" [class.editor-panel__field--invalid]="createForm.get('roleIDs')?.invalid && createForm.get('roleIDs')?.touched">
                                 <span>Roles *</span>
                                 <mat-form-field appearance="outline" style="width:100%">
                                     <mat-select formControlName="roleIDs" multiple>
@@ -219,6 +278,9 @@
                                         }
                                     </mat-select>
                                 </mat-form-field>
+                                @if (createForm.get('roleIDs')?.invalid && createForm.get('roleIDs')?.touched) {
+                                <span class="editor-panel__field-error">Debe seleccionar al menos un rol</span>
+                                }
                             </div>
                         </div>
                     </div>
@@ -589,7 +651,7 @@
                             </label>
                             <label class="editor-panel__field">
                                 <span>Fecha de Nacimiento</span>
-                                <input type="date" formControlName="dateOfBirth" />
+                                <input type="date" formControlName="dateOfBirth" [max]="todayDate" />
                             </label>
                         </div>
                     </div>
@@ -795,6 +857,7 @@
             <button class="btn btn--outline btn--sm" (click)="loadUsers()" [disabled]="loading">
                 <mat-icon>refresh</mat-icon> Actualizar
             </button>
+            @if (!isCompanyScoped) {
             <button class="btn btn--secondary btn--sm"
                 (click)="showBulkUpload = !showBulkUpload; showCreateForm = false; showEditForm = false">
                 <mat-icon>{{ showBulkUpload ? 'close' : 'upload' }}</mat-icon>
@@ -805,6 +868,7 @@
                 <mat-icon>{{ showCreateForm ? 'close' : 'person_add' }}</mat-icon>
                 {{ showCreateForm ? 'Cerrar' : 'Nuevo Usuario' }}
             </button>
+            }
         </div>
     </div>
 
@@ -857,6 +921,7 @@
                         </span>
                     </td>
                     <td class="actions-cell">
+                        @if (!isCompanyScoped) {
                         <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()"
                             title="Editar">
                             <mat-icon>edit</mat-icon>
@@ -864,15 +929,20 @@
                         <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()"
                             [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
-                        </button> @if (isSuperAdmin) {
+                        </button>
+                        @if (isSuperAdmin) {
                         <button class="btn btn--warning btn--xs" (click)="resetPassword(u);$event.stopPropagation()"
                             [disabled]="saving" title="Restablecer contraseña">
                             <mat-icon>lock_reset</mat-icon>
-                        </button> }
+                        </button>
+                        }
                         <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()"
                             [disabled]="saving" title="Eliminar">
                             <mat-icon>delete</mat-icon>
                         </button>
+                        } @else {
+                        <span class="badge badge--neutral">Solo lectura</span>
+                        }
                     </td>
                 </tr>
                 }

@@ -4,6 +4,7 @@ import { ApiResponse } from 'app/core/models/auth.model';
 import { environment } from '../../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 export interface AdminAlertsQuery {
     status?: string;
@@ -90,7 +91,14 @@ export interface AttendAlertDto {
 export class AdminAlertsService {
     private readonly apiUrl = environment.apiUrl;
 
-    constructor(private readonly http: HttpClient) { }
+    constructor(
+        private readonly http: HttpClient,
+        private readonly auth: AuthService,
+    ) { }
+
+    private get isHRManager(): boolean {
+        return this.auth.isHRManager();
+    }
 
     private mapAlert(row: BackendAlertDto): AdminAlertDto {
         return {
@@ -114,10 +122,13 @@ export class AdminAlertsService {
         };
     }
 
-    /** Get all alerts */
+    /** Get all alerts — auto-routes to /alert/my-company for HRManager */
     list(query?: AdminAlertsQuery): Observable<AdminAlertDto[]> {
+        const url = this.isHRManager
+            ? `${this.apiUrl}/alert/my-company`
+            : `${this.apiUrl}/alert`;
         return this.http
-            .get<unknown>(`${this.apiUrl}/alert`)
+            .get<unknown>(url)
             .pipe(
                 map((res) => {
                     const mapped = this.unwrapArray<BackendAlertDto>(res).map((x) => this.mapAlert(x));
@@ -167,17 +178,37 @@ export class AdminAlertsService {
             );
     }
 
-    /** Get alert statistics */
+    /** Get alert statistics — auto-routes for HRManager: derives stats from my-company alert list */
     getStatistics(): Observable<AlertStatisticsDto> {
+        if (this.isHRManager) {
+            return this.list().pipe(
+                map((alerts) => this.computeStatsFromAlerts(alerts)),
+                catchError(() => of(this.emptyStats()))
+            );
+        }
         return this.http
             .get<unknown>(`${this.apiUrl}/alert/statistics`)
             .pipe(
                 map((res) => this.unwrapObject<AlertStatisticsDto>(res)),
-                catchError(() => of({
-                    totalAlerts: 0, pendingCount: 0, acknowledgedCount: 0, resolvedCount: 0,
-                    criticalCount: 0, highCount: 0, mediumCount: 0, lowCount: 0,
-                }))
+                catchError(() => of(this.emptyStats()))
             );
+    }
+
+    private emptyStats(): AlertStatisticsDto {
+        return { totalAlerts: 0, pendingCount: 0, acknowledgedCount: 0, resolvedCount: 0, criticalCount: 0, highCount: 0, mediumCount: 0, lowCount: 0 };
+    }
+
+    computeStatsFromAlerts(alerts: AdminAlertDto[]): AlertStatisticsDto {
+        return {
+            totalAlerts: alerts.length,
+            pendingCount: alerts.filter(a => (a.status ?? '').toUpperCase() === 'OPEN').length,
+            acknowledgedCount: alerts.filter(a => (a.status ?? '').toUpperCase() === 'IN_PROGRESS' || (a.status ?? '').toUpperCase() === 'ACKNOWLEDGED').length,
+            resolvedCount: alerts.filter(a => (a.status ?? '').toUpperCase() === 'RESOLVED' || (a.status ?? '').toUpperCase() === 'CLOSED').length,
+            criticalCount: alerts.filter(a => (a.alertLevel ?? '').toUpperCase() === 'CRITICAL').length,
+            highCount: alerts.filter(a => (a.alertLevel ?? '').toUpperCase() === 'HIGH').length,
+            mediumCount: alerts.filter(a => (a.alertLevel ?? '').toUpperCase() === 'MEDIUM').length,
+            lowCount: alerts.filter(a => (a.alertLevel ?? '').toUpperCase() === 'LOW').length,
+        };
     }
 
     /** Get single alert by id */

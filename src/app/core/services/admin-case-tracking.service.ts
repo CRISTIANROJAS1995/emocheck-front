@@ -177,6 +177,16 @@ export class AdminCaseTrackingService {
     }
 
     // ── Cases CRUD ─────────────────────────────
+    /** GET /api/casetracking/my-company — all cases for the HRManager's company */
+    listMyCompany(): Observable<CaseTrackingDto[]> {
+        return this.http
+            .get<unknown>(`${this.apiUrl}/casetracking/my-company`)
+            .pipe(
+                map((res) => this.unwrapArray<BackendCaseTrackingDto>(res).map((x) => this.mapCase(x))),
+                catchError(() => of([])),
+            );
+    }
+
     list(query?: AdminCaseQuery): Observable<CaseTrackingDto[]> {
         // Si no hay filtro de status, traer todos los estados en paralelo
         if (!query?.status) {

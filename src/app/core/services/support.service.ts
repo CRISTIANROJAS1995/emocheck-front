@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse } from 'app/core/models/auth.model';
 import { environment } from '../../../environments/environment';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 export interface ProfessionalSupportDto {
     professionalSupportId: number;
@@ -189,6 +189,17 @@ export class SupportService {
                 const list = this.unwrapApiResponse<any[]>(res, 'No fue posible obtener solicitudes') ?? [];
                 return (list ?? []).map((item) => this.toSupportRequestDto(item));
             })
+        );
+    }
+
+    /** GET /api/support/my-company — all support requests for the HRManager's company */
+    getMyCompanyRequests(): Observable<SupportRequestDto[]> {
+        return this.http.get<unknown>(`${this.apiUrl}/support/my-company`).pipe(
+            map((res) => {
+                const list = this.unwrapApiResponse<any[]>(res, 'No fue posible obtener solicitudes de empresa') ?? [];
+                return (list ?? []).map((item) => this.toSupportRequestDto(item));
+            }),
+            catchError(() => of([]))
         );
     }
 }

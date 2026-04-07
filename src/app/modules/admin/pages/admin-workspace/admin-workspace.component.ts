@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -131,9 +132,15 @@ export class AdminWorkspaceComponent implements OnInit {
         private readonly orgService: AdminOrganizationService,
         private readonly catalogService: AdminCatalogService,
         private readonly http: HttpClient,
+        private readonly router: Router,
+        private readonly authService: AuthService,
     ) { }
 
     ngOnInit(): void {
+        if (this.authService.isCompanyScoped()) {
+            this.router.navigateByUrl('/admin/company-tracking');
+            return;
+        }
         forkJoin({
             indicators: this.dashboardService.getIndicators().pipe(catchError(() => of(null))),
             alertStats: this.alertsService.getStatistics().pipe(catchError(() => of(null))),

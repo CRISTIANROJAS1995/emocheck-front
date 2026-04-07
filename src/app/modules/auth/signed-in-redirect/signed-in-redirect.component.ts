@@ -24,15 +24,16 @@ export class SignedInRedirectComponent implements OnInit {
                 switchMap((user) => {
                     const roles = user?.roles ?? [];
                     const isSystemAdmin = roles.includes('SystemAdmin');
-                    const isAdmin = roles.includes('Admin') || roles.includes('CompanyAdmin');
+                    const isCompanyAdmin = roles.some(r => r.toLowerCase() === 'companyadmin');
+                    const isHRManager = roles.some(r => r.toLowerCase() === 'hrmanager');
+                    const isAdmin = roles.includes('Admin');
                     const isEmployee = roles.includes('Employee');
                     const isPsychologist = roles.includes('Psychologist');
 
-                    // Admin roles go straight to admin panel.
+                    // Admin roles
                     if (isSystemAdmin || isAdmin) return of('/admin');
-
-                    // Psychologist goes straight to home.
-                    if (isPsychologist) return of('/home');
+                    if (isCompanyAdmin || isHRManager) return of('/admin/company-tracking');
+                    if (isPsychologist) return of('/admin');
 
                     // Everyone else: Consent -> (Employee => Instructions) else Home.
                     // Profile is completed by admin during user creation, no need to check here.

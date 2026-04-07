@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 // ── Company ──────────────────────────────────────────────────
 export interface CompanyDto {
@@ -168,10 +169,59 @@ export class AdminOrganizationService {
     private readonly base = `${environment.apiUrl}/company`;
     private readonly catalogBase = `${environment.apiUrl}/catalog`;
 
-    constructor(private readonly http: HttpClient) { }
+    constructor(
+        private readonly http: HttpClient,
+        private readonly auth: AuthService,
+    ) { }
+
+    private get isHRManager(): boolean {
+        return this.auth.isHRManager();
+    }
+
+    // ── My-Company (HRManager scoped) ────────────────────────
+    getMyCompany(): Observable<CompanyDto> {
+        return this.http.get<any>(`${this.base}/my-company`).pipe(
+            map(r => mapCompany(r.data ?? r)),
+        );
+    }
+
+    /** Empresa completa con sedes y áreas */
+    getMyCompanyDetail(): Observable<CompanyDto & { sites: SiteDto[]; areas: AreaDto[] }> {
+        return this.http.get<any>(`${this.base}/my-company/detail`).pipe(
+            map(r => {
+                const d = r.data ?? r;
+                return {
+                    ...mapCompany(d),
+                    sites: (d.sites ?? []).map(mapSite),
+                    areas: (d.areas ?? []).map(mapArea),
+                };
+            }),
+        );
+    }
+
+    updateMyCompany(dto: Partial<CreateCompanyDto>): Observable<any> {
+        return this.http.put(`${this.base}/my-company`, {
+            businessName: dto.businessName || dto.name,
+            tradeName: dto.tradeName || dto.name,
+            taxID: dto.taxID,
+            industry: dto.industry,
+            email: dto.email,
+            phone: dto.phone,
+            address: dto.address,
+            cityID: dto.cityID,
+            website: dto.website,
+            employeeCount: dto.employeeCount,
+        });
+    }
 
     // ── Company ──────────────────────────────────────────────
     getCompanies(): Observable<CompanyDto[]> {
+        if (this.isHRManager) {
+            return this.http.get<any>(`${this.base}/my-company`).pipe(
+                map(r => [mapCompany(r.data ?? r)]),
+                catchError(() => of([])),
+            );
+        }
         return this.http.get<any>(`${this.base}`).pipe(
             map(r => (r.data ?? r ?? []).map(mapCompany)),
             catchError(() => of([])),
@@ -199,6 +249,9 @@ export class AdminOrganizationService {
         return this.http.post(`${this.base}`, payload);
     }
     updateCompany(id: number, dto: Partial<CreateCompanyDto>): Observable<any> {
+        if (this.isHRManager) {
+            return this.updateMyCompany(dto);
+        }
         const payload = {
             businessName: dto.businessName || dto.name,
             tradeName: dto.tradeName || dto.name,
@@ -224,15 +277,25 @@ export class AdminOrganizationService {
 
     // ── Sites ─────────────────────────────────────────────────
     getSites(companyId?: number): Observable<SiteDto[]> {
-        const url = companyId
-            ? `${this.base}/${companyId}/sites`
-            : `${this.base}/sites`;
+        const url = this.isHRManager
+            ? `${this.base}/my-company/sites`
+            : companyId
+                ? `${this.base}/${companyId}/sites`
+                : `${this.base}/sites`;
         return this.http.get<any>(url).pipe(
             map(r => (r.data ?? r ?? []).map(mapSite)),
             catchError(() => of([])),
         );
     }
     createSite(dto: CreateSiteDto): Observable<any> {
+        if (this.isHRManager) {
+            return this.http.post(`${this.base}/my-company/sites`, {
+                name: dto.name,
+                address: dto.address,
+                cityID: dto.cityID,
+                phone: dto.phone,
+            });
+        }
         const payload = {
             companyID: dto.companyID,
             name: dto.name,
@@ -244,32 +307,46 @@ export class AdminOrganizationService {
     }
     updateSite(id: number, dto: Partial<CreateSiteDto>): Observable<any> {
         const payload = {
-            companyID: dto.companyID,
             name: dto.name,
             address: dto.address,
             cityID: dto.cityID,
             phone: dto.phone,
         };
-        return this.http.put(`${this.base}/sites/${id}`, payload);
+        const url = this.isHRManager
+            ? `${this.base}/my-company/sites/${id}`
+            : `${this.base}/sites/${id}`;
+        return this.http.put(url, this.isHRManager ? payload : { ...payload, companyID: dto.companyID });
     }
     toggleSite(id: number, currentlyActive: boolean): Observable<any> {
+        const url = this.isHRManager
+            ? `${this.base}/my-company/sites/${id}`
+            : `${this.base}/sites/${id}`;
         if (currentlyActive) {
-            return this.http.delete(`${this.base}/sites/${id}`);
+            return this.http.delete(url);
         }
-        return this.http.put(`${this.base}/sites/${id}`, { isActive: true });
+        return this.http.put(url, { isActive: true });
     }
 
     // ── Areas ─────────────────────────────────────────────────
     getAreas(companyId?: number): Observable<AreaDto[]> {
-        const url = companyId
-            ? `${this.base}/${companyId}/areas`
-            : `${this.base}/areas`;
+        const url = this.isHRManager
+            ? `${this.base}/my-company/areas`
+            : companyId
+                ? `${this.base}/${companyId}/areas`
+                : `${this.base}/areas`;
         return this.http.get<any>(url).pipe(
             map(r => (r.data ?? r ?? []).map(mapArea)),
             catchError(() => of([])),
         );
     }
     createArea(dto: CreateAreaDto): Observable<any> {
+        if (this.isHRManager) {
+            return this.http.post(`${this.base}/my-company/areas`, {
+                name: dto.name,
+                siteID: dto.siteID || undefined,
+                managerName: dto.managerName,
+            });
+        }
         const payload = {
             companyID: dto.companyID,
             siteID: dto.siteID || undefined,
@@ -280,18 +357,23 @@ export class AdminOrganizationService {
     }
     updateArea(id: number, dto: Partial<CreateAreaDto>): Observable<any> {
         const payload = {
-            companyID: dto.companyID,
-            siteID: dto.siteID || undefined,
             name: dto.name,
+            siteID: dto.siteID || undefined,
             managerName: dto.managerName,
         };
-        return this.http.put(`${this.base}/areas/${id}`, payload);
+        const url = this.isHRManager
+            ? `${this.base}/my-company/areas/${id}`
+            : `${this.base}/areas/${id}`;
+        return this.http.put(url, this.isHRManager ? payload : { ...payload, companyID: dto.companyID });
     }
     toggleArea(id: number, currentlyActive: boolean): Observable<any> {
+        const url = this.isHRManager
+            ? `${this.base}/my-company/areas/${id}`
+            : `${this.base}/areas/${id}`;
         if (currentlyActive) {
-            return this.http.delete(`${this.base}/areas/${id}`);
+            return this.http.delete(url);
         }
-        return this.http.put(`${this.base}/areas/${id}`, { isActive: true });
+        return this.http.put(url, { isActive: true });
     }
 
     // ── JobTypes ──────────────────────────────────────────────

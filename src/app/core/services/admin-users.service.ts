@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 export type RiskLevel = 'Green' | 'Yellow' | 'Red' | string;
 
@@ -12,6 +13,23 @@ export interface AdminUsersQuery {
     areaId?: number;
     stateId?: number;
     search?: string;
+}
+
+export interface MyCompanyPagedQuery {
+    page?: number;
+    pageSize?: number;
+    siteId?: number;
+    areaId?: number;
+    isActive?: boolean;
+    search?: string;
+}
+
+export interface PagedResultDto<T> {
+    items: T[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
 }
 
 export interface AdminUserListItemDto {
@@ -180,7 +198,14 @@ interface BackendUserDto {
 export class AdminUsersService {
     private readonly apiUrl = environment.apiUrl;
 
-    constructor(private readonly http: HttpClient) { }
+    constructor(
+        private readonly http: HttpClient,
+        private readonly auth: AuthService,
+    ) { }
+
+    private get isHRManager(): boolean {
+        return this.auth.isHRManager();
+    }
 
     private mapUser(u: BackendUserDto): AdminUserListItemDto {
         return {
@@ -227,11 +252,43 @@ export class AdminUsersService {
     }
 
     listUsers(query?: AdminUsersQuery): Observable<AdminUserListItemDto[]> {
+        if (this.isHRManager) {
+            return this.http
+                .get<unknown>(`${this.apiUrl}/users/my-company`)
+                .pipe(map((res) => this.unwrapArray<BackendUserDto>(res).map((u) => this.mapUser(u))));
+        }
         return this.http
             .get<unknown>(`${this.apiUrl}/users`, { params: this.buildParams(query) })
             .pipe(
                 map((res) => this.unwrapArray<BackendUserDto>(res).map((u) => this.mapUser(u)))
             );
+    }
+
+    /** Paginated — uses /users/my-company/paged */
+    listMyCompanyUsersPaged(query?: MyCompanyPagedQuery): Observable<PagedResultDto<AdminUserListItemDto>> {
+        let params = new HttpParams();
+        if (query?.page) params = params.set('page', String(query.page));
+        if (query?.pageSize) params = params.set('pageSize', String(query.pageSize));
+        if (query?.siteId != null) params = params.set('siteId', String(query.siteId));
+        if (query?.areaId != null) params = params.set('areaId', String(query.areaId));
+        if (query?.isActive != null) params = params.set('isActive', String(query.isActive));
+        if (query?.search) params = params.set('search', query.search);
+
+        return this.http.get<unknown>(`${this.apiUrl}/users/my-company/paged`, { params }).pipe(
+            map((res) => {
+                const data = this.unwrapObject<any>(res);
+                const items: AdminUserListItemDto[] = (Array.isArray(data?.items) ? data.items : [])
+                    .map((u: BackendUserDto) => this.mapUser(u));
+                return {
+                    items,
+                    totalCount: Number(data?.totalCount ?? items.length),
+                    page: Number(data?.page ?? 1),
+                    pageSize: Number(data?.pageSize ?? items.length),
+                    totalPages: Number(data?.totalPages ?? 1),
+                } as PagedResultDto<AdminUserListItemDto>;
+            }),
+            catchError(() => of({ items: [], totalCount: 0, page: 1, pageSize: 20, totalPages: 0 }))
+        );
     }
 
     getUserById(userId: number): Observable<AdminUserListItemDto> {
@@ -256,8 +313,11 @@ export class AdminUsersService {
     }
 
     createUser(payload: AdminCreateUserRequestDto): Observable<AdminCreateUserResponseDto> {
+        const endpoint = this.isHRManager
+            ? `${this.apiUrl}/users/my-company`
+            : `${this.apiUrl}/users`;
         return this.http
-            .post<unknown>(`${this.apiUrl}/users`, payload)
+            .post<unknown>(endpoint, payload)
             .pipe(
                 map((res) => {
                     const u = this.unwrapObject<any>(res);

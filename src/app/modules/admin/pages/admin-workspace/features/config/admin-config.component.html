@@ -149,10 +149,12 @@
         </div>
         <div style="display:flex;align-items:center;gap:8px">
             <span class="admin-filters__count">{{ filteredCompanies.length }} empresas</span>
+            @if (!isCompanyScoped) {
             <button class="btn btn--primary btn--sm" (click)="showForm = !showForm">
                 <mat-icon>{{ showForm ? 'close' : 'add' }}</mat-icon>
                 {{ showForm ? 'Cerrar' : 'Crear Nuevo' }}
             </button>
+            }
         </div>
     </div>
 
@@ -172,7 +174,9 @@
                     <th>Áreas</th>
                     <th>Usuarios</th>
                     <th>Estado</th>
+                    @if (!isCompanyScoped) {
                     <th>Acciones</th>
+                    }
                 </tr>
             </thead>
             <tbody>
@@ -195,6 +199,7 @@
                             {{ c.isActive ? 'Activa' : 'Inactiva' }}
                         </span>
                     </td>
+                    @if (!isCompanyScoped) {
                     <td class="actions-cell">
                         <button class="btn btn--outline btn--xs" (click)="startEditCompany(c); $event.stopPropagation()" title="Editar">
                             <mat-icon>edit</mat-icon>
@@ -203,6 +208,7 @@
                             <mat-icon>{{ c.isActive ? 'toggle_off' : 'toggle_on' }}</mat-icon>
                         </button>
                     </td>
+                    }
                 </tr>
                 }
             </tbody>

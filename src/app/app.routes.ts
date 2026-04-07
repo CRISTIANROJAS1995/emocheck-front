@@ -157,7 +157,7 @@ export const appRoutes: Route[] = [
                 path: 'admin',
                 canActivate: [RoleGuard],
                 data: {
-                    roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin'],
+                    roles: ['SuperAdmin', 'SystemAdmin', 'Admin', 'CompanyAdmin', 'HRManager', 'Psychologist'],
                     seo: { title: 'Panel de Administración', canonical: '/admin' }
                 },
                 loadChildren: () => import('app/modules/admin/pages/admin-workspace/admin-workspace.routes'),

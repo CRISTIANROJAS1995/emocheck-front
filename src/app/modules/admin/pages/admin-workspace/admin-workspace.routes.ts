@@ -10,6 +10,8 @@ import { AdminResourcesComponent } from './features/resources/admin-resources.co
 import { AdminCatalogsComponent } from './features/catalogs/admin-catalogs.component';
 import { AdminRecommendationsComponent } from './features/recommendations/admin-recommendations.component';
 import { AdminEvaluationsComponent } from './features/evaluations/admin-evaluations.component';
+import { AdminCasesComponent } from './features/cases/admin-cases.component';
+import { CompanyTrackingComponent } from './features/company-tracking/company-tracking.component';
 import { RoleGuard } from 'app/core/auth/guards/role.guard';
 
 export default [
@@ -19,7 +21,12 @@ export default [
     { path: 'modules', component: AdminModulesComponent },
     { path: 'users', component: AdminPanelComponent },
     { path: 'audit', component: AdminAuditComponent },
-    { path: 'config', component: AdminConfigComponent },
+    {
+        path: 'config',
+        component: AdminConfigComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['SuperAdmin', 'SystemAdmin', 'Admin'] },
+    },
     {
         path: 'resources',
         component: AdminResourcesComponent,
@@ -31,4 +38,6 @@ export default [
     { path: 'catalogs', component: AdminCatalogsComponent },
     { path: 'recommendations', component: AdminRecommendationsComponent },
     { path: 'evaluations', component: AdminEvaluationsComponent },
+    { path: 'cases', component: AdminCasesComponent },
+    { path: 'company-tracking', component: CompanyTrackingComponent },
 ] as Routes;

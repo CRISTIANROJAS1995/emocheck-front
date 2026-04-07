@@ -28,7 +28,7 @@ Todos los endpoints `my-company` requieren que el token esté presente en el hea
 
 ```
 Authorization: Bearer <token>
-```
+``
 
 ---
 

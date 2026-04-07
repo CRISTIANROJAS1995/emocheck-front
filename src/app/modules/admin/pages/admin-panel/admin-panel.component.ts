@@ -68,6 +68,9 @@ export class AdminPanelComponent implements OnInit {
     areas: AreaDto[] = [];
     jobTypes: JobTypeDto[] = [];
 
+    /** Verdadero cuando el rol seleccionado requiere asignar empresa (CompanyAdmin / HRManager) */
+    requiresCompanySelection = false;
+
     roleOptions: Array<{ id: number; name: string }> = [
         { id: 1, name: 'Super Admin' },
         { id: 2, name: 'Company Admin' },
@@ -97,9 +100,9 @@ export class AdminPanelComponent implements OnInit {
             password: ['', [Validators.required, Validators.minLength(8)]],
             dateOfBirth: ['', Validators.required],
             hireDate: ['', Validators.required],
-            companyID: [null],
-            siteID: [null],
-            areaID: [null],
+            companyID: [null, this.isCompanyScoped ? [] : Validators.required],
+            siteID: [null, Validators.required],
+            areaID: [null, Validators.required],
             jobTypeID: [null, Validators.required],
             roleIDs: [[6], Validators.required],
             maritalStatus: [null],
@@ -107,9 +110,9 @@ export class AdminPanelComponent implements OnInit {
             stratum: [null],
             housingType: [null],
             dependents: [null],
-            contractType: [null],
-            dailyWorkHours: [null],
-            jobSeniority: [null],
+            contractType: [null, Validators.required],
+            dailyWorkHours: [null, Validators.required],
+            jobSeniority: [null, Validators.required],
             // Psychologist professional data (required only when Psychologist role is selected)
             graduateDegree: [null],
             professionalCard: [null],
@@ -132,6 +135,12 @@ export class AdminPanelComponent implements OnInit {
                 }
                 ctrl.updateValueAndValidity();
             });
+        });
+
+        // Reset Sede and Área when company changes
+        this.createForm.get('companyID')!.valueChanges.subscribe(() => {
+            this.createForm.get('siteID')!.setValue(null);
+            this.createForm.get('areaID')!.setValue(null);
         });
 
         this.editForm = this.fb.group({
@@ -177,7 +186,20 @@ export class AdminPanelComponent implements OnInit {
             if (roles.length > 0) {
                 this.roleOptions = (roles as RoleDto[]).map(r => ({ id: r.roleID, name: r.name }));
             }
+            this.enrichUserNames();
         });
+    }
+
+    private enrichUserNames(): void {
+        if (!this.users.length) return;
+        this.users = this.users.map(u => ({
+            ...u,
+            companyName: u.companyName || this.companies.find(c => c.companyID === u.companyID)?.name || u.companyName,
+            siteName:    u.siteName    || this.sites.find(s => s.siteID === u.siteID)?.name    || u.siteName,
+            areaName:    u.areaName    || this.areas.find(a => a.areaID === u.areaID)?.name    || u.areaName,
+            jobTypeName: u.jobTypeName || this.jobTypes.find(j => j.jobTypeID === u.jobTypeID)?.name || u.jobTypeName,
+        }));
+        this.applyFilter();
     }
 
     loadUsers(): void {
@@ -188,6 +210,7 @@ export class AdminPanelComponent implements OnInit {
             .subscribe({
                 next: (users) => {
                     this.users = users;
+                    this.enrichUserNames();
                     this.applyFilter();
                 },
                 error: (e) => {
@@ -512,9 +535,28 @@ export class AdminPanelComponent implements OnInit {
 
     // ── Reset Password (SuperAdmin) ──
 
+    get todayDate(): string {
+        return new Date().toISOString().split('T')[0];
+    }
+
     get isSuperAdmin(): boolean {
         const roles = this.auth.getCurrentUser()?.roles ?? [];
         return roles.some(r => ['superadmin', 'systemadmin'].includes(r.toLowerCase()));
+    }
+
+    /** Verdadero si el usuario autenticado es CompanyAdmin o HRManager (usa endpoints my-company) */
+    get isCompanyScoped(): boolean {
+        return this.auth.isCompanyScoped();
+    }
+
+    /** Verdadero si el formulario de creación tiene el rol CompanyAdmin o HRManager seleccionado */
+    get createRoleRequiresCompany(): boolean {
+        const ids: any[] = this.createForm?.get('roleIDs')?.value ?? [];
+        return ids.some((id: any) => {
+            const role = this.roleOptions.find(r => r.id == id);
+            const name = (role?.name ?? '').toLowerCase().replace(/\s+/g, '');
+            return name === 'companyadmin' || name === 'hrmanager';
+        });
     }
 
     /** Genera una contraseña temporal aleatoria de 10 caracteres */

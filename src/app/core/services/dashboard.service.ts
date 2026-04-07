@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { map, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export interface DashboardQuery {
     companyId?: number;
@@ -51,7 +52,14 @@ export interface TrendDataDto {
 export class DashboardService {
     private readonly apiUrl = environment.apiUrl;
 
-    constructor(private readonly http: HttpClient) { }
+    constructor(
+        private readonly http: HttpClient,
+        private readonly auth: AuthService,
+    ) { }
+
+    private get isHRManager(): boolean {
+        return this.auth.isHRManager();
+    }
 
     private unwrapObject<T>(res: unknown): T {
         const anyRes = res as any;
@@ -154,11 +162,12 @@ export class DashboardService {
 
     getIndicators(query?: DashboardQuery): Observable<DashboardIndicatorsDto> {
         const params = this.buildParams(query);
-        // Backend V5: GET /api/dashboard/indicators (SuperAdmin/HRManager)
-        return this.http.get<unknown>(`${this.apiUrl}/dashboard/indicators`, { params }).pipe(
+        const url = this.isHRManager
+            ? `${this.apiUrl}/dashboard/my-company/indicators`
+            : `${this.apiUrl}/dashboard/indicators`;
+        return this.http.get<unknown>(url, { params }).pipe(
             map((res) => this.mapIndicators(this.unwrapObject<any>(res))),
             catchError(() => {
-                // Fallback: return empty indicators if user lacks permission
                 return of(this.mapIndicators({}));
             })
         );
@@ -178,8 +187,10 @@ export class DashboardService {
 
     getRiskDistribution(query?: DashboardQuery): Observable<RiskDistributionDto> {
         const params = this.buildParams(query);
-        // Backend V5: GET /api/dashboard/risk-distribution
-        return this.http.get<unknown>(`${this.apiUrl}/dashboard/risk-distribution`, { params }).pipe(
+        const url = this.isHRManager
+            ? `${this.apiUrl}/dashboard/my-company/risk-distribution`
+            : `${this.apiUrl}/dashboard/risk-distribution`;
+        return this.http.get<unknown>(url, { params }).pipe(
             map((res) => {
                 const data = this.unwrapObject<any>(res);
                 return this.mapRiskDistribution(data);
@@ -190,8 +201,10 @@ export class DashboardService {
 
     getTrends(query: DashboardQuery): Observable<TrendDataDto[]> {
         const params = this.buildParams(query);
-        // Backend V5: GET /api/dashboard/trends
-        return this.http.get<unknown>(`${this.apiUrl}/dashboard/trends`, { params }).pipe(
+        const url = this.isHRManager
+            ? `${this.apiUrl}/dashboard/my-company/trends`
+            : `${this.apiUrl}/dashboard/trends`;
+        return this.http.get<unknown>(url, { params }).pipe(
             map((res) => {
                 const data = this.unwrapObject<any>(res);
                 return Array.isArray(data) ? data : (Array.isArray(data?.trends) ? data.trends : []);
@@ -201,8 +214,10 @@ export class DashboardService {
     }
 
     getModuleStatistics(query?: Omit<DashboardQuery, 'periodType'>): Observable<ModuleStatisticsDto[]> {
-        // Backend V5: GET /api/dashboard/module-statistics
-        return this.http.get<unknown>(`${this.apiUrl}/dashboard/module-statistics`, { params: this.buildParams(query) }).pipe(
+        const url = this.isHRManager
+            ? `${this.apiUrl}/dashboard/my-company/module-statistics`
+            : `${this.apiUrl}/dashboard/module-statistics`;
+        return this.http.get<unknown>(url, { params: this.buildParams(query) }).pipe(
             map((res) => {
                 const data = this.unwrapObject<any>(res);
                 return Array.isArray(data)
@@ -210,6 +225,20 @@ export class DashboardService {
                     : Array.isArray(data?.moduleStatistics)
                         ? data.moduleStatistics.map((m: any) => this.mapModuleStat(m))
                         : [];
+            }),
+            catchError(() => of([]))
+        );
+    }
+
+    /** GET /api/dashboard/my-company/area-comparison — HRManager only */
+    getAreaComparison(query?: Omit<DashboardQuery, 'periodType'>): Observable<any[]> {
+        const url = this.isHRManager
+            ? `${this.apiUrl}/dashboard/my-company/area-comparison`
+            : `${this.apiUrl}/dashboard/area-comparison`;
+        return this.http.get<unknown>(url, { params: this.buildParams(query) }).pipe(
+            map((res) => {
+                const data = this.unwrapObject<any>(res);
+                return Array.isArray(data) ? data : [];
             }),
             catchError(() => of([]))
         );
