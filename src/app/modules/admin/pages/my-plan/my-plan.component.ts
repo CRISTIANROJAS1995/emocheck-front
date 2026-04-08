@@ -15,6 +15,7 @@ export interface PlanSubSection {
     id: string;
     title: string;
     completed?: boolean;
+    actionPlanStepID?: number;
 }
 
 export interface IntroRichSection {
@@ -68,6 +69,7 @@ export interface PlanModule {
     // API fields
     moduleID?: number;
     moduleCode?: string;
+    programCode?: string;   // for RP sub-programs (e.g. 'RP_PRO_ACTIVO'); moduleCode stays 'RIESGO_PSICOSOCIAL'
     progressPercent?: number;
 }
 
@@ -182,10 +184,157 @@ const MODULE_VISUAL: Record<string, ModuleVisualConfig> = {
     },
 };
 
+/** introRich + title overrides injected at runtime onto the RIESGO_PSICOSOCIAL tile */
+const RP_PROGRAM_VISUAL: Record<string, { title: string; introRich: { title: string; subtitle: string; body: string; sections: { heading: string; icon: string; text?: string; bullets: string[] }[] } }> = {
+    RP_PRO_ACTIVO: {
+        title: 'PRO-Activo de Bienestar',
+        introRich: {
+            title: 'Bienvenido a tu Ruta de aprendizaje: PRO-Activo de Bienestar',
+            subtitle: 'Un programa de 12 semanas basado en evidencia para la autogestión del riesgo psicosocial.',
+            body: 'Este programa está diseñado para dotarte de herramientas prácticas que te permitan gestionar el estrés, fortalecer tu resiliencia y mantener un equilibrio saludable entre tu vida personal y laboral.',
+            sections: [
+                {
+                    heading: '¿Cómo funciona?',
+                    icon: 'heroicons_outline:play-circle',
+                    bullets: [
+                        'Cada semana desactivaremos una microcápsula con recursos (videos animados, audios para relajarte, flyers con resúmenes).',
+                        'Después de ver el video, el flyer o escuchar el audio, encontrarás un Reto Semanal para aplicar lo aprendido en tu día a día.',
+                    ],
+                },
+                {
+                    heading: '¿Qué lograrás?',
+                    icon: 'heroicons_outline:trophy',
+                    text: 'Aprenderás a:',
+                    bullets: [
+                        'Regular tu respuesta al estrés y mantener la calma bajo presión.',
+                        'Cuestionar pensamientos automáticos y ver la realidad con más claridad.',
+                        'Fortalecer tu identidad más allá del rol de trabajo.',
+                        'Aplicar estrategias prácticas de organización y comunicación asertiva.',
+                    ],
+                },
+            ],
+        },
+    },
+    RP_CO_GESTORES: {
+        title: 'Co-Gestores de Bienestar',
+        introRich: {
+            title: 'Bienvenido a tu Ruta de aprendizaje: Co-Gestores de Bienestar',
+            subtitle: 'Un programa de 12 semanas basado en evidencia para la autogestión del riesgo psicosocial.',
+            body: 'Este módulo ha sido diseñado para responder a los desafíos que enfrentas cada día: la toma de decisiones bajo presión, la gestión de cambios constantes, las conversaciones difíciles, la alta carga mental y la necesidad de un equilibrio real entre tu éxito profesional y tu vida personal.\n\nSer un Co-Gestor de Bienestar significa entender que el alto desempeño solo es posible cuando existe un equilibrio real.',
+            sections: [
+                {
+                    heading: '¿Cómo funciona?',
+                    icon: 'heroicons_outline:play-circle',
+                    bullets: [
+                        'Cada semana desactivaremos una microcápsula, con recursos (videos animados, audios para relajarte, flyers con resúmenes).',
+                        'Después de ver el video, el flyer o escuchar el audio, encontrarás un Reto Semanal para aplicar lo aprendido en tu día a día.',
+                    ],
+                },
+                {
+                    heading: '¿Qué lograrás?',
+                    icon: 'heroicons_outline:trophy',
+                    text: 'Aprenderás a:',
+                    bullets: [
+                        'Regular tu respuesta biológica al estrés para mantener el pensamiento estratégico.',
+                        'Desarrollar perspectiva, entendiendo que los desafíos son eventos de gestión, no definiciones personales.',
+                        'Expresar necesidades y negociar prioridades con asertividad y criterio.',
+                        'Establecer límites inteligentes que protejan tu capacidad de ejecución y tu energía mental.',
+                        'Fortalecer la colaboración y el reconocimiento mutuo con tus pares.',
+                        'Implementar rituales de cierre para recuperar tu bienestar personal y llegar con presencia plena a tu hogar.',
+                    ],
+                },
+            ],
+        },
+    },
+    RP_ARQUITECTOS: {
+        title: 'Arquitectos de Bienestar',
+        introRich: {
+            title: 'Bienvenido a tu Ruta de aprendizaje: Arquitectos de Bienestar',
+            subtitle: 'Un programa de 12 semanas para líderes y jefaturas.',
+            body: 'Como líder, tu bienestar impacta directamente el de tu equipo. Este programa te entrega herramientas de neurociencia aplicada, gestión estratégica y liderazgo consciente para sostenerte a ti mismo mientras sostienes a otros.',
+            sections: [
+                {
+                    heading: '¿Cómo funciona?',
+                    icon: 'heroicons_outline:play-circle',
+                    bullets: [
+                        'Cada semana desactivaremos una microcápsula, con recursos (videos animados, audios para relajarte, flyers con resúmenes).',
+                        'Después de ver el video, el flyer o escuchar el audio, encontrarás un Reto Semanal para aplicar lo aprendido en tu día a día.',
+                    ],
+                },
+                {
+                    heading: '¿Qué lograrás?',
+                    icon: 'heroicons_outline:trophy',
+                    text: 'Aprenderás a:',
+                    bullets: [
+                        'Comprender la neurobiología del liderazgo bajo presión.',
+                        'Tomar decisiones estratégicas desde la claridad, no desde la urgencia.',
+                        'Gestionar equipos con integridad y foco en resultados sostenibles.',
+                        'Crear ecosistemas de trabajo equilibrados y de alto rendimiento.',
+                    ],
+                },
+            ],
+        },
+    },
+    RP_CULTURA: {
+        title: 'Cultura de Bienestar',
+        introRich: {
+            title: 'Bienvenido a tu Ruta de aprendizaje: Cultura de Bienestar',
+            subtitle: 'Un programa de 12 semanas para directivos y alta dirección.',
+            body: 'Como directivo, eres el arquitecto de la cultura organizacional. Este programa te da las herramientas para construir entornos de alto rendimiento sostenible, donde el bienestar y los resultados no se contraponen, sino que se potencian mutuamente.',
+            sections: [
+                {
+                    heading: '¿Cómo funciona?',
+                    icon: 'heroicons_outline:play-circle',
+                    bullets: [
+                        'Cada semana desactivaremos una microcápsula, con recursos (videos animados, audios para relajarte, flyers con resúmenes).',
+                        'Después de ver el video, el flyer o escuchar el audio, encontrarás un Reto Semanal para aplicar lo aprendido en tu día a día.',
+                    ],
+                },
+                {
+                    heading: '¿Qué lograrás?',
+                    icon: 'heroicons_outline:trophy',
+                    text: 'Aprenderás a:',
+                    bullets: [
+                        'Diseñar entornos laborales que promuevan el bienestar y la productividad.',
+                        'Liderar con inteligencia financiera y visión estratégica de largo plazo.',
+                        'Construir equipos sinérgicos y culturas de reconocimiento.',
+                        'Implementar sistemas de feedback que impulsen la excelencia.',
+                    ],
+                },
+            ],
+        },
+    },
+    RP_ECOSISTEMA: {
+        title: 'Ecosistema Inclusivo',
+        introRich: {
+            title: 'Bienvenido a tu Ruta de aprendizaje: Ecosistema Inclusivo',
+            subtitle: 'Un programa sobre diversidad, inclusión y bienestar.',
+            body: 'Este programa está diseñado para construir entornos de trabajo donde todas las personas puedan desarrollarse plenamente, reconociendo la diversidad como una fortaleza y el cuidado mutuo como base del bienestar colectivo.',
+            sections: [
+                {
+                    heading: '¿Qué encontrarás?',
+                    icon: 'heroicons_outline:heart',
+                    bullets: [
+                        'Estrategias para crear espacios accesibles y adaptados a la diversidad.',
+                        'Herramientas para fortalecer el cuidado emocional propio y de los demás.',
+                        'Recursos para expresar autenticidad sin barreras en el entorno laboral.',
+                        'Prácticas para integrar bienestar en el trabajo remoto o híbrido.',
+                    ],
+                },
+            ],
+        },
+    },
+};
+
 const MODULE_TITLE: Record<string, string> = {
     SALUD_MENTAL:          'Salud Mental',
     FATIGA:                'Fatiga Laboral',
     RIESGO_PSICOSOCIAL:    'Riesgo Psicosocial',
+    RP_PRO_ACTIVO:         'PRO-Activo de Bienestar',
+    RP_CO_GESTORES:        'Co-Gestores de Bienestar',
+    RP_ARQUITECTOS:        'Arquitectos de Bienestar',
+    RP_CULTURA:            'Cultura de Bienestar',
+    RP_ECOSISTEMA:         'Ecosistema Inclusivo',
     CLIMA_ORGANIZACIONAL:  'Clima Organizacional',
 };
 
@@ -194,16 +343,39 @@ const STEP_PREFIX: Record<string, string> = {
     SALUD_MENTAL:          'mh',
     FATIGA:                'fl',
     RIESGO_PSICOSOCIAL:    'rp',
+    RP_PRO_ACTIVO:         'pa',
+    RP_CO_GESTORES:        'rp',
+    RP_ARQUITECTOS:        'lb',
+    RP_CULTURA:            've',
+    RP_ECOSISTEMA:         'ei',
     CLIMA_ORGANIZACIONAL:  'co',
 };
 
 /** Maps stepKey â†’ section id suffix */
 const STEP_KEY_SUFFIX: Record<string, string> = {
     BIENVENIDA: 'bienvenida',
-    APRENDE: 'aprende',
-    CONECTA: 'conecta',
-    ACTUA: 'actua',
-    CIERRE: 'cierre',
+    APRENDE:    'aprende',
+    CONECTA:    'conecta',
+    ACTUA:      'actua',
+    CIERRE:     'cierre',
+    // Weekly steps (SALUD_MENTAL + RP programs)
+    SEMANA_1:   's1',
+    SEMANA_2:   's2',
+    SEMANA_3:   's3',
+    SEMANA_4:   's4',
+    SEMANA_5:   's5',
+    SEMANA_6:   's6',
+    SEMANA_7:   's7',
+    SEMANA_8:   's8',
+    SEMANA_9:   's9',
+    SEMANA_10:  's10',
+    SEMANA_11:  's11',
+    SEMANA_12:  's12',
+    // Themes (RP_ECOSISTEMA)
+    TEMA_1:     'h1',
+    TEMA_2:     'h2',
+    TEMA_3:     'h3',
+    TEMA_4:     'h4',
 };
 
 type StaticSectionCfg = { id: string; title: string; children?: { id: string; title: string }[] };
@@ -414,11 +586,28 @@ export class MyPlanComponent implements OnInit {
         return this._actionPlanSvc.getModules().pipe(
             tap(dtos => {
                 dtos.forEach(dto => {
-                    const mod = this.modules.find(m => m.moduleCode === dto.moduleCode);
-                    if (mod) {
-                        mod.moduleID        = dto.moduleID;
-                        mod.title           = dto.moduleName;
-                        mod.progressPercent = dto.progressPercent;
+                    if (dto.moduleCode?.startsWith('RP_')) {
+                        // RP sub-programs map to the single RIESGO_PSICOSOCIAL tile
+                        const rpTile = this.modules.find(
+                            m => m.moduleCode === 'RIESGO_PSICOSOCIAL' || m.moduleCode?.startsWith('RP_')
+                        );
+                        if (rpTile && !rpTile.moduleID) {
+                            rpTile.moduleID        = dto.moduleID;
+                            rpTile.progressPercent = dto.progressPercent;
+                            rpTile.programCode     = dto.moduleCode; // specific sub-program
+                            // moduleCode stays 'RIESGO_PSICOSOCIAL' so _applyStaticSections shows all 5 programs
+                            const prog = RP_PROGRAM_VISUAL[dto.moduleCode];
+                            if (prog) {
+                                rpTile.introRich = prog.introRich as any;
+                            }
+                        }
+                    } else {
+                        const mod = this.modules.find(m => m.moduleCode === dto.moduleCode);
+                        if (mod) {
+                            mod.moduleID        = dto.moduleID;
+                            mod.title           = dto.moduleName;
+                            mod.progressPercent = dto.progressPercent;
+                        }
                     }
                 });
                 // Desplegar y activar el primer módulo con moduleID reconocido
@@ -441,13 +630,22 @@ export class MyPlanComponent implements OnInit {
     }
 
     private loadSteps(module: PlanModule): void {
-        // SALUD_MENTAL uses a custom week-based static structure regardless of API steps
-        if (!module.moduleID || module.moduleCode === 'SALUD_MENTAL') {
+        if (!module.moduleID) {
             this._applyStaticSections(module);
+            return;
+        }
+        // RP: load full 5-program structure in sidebar, then overlay API completion data
+        if (module.moduleCode === 'RIESGO_PSICOSOCIAL' && module.programCode) {
+            this._applyStaticSections(module);
+            this._actionPlanSvc.getSteps(module.moduleID).subscribe({
+                next: (steps) => this._overlayRpSteps(module, steps),
+                error: () => {},
+            });
             return;
         }
         this._actionPlanSvc.getSteps(module.moduleID).subscribe({
             next: (steps) => this._applySteps(module, steps),
+            error: ()      => this._applyStaticSections(module),
         });
     }
 
@@ -494,8 +692,56 @@ export class MyPlanComponent implements OnInit {
         }
     }
 
+    /** Overlay API completion data onto the user's enrolled RP sub-program children */
+    private _overlayRpSteps(module: PlanModule, steps: ActionPlanStepDto[]): void {
+        const prefix = STEP_PREFIX[module.programCode ?? ''] ?? 'rp';
+        // Build map: section-id → step dto
+        const stepById = new Map<string, ActionPlanStepDto>();
+        steps.forEach(s => {
+            const id = `${prefix}-${STEP_KEY_SUFFIX[s.stepKey] ?? s.stepKey.toLowerCase()}`;
+            stepById.set(id, s);
+        });
+        // Find first incomplete child for navigation
+        let firstIncompleteId: string | undefined;
+        module.sections.forEach(prog => {
+            if (!prog.children) return;
+            prog.children.forEach(child => {
+                const step = stepById.get(child.id);
+                if (step) {
+                    child.completed        = step.isCompleted;
+                    child.actionPlanStepID = step.actionPlanStepID;
+                    if (!step.isCompleted && !firstIncompleteId) firstIncompleteId = child.id;
+                }
+            });
+        });
+        module.hasCertification = steps.some(s => s.hasCertification);
+        const targetId = firstIncompleteId ?? this._flatStepsForModule(module)[0];
+        if (targetId) {
+            this.activeSectionId.set(targetId);
+            this._expandParentSection(module, targetId);
+            const flatIds = this._flatStepsForModule(module);
+            this.setNavSignals(module, Math.max(0, flatIds.indexOf(targetId)));
+        }
+    }
+
+    /**
+     * Returns the flat step list to use for Prev/Next navigation.
+     * For RP modules: scopes to whichever sub-program section contains the current active step,
+     * so navigating inside Co-Gestores doesn't bleed into PRO-Activo.
+     */
+    private _flatStepsForNavigation(m: PlanModule): string[] {
+        if (m.moduleCode === 'RIESGO_PSICOSOCIAL') {
+            const activeId = this.activeSectionId();
+            const parentSection = m.sections.find(s => s.children?.some(c => c.id === activeId));
+            if (parentSection?.children) {
+                return parentSection.children.map(c => c.id);
+            }
+        }
+        return this._flatStepsForModule(m);
+    }
+
     private setNavSignals(module: PlanModule, idx: number): void {
-        const total = this._flatStepsForModule(module).length;
+        const total = this._flatStepsForNavigation(module).length;
         this.activeStepPrevID.set(idx > 0 ? idx : null);
         this.activeStepNextID.set(idx < total - 1 ? idx + 1 : null);
     }
@@ -527,7 +773,15 @@ export class MyPlanComponent implements OnInit {
                     return of({ fresh: fresh ?? module, steps: null });
                 })
             ).subscribe({
-                next: ({ fresh, steps }) => steps && fresh.moduleCode !== 'SALUD_MENTAL' ? this._applySteps(fresh, steps) : this._applyStaticSections(fresh),
+                next: ({ fresh, steps }) => {
+                    if (!steps || fresh.moduleCode === 'SALUD_MENTAL') { this._applyStaticSections(fresh); return; }
+                    if (fresh.moduleCode === 'RIESGO_PSICOSOCIAL' && fresh.programCode) {
+                        this._applyStaticSections(fresh);
+                        this._overlayRpSteps(fresh, steps);
+                        return;
+                    }
+                    this._applySteps(fresh, steps);
+                },
                 error: () => {
                     const fresh = this.modules.find(m => m.id === moduleId) ?? module;
                     this._applyStaticSections(fresh);
@@ -583,8 +837,8 @@ export class MyPlanComponent implements OnInit {
             module.sections.forEach(s => { s.childExpanded = false; });
             this.activeSectionId.set(section.id);
         }
-        const flatIds = this._flatStepsForModule(module);
-        this.setNavSignals(module, Math.max(0, flatIds.indexOf(this.activeSectionId())));
+        const navIds = this._flatStepsForNavigation(module);
+        this.setNavSignals(module, Math.max(0, navIds.indexOf(this.activeSectionId())));
     }
 
     selectSubSection(module: PlanModule, weekId: string): void {
@@ -592,8 +846,8 @@ export class MyPlanComponent implements OnInit {
         this.activeTab.set('aprende');
         this.sliderIndex.set(0);
         this.activeSectionId.set(weekId);
-        const flatIds = this._flatStepsForModule(module);
-        this.setNavSignals(module, Math.max(0, flatIds.indexOf(weekId)));
+        const navIds = this._flatStepsForNavigation(module);
+        this.setNavSignals(module, Math.max(0, navIds.indexOf(weekId)));
     }
 
     isSectionOrChildActive(section: PlanSection): boolean {
@@ -605,29 +859,31 @@ export class MyPlanComponent implements OnInit {
         const m = this.activeModule;
         if (!m || m.sections.length === 0) return;
 
-        const flatIds = this._flatStepsForModule(m);
-        let idx = flatIds.indexOf(this.activeSectionId());
+        const navIds = this._flatStepsForNavigation(m);
+        let idx = navIds.indexOf(this.activeSectionId());
         if (idx === -1) { idx = 0; }
 
         if (direction === 'next') {
             const nextIdx = idx + 1;
-            if (nextIdx >= flatIds.length) return;
+            if (nextIdx >= navIds.length) return;
 
             // Marcar completado INMEDIATAMENTE en local (sin esperar API)
-            this._markStepComplete(m, flatIds[idx]);
+            this._markStepComplete(m, navIds[idx]);
             m.progressPercent = this.calcProgress(m);
 
-            // Sync con API — usa el actionPlanStepID de la sección padre
+            // Sync con API — solo si el paso tiene actionPlanStepID (solo programa inscrito)
             const parentSection = m.sections.find(s =>
-                s.id === flatIds[idx] || s.children?.some(c => c.id === flatIds[idx])
+                s.id === navIds[idx] || s.children?.some(c => c.id === navIds[idx])
             );
-            if (m.moduleID && parentSection?.actionPlanStepID) {
-                this._actionPlanSvc.completeStep(m.moduleID, parentSection.actionPlanStepID).subscribe({
+            const activeChild = parentSection?.children?.find(c => c.id === navIds[idx]);
+            const stepIdToComplete = activeChild?.actionPlanStepID ?? parentSection?.actionPlanStepID;
+            if (m.moduleID && stepIdToComplete) {
+                this._actionPlanSvc.completeStep(m.moduleID, stepIdToComplete).subscribe({
                     next: (result) => { m.progressPercent = result.moduleProgressPercent; },
                 });
             }
 
-            const nextId = flatIds[nextIdx];
+            const nextId = navIds[nextIdx];
             this.activeSectionId.set(nextId);
             this.activeTab.set('aprende');
             this.sliderIndex.set(0);
@@ -636,7 +892,7 @@ export class MyPlanComponent implements OnInit {
         } else {
             const prevIdx = idx - 1;
             if (prevIdx < 0) return;
-            const prevId = flatIds[prevIdx];
+            const prevId = navIds[prevIdx];
             this.activeSectionId.set(prevId);
             this.activeTab.set('aprende');
             this.sliderIndex.set(0);
@@ -663,6 +919,17 @@ export class MyPlanComponent implements OnInit {
 
     private _flatStepsForModule(m: PlanModule): string[] {
         const ids: string[] = [];
+        // For RP sub-programs, Previous/Next and step completion only apply to the enrolled program
+        if (m.moduleCode === 'RIESGO_PSICOSOCIAL' && m.programCode) {
+            const prefix = STEP_PREFIX[m.programCode];
+            const enrolledSection = prefix
+                ? m.sections.find(s => s.children?.some(c => c.id.startsWith(prefix + '-')))
+                : undefined;
+            if (enrolledSection?.children) {
+                enrolledSection.children.forEach(c => ids.push(c.id));
+                return ids;
+            }
+        }
         for (const s of m.sections) {
             if (s.children && s.children.length > 0) {
                 s.children.forEach(c => ids.push(c.id));
@@ -741,27 +1008,37 @@ export class MyPlanComponent implements OnInit {
     }
 
     get certModuleSubtitle(): string {
-        const code = this.activeModule?.moduleCode;
+        const code = this.activeModule?.programCode ?? this.activeModule?.moduleCode;
         if (code === 'FATIGA')             return 'en Gestión de Fatiga Laboral';
         if (code === 'RIESGO_PSICOSOCIAL') return 'en Manejo de Riesgo Psicosocial';
+        if (code === 'RP_PRO_ACTIVO')      return 'en PRO-Activo de Bienestar';
+        if (code === 'RP_CO_GESTORES')     return 'en Co-Gestión de Bienestar';
+        if (code === 'RP_ARQUITECTOS')     return 'en Arquitectura de Bienestar';
+        if (code === 'RP_CULTURA')         return 'en Cultura de Bienestar';
+        if (code === 'RP_ECOSISTEMA')      return 'en Ecosistema Inclusivo';
         return 'en Habilidades de Salud Mental';
     }
 
     get certModuleBadge(): string {
-        const code = this.activeModule?.moduleCode;
+        const code = this.activeModule?.programCode ?? this.activeModule?.moduleCode;
         if (code === 'FATIGA')             return 'Módulo: Fatiga Laboral';
         if (code === 'RIESGO_PSICOSOCIAL') return 'Módulo: Riesgo Psicosocial';
+        if (code === 'RP_PRO_ACTIVO')      return 'Programa: PRO-Activo de Bienestar';
+        if (code === 'RP_CO_GESTORES')     return 'Programa: Co-Gestores de Bienestar';
+        if (code === 'RP_ARQUITECTOS')     return 'Programa: Arquitectos de Bienestar';
+        if (code === 'RP_CULTURA')         return 'Programa: Cultura de Bienestar';
+        if (code === 'RP_ECOSISTEMA')      return 'Programa: Ecosistema Inclusivo';
         return 'Módulo: Salud Mental';
     }
 
     get certBodyText(): string {
-        const code = this.activeModule?.moduleCode;
+        const code = this.activeModule?.programCode ?? this.activeModule?.moduleCode;
         if (code === 'FATIGA') {
             return 'Reconocemos tu esfuerzo y dedicación en el fortalecimiento de habilidades junto a Emocheck. ' +
                 'Has aprobado este proceso, desarrollando recursos personales que te permiten identificar señales de fatiga, ' +
                 'comprender su impacto y aplicar estrategias efectivas para gestionarla de manera consciente y sostenible.';
         }
-        if (code === 'RIESGO_PSICOSOCIAL') {
+        if (code === 'RIESGO_PSICOSOCIAL' || code?.startsWith('RP_')) {
             return 'Reconocemos tu esfuerzo y dedicación en el fortalecimiento de habilidades junto a Emocheck. ' +
                 'Has aprobado este proceso, identificando factores de riesgo psicosocial y desarrollando estrategias ' +
                 'para gestionarlos y promover un entorno laboral más saludable y equilibrado.';
