@@ -1589,6 +1589,784 @@
                         </div>
                         }
 
+                        <!-- MH: Semana #8: Pirámide de logros -->
+                        @if (activeSectionId() === 'mh-s8') {
+                        <div class="section-content">
+
+                            <!-- Tab bar -->
+                            <div class="content-subtab-bar">
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'aprende'"
+                                    type="button" (click)="selectTab('aprende')">
+                                    <span class="cs-tab__ico">📚</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Aprende</span>
+                                        <span class="cs-tab__desc">Psicoeducación</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'conecta'"
+                                    type="button" (click)="selectTab('conecta')">
+                                    <span class="cs-tab__ico">🖼️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Conecta</span>
+                                        <span class="cs-tab__desc">Imagen</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'actua'"
+                                    type="button" (click)="selectTab('actua')">
+                                    <span class="cs-tab__ico">✍️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Actúa</span>
+                                        <span class="cs-tab__desc">Tarea de la semana</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- APRENDE tab -->
+                            @if (activeTab() === 'aprende') {
+                            <div class="tab-content">
+
+                                <div class="aprende-hero">
+                                    <div class="aprende-hero__left">
+                                        <span class="aprende-hero__week-badge">🏛️ Semana 8</span>
+                                        <h3 class="aprende-hero__title">Pirámide de logros</h3>
+                                        <p class="aprende-hero__sub">Como las grandes pirámides, para ser majestuoso tuviste que ser construido bloque por bloque.</p>
+                                    </div>
+                                    <div class="aprende-hero__emoji-wrap">
+                                        <span class="aprende-hero__big-emoji">🔺</span>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-definition">
+                                    <mat-icon class="aprende-definition__ico" svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                                    <p>Como las grandes pirámides, para ser majestuoso tuviste que ser construido <strong>bloque por bloque</strong>; y así eres tú, necesitas ir elaborando cada <strong>ladrillo de tu vida</strong>.</p>
+                                </div>
+
+                                <p class="aprende-section-label">Los bloques de tu pirámide</p>
+                                <div class="aprende-pillars">
+                                    <div class="aprende-pillar aprende-pillar--blue">
+                                        <span class="aprende-pillar__emoji">🧱</span>
+                                        <p class="aprende-pillar__title">Pequeños logros</p>
+                                        <p class="aprende-pillar__desc">Cada paso dado, cada meta alcanzada, es un ladrillo que sostiene lo que eres hoy.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--purple">
+                                        <span class="aprende-pillar__emoji">🏗️</span>
+                                        <p class="aprende-pillar__title">Construcción continua</p>
+                                        <p class="aprende-pillar__desc">No se construye de golpe. La majestuosidad surge de la constancia y el esfuerzo sostenido.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--teal">
+                                        <span class="aprende-pillar__emoji">✨</span>
+                                        <p class="aprende-pillar__title">Tu valor</p>
+                                        <p class="aprende-pillar__desc">Lo que has costruido eres tú. Tus logros son el reflejo de tu fortaleza y determinación.</p>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-fact">
+                                    <span class="aprende-fact__ico">🏆</span>
+                                    <div>
+                                        <p class="aprende-fact__heading">Recuerda</p>
+                                        <p class="aprende-fact__text">Cada pequeño logro tiene valor. Reconocer lo que has construido es el primer paso para seguir edificando con propósito.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            }
+
+                            <!-- CONECTA tab -->
+                            @if (activeTab() === 'conecta') {
+                            <div class="tab-content">
+                                <p class="section-content__tag">Imagen · Semana 8</p>
+                                <h3 class="section-content__title">Pirámide de logros</h3>
+                                <div class="single-infographic">
+                                    <img
+                                        src="https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I04_E.ANIMO_PIRAMIDE+DE+LOGROS.png"
+                                        alt="Imagen: Pirámide de logros"
+                                        class="single-infographic__img" />
+                                </div>
+                            </div>
+                            }
+
+                            <!-- ACTÚA tab -->
+                            @if (activeTab() === 'actua') {
+                            <div class="tab-content">
+
+                                <div class="actua-week-header">
+                                    <div class="actua-week-header__badge">✍️ Tarea de la semana</div>
+                                    <h3 class="actua-week-header__title">Dibuja tus logros</h3>
+                                    <p class="actua-week-header__sub">Lo más valioso que puedes cargar contigo son tus propios logros.</p>
+                                </div>
+
+                                <div class="actua-task-card">
+                                    <div class="actua-task-card__icon-wrap">
+                                        <span class="actua-task-card__emoji">🎨</span>
+                                    </div>
+                                    <div class="actua-task-card__body">
+                                        <p class="actua-task-card__label">Tu tarea</p>
+                                        <p class="actua-task-card__text">Tómate el espacio para cerrar los ojos y <strong>visualizarte como una gran escultura</strong> que se ha pulido todo este tiempo; recuerda los materiales que te sostienen y plásmalo en un <strong>pequeño dibujo</strong> que puedas cargar en tu cartera, porque allí siempre va lo más valioso.</p>
+                                    </div>
+                                </div>
+
+                                <p class="aprende-section-label">¿Cómo hacerlo?</p>
+                                <div class="actua-steps">
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">1</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Cierra los ojos</p>
+                                            <p class="actua-step__desc">Encuentra un lugar tranquilo. Respira profundo y visualízate como una gran escultura que ha sido tallada con el tiempo.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🧘</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">2</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Recuerda tus materiales</p>
+                                            <p class="actua-step__desc">¿Qué logros, valores y experiencias te sostienen? Son los bloques con los que se construyó tu pirámide.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🧱</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">3</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Plasma tu pirámide</p>
+                                            <p class="actua-step__desc">Dibuja de manera sencilla tu pirámide de logros. Guárdala en tu cartera como recordatorio de tu valor.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">✏️</span>
+                                    </div>
+                                </div>
+
+                                <div class="actua-tip">
+                                    <span class="actua-tip__ico">💛</span>
+                                    <p><strong>Recuerda:</strong> No importa el tamaño del dibujo ni si eres artista. Lo que importa es el significado que tiene para ti. ¡Qué más valioso que tus propios logros!</p>
+                                </div>
+
+                            </div>
+                            }
+
+                        </div>
+                        }
+
+                        <!-- MH: Semana #9: Y tú emoción habla ¿La escuchas? -->
+                        @if (activeSectionId() === 'mh-s9') {
+                        <div class="section-content">
+
+                            <!-- Tab bar -->
+                            <div class="content-subtab-bar">
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'aprende'"
+                                    type="button" (click)="selectTab('aprende')">
+                                    <span class="cs-tab__ico">📚</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Aprende</span>
+                                        <span class="cs-tab__desc">Psicoeducación</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'conecta'"
+                                    type="button" (click)="selectTab('conecta')">
+                                    <span class="cs-tab__ico">🖼️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Conecta</span>
+                                        <span class="cs-tab__desc">Imagen</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'actua'"
+                                    type="button" (click)="selectTab('actua')">
+                                    <span class="cs-tab__ico">✍️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Actúa</span>
+                                        <span class="cs-tab__desc">Tarea de la semana</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- APRENDE tab -->
+                            @if (activeTab() === 'aprende') {
+                            <div class="tab-content">
+
+                                <div class="aprende-hero">
+                                    <div class="aprende-hero__left">
+                                        <span class="aprende-hero__week-badge">👂 Semana 9</span>
+                                        <h3 class="aprende-hero__title">Y tú emoción habla ¿La escuchas?</h3>
+                                        <p class="aprende-hero__sub">Ignorar lo que sentimos no hace que desaparezca, solo lo intensifica.</p>
+                                    </div>
+                                    <div class="aprende-hero__emoji-wrap">
+                                        <span class="aprende-hero__big-emoji">💬</span>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-definition">
+                                    <mat-icon class="aprende-definition__ico" svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                                    <p>Ignorar lo que sentimos <strong>no hace que desaparezca</strong>, solo lo intensifica. Reconocer las emociones permite procesarlas y tomar decisiones más alineadas con nuestro bienestar. La <strong>autoconciencia emocional</strong> es la base de la regulación.</p>
+                                </div>
+
+                                <p class="aprende-section-label">¿Por qué escuchar tus emociones?</p>
+                                <div class="aprende-pillars">
+                                    <div class="aprende-pillar aprende-pillar--blue">
+                                        <span class="aprende-pillar__emoji">🎙️</span>
+                                        <p class="aprende-pillar__title">Las emociones hablan</p>
+                                        <p class="aprende-pillar__desc">Cada emoción lleva un mensaje sobre lo que necesitas. Ignorarlas es perder información valiosa.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--purple">
+                                        <span class="aprende-pillar__emoji">🔍</span>
+                                        <p class="aprende-pillar__title">Reconocer = Procesar</p>
+                                        <p class="aprende-pillar__desc">Nombrar una emoción ya la reduce. El reconocimiento emocional activa el córtex prefrontal y calma la amígdala.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--teal">
+                                        <span class="aprende-pillar__emoji">🧭</span>
+                                        <p class="aprende-pillar__title">Mejor toma de decisiones</p>
+                                        <p class="aprende-pillar__desc">Cuando entiendes tus emociones, puedes elegir respuestas más alineadas con tu bienestar.</p>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-fact">
+                                    <span class="aprende-fact__ico">💡</span>
+                                    <div>
+                                        <p class="aprende-fact__heading">La autoconciencia emocional</p>
+                                        <p class="aprende-fact__text">Es la base de la regulación emocional. Sin ella, las emociones nos controlan; con ella, nosotros las guiamos.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            }
+
+                            <!-- CONECTA tab -->
+                            @if (activeTab() === 'conecta') {
+                            <div class="tab-content">
+                                <p class="section-content__tag">Imagen · Semana 9</p>
+                                <h3 class="section-content__title">Y tú emoción habla ¿La escuchas?</h3>
+                                <div class="single-infographic">
+                                    <img
+                                        src="https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/Yt%C3%BA+emoci%C3%B3n+habla%2C+La+escuchas.png"
+                                        alt="Imagen: Y tú emoción habla ¿La escuchas?"
+                                        class="single-infographic__img" />
+                                </div>
+                            </div>
+                            }
+
+                            <!-- ACTÚA tab -->
+                            @if (activeTab() === 'actua') {
+                            <div class="tab-content">
+
+                                <div class="actua-week-header">
+                                    <div class="actua-week-header__badge">✍️ Tarea de la semana</div>
+                                    <h3 class="actua-week-header__title">Nombra y valida tu emoción</h3>
+                                    <p class="actua-week-header__sub">Completar esta frase es un acto poderoso de autoconciencia y autocompasión.</p>
+                                </div>
+
+                                <div class="actua-task-card">
+                                    <div class="actua-task-card__icon-wrap">
+                                        <span class="actua-task-card__emoji">🗣️</span>
+                                    </div>
+                                    <div class="actua-task-card__body">
+                                        <p class="actua-task-card__label">Tu tarea</p>
+                                        <p class="actua-task-card__text">Cuando sientas una emoción intensa hoy, <strong>nómbrala en voz baja</strong> y completa la frase: <em>"Esto que siento es ________ y es válido porque ___________"</em></p>
+                                    </div>
+                                </div>
+
+                                <p class="aprende-section-label">¿Cómo practicarlo?</p>
+                                <div class="actua-steps">
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">1</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Detente y observa</p>
+                                            <p class="actua-step__desc">Cuando sientas algo intenso, haz una pausa. No actúes de inmediato; simplemente observa lo que sucede dentro de ti.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🛑</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">2</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Nómbrala en voz baja</p>
+                                            <p class="actua-step__desc">¿Es tristeza, frustración, miedo, alegría? Darle nombre a la emoción ya reduce su intensidad.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🏷️</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">3</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Completa la frase</p>
+                                            <p class="actua-step__desc">"Esto que siento es ________ y es válido porque ___________". Validar la emoción le quita poder y te devuelve el control.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">💬</span>
+                                    </div>
+                                </div>
+
+                                <div class="actua-tip">
+                                    <span class="actua-tip__ico">💞</span>
+                                    <p><strong>Recuerda:</strong> Todas las emociones son válidas. No hay emociones buenas ni malas; hay emociones que merecen ser escuchadas y comprendidas.</p>
+                                </div>
+
+                            </div>
+                            }
+
+                        </div>
+                        }
+
+                        <!-- MH: Semana #10: Interruptores del sueño -->
+                        @if (activeSectionId() === 'mh-s10') {
+                        <div class="section-content">
+
+                            <!-- Tab bar -->
+                            <div class="content-subtab-bar">
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'aprende'"
+                                    type="button" (click)="selectTab('aprende')">
+                                    <span class="cs-tab__ico">📚</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Aprende</span>
+                                        <span class="cs-tab__desc">Psicoeducación</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'conecta'"
+                                    type="button" (click)="selectTab('conecta')">
+                                    <span class="cs-tab__ico">🎬</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Conecta</span>
+                                        <span class="cs-tab__desc">Video</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'actua'"
+                                    type="button" (click)="selectTab('actua')">
+                                    <span class="cs-tab__ico">✍️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Actúa</span>
+                                        <span class="cs-tab__desc">Tarea de la semana</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- APRENDE tab -->
+                            @if (activeTab() === 'aprende') {
+                            <div class="tab-content">
+
+                                <div class="aprende-hero">
+                                    <div class="aprende-hero__left">
+                                        <span class="aprende-hero__week-badge">💡 Semana 10</span>
+                                        <h3 class="aprende-hero__title">Interruptores del sueño</h3>
+                                        <p class="aprende-hero__sub">El cuerpo necesita "desconectarse" para dormir mejor.</p>
+                                    </div>
+                                    <div class="aprende-hero__emoji-wrap">
+                                        <span class="aprende-hero__big-emoji">🌙</span>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-definition">
+                                    <mat-icon class="aprende-definition__ico" svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                                    <p>La <strong>relajación muscular progresiva</strong> ayuda a reducir la activación del cuerpo, facilitando el descanso. El cuerpo necesita <strong>"desconectarse"</strong> para dormir mejor.</p>
+                                </div>
+
+                                <p class="aprende-section-label">¿Cómo funciona la relajación muscular?</p>
+                                <div class="aprende-pillars">
+                                    <div class="aprende-pillar aprende-pillar--blue">
+                                        <span class="aprende-pillar__emoji">💪</span>
+                                        <p class="aprende-pillar__title">Tensión</p>
+                                        <p class="aprende-pillar__desc">Al tensar conscientemente un grupo muscular, se genera conciencia de la zona y se prepara para la liberación.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--purple">
+                                        <span class="aprende-pillar__emoji">😌</span>
+                                        <p class="aprende-pillar__title">Relajación</p>
+                                        <p class="aprende-pillar__desc">Al soltar la tensión, el músculo se relaja profundamente, más de lo habitual, activando el sistema parasimpático.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--teal">
+                                        <span class="aprende-pillar__emoji">😴</span>
+                                        <p class="aprende-pillar__title">Descanso</p>
+                                        <p class="aprende-pillar__desc">El recorrido de pies a cabeza "apaga" el cuerpo de forma progresiva, preparándolo para el sueño profundo.</p>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-fact">
+                                    <span class="aprende-fact__ico">🔬</span>
+                                    <div>
+                                        <p class="aprende-fact__heading">Técnica respaldada</p>
+                                        <p class="aprende-fact__text">La relajación muscular progresiva (RMP), desarrollada por Edmund Jacobson, es una de las técnicas más estudiadas para mejorar la calidad del sueño y reducir la ansiedad nocturna.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            }
+
+                            <!-- CONECTA tab -->
+                            @if (activeTab() === 'conecta') {
+                            <div class="tab-content">
+                                <p class="section-content__tag">Video · Semana 10</p>
+                                <h3 class="section-content__title">Interruptores del sueño</h3>
+                                <div class="video-player-wrap">
+                                    <video
+                                        class="video-player"
+                                        src="https://material-adjunto.s3.us-east-2.amazonaws.com/videos/V02_CALIDAD+DE+SUENO_INTERRUPTORES+DEL+SUENO.mp4"
+                                        autoplay
+                                        controls
+                                        playsinline>
+                                    </video>
+                                </div>
+                            </div>
+                            }
+
+                            <!-- ACTÚA tab -->
+                            @if (activeTab() === 'actua') {
+                            <div class="tab-content">
+
+                                <div class="actua-week-header">
+                                    <div class="actua-week-header__badge">✍️ Tarea de la semana</div>
+                                    <h3 class="actua-week-header__title">Apaga tus interruptores</h3>
+                                    <p class="actua-week-header__sub">Cada grupo muscular que relajas es un interruptor de luz que apagas antes de dormir.</p>
+                                </div>
+
+                                <div class="actua-task-card">
+                                    <div class="actua-task-card__icon-wrap">
+                                        <span class="actua-task-card__emoji">🌙</span>
+                                    </div>
+                                    <div class="actua-task-card__body">
+                                        <p class="actua-task-card__label">Tu tarea</p>
+                                        <p class="actua-task-card__text">Antes de dormir, <strong>tensa y relaja cada grupo muscular</strong> desde los pies hasta la cabeza, como una lista en donde apagas cada interruptor de luz en tu casa.</p>
+                                    </div>
+                                </div>
+
+                                <p class="aprende-section-label">El recorrido de pies a cabeza</p>
+                                <div class="actua-steps">
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">1</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Pies y pantorrillas</p>
+                                            <p class="actua-step__desc">Tensa los pies doblando los dedos hacia arriba 5 segundos, luego suelta. Siente la diferencia.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🦶</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">2</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Muslos y glúteos</p>
+                                            <p class="actua-step__desc">Aprieta los muslos y glúteos durante 5 segundos. Suelta y observa cómo se relajan por completo.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🏃</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">3</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Abdomen, hombros y cara</p>
+                                            <p class="actua-step__desc">Continúa ascendiendo: abdomen, hombros, manos y por último la cara. Tensa y suelta cada zona.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">😴</span>
+                                    </div>
+                                </div>
+
+                                <div class="actua-tip">
+                                    <span class="actua-tip__ico">🌙</span>
+                                    <p><strong>Tip:</strong> Hazlo acostado en la cama, con los ojos cerrados y respirando lentamente. En pocos minutos sentirás tu cuerpo completamente relajado y listo para dormir.</p>
+                                </div>
+
+                            </div>
+                            }
+
+                        </div>
+                        }
+
+                        <!-- MH: Semana #11: Ruta hacia el buen dormir -->
+                        @if (activeSectionId() === 'mh-s11') {
+                        <div class="section-content">
+
+                            <!-- Tab bar -->
+                            <div class="content-subtab-bar">
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'aprende'"
+                                    type="button" (click)="selectTab('aprende')">
+                                    <span class="cs-tab__ico">📚</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Aprende</span>
+                                        <span class="cs-tab__desc">Psicoeducación</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'conecta'"
+                                    type="button" (click)="selectTab('conecta')">
+                                    <span class="cs-tab__ico">🖼️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Conecta</span>
+                                        <span class="cs-tab__desc">Imagen</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'actua'"
+                                    type="button" (click)="selectTab('actua')">
+                                    <span class="cs-tab__ico">✍️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Actúa</span>
+                                        <span class="cs-tab__desc">Tarea de la semana</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- APRENDE tab -->
+                            @if (activeTab() === 'aprende') {
+                            <div class="tab-content">
+
+                                <div class="aprende-hero">
+                                    <div class="aprende-hero__left">
+                                        <span class="aprende-hero__week-badge">🗺️ Semana 11</span>
+                                        <h3 class="aprende-hero__title">Ruta hacia el buen dormir</h3>
+                                        <p class="aprende-hero__sub">El buen descanso no depende solo de acostarse temprano, sino de hábitos previos que preparan el cuerpo y la mente.</p>
+                                    </div>
+                                    <div class="aprende-hero__emoji-wrap">
+                                        <span class="aprende-hero__big-emoji">🌛</span>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-definition">
+                                    <mat-icon class="aprende-definition__ico" svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                                    <p>El buen descanso no depende solo de acostarse temprano, sino de <strong>hábitos previos</strong> que preparan el cuerpo y la mente. Mantener rutinas, reducir estímulos y cuidar el entorno facilita un sueño más <strong>profundo y reparador</strong>.</p>
+                                </div>
+
+                                <p class="aprende-section-label">Las 5 rutas del buen dormir</p>
+                                <div class="aprende-pillars">
+                                    <div class="aprende-pillar aprende-pillar--blue">
+                                        <span class="aprende-pillar__emoji">⏰</span>
+                                        <p class="aprende-pillar__title">Horario</p>
+                                        <p class="aprende-pillar__desc">Acostarte y levantarte a la misma hora regula tu reloj biológico y mejora la calidad del sueño.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--purple">
+                                        <span class="aprende-pillar__emoji">📵</span>
+                                        <p class="aprende-pillar__title">Desconexión</p>
+                                        <p class="aprende-pillar__desc">Alejar pantallas al menos 30 minutos antes de dormir reduce la estimulación mental y la luz azul.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--teal">
+                                        <span class="aprende-pillar__emoji">🌡️</span>
+                                        <p class="aprende-pillar__title">Ambiente</p>
+                                        <p class="aprende-pillar__desc">Un cuarto oscuro, fresco y silencioso es el entorno ideal para que tu cuerpo entre en modo descanso.</p>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-fact">
+                                    <span class="aprende-fact__ico">💤</span>
+                                    <div>
+                                        <p class="aprende-fact__heading">Cuerpo y mente</p>
+                                        <p class="aprende-fact__text">Pequeños rituales como leer, hacer respiraciones profundas o tomar una ducha tibia preparan al cuerpo y a la mente para un sueño reparador.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            }
+
+                            <!-- CONECTA tab -->
+                            @if (activeTab() === 'conecta') {
+                            <div class="tab-content">
+                                <p class="section-content__tag">Imagen · Semana 11</p>
+                                <h3 class="section-content__title">Ruta hacia el buen dormir</h3>
+                                <div class="single-infographic">
+                                    <img
+                                        src="https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I12_EDUCACION_RUTA+HACIA+EL+DORMIR.png"
+                                        alt="Imagen: Ruta hacia el buen dormir"
+                                        class="single-infographic__img" />
+                                </div>
+                            </div>
+                            }
+
+                            <!-- ACTÚA tab -->
+                            @if (activeTab() === 'actua') {
+                            <div class="tab-content">
+
+                                <div class="actua-week-header">
+                                    <div class="actua-week-header__badge">✍️ Tarea de la semana</div>
+                                    <h3 class="actua-week-header__title">Elige 2 hábitos esta noche</h3>
+                                    <p class="actua-week-header__sub">Observa cómo cambia tu descanso con solo dos pequeños cambios.</p>
+                                </div>
+
+                                <div class="actua-task-card">
+                                    <div class="actua-task-card__icon-wrap">
+                                        <span class="actua-task-card__emoji">🌛</span>
+                                    </div>
+                                    <div class="actua-task-card__body">
+                                        <p class="actua-task-card__label">Tu tarea</p>
+                                        <p class="actua-task-card__text">Elige <strong>2 hábitos de esta ruta</strong> (horario, desconexión, ambiente, cuerpo o mente) y aplícalos hoy antes de dormir. Observa cómo cambia tu descanso.</p>
+                                    </div>
+                                </div>
+
+                                <p class="aprende-section-label">Hábitos que puedes elegir</p>
+                                <div class="actua-steps">
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">⏰</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Fija un horario</p>
+                                            <p class="actua-step__desc">Decide a qué hora te acostarás esta noche y cúmplelo. La consistencia es la clave del ritmo circadiano.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🕙</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">📵</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Desconéctate 30 min antes</p>
+                                            <p class="actua-step__desc">Apaga o aleja las pantallas media hora antes de dormir. Sustitúyela por lectura, música suave o respiración.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">📚</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">🌡️</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">Prepara tu ambiente</p>
+                                            <p class="actua-step__desc">Oscurece el cuarto, reduce el ruido y ajusta la temperatura. Tu entorno le dice al cuerpo que es hora de dormir.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🌙</span>
+                                    </div>
+                                </div>
+
+                                <div class="actua-tip">
+                                    <span class="actua-tip__ico">⭐</span>
+                                    <p><strong>Tip:</strong> No necesitas cambiar todo a la vez. Dos hábitos consistentes son más poderosos que diez hábitos esporádicos.</p>
+                                </div>
+
+                            </div>
+                            }
+
+                        </div>
+                        }
+
+                        <!-- MH: Semana #12: La frecuencia de la ansiedad -->
+                        @if (activeSectionId() === 'mh-s12') {
+                        <div class="section-content">
+
+                            <!-- Tab bar -->
+                            <div class="content-subtab-bar">
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'aprende'"
+                                    type="button" (click)="selectTab('aprende')">
+                                    <span class="cs-tab__ico">📚</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Aprende</span>
+                                        <span class="cs-tab__desc">Psicoeducación</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'conecta'"
+                                    type="button" (click)="selectTab('conecta')">
+                                    <span class="cs-tab__ico">🖼️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Conecta</span>
+                                        <span class="cs-tab__desc">Imagen</span>
+                                    </div>
+                                </button>
+                                <button class="cs-tab" [class.cs-tab--active]="activeTab() === 'actua'"
+                                    type="button" (click)="selectTab('actua')">
+                                    <span class="cs-tab__ico">✍️</span>
+                                    <div class="cs-tab__text">
+                                        <span class="cs-tab__name">Actúa</span>
+                                        <span class="cs-tab__desc">Tarea de la semana</span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- APRENDE tab -->
+                            @if (activeTab() === 'aprende') {
+                            <div class="tab-content">
+
+                                <div class="aprende-hero">
+                                    <div class="aprende-hero__left">
+                                        <span class="aprende-hero__week-badge">📡 Semana 12</span>
+                                        <h3 class="aprende-hero__title">La frecuencia de la ansiedad</h3>
+                                        <p class="aprende-hero__sub">La ansiedad puede aumentar con pensamientos repetitivos y anticipatorios, volviéndose una ola de ruido.</p>
+                                    </div>
+                                    <div class="aprende-hero__emoji-wrap">
+                                        <span class="aprende-hero__big-emoji">🌊</span>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-definition">
+                                    <mat-icon class="aprende-definition__ico" svgIcon="heroicons_outline:light-bulb"></mat-icon>
+                                    <p>La ansiedad puede aumentar con <strong>pensamientos repetitivos y anticipatorios</strong>, volviéndose una ola de ruido. En este momento es importante <strong>enfocar tu atención en el presente</strong> usando tus sentidos.</p>
+                                </div>
+
+                                <p class="aprende-section-label">Tus sentidos como ancla al presente</p>
+                                <div class="aprende-pillars">
+                                    <div class="aprende-pillar aprende-pillar--blue">
+                                        <span class="aprende-pillar__emoji">👁️</span>
+                                        <p class="aprende-pillar__title">Vista</p>
+                                        <p class="aprende-pillar__desc">¿Qué ves ahora mismo? Nombra objetos, colores y formas a tu alrededor. Ancla tu atención al presente visual.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--purple">
+                                        <span class="aprende-pillar__emoji">👂</span>
+                                        <p class="aprende-pillar__title">Oído</p>
+                                        <p class="aprende-pillar__desc">¿Qué escuchas? Sonidos cercanos, lejanos, internos o externos. Escuchar activamente reduce la rumiación.</p>
+                                    </div>
+                                    <div class="aprende-pillar aprende-pillar--teal">
+                                        <span class="aprende-pillar__emoji">👃</span>
+                                        <p class="aprende-pillar__title">Olfato y gusto</p>
+                                        <p class="aprende-pillar__desc">¿Qué hueles o saboreas? Estos sentidos conectan directamente con el sistema límbico y calman la ansiedad.</p>
+                                    </div>
+                                </div>
+
+                                <div class="aprende-fact">
+                                    <span class="aprende-fact__ico">🧠</span>
+                                    <div>
+                                        <p class="aprende-fact__heading">Técnica 5-4-3-2-1</p>
+                                        <p class="aprende-fact__text">Esta técnica de grounding usa los 5 sentidos para interrumpir el ciclo de ansiedad y traer la mente al momento presente. Es especialmente útil cuando la mente se siente abrumada por la incertidumbre.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                            }
+
+                            <!-- CONECTA tab -->
+                            @if (activeTab() === 'conecta') {
+                            <div class="tab-content">
+                                <p class="section-content__tag">Imagen · Semana 12</p>
+                                <h3 class="section-content__title">La frecuencia de la ansiedad</h3>
+                                <div class="single-infographic">
+                                    <img
+                                        src="https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I07_E.ANIMO_LA+FRECUENCIA+DE+LA+ANSIEDAD.png"
+                                        alt="Imagen: La frecuencia de la ansiedad"
+                                        class="single-infographic__img" />
+                                </div>
+                            </div>
+                            }
+
+                            <!-- ACTÚA tab -->
+                            @if (activeTab() === 'actua') {
+                            <div class="tab-content">
+
+                                <div class="actua-week-header">
+                                    <div class="actua-week-header__badge">✍️ Tarea de la semana</div>
+                                    <h3 class="actua-week-header__title">Sintoniza tus sentidos</h3>
+                                    <p class="actua-week-header__sub">Cada sentido es un canal que te devuelve al presente cuando la mente se desborda.</p>
+                                </div>
+
+                                <div class="actua-task-card">
+                                    <div class="actua-task-card__icon-wrap">
+                                        <span class="actua-task-card__emoji">📡</span>
+                                    </div>
+                                    <div class="actua-task-card__body">
+                                        <p class="actua-task-card__label">Tu tarea</p>
+                                        <p class="actua-task-card__text">Cada vez que sientas que no comprendes lo que está pasando, <strong>separa cada cosa por medio de tus sentidos</strong>: identifica qué escuchas, qué hueles, qué ves y qué saboreas.</p>
+                                    </div>
+                                </div>
+
+                                <p class="aprende-section-label">Tu recorrido sensorial</p>
+                                <div class="actua-steps">
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">👁️</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">¿Qué ves?</p>
+                                            <p class="actua-step__desc">Nombra 3 cosas que puedes ver ahora mismo. Describe sus colores, formas o texturas.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🔭</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">👂</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">¿Qué escuchas?</p>
+                                            <p class="actua-step__desc">Identifica 2 sonidos: uno cercano y uno lejano. Solo escucha, sin juzgar.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🎵</span>
+                                    </div>
+                                    <div class="actua-step">
+                                        <div class="actua-step__num">👃</div>
+                                        <div class="actua-step__content">
+                                            <p class="actua-step__title">¿Qué hueles y saboreas?</p>
+                                            <p class="actua-step__desc">Identifica cualquier aroma o sabor presente. Estos sentidos son los más directos al sistema límbico.</p>
+                                        </div>
+                                        <span class="actua-step__emoji">🌸</span>
+                                    </div>
+                                </div>
+
+                                <div class="actua-tip">
+                                    <span class="actua-tip__ico">🌟</span>
+                                    <p><strong>Recuerda:</strong> Esta técnica es excelente para cuando la mente se siente abrumada por la incertidumbre. Los sentidos son tu ancla al presente.</p>
+                                </div>
+
+                            </div>
+                            }
+
+                        </div>
+                        }
+
                         <!-- MH: Aprende -->
                         @if (activeSectionId() === 'mh-aprende') {
                         <div class="section-content">

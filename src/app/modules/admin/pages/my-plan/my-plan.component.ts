@@ -219,6 +219,11 @@ const STATIC_SECTIONS: Record<string, StaticSectionCfg[]> = {
         { id: 'mh-s5', title: 'Semana #5: P.A.C.O.' },
         { id: 'mh-s6', title: 'Semana #6: Descarga 180°' },
         { id: 'mh-s7', title: 'Semana #7: La habitación' },
+        { id: 'mh-s8', title: 'Semana #8: Pirámide de logros' },
+        { id: 'mh-s9', title: 'Semana #9: Y tú emoción habla ¿La escuchas?' },
+        { id: 'mh-s10', title: 'Semana #10: Interruptores del sueño' },
+        { id: 'mh-s11', title: 'Semana #11: Ruta hacia el buen dormir' },
+        { id: 'mh-s12', title: 'Semana #12: La frecuencia de la ansiedad' },
         { id: 'mh-cierre', title: 'Cierre y certificado' },
     ],
     FATIGA: [
