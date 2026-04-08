@@ -32,6 +32,36 @@ export class ResourcesComponent implements OnInit, OnDestroy {
 
     categories: ResourceCategoryDto[] = [];
     selectedCategoryId: number | null = null;
+    selectedStaticCategory = 'mindfulness';
+
+    // ── Sub-item selection ────────────────────────────────────────────────
+    selectedSubItem = 'mindfulness-infografias';
+
+    // ── Mindfulness assets ────────────────────────────────────────────────
+    readonly mindfulnessImages = [
+        'images/infografia/1.png',
+        'images/infografia/2.png',
+        'images/infografia/3.png',
+        'images/infografia/4.png',
+        'images/infografia/5.png',
+    ];
+    readonly mindfulnessVideoUrl = 'https://emocheck-storage.s3.us-east-2.amazonaws.com/recursos/videos/1773932340162-z32655.mp4';
+
+    readonly mindfulnessVideos: { id: string; title: string; url: string }[] = [
+        {
+            id: 'mindfulness-video-respiracion',
+            title: 'El poder de la respiración',
+            url: 'https://material-adjunto.s3.us-east-2.amazonaws.com/videos/mindfulness/VM01_El+poder+de+la+respiraci%C3%B3n.mp4',
+        },
+        {
+            id: 'mindfulness-video-permanece',
+            title: 'Permanece: Más allá del cambio',
+            url: 'https://material-adjunto.s3.us-east-2.amazonaws.com/videos/mindfulness/VM03_Permanece+m%C3%A1s+all%C3%A1+del+cambio.mp4',
+        },
+    ];
+
+    categorySliderIndex = 0;
+    private _categorySliderTimer: ReturnType<typeof setInterval> | null = null;
 
     get selectedCategoryName(): string | null {
         if (this.selectedCategoryId == null) return null;
@@ -86,7 +116,18 @@ export class ResourcesComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         // Leer query param ?category= si viene desde el home
         const categoryParam = this.route.snapshot.queryParamMap.get('category');
-        this._pendingCategorySlug = categoryParam ?? null;
+
+        // Aplicar categoría estática inmediatamente (sin esperar la API)
+        if (categoryParam) {
+            this.openQuickAccess(categoryParam as any);
+        } else {
+            // Start auto-slider for the default sub-item (mindfulness infografías)
+            if (this.selectedSubItem === 'mindfulness-infografias') {
+                this._startCategorySlider();
+            }
+        }
+
+        this._pendingCategorySlug = null;
         this.loadInitial();
     }
 
@@ -94,6 +135,7 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         this.subscriptions.unsubscribe();
         this._stopSlider();
         this._stopActionPlanSlider();
+        this._stopCategorySlider();
     }
 
     loadInitial(): void {
@@ -131,14 +173,7 @@ export class ResourcesComponent implements OnInit, OnDestroy {
                     this.recommended = recommended;
                     this.professionals = professionals;
                     this.emergencyContacts = emergency;
-
-                    // Aplicar filtro automático si viene de un acceso directo (home)
-                    if (this._pendingCategorySlug) {
-                        this.openQuickAccess(this._pendingCategorySlug as any);
-                        this._pendingCategorySlug = null;
-                    } else {
-                        this.loadResources();
-                    }
+                    this.loadResources();
                 },
                 error: () => {
                     this.error = 'No fue posible cargar recursos';
@@ -151,6 +186,66 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         this._stopSlider();
         this._stopActionPlanSlider();
         this.loadResources();
+    }
+
+    selectStaticCategory(cat: string): void {
+        this.selectedStaticCategory = cat;
+        this._stopCategorySlider();
+        this.categorySliderIndex = 0;
+        // Auto-select first sub-item per category
+        const defaults: Record<string, string> = {
+            mindfulness: 'mindfulness-infografias',
+        };
+        this.selectedSubItem = defaults[cat] ?? '';
+        if (this.selectedSubItem === 'mindfulness-infografias') {
+            this._startCategorySlider();
+        }
+    }
+
+    selectSubItem(sub: string): void {
+        this.selectedSubItem = sub;
+        this._stopCategorySlider();
+        this.categorySliderIndex = 0;
+        if (sub === 'mindfulness-infografias') {
+            this._startCategorySlider();
+        }
+    }
+
+    categorySliderPrev(): void {
+        const len = this.mindfulnessImages.length;
+        this.categorySliderIndex = (this.categorySliderIndex - 1 + len) % len;
+        this._stopCategorySlider();
+        this._startCategorySlider();
+    }
+
+    categorySliderNext(): void {
+        const len = this.mindfulnessImages.length;
+        this.categorySliderIndex = (this.categorySliderIndex + 1) % len;
+        this._stopCategorySlider();
+        this._startCategorySlider();
+    }
+
+    categorySliderGoTo(i: number): void {
+        this.categorySliderIndex = i;
+        this._stopCategorySlider();
+        this._startCategorySlider();
+    }
+
+    private _startCategorySlider(): void {
+        this.ngZone.runOutsideAngular(() => {
+            this._categorySliderTimer = setInterval(() => {
+                this.ngZone.run(() => {
+                    this.categorySliderIndex = (this.categorySliderIndex + 1) % this.mindfulnessImages.length;
+                });
+            }, 3500);
+        });
+    }
+
+    private _stopCategorySlider(): void {
+        if (this._categorySliderTimer != null) {
+            clearInterval(this._categorySliderTimer);
+            this._categorySliderTimer = null;
+        }
     }
 
     loadResources(): void {
@@ -200,35 +295,24 @@ export class ResourcesComponent implements OnInit, OnDestroy {
                 this.router.navigate(['/support']);
                 return;
             case 'mindfulness':
-                this.selectCategoryByAnyName([
-                    'Mindfulness',
-                    'mindfulness',
-                    'Atención Plena',
-                    'Atencion Plena',
-                    'Meditación',
-                    'Meditacion',
-                ]);
+                this.selectStaticCategory('mindfulness');
+                this._scrollToLayout();
                 return;
             case 'neuropauses':
-                this.selectCategoryByAnyName([
-                    'Neuropausas',
-                    'Neuro Pausas',
-                    'Neuro-Pausas',
-                    'Pausas activas',
-                    'Pausas Activas',
-                    'Pausas Neurales',
-                ]);
+                this.selectStaticCategory('neuropausas');
+                this._scrollToLayout();
                 return;
             case 'action-plan':
-                this.selectCategoryByAnyName([
-                    'Plan de acción',
-                    'Plan de Accion',
-                    'Plan de accion',
-                    'Plan Acción',
-                    'Plan Accion',
-                ]);
+                this.selectStaticCategory('calibracion');
+                this._scrollToLayout();
                 return;
         }
+    }
+
+    private _scrollToLayout(): void {
+        setTimeout(() => {
+            document.querySelector('.resources-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
     }
 
     resourceTypeIcon(resourceType: string | null | undefined): string {

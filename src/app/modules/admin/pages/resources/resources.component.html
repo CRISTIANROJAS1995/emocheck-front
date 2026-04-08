@@ -19,296 +19,190 @@
             </a>
         </section>
 
-        <div class="resources-card">
-            <div class="resources-loading" *ngIf="loading">
-                <mat-progress-spinner diameter="28" mode="indeterminate"></mat-progress-spinner>
+        <!-- Acceso permanente — full width above the grid -->
+        <div class="resources-quick-bar">
+            <div class="resources-quick-bar__header">
+                <div class="resources-section__title">Acceso permanente</div>
+                <!-- <div class="resources-section__subtitle">Atajos rápidos para tu bienestar</div> -->
             </div>
+            <div class="quick-grid">
+                <button class="quick-card quick-card--purple" type="button" (click)="openQuickAccess('emotional-calibration')">
+                    <div class="quick-card__head">
+                        <div class="quick-card__glyph">
+                            <mat-icon svgIcon="heroicons_outline:sparkles"></mat-icon>
+                        </div>
+                        <div class="quick-card__title">Calibración emocional</div>
+                    </div>
+                    <div class="quick-card__desc">Analiza tu estado emocional cuando lo necesites</div>
+                    <span class="quick-card__cta">Abrir</span>
+                </button>
 
-            <div class="resources-callout resources-callout--danger" *ngIf="!loading && error">
-                <div class="resources-callout__icon">
-                    <mat-icon svgIcon="heroicons_outline:exclamation-triangle"></mat-icon>
-                </div>
-                <div class="resources-callout__body">
-                    <div class="resources-callout__title">No pudimos cargar el módulo</div>
-                    <div class="resources-callout__text">{{ error }}</div>
-                </div>
-                <button class="resources-callout__cta" mat-button type="button" (click)="loadInitial()">
-                    Reintentar
+                <button class="quick-card quick-card--teal" type="button" (click)="openQuickAccess('mindfulness')">
+                    <div class="quick-card__head">
+                        <div class="quick-card__glyph">
+                            <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
+                        </div>
+                        <div class="quick-card__title">Mindfulness</div>
+                    </div>
+                    <div class="quick-card__desc">Ejercicios de respiración y atención plena</div>
+                    <span class="quick-card__cta">Explorar</span>
+                </button>
+
+                <button class="quick-card quick-card--lime" type="button" (click)="openQuickAccess('neuropauses')">
+                    <div class="quick-card__head">
+                        <div class="quick-card__glyph">
+                            <mat-icon svgIcon="heroicons_outline:bolt"></mat-icon>
+                        </div>
+                        <div class="quick-card__title">Neuropausas</div>
+                    </div>
+                    <div class="quick-card__desc">Pausas activas para recargar energía mental</div>
+                    <span class="quick-card__cta">Explorar</span>
+                </button>
+
+                <button class="quick-card quick-card--blue" type="button" (click)="openQuickAccess('professional-support')">
+                    <div class="quick-card__head">
+                        <div class="quick-card__glyph">
+                            <mat-icon svgIcon="heroicons_outline:chat-bubble-left-right"></mat-icon>
+                        </div>
+                        <div class="quick-card__title">Apoyo profesional</div>
+                    </div>
+                    <div class="quick-card__desc">Solicita una cita o consulta opciones de contacto</div>
+                    <span class="quick-card__cta">Solicitar</span>
                 </button>
             </div>
+        </div>
 
-            <div class="resources-warnings" *ngIf="!loading && !error && warnings?.length">
-                <div class="resources-warnings__title">Algunos datos no se pudieron cargar:</div>
-                <div class="resources-warnings__item" *ngFor="let w of warnings">{{ w }}</div>
-            </div>
+        <div class="resources-layout">
 
-            <!-- Acceso rápido -->
+            <!-- LEFT sidebar: Categories -->
+            <aside class="res-sidebar">
+                <div class="res-sidebar__inner">
+                    <p class="res-sidebar__label">Categorías</p>
+
+                    <!-- Mindfulness (expandable) -->
+                    <div class="res-sidebar__group">
+                        <button type="button" class="res-sidebar__item"
+                            [class.res-sidebar__item--active]="selectedStaticCategory === 'mindfulness'"
+                            (click)="selectStaticCategory('mindfulness')">
+                            <span class="res-sidebar__dot"></span>
+                            <span class="res-sidebar__name">Mindfulness</span>
+                            <mat-icon class="res-sidebar__chevron"
+                                [class.is-open]="selectedStaticCategory === 'mindfulness'"
+                                svgIcon="heroicons_outline:chevron-down">
+                            </mat-icon>
+                        </button>
+                        @if (selectedStaticCategory === 'mindfulness') {
+                        <div class="res-sidebar__children">
+                            <button type="button" class="res-sidebar__child"
+                                [class.is-active]="selectedSubItem === 'mindfulness-infografias'"
+                                (click)="selectSubItem('mindfulness-infografias')">
+                                Infografías
+                            </button>
+                            @for (v of mindfulnessVideos; track v.id) {
+                            <button type="button" class="res-sidebar__child"
+                                [class.is-active]="selectedSubItem === v.id"
+                                (click)="selectSubItem(v.id)">
+                                {{ v.title }}
+                            </button>
+                            }
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Neuropausas -->
+                    <button type="button" class="res-sidebar__item"
+                        [class.res-sidebar__item--active]="selectedStaticCategory === 'neuropausas'"
+                        (click)="selectStaticCategory('neuropausas')">
+                        <span class="res-sidebar__dot"></span>
+                        <span class="res-sidebar__name">Neuropausas</span>
+                    </button>
+
+                    <!-- Calibración Emocional -->
+                    <button type="button" class="res-sidebar__item"
+                        [class.res-sidebar__item--active]="selectedStaticCategory === 'calibracion'"
+                        (click)="selectStaticCategory('calibracion')">
+                        <span class="res-sidebar__dot"></span>
+                        <span class="res-sidebar__name">Calibración Emocional</span>
+                    </button>
+
+                    <!-- Bienestar Físico -->
+                    <button type="button" class="res-sidebar__item"
+                        [class.res-sidebar__item--active]="selectedStaticCategory === 'bienestar'"
+                        (click)="selectStaticCategory('bienestar')">
+                        <span class="res-sidebar__dot"></span>
+                        <span class="res-sidebar__name">Bienestar Físico</span>
+                    </button>
+
+                    <!-- Desarrollo Personal -->
+                    <button type="button" class="res-sidebar__item"
+                        [class.res-sidebar__item--active]="selectedStaticCategory === 'desarrollo'"
+                        (click)="selectStaticCategory('desarrollo')">
+                        <span class="res-sidebar__dot"></span>
+                        <span class="res-sidebar__name">Desarrollo Personal</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- RIGHT: main content -->
+            <div class="resources-card">
+
+            <!-- ── MINDFULNESS: Infografías ──────────────────────────────────── -->
+            @if (selectedSubItem === 'mindfulness-infografias') {
             <section class="resources-section">
-                <div class="resources-section__title">Acceso permanente</div>
-                <div class="resources-section__subtitle">Atajos rápidos para tu bienestar</div>
-
-                <div class="quick-grid">
-                    <button class="quick-card quick-card--purple" type="button" (click)="openQuickAccess('emotional-calibration')">
-                        <div class="quick-card__head">
-                            <div class="quick-card__glyph">
-                                <mat-icon svgIcon="heroicons_outline:sparkles"></mat-icon>
-                            </div>
-                            <div class="quick-card__title">Calibración emocional</div>
+                <div class="resources-section__title">Mindfulness</div>
+                <div class="resources-section__subtitle">Recursos de atención plena y meditación</div>
+                <div class="infografia-slider">
+                    <div class="infografia-slider__stage">
+                        <button class="infografia-slider__arrow infografia-slider__arrow--prev" type="button" (click)="categorySliderPrev()" aria-label="Anterior">
+                            <mat-icon svgIcon="heroicons_outline:chevron-left"></mat-icon>
+                        </button>
+                        <div class="infografia-slider__track">
+                            @for (img of mindfulnessImages; track img; let i = $index) {
+                                <div class="infografia-slider__slide" [class.is-active]="i === categorySliderIndex">
+                                    <img [src]="img" [alt]="'Mindfulness ' + (i + 1)" class="infografia-slider__img" />
+                                </div>
+                            }
                         </div>
-                        <div class="quick-card__desc">Analiza tu estado emocional cuando lo necesites</div>
-                        <span class="quick-card__cta">Abrir</span>
-                    </button>
-
-                    <button class="quick-card quick-card--teal" type="button" (click)="openQuickAccess('mindfulness')">
-                        <div class="quick-card__head">
-                            <div class="quick-card__glyph">
-                                <mat-icon svgIcon="heroicons_outline:heart"></mat-icon>
-                            </div>
-                            <div class="quick-card__title">Mindfulness</div>
-                        </div>
-                        <div class="quick-card__desc">Ejercicios de respiración y atención plena</div>
-                        <span class="quick-card__cta">Explorar</span>
-                    </button>
-
-                    <button class="quick-card quick-card--lime" type="button" (click)="openQuickAccess('neuropauses')">
-                        <div class="quick-card__head">
-                            <div class="quick-card__glyph">
-                                <mat-icon svgIcon="heroicons_outline:bolt"></mat-icon>
-                            </div>
-                            <div class="quick-card__title">Neuropausas</div>
-                        </div>
-                        <div class="quick-card__desc">Pausas activas para recargar energía mental</div>
-                        <span class="quick-card__cta">Explorar</span>
-                    </button>
-
-                    <button class="quick-card quick-card--blue" type="button" (click)="openQuickAccess('professional-support')">
-                        <div class="quick-card__head">
-                            <div class="quick-card__glyph">
-                                <mat-icon svgIcon="heroicons_outline:chat-bubble-left-right"></mat-icon>
-                            </div>
-                            <div class="quick-card__title">Apoyo profesional</div>
-                        </div>
-                        <div class="quick-card__desc">Solicita una cita o consulta opciones de contacto</div>
-                        <span class="quick-card__cta">Solicitar</span>
-                    </button>
-
-                    <button class="quick-card quick-card--orange" type="button" (click)="openQuickAccess('action-plan')">
-                        <div class="quick-card__head">
-                            <div class="quick-card__glyph">
-                                <mat-icon svgIcon="heroicons_outline:clipboard-document-list"></mat-icon>
-                            </div>
-                            <div class="quick-card__title">Plan de acción</div>
-                        </div>
-                        <div class="quick-card__desc">Estrategias personalizadas para tu bienestar</div>
-                        <span class="quick-card__cta">Explorar</span>
-                    </button>
-                </div>
-            </section>
-
-            <!-- Categorías -->
-            <section class="resources-section">
-                <div class="resources-section__title">Categorías</div>
-                <div class="resources-section__subtitle">Explora por temática</div>
-
-                <div class="resources-categories">
-                    <button mat-button class="resources-chip" type="button" [class.is-active]="selectedCategoryId === null" (click)="selectCategory(null)">
-                        Todas
-                    </button>
-
-                    <button mat-button class="resources-chip" type="button" *ngFor="let c of categories" [class.is-active]="selectedCategoryId === c.resourceCategoryID" (click)="selectCategory(c.resourceCategoryID)">
-                        {{ c.name }}
-                        <span class="resources-chip__count" *ngIf="c.resourceCount != null">({{ c.resourceCount }})</span>
-                    </button>
-                </div>
-
-                <div class="resources-empty" *ngIf="!loading && !error && !(categories?.length)">
-                    No hay categorías disponibles por ahora.
-                </div>
-            </section>
-
-            <!-- ── Vista SIN filtro: Recomendados + Destacados + Todos ─────── -->
-            <ng-container *ngIf="selectedCategoryId === null">
-
-                <!-- Recomendados -->
-                <section class="resources-section" *ngIf="recommended?.length">
-                    <div class="resources-section__title">Recomendados para ti</div>
-                    <div class="resources-grid">
-                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of recommended">
-                            <div class="resource-card__top">
-                                <div class="resource-card__title">{{ r.title }}</div>
-                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
-                            </div>
-                            <div class="resource-card__meta">
-                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
-                                <span class="resource-badge">{{ r.contentType }}</span>
-                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
-                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
-                            </div>
-                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Destacados -->
-                <section class="resources-section" *ngIf="featured?.length">
-                    <div class="resources-section__title">Destacados</div>
-                    <div class="resources-section__subtitle">Selección curada para empezar hoy</div>
-                    <div class="resources-grid">
-                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of featured">
-                            <div class="resource-card__top">
-                                <div class="resource-card__title">{{ r.title }}</div>
-                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
-                            </div>
-                            <div class="resource-card__meta">
-                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
-                                <span class="resource-badge">{{ r.contentType }}</span>
-                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
-                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
-                            </div>
-                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Todos -->
-                <section class="resources-section">
-                    <div class="resources-section__title">Todos los recursos</div>
-                    <div class="resources-empty" *ngIf="!loading && !error && !resources?.length">
-                        No hay recursos disponibles por ahora.
-                    </div>
-                    <div class="resources-grid" *ngIf="resources?.length">
-                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of resources">
-                            <div class="resource-card__top">
-                                <div class="resource-card__title">{{ r.title }}</div>
-                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
-                            </div>
-                            <div class="resource-card__meta">
-                                <span class="resource-category" *ngIf="r.categoryName">{{ r.categoryName }}</span>
-                                <span class="resource-dot" *ngIf="r.categoryName">•</span>
-                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
-                                <span class="resource-badge">{{ r.contentType }}</span>
-                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
-                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
-                            </div>
-                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
-                        </div>
-                    </div>
-                </section>
-
-            </ng-container>
-
-            <!-- ── Vista CON filtro: solo resultados de la categoría ─────── -->
-            <ng-container *ngIf="selectedCategoryId !== null">
-                <section class="resources-section">
-                    <div class="resources-section__title">{{ selectedCategoryName }}</div>
-                    <div class="resources-section__subtitle">Recursos disponibles en esta categoría</div>
-
-                    <!-- Sin resultados -->
-                    <div class="resources-empty-category" *ngIf="!loading && !error && !resources?.length">
-                        <mat-icon svgIcon="heroicons_outline:folder-open"></mat-icon>
-                        <p class="resources-empty-category__title">Sin contenido en esta categoría</p>
-                        <p class="resources-empty-category__text">
-                            Aún no hay recursos publicados en <strong>{{ selectedCategoryName }}</strong>. Estamos trabajando para traerte contenido muy pronto.
-                        </p>
-                        <button mat-button class="resources-chip is-active" type="button" (click)="selectCategory(null)">
-                            Ver todos los recursos
+                        <button class="infografia-slider__arrow infografia-slider__arrow--next" type="button" (click)="categorySliderNext()" aria-label="Siguiente">
+                            <mat-icon svgIcon="heroicons_outline:chevron-right"></mat-icon>
                         </button>
                     </div>
-
-                    <!-- Con resultados -->
-                    <div class="resources-grid" *ngIf="resources?.length">
-                        <div class="resource-card" [ngClass]="resourceToneClass(r.contentType)" *ngFor="let r of resources">
-                            <div class="resource-card__top">
-                                <div class="resource-card__title">{{ r.title }}</div>
-                                <button mat-button class="resource-card__open" type="button" (click)="openResource(r)">Abrir</button>
-                            </div>
-                            <div class="resource-card__meta">
-                                <mat-icon class="resource-type-icon" [svgIcon]="resourceTypeIcon(r.contentType)"></mat-icon>
-                                <span class="resource-badge">{{ r.contentType }}</span>
-                                <span class="resource-dot" *ngIf="r.durationMinutes">•</span>
-                                <span class="resource-duration" *ngIf="r.durationMinutes">{{ r.durationMinutes }} min</span>
-                            </div>
-                            <div class="resource-card__desc" *ngIf="r.description">{{ r.description }}</div>
-                        </div>
+                    <div class="infografia-slider__dots">
+                        @for (img of mindfulnessImages; track img; let i = $index) {
+                            <button class="infografia-slider__dot" [class.is-active]="i === categorySliderIndex" type="button" (click)="categorySliderGoTo(i)" [attr.aria-label]="'Imagen ' + (i + 1)"></button>
+                        }
                     </div>
+                </div>
+            </section>
+            }
 
-                    <!-- Infografía slider (solo en categoría Mindfulness) -->
-                    <div class="infografia-slider" *ngIf="isMindfulnessCategory">
-                        <div class="infografia-slider__header">
-                            <div class="resources-section__title">Antes de comenzar</div>
-                            <div class="resources-section__subtitle infografia-slider__subtitle--lg">Algunos consejos para "navegar" en el Mindfulness</div>
-                        </div>
-
-                        <div class="infografia-slider__stage">
-                            <!-- Botón anterior -->
-                            <button class="infografia-slider__arrow infografia-slider__arrow--prev" type="button" (click)="sliderPrev()" aria-label="Anterior">
-                                <mat-icon svgIcon="heroicons_outline:chevron-left"></mat-icon>
-                            </button>
-
-                            <!-- Track de imágenes -->
-                            <div class="infografia-slider__track">
-                                <div class="infografia-slider__slide" *ngFor="let img of sliderImages; let i = index" [class.is-active]="i === sliderIndex" [class.is-last]="i === sliderImages.length - 1" (click)="sliderClickImage(i)">
-                                    <img [src]="img" [alt]="'Infografía ' + (i + 1)" class="infografia-slider__img" />
-                                    <!-- Overlay en la última imagen -->
-                                    <div class="infografia-slider__video-overlay" *ngIf="i === sliderImages.length - 1">
-                                        <div class="infografia-slider__play-btn">
-                                            <mat-icon svgIcon="heroicons_solid:play"></mat-icon>
-                                        </div>
-                                        <span class="infografia-slider__video-label">Ver video</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Botón siguiente -->
-                            <button class="infografia-slider__arrow infografia-slider__arrow--next" type="button" (click)="sliderNext()" aria-label="Siguiente">
-                                <mat-icon svgIcon="heroicons_outline:chevron-right"></mat-icon>
-                            </button>
-                        </div>
-
-                        <!-- Dots -->
-                        <div class="infografia-slider__dots">
-                            <button class="infografia-slider__dot" *ngFor="let img of sliderImages; let i = index" [class.is-active]="i === sliderIndex" type="button" (click)="sliderGoTo(i)" [attr.aria-label]="'Ir a imagen ' + (i + 1)">
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Slider — Plan de acción -->
-                    <div class="infografia-slider" *ngIf="isActionPlanCategory">
-                        <div class="infografia-slider__header">
-                            <div class="resources-section__title">Antes de comenzar</div>
-                            <div class="resources-section__subtitle infografia-slider__subtitle--lg">Algunos consejos para gestionar tu ansiedad</div>
-                        </div>
-
-                        <div class="infografia-slider__stage">
-                            <button class="infografia-slider__arrow infografia-slider__arrow--prev" type="button" (click)="actionPlanSliderPrev()" aria-label="Anterior">
-                                <mat-icon svgIcon="heroicons_outline:chevron-left"></mat-icon>
-                            </button>
-
-                            <div class="infografia-slider__track">
-                                <div class="infografia-slider__slide" *ngFor="let img of actionPlanSliderImages; let i = index" [class.is-active]="i === actionPlanSliderIndex" [class.is-last]="i === actionPlanSliderImages.length - 1" (click)="actionPlanSliderClickImage(i)">
-                                    <img [src]="img" [alt]="'Plan de acción ' + (i + 1)" class="infografia-slider__img" />
-                                    <div class="infografia-slider__video-overlay" *ngIf="i === actionPlanSliderImages.length - 1">
-                                        <div class="infografia-slider__play-btn">
-                                            <mat-icon svgIcon="heroicons_solid:play"></mat-icon>
-                                        </div>
-                                        <span class="infografia-slider__video-label">Ver video</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button class="infografia-slider__arrow infografia-slider__arrow--next" type="button" (click)="actionPlanSliderNext()" aria-label="Siguiente">
-                                <mat-icon svgIcon="heroicons_outline:chevron-right"></mat-icon>
-                            </button>
-                        </div>
-
-                        <div class="infografia-slider__dots">
-                            <button class="infografia-slider__dot" *ngFor="let img of actionPlanSliderImages; let i = index" [class.is-active]="i === actionPlanSliderIndex" type="button" (click)="actionPlanSliderGoTo(i)" [attr.aria-label]="'Ir a imagen ' + (i + 1)">
-                            </button>
-                        </div>
+            <!-- ── MINDFULNESS: Videos ──────────────────────────────────────────── -->
+            @for (v of mindfulnessVideos; track v.id) {
+                @if (selectedSubItem === v.id) {
+                <section class="resources-section">
+                    <div class="resources-section__title">{{ v.title }}</div>
+                    <div class="res-video-block">
+                        <video class="res-video" autoplay muted controls playsinline
+                            [attr.poster]="mindfulnessImages[0]">
+                            <source [src]="v.url" type="video/mp4">
+                        </video>
                     </div>
                 </section>
-            </ng-container>
+                }
+            }
 
-        </div>
+            <!-- ── Otras categorías (vacías por ahora) ────────────────────────── -->
+            @if (selectedStaticCategory !== 'mindfulness') {
+            <section class="resources-section">
+                <div class="resources-coming-soon">
+                    <mat-icon svgIcon="heroicons_outline:clock"></mat-icon>
+                    <p class="resources-coming-soon__title">Contenido en preparación</p>
+                    <p class="resources-coming-soon__text">Estamos preparando recursos especializados. ¡Vuelve pronto!</p>
+                </div>
+            </section>
+            }
+
+            </div><!-- /resources-card -->
+        </div><!-- /resources-layout -->
     </div>
 </div>
