@@ -168,18 +168,40 @@ const MODULE_VISUAL: Record<string, ModuleVisualConfig> = {
         gradient: 'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)',
         icon: 'heroicons_outline:building-office-2',
         emoji: '🏢',
-        description: 'Evalúa el ambiente y la cultura de tu organización',
-        introTexts: [
-            'El clima organizacional refleja las percepciones compartidas por los miembros de una organización sobre su entorno de trabajo. Abarca aspectos como el liderazgo, la comunicación, el reconocimiento y la cohesión del equipo.',
-            'Próximamente dispondrás de este módulo para explorar cómo el clima organizacional influye en tu motivación, compromiso y bienestar en el trabajo.',
-        ],
+        description: 'Fortalece el ambiente y la cultura de tu organización',
+        introTexts: [],
+        introRich: {
+            title: 'Bienvenido a Transformadores del Clima Laboral',
+            subtitle: 'Un programa de 3 meses para construir un entorno de trabajo que te haga querer llegar los lunes.',
+            body: '¿Alguna vez te has preguntado qué hace que un lunes sea motivador y no agotador? La respuesta es el Clima Laboral.\n\nEl clima laboral es el conjunto de percepciones, emociones y dinámicas que viven las personas en un equipo de trabajo. No es un lujo — es el factor que determina si las personas dan lo mejor de sí o simplemente dan lo justo para sobrevivir la jornada.\n\nUn buen clima laboral es tu mejor aliado: reduce el ausentismo, dispara la motivación y convierte cada interacción en una oportunidad de crecer juntos.',
+            sections: [
+                {
+                    heading: '¿Qué encontrarás aquí?',
+                    icon: 'heroicons_outline:play-circle',
+                    bullets: [
+                        'Tres programas diseñados para abordar el clima desde diferentes ángulos: propósito, confianza y liderazgo.',
+                        'Contenido práctico organizado por meses, con aprendizajes y retos aplicables desde el primer día.',
+                        'Herramientas para construir equipos más cohesionados y entornos laborales más saludables.',
+                    ],
+                },
+                {
+                    heading: '¿Qué lograrás?',
+                    icon: 'heroicons_outline:trophy',
+                    text: 'Al finalizar este módulo podrás:',
+                    bullets: [
+                        'Conectar con el propósito de tu trabajo y el de tu equipo.',
+                        'Construir relaciones de confianza genuina con tus compañeros y líderes.',
+                        'Aplicar estrategias concretas de liderazgo que transformen el ambiente laboral.',
+                    ],
+                },
+            ],
+        },
         image: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80',
-        duration: 'Próximamente',
-        topicsCount: 5,
-        resourcesCount: 10,
+        duration: '3 meses',
+        topicsCount: 9,
+        resourcesCount: 12,
         hasCertification: true,
-        materials: ['Psicoeducación', 'Diagnóstico organizacional'],
-        disabled: true,
+        materials: ['Psicoeducación', 'Dinámicas de equipo', 'Estrategias de liderazgo'],
         expanded: false,
     },
 };
@@ -327,55 +349,55 @@ const RP_PROGRAM_VISUAL: Record<string, { title: string; introRich: { title: str
 };
 
 const MODULE_TITLE: Record<string, string> = {
-    SALUD_MENTAL:          'Salud Mental',
-    FATIGA:                'Fatiga Laboral',
-    RIESGO_PSICOSOCIAL:    'Riesgo Psicosocial',
-    RP_PRO_ACTIVO:         'PRO-Activo de Bienestar',
-    RP_CO_GESTORES:        'Co-Gestores de Bienestar',
-    RP_ARQUITECTOS:        'Arquitectos de Bienestar',
-    RP_CULTURA:            'Cultura de Bienestar',
-    RP_ECOSISTEMA:         'Ecosistema Inclusivo',
-    CLIMA_ORGANIZACIONAL:  'Clima Organizacional',
+    SALUD_MENTAL: 'Salud Mental',
+    FATIGA: 'Fatiga Laboral',
+    RIESGO_PSICOSOCIAL: 'Riesgo Psicosocial',
+    RP_PRO_ACTIVO: 'PRO-Activo de Bienestar',
+    RP_CO_GESTORES: 'Co-Gestores de Bienestar',
+    RP_ARQUITECTOS: 'Arquitectos de Bienestar',
+    RP_CULTURA: 'Cultura de Bienestar',
+    RP_ECOSISTEMA: 'Ecosistema Inclusivo',
+    CLIMA_ORGANIZACIONAL: 'Clima Organizacional',
 };
 
 /** Prefix for section IDs per moduleCode — maps to existing HTML @if blocks */
 const STEP_PREFIX: Record<string, string> = {
-    SALUD_MENTAL:          'mh',
-    FATIGA:                'fl',
-    RIESGO_PSICOSOCIAL:    'rp',
-    RP_PRO_ACTIVO:         'pa',
-    RP_CO_GESTORES:        'rp',
-    RP_ARQUITECTOS:        'lb',
-    RP_CULTURA:            've',
-    RP_ECOSISTEMA:         'ei',
-    CLIMA_ORGANIZACIONAL:  'co',
+    SALUD_MENTAL: 'mh',
+    FATIGA: 'fl',
+    RIESGO_PSICOSOCIAL: 'rp',
+    RP_PRO_ACTIVO: 'pa',
+    RP_CO_GESTORES: 'rp',
+    RP_ARQUITECTOS: 'lb',
+    RP_CULTURA: 've',
+    RP_ECOSISTEMA: 'ei',
+    CLIMA_ORGANIZACIONAL: 'co',
 };
 
 /** Maps stepKey â†’ section id suffix */
 const STEP_KEY_SUFFIX: Record<string, string> = {
     BIENVENIDA: 'bienvenida',
-    APRENDE:    'aprende',
-    CONECTA:    'conecta',
-    ACTUA:      'actua',
-    CIERRE:     'cierre',
+    APRENDE: 'aprende',
+    CONECTA: 'conecta',
+    ACTUA: 'actua',
+    CIERRE: 'cierre',
     // Weekly steps (SALUD_MENTAL + RP programs)
-    SEMANA_1:   's1',
-    SEMANA_2:   's2',
-    SEMANA_3:   's3',
-    SEMANA_4:   's4',
-    SEMANA_5:   's5',
-    SEMANA_6:   's6',
-    SEMANA_7:   's7',
-    SEMANA_8:   's8',
-    SEMANA_9:   's9',
-    SEMANA_10:  's10',
-    SEMANA_11:  's11',
-    SEMANA_12:  's12',
+    SEMANA_1: 's1',
+    SEMANA_2: 's2',
+    SEMANA_3: 's3',
+    SEMANA_4: 's4',
+    SEMANA_5: 's5',
+    SEMANA_6: 's6',
+    SEMANA_7: 's7',
+    SEMANA_8: 's8',
+    SEMANA_9: 's9',
+    SEMANA_10: 's10',
+    SEMANA_11: 's11',
+    SEMANA_12: 's12',
     // Themes (RP_ECOSISTEMA)
-    TEMA_1:     'h1',
-    TEMA_2:     'h2',
-    TEMA_3:     'h3',
-    TEMA_4:     'h4',
+    TEMA_1: 'h1',
+    TEMA_2: 'h2',
+    TEMA_3: 'h3',
+    TEMA_4: 'h4',
 };
 
 type StaticSectionCfg = { id: string; title: string; children?: { id: string; title: string }[] };
@@ -400,98 +422,142 @@ const STATIC_SECTIONS: Record<string, StaticSectionCfg[]> = {
     ],
     FATIGA: [
         { id: 'fl-bienvenida', title: 'Bienvenida' },
-        { id: 'fl-aprende', title: 'Aprende', children: [
-            { id: 'fl-aprende-s1', title: 'Semana 1' },
-            { id: 'fl-aprende-s2', title: 'Semana 2' },
-            { id: 'fl-aprende-s3', title: 'Semana 3' },
-        ]},
-        { id: 'fl-conecta', title: 'Conecta', children: [
-            { id: 'fl-conecta-s1', title: 'Semana 4' },
-            { id: 'fl-conecta-s2', title: 'Semana 5' },
-            { id: 'fl-conecta-s3', title: 'Semana 6' },
-        ]},
-        { id: 'fl-actua', title: 'Actúa', children: [
-            { id: 'fl-actua-s1', title: 'Semana 7' },
-            { id: 'fl-actua-s2', title: 'Semana 8' },
-            { id: 'fl-actua-s3', title: 'Semana 9' },
-        ]},
+        {
+            id: 'fl-aprende', title: 'Aprende', children: [
+                { id: 'fl-aprende-s1', title: 'Semana 1' },
+                { id: 'fl-aprende-s2', title: 'Semana 2' },
+                { id: 'fl-aprende-s3', title: 'Semana 3' },
+            ]
+        },
+        {
+            id: 'fl-conecta', title: 'Conecta', children: [
+                { id: 'fl-conecta-s1', title: 'Semana 4' },
+                { id: 'fl-conecta-s2', title: 'Semana 5' },
+                { id: 'fl-conecta-s3', title: 'Semana 6' },
+            ]
+        },
+        {
+            id: 'fl-actua', title: 'Actúa', children: [
+                { id: 'fl-actua-s1', title: 'Semana 7' },
+                { id: 'fl-actua-s2', title: 'Semana 8' },
+                { id: 'fl-actua-s3', title: 'Semana 9' },
+            ]
+        },
         { id: 'fl-cierre', title: 'Cierre y certificado' },
     ],
     RIESGO_PSICOSOCIAL: [
-        { id: 'rp-prog-pa', title: 'PRO-Activo de Bienestar', children: [
-            { id: 'pa-bienvenida',  title: 'Bienvenida' },
-            { id: 'pa-s1',          title: 'S1 · El Poder de la Calma' },
-            { id: 'pa-s2',          title: 'S2 · ¿Amenaza o Desafío?' },
-            { id: 'pa-s3',          title: 'S3 · Tú no eres tu trabajo' },
-            { id: 'pa-s4',          title: 'S4 · Mente Clara, Trabajo Seguro' },
-            { id: 'pa-s5',          title: 'S5 · Foco en lo Controlable' },
-            { id: 'pa-s6',          title: 'S6 · Tu Voz es el Motor' },
-            { id: 'pa-s7',          title: 'S7 · Gestión de Órdenes' },
-            { id: 'pa-s8',          title: 'S8 · El Poder del Feedback' },
-            { id: 'pa-s9',          title: 'S9 · Críticas con Resiliencia' },
-            { id: 'pa-s10',         title: 'S10 · Persona vs. Problema' },
-            { id: 'pa-s11',         title: 'S11 · El Apoyo Social' },
-            { id: 'pa-s12',         title: 'S12 · Mi Hogar, Mi Refugio' },
-            { id: 'pa-cierre',      title: 'Cierre y certificado' },
-        ]},
-        { id: 'rp-prog-co', title: 'Co-Gestores de Bienestar', children: [
-            { id: 'rp-bienvenida',   title: 'Bienvenida' },
-            { id: 'rp-aprende-s1',  title: 'S1 · Anclaje de Alto Rendimiento' },
-            { id: 'rp-aprende-s2',  title: 'S2 · Perspectiva Sistémica' },
-            { id: 'rp-aprende-s3',  title: 'S3 · Esencia vs. Rol' },
-            { id: 'rp-aprende-s4',  title: 'S4 · Foco de Control' },
-            { id: 'rp-conecta-s1',  title: 'S5 · Deep Work' },
-            { id: 'rp-conecta-s2',  title: 'S6 · Ingeniería de Prioridades' },
-            { id: 'rp-conecta-s3',  title: 'S7 · Sin Procrastinación' },
-            { id: 'rp-conecta-s4',  title: 'S8 · Sinergia en Agenda' },
-            { id: 'rp-actua-s1',    title: 'S9 · Resolución de Problemas' },
-            { id: 'rp-actua-s2',    title: 'S10 · Feedback para la Excelencia' },
-            { id: 'rp-actua-s3',    title: 'S11 · Negociación de Apoyos' },
-            { id: 'rp-actua-s4',    title: 'S12 · Desconexión de Alto Nivel' },
-            { id: 'rp-cierre',      title: 'Cierre y certificado' },
-        ]},
-        { id: 'rp-prog-lb', title: 'Arquitectos de Bienestar', children: [
-            { id: 'lb-bienvenida',  title: 'Bienvenida' },
-            { id: 'lb-s1',          title: 'S1 · Neurobiología del Mando' },
-            { id: 'lb-s2',          title: 'S2 · Perspectiva de Escenario' },
-            { id: 'lb-s3',          title: 'S3 · Integridad vs. Rol' },
-            { id: 'lb-s4',          title: 'S4 · Arquitectura de Decisiones' },
-            { id: 'lb-s5',          title: 'S5 · Matriz de Priorización' },
-            { id: 'lb-s6',          title: 'S6 · Blindaje del Enfoque' },
-            { id: 'lb-s7',          title: 'S7 · Gestión de la Ejecución' },
-            { id: 'lb-s8',          title: 'S8 · Sinergia Grupal' },
-            { id: 'lb-s9',          title: 'S9 · Delegación Facultativa' },
-            { id: 'lb-s10',         title: 'S10 · Algoritmos de Resolución' },
-            { id: 'lb-s11',         title: 'S11 · Feedback de Alto Rendimiento' },
-            { id: 'lb-s12',         title: 'S12 · Ecosistemas en Equilibrio' },
-            { id: 'lb-cierre',      title: 'Cierre y certificado' },
-        ]},
-        { id: 'rp-prog-ve', title: 'Cultura de Bienestar', children: [
-            { id: 've-bienvenida',  title: 'Bienvenida' },
-            { id: 've-s1',          title: 'S1 · Bio-Recarga' },
-            { id: 've-s2',          title: 'S2 · Zona de Enfoque' },
-            { id: 've-s3',          title: 'S3 · Pausas Cognitivas' },
-            { id: 've-s4',          title: 'S4 · Brújula de Prioridades' },
-            { id: 've-s5',          title: 'S5 · Inteligencia Financiera' },
-            { id: 've-s6',          title: 'S6 · Sinergia de Equipo' },
-            { id: 've-s7',          title: 'S7 · Maestría en el Cambio' },
-            { id: 've-s8',          title: 'S8 · Algoritmos de Solución' },
-            { id: 've-s9',          title: 'S9 · Tu Voz es el Motor' },
-            { id: 've-s10',         title: 'S10 · Escudo del Reconocimiento' },
-            { id: 've-s11',         title: 'S11 · Feedback Inteligente' },
-            { id: 've-s12',         title: 'S12 · Mi Hogar, Mi Fortaleza' },
-            { id: 've-cierre',      title: 'Cierre y certificado' },
-        ]},
-        { id: 'rp-prog-ei', title: 'Ecosistema Inclusivo', children: [
-            { id: 'ei-bienvenida',  title: 'Bienvenida' },
-            { id: 'ei-h1',          title: 'Espacios a tu Medida' },
-            { id: 'ei-h2',          title: 'Corazón del Cuidador' },
-            { id: 'ei-h3',          title: 'Autenticidad sin Barreras' },
-            { id: 'ei-h4',          title: 'Tu Hogar, Tu Trabajo' },
-            { id: 'ei-cierre',      title: 'Cierre' },
-        ]},
+        {
+            id: 'rp-prog-pa', title: 'PRO-Activo de Bienestar', children: [
+                { id: 'pa-bienvenida', title: 'Bienvenida' },
+                { id: 'pa-s1', title: 'S1 · El Poder de la Calma' },
+                { id: 'pa-s2', title: 'S2 · ¿Amenaza o Desafío?' },
+                { id: 'pa-s3', title: 'S3 · Tú no eres tu trabajo' },
+                { id: 'pa-s4', title: 'S4 · Mente Clara, Trabajo Seguro' },
+                { id: 'pa-s5', title: 'S5 · Foco en lo Controlable' },
+                { id: 'pa-s6', title: 'S6 · Tu Voz es el Motor' },
+                { id: 'pa-s7', title: 'S7 · Gestión de Órdenes' },
+                { id: 'pa-s8', title: 'S8 · El Poder del Feedback' },
+                { id: 'pa-s9', title: 'S9 · Críticas con Resiliencia' },
+                { id: 'pa-s10', title: 'S10 · Persona vs. Problema' },
+                { id: 'pa-s11', title: 'S11 · El Apoyo Social' },
+                { id: 'pa-s12', title: 'S12 · Mi Hogar, Mi Refugio' },
+                { id: 'pa-cierre', title: 'Cierre y certificado' },
+            ]
+        },
+        {
+            id: 'rp-prog-co', title: 'Co-Gestores de Bienestar', children: [
+                { id: 'rp-bienvenida', title: 'Bienvenida' },
+                { id: 'rp-aprende-s1', title: 'S1 · Anclaje de Alto Rendimiento' },
+                { id: 'rp-aprende-s2', title: 'S2 · Perspectiva Sistémica' },
+                { id: 'rp-aprende-s3', title: 'S3 · Esencia vs. Rol' },
+                { id: 'rp-aprende-s4', title: 'S4 · Foco de Control' },
+                { id: 'rp-conecta-s1', title: 'S5 · Deep Work' },
+                { id: 'rp-conecta-s2', title: 'S6 · Ingeniería de Prioridades' },
+                { id: 'rp-conecta-s3', title: 'S7 · Sin Procrastinación' },
+                { id: 'rp-conecta-s4', title: 'S8 · Sinergia en Agenda' },
+                { id: 'rp-actua-s1', title: 'S9 · Resolución de Problemas' },
+                { id: 'rp-actua-s2', title: 'S10 · Feedback para la Excelencia' },
+                { id: 'rp-actua-s3', title: 'S11 · Negociación de Apoyos' },
+                { id: 'rp-actua-s4', title: 'S12 · Desconexión de Alto Nivel' },
+                { id: 'rp-cierre', title: 'Cierre y certificado' },
+            ]
+        },
+        {
+            id: 'rp-prog-lb', title: 'Arquitectos de Bienestar', children: [
+                { id: 'lb-bienvenida', title: 'Bienvenida' },
+                { id: 'lb-s1', title: 'S1 · Neurobiología del Mando' },
+                { id: 'lb-s2', title: 'S2 · Perspectiva de Escenario' },
+                { id: 'lb-s3', title: 'S3 · Integridad vs. Rol' },
+                { id: 'lb-s4', title: 'S4 · Arquitectura de Decisiones' },
+                { id: 'lb-s5', title: 'S5 · Matriz de Priorización' },
+                { id: 'lb-s6', title: 'S6 · Blindaje del Enfoque' },
+                { id: 'lb-s7', title: 'S7 · Gestión de la Ejecución' },
+                { id: 'lb-s8', title: 'S8 · Sinergia Grupal' },
+                { id: 'lb-s9', title: 'S9 · Delegación Facultativa' },
+                { id: 'lb-s10', title: 'S10 · Algoritmos de Resolución' },
+                { id: 'lb-s11', title: 'S11 · Feedback de Alto Rendimiento' },
+                { id: 'lb-s12', title: 'S12 · Ecosistemas en Equilibrio' },
+                { id: 'lb-cierre', title: 'Cierre y certificado' },
+            ]
+        },
+        {
+            id: 'rp-prog-ve', title: 'Cultura de Bienestar', children: [
+                { id: 've-bienvenida', title: 'Bienvenida' },
+                { id: 've-s1', title: 'S1 · Bio-Recarga' },
+                { id: 've-s2', title: 'S2 · Zona de Enfoque' },
+                { id: 've-s3', title: 'S3 · Pausas Cognitivas' },
+                { id: 've-s4', title: 'S4 · Brújula de Prioridades' },
+                { id: 've-s5', title: 'S5 · Inteligencia Financiera' },
+                { id: 've-s6', title: 'S6 · Sinergia de Equipo' },
+                { id: 've-s7', title: 'S7 · Maestría en el Cambio' },
+                { id: 've-s8', title: 'S8 · Algoritmos de Solución' },
+                { id: 've-s9', title: 'S9 · Tu Voz es el Motor' },
+                { id: 've-s10', title: 'S10 · Escudo del Reconocimiento' },
+                { id: 've-s11', title: 'S11 · Feedback Inteligente' },
+                { id: 've-s12', title: 'S12 · Mi Hogar, Mi Fortaleza' },
+                { id: 've-cierre', title: 'Cierre y certificado' },
+            ]
+        },
+        {
+            id: 'rp-prog-ei', title: 'Ecosistema Inclusivo', children: [
+                { id: 'ei-bienvenida', title: 'Bienvenida' },
+                { id: 'ei-h1', title: 'Espacios a tu Medida' },
+                { id: 'ei-h2', title: 'Corazón del Cuidador' },
+                { id: 'ei-h3', title: 'Autenticidad sin Barreras' },
+                { id: 'ei-h4', title: 'Tu Hogar, Tu Trabajo' },
+                { id: 'ei-cierre', title: 'Cierre' },
+            ]
+        },
     ],
-    CLIMA_ORGANIZACIONAL: [],
+    CLIMA_ORGANIZACIONAL: [
+        {
+            id: 'co-prog-vp', title: 'Vida y Trabajo con Propósito', children: [
+                { id: 'co-vp-bienvenida', title: 'Bienvenida' },
+                { id: 'co-vp-m1', title: 'Mes 1 · El arte de conectar con el propósito' },
+                { id: 'co-vp-m2', title: 'Mes 2 · El Valor de la Reciprocidad' },
+                { id: 'co-vp-m3', title: 'Mes 3 · La Ruta de mi Futuro' },
+                { id: 'co-vp-cierre', title: 'Cierre y certificado' },
+            ]
+        },
+        {
+            id: 'co-prog-ct', title: 'Reconstruyendo el Puente de la Confianza', children: [
+                { id: 'co-ct-bienvenida', title: 'Bienvenida' },
+                { id: 'co-ct-m1', title: 'Mes 1 · Alivio y Validación' },
+                { id: 'co-ct-m2', title: 'Mes 2 · Liderazgo de Servicio y Empatía' },
+                { id: 'co-ct-m3', title: 'Mes 3 · Propósito y Futuro' },
+                { id: 'co-ct-cierre', title: 'Cierre y certificado' },
+            ]
+        },
+        {
+            id: 'co-prog-at', title: 'Arquitectos de Confianza: Liderazgo que Transforma', children: [
+                { id: 'co-at-bienvenida', title: 'Bienvenida' },
+                { id: 'co-at-m1', title: 'Mes 1 · Autoliderazgo y Credibilidad' },
+                { id: 'co-at-m2', title: 'Mes 2 · Seguridad Psicológica y Comunicación' },
+                { id: 'co-at-m3', title: 'Mes 3 · Reconocimiento y Propósito' },
+                { id: 'co-at-cierre', title: 'Cierre y certificado' },
+            ]
+        },
+    ],
 };
 
 // â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -504,17 +570,17 @@ const STATIC_SECTIONS: Record<string, StaticSectionCfg[]> = {
     styleUrls: ['./my-plan.component.scss'],
 })
 export class MyPlanComponent implements OnInit {
-    private readonly _userService     = inject(UserService);
-    private readonly _actionPlanSvc   = inject(ActionPlanService);
+    private readonly _userService = inject(UserService);
+    private readonly _actionPlanSvc = inject(ActionPlanService);
 
     // â”€â”€ View state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    view             = signal<'intro' | 'module-intro' | 'module'>('intro');
-    activeModuleId   = signal<string>('');
-    activeSectionId  = signal<string>('');
-    loading          = signal<boolean>(false);
+    view = signal<'intro' | 'module-intro' | 'module'>('intro');
+    activeModuleId = signal<string>('');
+    activeSectionId = signal<string>('');
+    loading = signal<boolean>(false);
 
     // ── Week tab & slider ────────────────────────────────────────────────────────────────────
-    activeTab   = signal<'aprende' | 'conecta' | 'actua'>('aprende');
+    activeTab = signal<'aprende' | 'conecta' | 'actua'>('aprende');
     sliderIndex = signal<number>(0);
 
     readonly MH_WEEK_IMAGES: Record<string, string[]> = {
@@ -552,8 +618,8 @@ export class MyPlanComponent implements OnInit {
     activeStepNextID = signal<number | null>(null);
 
     // â”€â”€ Certificate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    userName        = signal<string>('Nombre del usuario');
-    today           = new Date();
+    userName = signal<string>('Nombre del usuario');
+    today = new Date();
     showCertificate = signal<boolean>(false);
 
     // â”€â”€ Modules (populated from API) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -573,12 +639,12 @@ export class MyPlanComponent implements OnInit {
         // Pre-poblar módulos conocidos visualmente (sin pantalla en blanco)
         this.modules = Object.entries(MODULE_VISUAL).map(([code, visual]) => ({
             ...visual,
-            title:           MODULE_TITLE[code] ?? code,
-            moduleCode:      code,
-            moduleID:        undefined,
+            title: MODULE_TITLE[code] ?? code,
+            moduleCode: code,
+            moduleID: undefined,
             progressPercent: 0,
-            sections:        [],
-            expanded:        false,
+            sections: [],
+            expanded: false,
         }));
 
         // Obtener moduleIDs, títulos y progreso reales desde la API
@@ -592,9 +658,9 @@ export class MyPlanComponent implements OnInit {
                             m => m.moduleCode === 'RIESGO_PSICOSOCIAL' || m.moduleCode?.startsWith('RP_')
                         );
                         if (rpTile && !rpTile.moduleID) {
-                            rpTile.moduleID        = dto.moduleID;
+                            rpTile.moduleID = dto.moduleID;
                             rpTile.progressPercent = dto.progressPercent;
-                            rpTile.programCode     = dto.moduleCode; // specific sub-program
+                            rpTile.programCode = dto.moduleCode; // specific sub-program
                             // moduleCode stays 'RIESGO_PSICOSOCIAL' so _applyStaticSections shows all 5 programs
                             const prog = RP_PROGRAM_VISUAL[dto.moduleCode];
                             if (prog) {
@@ -604,8 +670,8 @@ export class MyPlanComponent implements OnInit {
                     } else {
                         const mod = this.modules.find(m => m.moduleCode === dto.moduleCode);
                         if (mod) {
-                            mod.moduleID        = dto.moduleID;
-                            mod.title           = dto.moduleName;
+                            mod.moduleID = dto.moduleID;
+                            mod.title = dto.moduleName;
                             mod.progressPercent = dto.progressPercent;
                         }
                     }
@@ -639,27 +705,27 @@ export class MyPlanComponent implements OnInit {
             this._applyStaticSections(module);
             this._actionPlanSvc.getSteps(module.moduleID).subscribe({
                 next: (steps) => this._overlayRpSteps(module, steps),
-                error: () => {},
+                error: () => { },
             });
             return;
         }
         this._actionPlanSvc.getSteps(module.moduleID).subscribe({
             next: (steps) => this._applySteps(module, steps),
-            error: ()      => this._applyStaticSections(module),
+            error: () => this._applyStaticSections(module),
         });
     }
 
     private _applySteps(module: PlanModule, steps: ActionPlanStepDto[]): void {
-        const code   = module.moduleCode ?? '';
+        const code = module.moduleCode ?? '';
         const prefix = STEP_PREFIX[code] ?? module.id.substring(0, 2);
         module.sections = steps.map(s => ({
-            id:               `${prefix}-${STEP_KEY_SUFFIX[s.stepKey] ?? s.stepKey.toLowerCase()}`,
-            title:            s.stepKey === 'CIERRE' ? 'Cierre y certificado' : s.title,
+            id: `${prefix}-${STEP_KEY_SUFFIX[s.stepKey] ?? s.stepKey.toLowerCase()}`,
+            title: s.stepKey === 'CIERRE' ? 'Cierre y certificado' : s.title,
             actionPlanStepID: s.actionPlanStepID,
-            stepKey:          s.stepKey,
-            isCompleted:      s.isCompleted,
-            completedAt:      s.completedAt,
-            completed:        s.isCompleted,
+            stepKey: s.stepKey,
+            isCompleted: s.isCompleted,
+            completedAt: s.completedAt,
+            completed: s.isCompleted,
         }));
         module.hasCertification = steps.some(s => s.hasCertification);
         if (module.sections.length > 0) {
@@ -708,7 +774,7 @@ export class MyPlanComponent implements OnInit {
             prog.children.forEach(child => {
                 const step = stepById.get(child.id);
                 if (step) {
-                    child.completed        = step.isCompleted;
+                    child.completed = step.isCompleted;
                     child.actionPlanStepID = step.actionPlanStepID;
                     if (!step.isCompleted && !firstIncompleteId) firstIncompleteId = child.id;
                 }
@@ -979,7 +1045,7 @@ export class MyPlanComponent implements OnInit {
 
     get activeStepTitle(): string {
         const id = this.activeSectionId();
-        const m  = this.activeModule;
+        const m = this.activeModule;
         if (!m) return '';
         const sec = m.sections.find(s => s.id === id);
         if (sec) return sec.title;
@@ -1009,25 +1075,39 @@ export class MyPlanComponent implements OnInit {
 
     get certModuleSubtitle(): string {
         const code = this.activeModule?.programCode ?? this.activeModule?.moduleCode;
-        if (code === 'FATIGA')             return 'en Gestión de Fatiga Laboral';
+        if (code === 'FATIGA') return 'en Gestión de Fatiga Laboral';
         if (code === 'RIESGO_PSICOSOCIAL') return 'en Manejo de Riesgo Psicosocial';
-        if (code === 'RP_PRO_ACTIVO')      return 'en PRO-Activo de Bienestar';
-        if (code === 'RP_CO_GESTORES')     return 'en Co-Gestión de Bienestar';
-        if (code === 'RP_ARQUITECTOS')     return 'en Arquitectura de Bienestar';
-        if (code === 'RP_CULTURA')         return 'en Cultura de Bienestar';
-        if (code === 'RP_ECOSISTEMA')      return 'en Ecosistema Inclusivo';
+        if (code === 'RP_PRO_ACTIVO') return 'en PRO-Activo de Bienestar';
+        if (code === 'RP_CO_GESTORES') return 'en Co-Gestión de Bienestar';
+        if (code === 'RP_ARQUITECTOS') return 'en Arquitectura de Bienestar';
+        if (code === 'RP_CULTURA') return 'en Cultura de Bienestar';
+        if (code === 'RP_ECOSISTEMA') return 'en Ecosistema Inclusivo';
+        if (code === 'CLIMA_ORGANIZACIONAL') {
+            const sid = this.activeSectionId();
+            if (sid.startsWith('co-vp-')) return 'Programa: Vida y Trabajo con Propósito';
+            if (sid.startsWith('co-ct-')) return 'Programa: Reconstruyendo el Puente de la Confianza';
+            if (sid.startsWith('co-at-')) return 'Programa: Arquitectos de Confianza: Liderazgo que Transforma';
+            return 'en Clima Organizacional';
+        }
         return 'en Habilidades de Salud Mental';
     }
 
     get certModuleBadge(): string {
         const code = this.activeModule?.programCode ?? this.activeModule?.moduleCode;
-        if (code === 'FATIGA')             return 'Módulo: Fatiga Laboral';
+        if (code === 'FATIGA') return 'Módulo: Fatiga Laboral';
         if (code === 'RIESGO_PSICOSOCIAL') return 'Módulo: Riesgo Psicosocial';
-        if (code === 'RP_PRO_ACTIVO')      return 'Programa: PRO-Activo de Bienestar';
-        if (code === 'RP_CO_GESTORES')     return 'Programa: Co-Gestores de Bienestar';
-        if (code === 'RP_ARQUITECTOS')     return 'Programa: Arquitectos de Bienestar';
-        if (code === 'RP_CULTURA')         return 'Programa: Cultura de Bienestar';
-        if (code === 'RP_ECOSISTEMA')      return 'Programa: Ecosistema Inclusivo';
+        if (code === 'RP_PRO_ACTIVO') return 'Programa: PRO-Activo de Bienestar';
+        if (code === 'RP_CO_GESTORES') return 'Programa: Co-Gestores de Bienestar';
+        if (code === 'RP_ARQUITECTOS') return 'Programa: Arquitectos de Bienestar';
+        if (code === 'RP_CULTURA') return 'Programa: Cultura de Bienestar';
+        if (code === 'RP_ECOSISTEMA') return 'Programa: Ecosistema Inclusivo';
+        if (code === 'CLIMA_ORGANIZACIONAL') {
+            const sid = this.activeSectionId();
+            if (sid.startsWith('co-vp-')) return 'Programa: Vida y Trabajo con Propósito';
+            if (sid.startsWith('co-ct-')) return 'Programa: Reconstruyendo el Puente de la Confianza';
+            if (sid.startsWith('co-at-')) return 'Programa: Arquitectos de Confianza: Liderazgo que Transforma';
+            return 'Módulo: Clima Organizacional';
+        }
         return 'Módulo: Salud Mental';
     }
 
@@ -1043,6 +1123,25 @@ export class MyPlanComponent implements OnInit {
                 'Has aprobado este proceso, identificando factores de riesgo psicosocial y desarrollando estrategias ' +
                 'para gestionarlos y promover un entorno laboral más saludable y equilibrado.';
         }
+        if (code === 'CLIMA_ORGANIZACIONAL') {
+            const sid = this.activeSectionId();
+            if (sid.startsWith('co-vp-')) {
+                return 'Reconocemos tu compromiso con el desarrollo de un clima laboral más humano y significativo. ' +
+                    'Has completado el programa Vida y Trabajo con Propósito, cultivando la conexión con tu propósito, ' +
+                    'la reciprocidad en tus relaciones y una visión clara de tu futuro profesional.';
+            }
+            if (sid.startsWith('co-ct-')) {
+                return 'Reconocemos tu compromiso con la construcción de entornos laborales basados en la confianza. ' +
+                    'Has completado el programa Reconstruyendo el Puente de la Confianza, desarrollando habilidades ' +
+                    'de escucha, empatía y liderazgo de servicio para fortalecer tu equipo.';
+            }
+            if (sid.startsWith('co-at-')) {
+                return 'Reconocemos tu compromiso con el autoliderazgo y la credibilidad. ' +
+                    'Has completado el programa Arquitectos de Confianza, fortaleciendo la coherencia, ' +
+                    'la transparencia y la responsabilidad como pilares de un liderazgo que transforma el clima laboral.';
+            }
+            return 'Reconocemos tu esfuerzo y dedicación en el fortalecimiento del clima organizacional junto a Emocheck.';
+        }
         return 'Reconocemos tu esfuerzo y dedicación en el desarrollo de habilidades junto a Emocheck. ' +
             'Has aprobado este proceso, fortaleciendo recursos personales que te permiten evaluar, ' +
             'comprender y aplicar estrategias adecuadas frente a situaciones que puedan impactar ' +
@@ -1054,8 +1153,8 @@ export class MyPlanComponent implements OnInit {
         if (!m) return;
         const last = m.sections[m.sections.length - 1];
         if (!last) return;
-        last.isCompleted  = true;
-        last.completed    = true;
+        last.isCompleted = true;
+        last.completed = true;
         m.progressPercent = this.calcProgress(m);
 
         const afterComplete = (finalProgress: number) => {
@@ -1068,7 +1167,7 @@ export class MyPlanComponent implements OnInit {
         if (m.moduleID && last.actionPlanStepID) {
             this._actionPlanSvc.completeStep(m.moduleID, last.actionPlanStepID).subscribe({
                 next: (result) => afterComplete(result.moduleProgressPercent),
-                error: ()       => afterComplete(m.progressPercent ?? 0),
+                error: () => afterComplete(m.progressPercent ?? 0),
             });
         } else {
             afterComplete(m.progressPercent);
@@ -1076,7 +1175,7 @@ export class MyPlanComponent implements OnInit {
     }
 
     private _goToNextPendingModule(current: PlanModule): void {
-        const currentIdx  = this.modules.indexOf(current);
+        const currentIdx = this.modules.indexOf(current);
         // Buscar siguiente módulo incompleto después del actual
         const nextPending = this.modules.find(
             (m, i) => i > currentIdx && (m.progressPercent ?? 0) < 100
