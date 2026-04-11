@@ -291,7 +291,7 @@ export class AuthService {
     /** Cerrar sesión */
     logout(): void {
         this.clearSession();
-        this.router.navigate(['/sign-in']);
+        this.router.navigate(['/welcome']);
     }
 
     /** Verificar si el usuario está autenticado */

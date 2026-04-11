@@ -34,8 +34,7 @@ export const RoleGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
 
     // 1. Verificación síncrona de token
     if (!auth.getToken()) {
-        const redirectURL = state.url === '/sign-out' ? '' : `redirectURL=${state.url}`;
-        return router.parseUrl(`sign-in?${redirectURL}`);
+        return router.parseUrl('welcome');
     }
 
     const requiredRoles = (route.data?.['roles'] as string[] | undefined) ?? [];
@@ -59,10 +58,9 @@ export const RoleGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
             );
         }),
         catchError(() => {
-            // Solo redirigir a sign-in si realmente no hay token
+            // Solo redirigir a /welcome si realmente no hay token
             if (!auth.getToken()) {
-                const redirectURL = state.url === '/sign-out' ? '' : `redirectURL=${state.url}`;
-                return of(router.parseUrl(`sign-in?${redirectURL}`));
+                return of(router.parseUrl('welcome'));
             }
             // Si hay token pero falló la carga del usuario (ej: red lenta),
             // dejar pasar para no expulsar al usuario innecesariamente.

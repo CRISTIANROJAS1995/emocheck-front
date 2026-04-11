@@ -1,0 +1,45 @@
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [{
+            "@type": "Question",
+            "name": "¿Qué es EmoCheck?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "EmoCheck es una plataforma integral de bienestar emocional y salud mental laboral que utiliza análisis facial por inteligencia artificial, evaluación de riesgo psicosocial, clima organizacional y fatiga laboral. Es 100% normativa SG-SST."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Cómo funciona el análisis facial por IA de EmoCheck?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "EmoCheck utiliza tecnología de análisis facial avanzada para detectar emociones y estados emocionales en tiempo real. La plataforma integra ciencia de datos con bienestar humano para ofrecer análisis predictivos y personalizados."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿EmoCheck cumple con las normas SG-SST?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, EmoCheck es 100% normativa SG-SST (Sistema de Gestión de Seguridad y Salud en el Trabajo). La plataforma está diseñada para cumplir con todos los requerimientos legales colombianos en materia de riesgo psicosocial y salud mental laboral."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Qué módulos incluye la plataforma EmoCheck?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "EmoCheck incluye 4 módulos principales: 1) Salud Mental, 2) Fatiga Laboral, 3) Clima Organizacional, y 4) Riesgo Psicosocial. Todos integrados en un dashboard en tiempo real con análisis predictivos."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Para qué tipo de organizaciones está diseñado EmoCheck?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "EmoCheck está diseñado para empresas e instituciones educativas que buscan gestionar integralmente el bienestar emocional de sus equipos, cumplir con normativas SG-SST y mejorar el clima organizacional."
+            }
+        }
+    ]
+}

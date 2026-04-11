@@ -1,93 +1,1123 @@
-<div class="relative flex min-h-screen w-full items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-10" style="background: linear-gradient(135deg, #EFF6FF 0%, #FFF 50%, #F0FDFA 100%);">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<!-- Swiper -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<!-- Montserrat -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- Decorative background circles -->
-    <div class="pointer-events-none absolute right-[40px] top-[100px] h-[80px] w-[80px] rounded-full sm:right-[80px] sm:top-[160px] sm:h-[96px] sm:w-[96px]" style="background: rgba(43, 127, 255, 0.20); filter: blur(40px);"></div>
-    <div class="pointer-events-none absolute right-[20px] bottom-[80px] h-[120px] w-[120px] rounded-full sm:right-[60px] sm:bottom-[100px] sm:h-[160px] sm:w-[160px]" style="background: rgba(0, 187, 167, 0.20); filter: blur(64px);"></div>
-    <div class="pointer-events-none absolute left-[20px] top-[80px] h-[100px] w-[100px] rounded-full sm:left-[100px] sm:top-[120px] sm:h-[128px] sm:w-[128px]" style="background: rgba(154, 230, 0, 0.20); filter: blur(64px);"></div>
+<div class="lp">
 
-    <!-- Card principal -->
-    <div class="w-full max-w-[576px]">
-        <div class="w-full rounded-3xl border border-teal-100 bg-white px-4 py-4 shadow-2xl sm:px-8 sm:py-6" style="font-family: Montserrat, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+    <!-- ══════════════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════════════ -->
+    <nav id="lp-navbar">
+        <div class="lp-container">
+            <div class="lp-nav-inner">
+                <a href="#" class="lp-nav-logo">
+                    <img src="images/logo-emocheck-web.png" alt="EmoCheck" />
+                </a>
+                <div class="lp-nav-links">
+                    <a href="#lp-inicio">Inicio</a>
+                    <a href="#lp-soluciones">Soluciones</a>
+                    <a href="#lp-empresas">Clientes</a>
+                    <a href="#lp-tecnologia">Módulos</a>
+                    <a href="#lp-faceid">Calibración</a>
+                    <button (click)="openSignInModal()" class="lp-btn lp-btn-primary" style="cursor:pointer;border:none;">Acceder a EmoCheck</button>
+                </div>
+                <button class="lp-hamburger" id="lp-hamburger" aria-label="Abrir menú">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+            <div class="lp-mobile-menu" id="lp-mobile-menu">
+                <a href="#lp-inicio">Inicio</a>
+                <a href="#lp-soluciones">Soluciones</a>
+                <a href="#lp-empresas">Clientes</a>
+                <a href="#lp-tecnologia">Módulos</a>
+                <a href="#lp-faceid">Calibración</a>
+                <button (click)="openSignInModal()" class="lp-btn lp-btn-primary" style="cursor:pointer;border:none;">Acceder a EmoCheck</button>
+            </div>
+        </div>
+    </nav>
 
-            <!-- Logo + encabezado -->
-            <div class="flex flex-col items-center text-center">
-                <img class="w-28 max-w-full sm:w-36" src="images/logo/emocheck-logo.png" alt="EmoCheck" />
+    <!-- ══════════════════════════════════════════
+       HERO
+  ══════════════════════════════════════════ -->
+    <section id="lp-inicio" class="lp-hero-section">
+        <!-- Blur decorativo -->
+        <div class="lp-hero-blob lp-hero-blob--lime"></div>
+        <div class="lp-hero-blob lp-hero-blob--teal"></div>
+        <div class="lp-hero-blob lp-hero-blob--blue"></div>
 
-                <div class="mt-3 text-lg font-bold text-blue-600">Bienvenid&#64;</div>
+        <div class="lp-container">
+            <!-- Fila superior: copy izquierda + imagen derecha -->
+            <div class="lp-hero-inner">
+                <!-- Columna izquierda: texto + botones -->
+                <div class="lp-hero-copy lp-fade">
+                    <span class="lp-tag">✨ Bienvenidos a EmoCheck</span>
+                    <h1>
+                        Tecnología que<br>
+                        <span class="lp-gradient-text">escucha, analiza</span><br> y cuida la mente.
+                    </h1>
+                    <p>
+                        EmoCheck es una herramienta digital diseñada para fortalecer la gestión integral de los factores de riesgo psicosocial y la salud mental, integrando ciencia de datos con bienestar humano.
+                    </p>
+                    <div class="lp-hero-btns">
+                        <button (click)="openSignInModal()" class="lp-btn lp-btn-primary" style="cursor:pointer;border:none;">Comenzar ahora →</button>
+                        <a href="#lp-tecnologia" class="lp-btn lp-btn-outline">Ver módulos</a>
+                    </div>
+                    <!-- Mini trust badges -->
+                    <div class="lp-hero-trust">
+                        <div class="lp-trust-badge lp-trust-badge--teal">
+                            <div class="lp-trust-badge-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                            <div class="lp-trust-badge-body">
+                                <strong>100% SG-SST</strong>
+                                <span>Normativo</span>
+                            </div>
+                        </div>
 
-                <!-- Subtítulo -->
-                <div class="mt-1 flex items-center justify-center gap-1 px-2 text-center" style="font-size: 13px; font-weight: 700; line-height: 18.5714px; color: #009689;">
-                    <img class="h-4 w-4 shrink-0" src="icons/Icon.svg" alt="" aria-hidden="true" />
-                    <span>Tu bienestar también es parte de la productividad</span>
-                    <img class="h-4 w-4 shrink-0" src="icons/Icon.svg" alt="" aria-hidden="true" />
+                        <div class="lp-trust-badge lp-trust-badge--blue">
+                            <div class="lp-trust-badge-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                            </div>
+                            <div class="lp-trust-badge-body">
+                                <strong>+91K</strong>
+                                <span>Evaluaciones</span>
+                            </div>
+                        </div>
+
+                        <div class="lp-trust-badge lp-trust-badge--lime">
+                            <div class="lp-trust-badge-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                            </div>
+                            <div class="lp-trust-badge-body">
+                                <strong>Seguro</strong>
+                                <span>100% anónimo</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Párrafos descriptivos -->
-                <div class="mt-5 w-full max-w-[494px] space-y-1">
-                    <p class="text-left" style="font-size: 13px; font-weight: 400; line-height: 18.5714px; color: #364153;">
-                        En el mundo laboral actual, la velocidad, las metas y la presión constante pueden hacer que olvidemos algo esencial:
-                        <span style="color: #009689;">nuestro bienestar mental</span>.
-                    </p>
-                    <p class="text-left" style="font-size: 13px; font-weight: 400; line-height: 18.5714px; color: #364153;">
-                        EmoCheck nace para recordarnos que
-                        <span style="color: #5EA500;">cuidar la mente también es parte del trabajo bien hecho</span>.
-                    </p>
+                <!-- Columna derecha: mockup app ligero -->
+                <div class="lp-hero-img-wrap lp-fade">
+
+                    <!-- Tarjeta principal — estado emocional -->
+                    <div class="lp-hero-card-main">
+                        <div class="lp-hero-card-header">
+                            <div class="lp-hero-card-avatar">EC</div>
+                            <div>
+                                <p class="lp-hero-card-name">EmoCheck</p>
+                                <p class="lp-hero-card-role">Bienestar Organizacional</p>
+                            </div>
+                            <div class="lp-hero-card-live">
+                                <span class="lp-hero-card-live-dot"></span> En vivo
+                            </div>
+                        </div>
+
+                        <!-- Banner teal→azul como en la app -->
+                        <div class="lp-hero-card-banner">
+                            <p>✨ Hola, EmoCheck</p>
+                            <small>Personas sanas, organizaciones fuertes</small>
+                            <div class="lp-hero-card-banner-chips">
+                                <span>🔒 Respuestas confidenciales</span>
+                                <span>❤️ Tu bienestar es prioridad</span>
+                            </div>
+                        </div>
+
+                        <!-- Score emocional -->
+                        <div class="lp-hero-card-score-row">
+                            <div class="lp-hero-card-score-item">
+                                <span class="lp-hero-card-score-num lp-hero-card-score-num--teal">8.4</span>
+                                <span class="lp-hero-card-score-label">Bienestar</span>
+                            </div>
+                            <div class="lp-hero-card-score-sep"></div>
+                            <div class="lp-hero-card-score-item">
+                                <span class="lp-hero-card-score-num lp-hero-card-score-num--blue">Leve</span>
+                                <span class="lp-hero-card-score-label">Fatiga</span>
+                            </div>
+                            <div class="lp-hero-card-score-sep"></div>
+                            <div class="lp-hero-card-score-item">
+                                <span class="lp-hero-card-score-num lp-hero-card-score-num--lime">✓</span>
+                                <span class="lp-hero-card-score-label">SG-SST</span>
+                            </div>
+                        </div>
+
+                        <!-- Módulos rápidos -->
+                        <div class="lp-hero-card-mods">
+                            <div class="lp-hero-card-mod lp-hero-card-mod--blue">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Salud Mental
+                            </div>
+                            <div class="lp-hero-card-mod lp-hero-card-mod--lime">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Fatiga Laboral
+                            </div>
+                            <div class="lp-hero-card-mod lp-hero-card-mod--teal">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> Clima
+                            </div>
+                            <div class="lp-hero-card-mod lp-hero-card-mod--orange">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>                                Psicosocial
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tip flotante 1 — estado confuso -->
+                    <div class="lp-hero-tip lp-hero-tip--1">
+                        <div class="lp-hero-tip-icon lp-hero-tip-icon--orange">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        </div>
+                        <div>
+                            <strong>Estado Confuso · 4.9/10</strong>
+                            <span>Alerta temprana detectada</span>
+                        </div>
+                    </div>
+
+                    <!-- Tip flotante 2 — calibración -->
+                    <div class="lp-hero-tip lp-hero-tip--2">
+                        <div class="lp-hero-tip-icon lp-hero-tip-icon--teal">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M9 11l3 3L22 4"/></svg>
+                        </div>
+                        <div>
+                            <strong>Face ID calibrado ✓</strong>
+                            <span>Perfil emocional listo</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- Tarjetas de características -->
-            <div class="mt-6 w-full max-w-[494px] mx-auto space-y-2">
-
-                <!-- Cuidado Integral -->
-                <div class="rounded-2xl border border-lime-100 bg-lime-50 px-4 py-3 sm:px-5">
-                    <div class="flex items-center gap-3">
-                        <div class="shrink-0 flex h-9 w-9 items-center justify-center rounded-[14px]" style="background: linear-gradient(135deg, #9AE600 0%, #7CCF00 100%);">
-                            <img src="icons/cuidado-integral.svg" alt="Cuidado Integral" class="h-4 w-4">
-                        </div>
-                        <div>
-                            <div style="color: #00786F; font-size: 14px; font-weight: 700; line-height: 20px;">Cuidado Integral</div>
-                            <div class="text-sm text-slate-600">Evaluamos tu bienestar emocional con herramientas validadas</div>
-                        </div>
+            <!-- Fila inferior: pills en horizontal -->
+            <div class="lp-pills-row lp-fade">
+                <div class="lp-pill-card">
+                    <div class="lp-pill-icon" style="background:linear-gradient(135deg,#00BBA7,#009689);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        </svg>
                     </div>
+                    <div class="lp-pill-text">
+                        <strong>Evaluaciones</strong>
+                        <span>Diagnóstico preciso en minutos</span>
+                    </div>
+                    <span class="lp-pill-badge">🔥 Popular</span>
                 </div>
 
-                <!-- Tecnología Humana -->
-                <div class="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 sm:px-5">
-                    <div class="flex items-center gap-3">
-                        <div class="shrink-0 flex h-9 w-9 items-center justify-center rounded-[14px]" style="background: linear-gradient(135deg, #2B7FFF 0%, #155DFC 100%);">
-                            <img src="icons/tecnologia-humana.svg" alt="Tecnología Humana" class="h-4 w-4">
-                        </div>
-                        <div>
-                            <div style="color: #00786F; font-size: 14px; font-weight: 700; line-height: 20px;">Tecnología Humana</div>
-                            <div class="text-sm text-slate-600">Combinamos innovación con un enfoque cálido y empático</div>
-                        </div>
+                <div class="lp-pill-sep"></div>
+
+                <div class="lp-pill-card">
+                    <div class="lp-pill-icon" style="background:linear-gradient(135deg,#3B82F6,#155DFC);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
                     </div>
+                    <div class="lp-pill-text">
+                        <strong>Seguimientos</strong>
+                        <span>Monitoreo continuo en tiempo real</span>
+                    </div>
+                    <span class="lp-pill-badge lp-pill-badge--blue">📊 Live</span>
                 </div>
 
-                <!-- Acción Inmediata -->
-                <div class="rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3 sm:px-5">
-                    <div class="flex items-center gap-3">
-                        <div class="shrink-0 flex h-9 w-9 items-center justify-center rounded-[14px]" style="background: linear-gradient(135deg, #00BBA7 0%, #009689 100%);">
-                            <img src="icons/accion-inmediata.svg" alt="Acción Inmediata" class="h-4 w-4">
-                        </div>
-                        <div>
-                            <div style="color: #00786F; font-size: 14px; font-weight: 700; line-height: 20px;">Acción Inmediata</div>
-                            <div class="text-sm text-slate-600">Obtén resultados al instante y recursos personalizados</div>
-                        </div>
+                <div class="lp-pill-sep"></div>
+
+                <div class="lp-pill-card">
+                    <div class="lp-pill-icon" style="background:linear-gradient(135deg,#9AE600,#5EA500);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
                     </div>
+                    <div class="lp-pill-text">
+                        <strong>Planes de acción</strong>
+                        <span>Intervención personalizada y efectiva</span>
+                    </div>
+                    <span class="lp-pill-badge lp-pill-badge--lime">⚡ Nuevo</span>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Botón CTA -->
-            <a [routerLink]="'/sign-in'" class="mt-5 flex w-full max-w-[494px] mx-auto cursor-pointer items-center justify-center rounded-[14px] px-5 py-3 text-sm font-medium !text-white shadow-lg transition-all hover:brightness-90" style="background: linear-gradient(135deg, #7CCF00 0%, #5EA500 100%); font-family: Montserrat; text-decoration: none;">
-                Comenzar tu experiencia
-            </a>
+    <!-- ══════════════════════════════════════════
+       STATS
+  ══════════════════════════════════════════ -->
+    <section id="lp-stats">
+        <!-- partículas decorativas -->
+        <div class="lp-stats-blob lp-stats-blob--1"></div>
+        <div class="lp-stats-blob lp-stats-blob--2"></div>
+        <div class="lp-stats-blob lp-stats-blob--3"></div>
 
-            <!-- Pie de privacidad -->
-            <div class="mt-3 pb-1 text-center text-sm text-slate-500" style="font-family: Montserrat; line-height: 20px;">
-                Tus datos están protegidos bajo los más altos estándares de confidencialidad
+        <div class="lp-container">
+            <div class="lp-stats-grid">
+
+                <!-- Evaluaciones -->
+                <div class="lp-stat-card lp-fade">
+                    <div class="lp-stat-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        </svg>
+                    </div>
+                    <div class="lp-stat-body">
+                        <div class="lp-stat-value">
+                            <span class="lp-stat-prefix">+</span><span class="lp-counter" data-target="91500">0</span>
+                        </div>
+                        <span class="lp-stat-label">Evaluaciones realizadas</span>
+                        <span class="lp-stat-trend">📈 +18% este mes</span>
+                    </div>
+                </div>
+
+                <div class="lp-stat-sep"></div>
+
+                <!-- Seguimientos -->
+                <div class="lp-stat-card lp-fade">
+                    <div class="lp-stat-icon lp-stat-icon--blue">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        </svg>
+                    </div>
+                    <div class="lp-stat-body">
+                        <div class="lp-stat-value">
+                            <span class="lp-counter" data-target="23">0</span><span class="lp-stat-suffix">M+</span>
+                        </div>
+                        <span class="lp-stat-label">Seguimientos activos</span>
+                        <span class="lp-stat-trend">🟢 En tiempo real</span>
+                    </div>
+                </div>
+
+                <div class="lp-stat-sep"></div>
+
+                <!-- Planes -->
+                <div class="lp-stat-card lp-fade">
+                    <div class="lp-stat-icon lp-stat-icon--lime">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                    </div>
+                    <div class="lp-stat-body">
+                        <div class="lp-stat-value">
+                            <span class="lp-counter" data-target="48">0</span><span class="lp-stat-suffix">K+</span>
+                        </div>
+                        <span class="lp-stat-label">Planes de acción ejecutados</span>
+                        <span class="lp-stat-trend">⚡ Alto impacto</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+       SOLUCIONES
+  ══════════════════════════════════════════ -->
+    <!-- ══════════════════════════════════════════
+       SOLUCIONES
+  ══════════════════════════════════════════ -->
+    <section class="lp-sol-section" id="lp-soluciones">
+        <div class="lp-container">
+
+            <!-- Header centrado -->
+            <div class="lp-sol-header lp-fade">
+                <span class="lp-tag">🌿 Asistencia 24/7 y recursos de bienestar</span>
+                <h2>Todo lo que necesitas<br><span class="lp-gradient-text">en una sola plataforma</span></h2>
+                <p>Herramientas diseñadas para acompañar el bienestar organizacional de forma integral, trazable y en tiempo real.</p>
+            </div>
+
+            <!-- Grid de features numeradas -->
+            <div class="lp-sol-grid">
+
+                <!-- 01 -->
+                <div class="lp-sol-card lp-fade">
+                    <div class="lp-sol-card-top">
+                        <span class="lp-sol-num">01</span>
+                        <div class="lp-sol-icon lp-sol-icon--teal">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="lp-sol-body">
+                        <h4>Calibración emocional diaria</h4>
+                        <p>Registro del estado de ánimo con privacidad y anonimato total. Detecta patrones antes de que se conviertan en riesgos.</p>
+                        <div class="lp-sol-metric">
+                            <span class="lp-sol-metric-num">98%</span>
+                            <span class="lp-sol-metric-label">de adopción entre usuarios activos</span>
+                        </div>
+                    </div>
+                    <!-- flecha conectora -->
+                    <div class="lp-sol-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 02 -->
+                <div class="lp-sol-card lp-fade">
+                    <div class="lp-sol-card-top">
+                        <span class="lp-sol-num">02</span>
+                        <div class="lp-sol-icon lp-sol-icon--blue">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="lp-sol-body">
+                        <h4>Dashboard en tiempo real</h4>
+                        <p>Centraliza evaluaciones, seguimientos y planes de acción en un sistema digital conectado, trazable y seguro.</p>
+                        <div class="lp-sol-metric">
+                            <span class="lp-sol-metric-num">4</span>
+                            <span class="lp-sol-metric-label">módulos integrados y sincronizados</span>
+                        </div>
+                    </div>
+                    <div class="lp-sol-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 03 -->
+                <div class="lp-sol-card lp-fade">
+                    <div class="lp-sol-card-top">
+                        <span class="lp-sol-num">03</span>
+                        <div class="lp-sol-icon lp-sol-icon--orange">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="lp-sol-body">
+                        <h4>Reportes y analítica avanzada</h4>
+                        <p>Indicadores listos para auditorías SG-SST. Exporta reportes con un clic y presenta evidencia de cumplimiento normativo.</p>
+                        <div class="lp-sol-metric">
+                            <span class="lp-sol-metric-num">100%</span>
+                            <span class="lp-sol-metric-label">normativo SG-SST Colombia</span>
+                        </div>
+                    </div>
+                    <div class="lp-sol-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 04 — última, sin flecha -->
+                <div class="lp-sol-card lp-fade">
+                    <div class="lp-sol-card-top">
+                        <span class="lp-sol-num">04</span>
+                        <div class="lp-sol-icon lp-sol-icon--lime">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="lp-sol-body">
+                        <h4>Planes de acción automáticos</h4>
+                        <p>Intervenciones personalizadas generadas según los resultados. De la medición a la acción sin fricción.</p>
+                        <div class="lp-sol-metric">
+                            <span class="lp-sol-metric-num">48K+</span>
+                            <span class="lp-sol-metric-label">planes ejecutados con éxito</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CTA -->
+            <div class="lp-sol-cta lp-fade">
+                <button (click)="openSignInModal()" class="lp-btn lp-btn-primary" style="cursor:pointer;border:none;">Explorar la plataforma →</button>
             </div>
 
         </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+       MÓDULOS
+  ══════════════════════════════════════════ -->
+    <section class="lp-section lp-section-modules" id="lp-tecnologia">
+        <div class="lp-container">
+
+            <!-- Header interactivo -->
+            <div class="lp-mod-header lp-fade">
+                <div class="lp-mod-header-top">
+                    <span class="lp-tag">🧠 EmoCheck — Plataforma de bienestar</span>
+                    <span class="lp-mod-live-badge">
+                        <span class="lp-mod-live-dot"></span> Activo
+                    </span>
+                </div>
+                <h2 style="margin:.4rem 0 .8rem;">Módulos de diagnóstico y seguimiento</h2>
+                <p style="max-width:560px;margin:0 auto;">
+                    Cada módulo es una herramienta especializada, científicamente validada, para medir, detectar y actuar sobre las dimensiones críticas del bienestar organizacional.
+                </p>
+                <!-- Mini stats del header -->
+                <div class="lp-mod-header-stats">
+                    <div class="lp-mod-hstat"><span>4</span><small>Módulos activos</small></div>
+                    <div class="lp-mod-hstat-div"></div>
+                    <div class="lp-mod-hstat"><span>+91K</span><small>Evaluaciones</small></div>
+                    <div class="lp-mod-hstat-div"></div>
+                    <div class="lp-mod-hstat"><span>100%</span><small>Normativo SG-SST</small></div>
+                </div>
+            </div>
+
+            <div class="lp-modules-grid">
+
+                <!-- Salud Mental -->
+                <div class="lp-module-card lp-fade">
+                    <div class="lp-module-card-top">
+                        <div class="lp-module-icon-circle lp-mic--teal">
+                            <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6C20 6 12 10 12 19C12 23.4 15.6 27 20 27C24.4 27 28 23.4 28 19C28 10 20 6 20 6Z" stroke="#009689" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15 19C15 19 16 22 20 23C24 22 25 19 25 19" stroke="#009689" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17 15.5C17 15.5 16 17 17 18" stroke="#009689" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M23 15.5C23 15.5 24 17 23 18" stroke="#009689" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M20 27V33" stroke="#009689" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M16 33H24" stroke="#009689" stroke-width="1.8" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <span class="lp-module-tag lp-module-tag--teal">🧘 Bienestar</span>
+                    </div>
+                    <div class="lp-module-body">
+                        <h5>Módulo de Salud Mental</h5>
+                        <p>Evalúa ansiedad, depresión, estrés, calidad del sueño y capacidad de afrontamiento.</p>
+                        <div class="lp-module-impact">
+                            <span class="lp-impact-label">⚡ Impacto</span>
+                            <span>Detección temprana y planes de acción personalizados.</span>
+                        </div>
+                        <div class="lp-module-chips">
+                            <span>Ansiedad</span><span>Depresión</span><span>Estrés</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fatiga Laboral -->
+                <div class="lp-module-card lp-fade">
+                    <div class="lp-module-card-top">
+                        <div class="lp-module-icon-circle lp-mic--orange">
+                            <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="20" cy="14" r="7" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M20 7V9" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M20 19V21" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M14 14H12" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M28 14H26" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M17 22C17 22 14 24 14 28C14 30.2 16.7 32 20 32C23.3 32 26 30.2 26 28C26 24 23 22 23 22" stroke="#F97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17 27H23" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <span class="lp-module-tag lp-module-tag--orange">😴 Rendimiento</span>
+                    </div>
+                    <div class="lp-module-body">
+                        <h5>Módulo de Fatiga Laboral</h5>
+                        <p>Mide el cansancio físico y mental, la reducción de motivación y fatiga acumulada por rol y jornada.</p>
+                        <div class="lp-module-impact">
+                            <span class="lp-impact-label">⚡ Impacto</span>
+                            <span>Previene errores operativos y optimiza la gestión del tiempo.</span>
+                        </div>
+                        <div class="lp-module-chips">
+                            <span>Cansancio</span><span>Motivación</span><span>Jornada</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clima Organizacional -->
+                <div class="lp-module-card lp-fade">
+                    <div class="lp-module-card-top">
+                        <div class="lp-module-icon-circle lp-mic--blue">
+                            <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M28 30C28 26.7 24.4 24 20 24C15.6 24 12 26.7 12 30" stroke="#155DFC" stroke-width="1.8" stroke-linecap="round"/>
+                                <circle cx="20" cy="17" r="5" stroke="#155DFC" stroke-width="1.8"/>
+                                <path d="M34 30C34 27.4 31.4 25.2 28 24.4" stroke="#155DFC" stroke-width="1.8" stroke-linecap="round"/>
+                                <circle cx="30" cy="16" r="3.5" stroke="#155DFC" stroke-width="1.8"/>
+                                <path d="M6 30C6 27.4 8.6 25.2 12 24.4" stroke="#155DFC" stroke-width="1.8" stroke-linecap="round"/>
+                                <circle cx="10" cy="16" r="3.5" stroke="#155DFC" stroke-width="1.8"/>
+                            </svg>
+                        </div>
+                        <span class="lp-module-tag lp-module-tag--blue">🤝 Cultura</span>
+                    </div>
+                    <div class="lp-module-body">
+                        <h5>Módulo de Clima Organizacional</h5>
+                        <p>Evalúa compromiso institucional, sentido de pertenencia y percepción del liderazgo.</p>
+                        <div class="lp-module-impact">
+                            <span class="lp-impact-label">⚡ Impacto</span>
+                            <span>Previene la rotación silenciosa y fortalece la cultura.</span>
+                        </div>
+                        <div class="lp-module-chips">
+                            <span>Liderazgo</span><span>Compromiso</span><span>Pertenencia</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Riesgo Psicosocial -->
+                <div class="lp-module-card lp-fade">
+                    <div class="lp-module-card-top">
+                        <div class="lp-module-icon-circle lp-mic--lime">
+                            <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M28 12H30C31.1 12 32 12.9 32 14V30C32 31.1 31.1 32 30 32H10C8.9 32 8 31.1 8 30V14C8 12.9 8.9 12 10 12H12" stroke="#5EA500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M16 10C16 8.9 16.9 8 18 8H22C23.1 8 24 8.9 24 10V14H16V10Z" stroke="#5EA500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M14 22L18 26L26 18" stroke="#5EA500" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <span class="lp-module-tag lp-module-tag--lime">🛡️ Normativo</span>
+                    </div>
+                    <div class="lp-module-body">
+                        <h5>Módulo de Riesgo Psicosocial</h5>
+                        <p>Automatiza la Batería de Riesgo Psicosocial del Ministerio del Trabajo de Colombia.</p>
+                        <div class="lp-module-impact">
+                            <span class="lp-impact-label">⚡ Impacto</span>
+                            <span>Cumplimiento normativo SG-SST y auditorías sin fricción.</span>
+                        </div>
+                        <div class="lp-module-chips">
+                            <span>SG-SST</span><span>Batería</span><span>Auditoría</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CTA inferior -->
+            <div class="lp-mod-footer-cta lp-fade">
+                <p>¿Quieres ver cómo funciona en tu organización?</p>
+                <button (click)="openSignInModal()" class="lp-btn lp-btn-primary" style="cursor:pointer;border:none;">Explorar la plataforma →</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+       AUDIENCIAS — Empresas & Educación
+  ══════════════════════════════════════════ -->
+    <section class="lp-aud-section lp-section" id="lp-empresas">
+        <div class="lp-container">
+
+            <!-- Header -->
+            <div class="lp-aud-header lp-fade">
+                <span class="lp-tag">🎯 ¿Para quién es EmoCheck?</span>
+                <h2>Diseñado para <span class="lp-gradient-text">empresas</span> e <span class="lp-gradient-text">instituciones educativas</span></h2>
+                <p>Una plataforma flexible que se adapta a las necesidades del sector privado y del ecosistema universitario.</p>
+            </div>
+
+            <!-- Dos paneles lado a lado -->
+            <div class="lp-aud-grid">
+
+                <!-- Panel Empresas -->
+                <div class="lp-aud-panel lp-aud-panel--empresa lp-fade">
+                    <div class="lp-aud-panel-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>                        Empresas
+                    </div>
+                    <h3>Gestión psicosocial <br>laboral</h3>
+                    <p class="lp-aud-desc">Cumple con el SG-SST, protege a tus colaboradores y toma decisiones basadas en datos reales de bienestar organizacional.</p>
+
+                    <ul class="lp-aud-features">
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--teal">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Batería de riesgo psicosocial</strong>
+                                <span>Evaluación validada según normativa MinSalud Colombia</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--teal">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Clima y fatiga laboral</strong>
+                                <span>Detección temprana de burnout y disfunción de equipos</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--teal">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Planes de intervención</strong>
+                                <span>Acciones concretas por área, cargo o nivel de riesgo</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--teal">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Reportes para auditorías</strong>
+                                <span>Evidencia lista para entes de control y SGS-SST</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="lp-aud-chips">
+                        <span class="lp-aud-chip">🏭 Sector industrial</span>
+                        <span class="lp-aud-chip">🏢 Empresas de servicios</span>
+                        <span class="lp-aud-chip">🏥 Sector salud</span>
+                        <span class="lp-aud-chip">📦 Retail y logística</span>
+                    </div>
+
+                    <div class="lp-aud-metric-row">
+                        <div class="lp-aud-metric">
+                            <strong>91K+</strong><span>Evaluaciones realizadas</span>
+                        </div>
+                        <div class="lp-aud-metric">
+                            <strong>100%</strong><span>Cumplimiento SG-SST</span>
+                        </div>
+                        <div class="lp-aud-metric">
+                            <strong>48K+</strong><span>Planes ejecutados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divisor central -->
+                <div class="lp-aud-divider">
+                    <span>O</span>
+                </div>
+
+                <!-- Panel Educación -->
+                <div class="lp-aud-panel lp-aud-panel--edu lp-fade">
+                    <div class="lp-aud-panel-badge lp-aud-panel-badge--blue">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>                        Instituciones Educativas
+                    </div>
+                    <h3>Bienestar universitario <br>y estudiantil</h3>
+                    <p class="lp-aud-desc">Acompaña la salud mental de estudiantes y docentes con herramientas de detección temprana, seguimiento y derivación oportuna.</p>
+
+                    <ul class="lp-aud-features">
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--blue">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Evaluación emocional de estudiantes</strong>
+                                <span>Diagnóstico del estado psicológico por cohorte o programa</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--blue">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Detección temprana de crisis</strong>
+                                <span>Alertas automáticas ante señales de riesgo psicológico alto</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--blue">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Semaforización de riesgo</strong>
+                                <span>Visualización por niveles para que bienestar actúe rápido</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="lp-aud-feat-icon lp-aud-feat-icon--blue">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div>
+                                <strong>Derivación a orientación psicológica</strong>
+                                <span>Flujo integrado desde la alerta hasta la atención profesional</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="lp-aud-chips">
+                        <span class="lp-aud-chip lp-aud-chip--blue">🎓 Universidades</span>
+                        <span class="lp-aud-chip lp-aud-chip--blue">📚 Institutos técnicos</span>
+                        <span class="lp-aud-chip lp-aud-chip--blue">🏫 Colegios</span>
+                        <span class="lp-aud-chip lp-aud-chip--blue">🔬 Centros de investigación</span>
+                    </div>
+
+                    <div class="lp-aud-metric-row">
+                        <div class="lp-aud-metric lp-aud-metric--blue">
+                            <strong>70%</strong><span>Evaluación emocional</span>
+                        </div>
+                        <div class="lp-aud-metric lp-aud-metric--blue">
+                            <strong>90%</strong><span>Semaforización efectiva</span>
+                        </div>
+                        <div class="lp-aud-metric lp-aud-metric--blue">
+                            <strong>98%</strong><span>Derivación oportuna</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- CTA -->
+            <div class="lp-aud-cta lp-fade">
+                <button (click)="openSignInModal()" class="lp-btn lp-btn-primary" style="cursor:pointer;border:none;">Comenzar ahora →</button>
+                <a href="https://wa.me/573122503928?text=Hola%2C%20quiero%20conocer%20más%20sobre%20EmoCheck" target="_blank" rel="noopener" class="lp-btn lp-btn-whatsapp">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                        <path d="M12 0C5.373 0 0 5.373 0 12c0 2.132.558 4.13 1.532 5.864L.057 23.997l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.017-1.376l-.36-.214-3.737.98.998-3.648-.235-.374A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
+                    </svg> Hablar con un asesor
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+       FACE ID / CALIBRACIÓN PERSONAL
+  ══════════════════════════════════════════ -->
+    <section class="lp-faceid-section lp-section" id="lp-faceid">
+        <div class="lp-container">
+            <div class="lp-faceid-grid">
+
+                <!-- Columna izquierda: visual -->
+                <div class="lp-faceid-visual lp-fade">
+                    <div class="lp-faceid-phone">
+                        <div class="lp-faceid-screen">
+                            <!-- Scan ring animado -->
+                            <div class="lp-faceid-ring lp-faceid-ring--1"></div>
+                            <div class="lp-faceid-ring lp-faceid-ring--2"></div>
+                            <div class="lp-faceid-ring lp-faceid-ring--3"></div>
+                            <!-- Rostro -->
+                            <div class="lp-faceid-face">
+                                <svg width="96" height="96" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="32" cy="32" r="30" stroke="url(#faceGrad)" stroke-width="2.5"/>
+                                    <circle cx="22" cy="26" r="4" fill="#00BBA7"/>
+                                    <circle cx="42" cy="26" r="4" fill="#00BBA7"/>
+                                    <path d="M20 40 Q32 50 44 40" stroke="#00BBA7" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                                    <defs>
+                                        <linearGradient id="faceGrad" x1="0" y1="0" x2="64" y2="64">
+                                            <stop offset="0%" stop-color="#00BBA7"/>
+                                            <stop offset="100%" stop-color="#155DFC"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <!-- Puntos de mapping facial -->
+                            <div class="lp-faceid-dot" style="top:28%;left:26%"></div>
+                            <div class="lp-faceid-dot" style="top:28%;right:26%"></div>
+                            <div class="lp-faceid-dot" style="top:38%;left:34%"></div>
+                            <div class="lp-faceid-dot" style="top:38%;right:34%"></div>
+                            <div class="lp-faceid-dot" style="top:50%;left:30%"></div>
+                            <div class="lp-faceid-dot" style="top:50%;right:30%"></div>
+                            <div class="lp-faceid-dot" style="top:60%;left:38%"></div>
+                            <div class="lp-faceid-dot" style="top:60%;right:38%"></div>
+                        </div>
+                        <!-- Chips flotantes -->
+                        <div class="lp-faceid-chip lp-faceid-chip--top">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Reconocimiento facial
+                        </div>
+                        <div class="lp-faceid-chip lp-faceid-chip--bottom lp-faceid-chip--teal">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Calibrado · Listo
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna derecha: copy -->
+                <div class="lp-faceid-copy lp-fade">
+                    <span class="lp-tag">✨ Tecnología exclusiva</span>
+                    <h2 style="margin:.4rem 0 1rem;">Calibración emocional <span class="lp-gradient-text">personalizada con Face ID</span></h2>
+                    <p style="font-size:.98rem;color:#4A5565;line-height:1.7;margin-bottom:1.75rem;">
+                        EmoCheck va más allá de los cuestionarios. A través del reconocimiento facial, la plataforma aprende el estado emocional de referencia de cada colaborador y calibra sus evaluaciones de forma individualizada — resultados precisos, no promedios genéricos.
+                    </p>
+
+                    <div class="lp-faceid-features">
+
+                        <div class="lp-faceid-card lp-faceid-card--teal">
+                            <div class="lp-faceid-card-icon lp-faceid-feat-icon--teal">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="5"/><path d="M3 21c0-4 4-7 9-7s9 3 9 7"/></svg>
+                            </div>
+                            <span class="lp-faceid-card-num">01</span>
+                            <strong>Perfil emocional único</strong>
+                            <span>Cada persona tiene su propia línea base. Las alertas se activan según <em>su</em> patrón, no el de todos.</span>
+                        </div>
+
+                        <div class="lp-faceid-card lp-faceid-card--blue">
+                            <div class="lp-faceid-card-icon lp-faceid-feat-icon--blue">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            </div>
+                            <span class="lp-faceid-card-num">02</span>
+                            <strong>Privacidad garantizada</strong>
+                            <span>Los datos biométricos nunca salen del dispositivo. Solo se procesa el vector emocional anonimizado.</span>
+                        </div>
+
+                        <div class="lp-faceid-card lp-faceid-card--lime">
+                            <div class="lp-faceid-card-icon lp-faceid-feat-icon--lime">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                            </div>
+                            <span class="lp-faceid-card-num">03</span>
+                            <strong>Detección temprana de fatiga</strong>
+                            <span>Identifica señales de agotamiento o estrés antes de que se conviertan en ausentismo o burnout.</span>
+                        </div>
+
+                        <div class="lp-faceid-card lp-faceid-card--orange">
+                            <div class="lp-faceid-card-icon lp-faceid-feat-icon--orange">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2m0 16v2M4.22 4.22l1.42 1.42m12.72 12.72 1.42 1.42M2 12h2m16 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                            </div>
+                            <span class="lp-faceid-card-num">04</span>
+                            <strong>Aprendizaje continuo</strong>
+                            <span>El modelo se ajusta semana a semana con cada check-in, volviéndose más preciso con el tiempo.</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Pasos reales del instructivo Face ID -->
+                    <div class="lp-faceid-steps">
+                        <div class="lp-faceid-step">
+                            <div class="lp-faceid-step-icon lp-faceid-step-icon--teal">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                            </div>
+                            <div>
+                                <strong>Cámara y micrófono</strong>
+                                <span>Solo mira la cámara y habla unos segundos. Sin datos almacenados.</span>
+                            </div>
+                        </div>
+                        <div class="lp-faceid-step">
+                            <div class="lp-faceid-step-icon lp-faceid-step-icon--blue">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                            </div>
+                            <div>
+                                <strong>Sigue las instrucciones</strong>
+                                <span>Gira levemente la cabeza, sonríe y respira profundo. &lt; 3 seg.</span>
+                            </div>
+                        </div>
+                        <div class="lp-faceid-step">
+                            <div class="lp-faceid-step-icon lp-faceid-step-icon--lime">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            </div>
+                            <div>
+                                <strong>Relájate y sé tú mismo</strong>
+                                <span>Tus datos son privados y anónimos. No hay respuestas correctas.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+    <footer class="lp-footer">
+        <div class="lp-container">
+            <div class="lp-footer-grid">
+
+                <!-- Marca -->
+                <div class="lp-footer-brand">
+                    <div class="lp-footer-logo-wrap">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span>EmoCheck</span>
+                    </div>
+                    <p>Personas <strong style="color:#9AE600;">sanas,</strong> organizaciones fuertes</p>
+                    <p class="lp-footer-desc">Herramienta digital para la gestión integral de la salud mental y los factores de riesgo psicosocial.</p>
+                    <div class="lp-social">
+                        <a href="#" aria-label="Instagram">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                        </a>
+                        <a href="#" aria-label="LinkedIn">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                        </a>
+                        <a href="https://wa.me/573122503928" target="_blank" rel="noopener" aria-label="WhatsApp">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Navegación -->
+                <div class="lp-footer-col">
+                    <h5>EmoCheck</h5>
+                    <a href="#lp-inicio">Inicio</a>
+                    <a href="#lp-soluciones">Soluciones</a>
+                    <a href="#lp-empresas">Clientes</a>
+                    <a href="#lp-tecnologia">Módulos</a>
+                    <a href="#lp-faceid">Calibración</a>
+                </div>
+
+                <!-- Contacto — datos de la app -->
+                <div class="lp-footer-col">
+                    <h5>Contacto</h5>
+                    <div class="lp-footer-contact">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                        <a href="tel:+573122503928" style="color:inherit;">+57 312 250 3928</a>
+                    </div>
+                    <div class="lp-footer-contact">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                        <a href="https://wa.me/573122503928" target="_blank" rel="noopener" style="color:inherit;">WhatsApp</a>
+                    </div>
+                    <div class="lp-footer-contact">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <a href="mailto:soluciones&#64;emocheck.co" style="color:inherit;">soluciones&#64;emocheck.co</a>
+                    </div>
+                </div>
+
+                <!-- Acceder -->
+                <div class="lp-footer-col">
+                    <h5>Plataforma web</h5>
+                    <button (click)="openSignInModal()" style="cursor:pointer;border:none;background:none;text-align:left;padding:0;color:inherit;font-size:inherit;">Acceder a EmoCheck</button>
+                    <a [routerLink]="'/sign-up'">Crear cuenta</a>
+                </div>
+
+            </div>
+            <div class="lp-footer-bottom">
+                <span>Todos los derechos reservados &copy; 2026 EmoCheck</span>
+                <a href="#">Términos y condiciones</a>
+            </div>
+        </div>
+    </footer>
+
+    <button id="lp-scrollup" aria-label="Volver arriba"><i class="fas fa-chevron-up"></i></button>
+
+    <!-- ══════════════════════════════════════════
+       MODAL: SIGN IN
+  ══════════════════════════════════════════ -->
+    <div *ngIf="showSignInModal" class="sign-in-modal-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Montserrat,Inter,system-ui,-apple-system,sans-serif;">
+        <div class="sign-in-modal" style="position:relative;width:100%;max-width:480px;background:#fff;border-radius:24px;box-shadow:0 24px 80px rgba(0,0,0,0.25);border:1px solid rgba(150,247,228,0.3);" (click)="$event.stopPropagation()">
+
+            <!-- Close button -->
+            <button type="button" (click)="closeSignInModal()" aria-label="Cerrar" style="position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:none;background:#F1F5F9;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:all 0.2s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <!-- Modal content -->
+            <div style="padding:48px 32px 32px 32px;">
+                <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+                    <img style="margin-top:0;width:140px;max-width:100%;" src="images/logo/emocheck-logo.png" alt="EmoCheck" />
+
+                    <div style="margin-top:16px;font-size:20px;font-weight:700;color:#155DFC;">Iniciar Sesión</div>
+
+                    <p style="margin-top:12px;text-align:center;font-size:13px;font-weight:600;line-height:1.4;color:#009689;">
+                        <img style="margin-right:4px;display:inline-block;height:14px;width:14px;vertical-align:middle;" src="icons/Icon.svg" alt="" aria-hidden="true" /> Tu bienestar también es parte de la productividad
+                        <img style="margin-left:4px;display:inline-block;height:14px;width:14px;vertical-align:middle;" src="icons/Icon.svg" alt="" aria-hidden="true" />
+                    </p>
+
+                    <!-- Sign in form -->
+                    <form style="margin-top:32px;width:100%;text-align:left;" [formGroup]="signInForm" #signInNgForm="ngForm">
+                        <!-- Email field -->
+                        <div style="margin-bottom:20px;">
+                            <label style="margin-bottom:8px;display:block;font-size:14px;font-weight:600;line-height:14px;color:#2D3748;">Correo electrónico</label>
+                            <div style="position:relative;">
+                                <div style="position:absolute;top:0;bottom:0;left:0;display:flex;align-items:center;padding-left:12px;">
+                                    <img style="height:20px;width:20px;" src="icons/user-login.svg" alt="" aria-hidden="true" />
+                                </div>
+                                <input type="text" [formControlName]="'email'" placeholder="usuario@empresa.com" style="height:44px;width:100%;border-radius:14px;border:1px solid #96F7E4;background:#F3F3F5;padding:8px 12px 8px 44px;font-size:14px;font-weight:400;line-height:20px;color:#0A0A0A;font-family:Montserrat,sans-serif;box-sizing:border-box;"
+                                />
+                            </div>
+                            <div *ngIf="signInForm.get('email')?.hasError('required') && signInForm.get('email')?.touched" style="margin-top:6px;font-size:13px;color:#DC2626;">
+                                El Correo Electrónico es requerido.
+                            </div>
+                        </div>
+
+                        <!-- Password field -->
+                        <div style="margin-bottom:20px;">
+                            <label style="margin-bottom:8px;display:block;font-size:14px;font-weight:600;line-height:14px;color:#2D3748;">Contraseña</label>
+                            <div style="position:relative;">
+                                <div style="position:absolute;top:0;bottom:0;left:0;display:flex;align-items:center;padding-left:12px;">
+                                    <img style="height:20px;width:20px;" src="icons/password-login.svg" alt="" aria-hidden="true" />
+                                </div>
+                                <input [type]="showPassword ? 'text' : 'password'" [formControlName]="'password'" placeholder="•••••••" style="height:44px;width:100%;border-radius:14px;border:1px solid #96F7E4;background:#F3F3F5;padding:8px 44px 8px 44px;font-size:14px;font-weight:400;line-height:20px;color:#0A0A0A;font-family:Montserrat,sans-serif;box-sizing:border-box;"
+                                />
+                                <button type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Ver contraseña'" style="position:absolute;top:0;bottom:0;right:0;display:flex;align-items:center;padding-right:12px;color:#94A3B8;background:transparent;border:none;cursor:pointer;">
+                                    <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div *ngIf="signInForm.get('password')?.hasError('required') && signInForm.get('password')?.touched" style="margin-top:6px;font-size:13px;color:#DC2626;">
+                                La contraseña es requerida.
+                            </div>
+                        </div>
+
+                        <!-- Remember me and Forgot password -->
+                        <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
+                            <label style="display:flex;align-items:center;cursor:pointer;">
+                                <input 
+                                    type="checkbox" 
+                                    [formControlName]="'rememberMe'"
+                                    style="margin-right:8px;height:16px;width:16px;cursor:pointer;">
+                                <span style="font-size:14px;line-height:20px;color:#4A5565;">Recordarme</span>
+                            </label>
+                            <button type="button" (click)="showForgotModal = true" style="cursor:pointer;border:none;background:transparent;font-size:14px;line-height:20px;color:#009689;text-decoration:none;font-family:Montserrat,sans-serif;">
+                                ¿Olvidaste tu contraseña?
+                            </button>
+                        </div>
+
+                        <!-- Submit button -->
+                        <emo-button variant="primary" size="medium" [fullWidth]="true" [loading]="signInForm.disabled" [disabled]="signInForm.disabled" (clicked)="signIn()">
+                            Ingresar
+                        </emo-button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Privacy notice -->
+            <div style="margin-top:16px;padding-bottom:24px;text-align:center;font-size:13px;font-weight:400;line-height:18px;color:#64748B;padding-left:32px;padding-right:32px;">
+                Tus datos están protegidos bajo los más altos estándares de confidencialidad
+            </div>
+        </div>
     </div>
+
+    <!-- ── Modal: ¿Olvidaste tu contraseña? ─────────────────────────────────── -->
+    <div *ngIf="showForgotModal" class="forgot-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;padding:16px;" (click)="showForgotModal = false">
+        <div class="forgot-modal" style="position:relative;width:100%;max-width:420px;background:#fff;border-radius:24px;padding:36px 28px 28px;box-shadow:0 24px 80px rgba(0,0,0,0.22);font-family:'Montserrat',sans-serif;" (click)="$event.stopPropagation()">
+
+            <button class="forgot-modal__close" type="button" (click)="showForgotModal = false" aria-label="Cerrar" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:none;background:#F1F5F9;color:#64748B;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <div class="forgot-modal__icon" aria-hidden="true" style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,rgba(0,150,137,0.12) 0%,rgba(21,93,252,0.10) 100%);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#009689" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <circle cx="12" cy="16" r="1"></circle>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+
+            <h2 class="forgot-modal__title" style="font-size:18px;font-weight:700;color:#101828;margin:0 0 10px;">¿Olvidaste tu contraseña?</h2>
+            <p class="forgot-modal__text" style="font-size:13.5px;color:#4A5565;line-height:1.6;margin:0 0 20px;">
+                El restablecimiento de contraseña es gestionado por el administrador del sistema. Comunícate con nosotros a través de los siguientes medios y te ayudaremos a recuperar el acceso:
+            </p>
+
+            <div class="forgot-modal__contacts" style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+                <a class="forgot-contact" href="tel:+573122503928" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(148,163,184,0.22);background:#F8FAFC;text-decoration:none;">
+                    <span class="forgot-contact__icon forgot-contact__icon--phone" style="width:40px;height:40px;border-radius:12px;background:#009689;display:flex;align-items:center;justify-content:center;flex:0 0 40px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6.14-6.14 19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </span>
+                    <div class="forgot-contact__info">
+                        <div class="forgot-contact__label" style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">Teléfono / WhatsApp</div>
+                        <div class="forgot-contact__value" style="font-size:13.5px;font-weight:700;color:#101828;margin-top:1px;">+57 312 250 3928</div>
+                    </div>
+                </a>
+
+                <a class="forgot-contact" href="https://wa.me/573122503928?text=Hola!%20Necesito%20ayuda%20para%20restablecer%20mi%20contrasena%20en%20EmoCheck." target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(148,163,184,0.22);background:#F8FAFC;text-decoration:none;">
+                    <span class="forgot-contact__icon forgot-contact__icon--whatsapp" style="width:40px;height:40px;border-radius:12px;background:#25D366;display:flex;align-items:center;justify-content:center;flex:0 0 40px;">
+                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px;">
+                            <path d="M22.9 9.06A9.73 9.73 0 0 0 16.05 6C10.52 6 6.01 10.51 6 16.04a9.97 9.97 0 0 0 1.34 4.99L6 26l5.1-1.34a9.96 9.96 0 0 0 4.77 1.21h.01c5.52 0 10.03-4.51 10.04-10.05a9.98 9.98 0 0 0-2.93-7.76ZM16.06 24.3a8.28 8.28 0 0 1-4.22-1.16l-.3-.18-3.12.82.83-3.05-.2-.31a8.27 8.27 0 0 1-1.27-4.38c0-4.57 3.72-8.28 8.3-8.28a8.3 8.3 0 0 1 8.28 8.3c-.01 4.57-3.73 8.24-8.3 8.24Zm4.55-6.2c-.25-.12-1.47-.72-1.7-.81-.22-.08-.39-.12-.55.13-.16.25-.63.8-.77.97-.14.17-.29.19-.53.06-.25-.12-1.04-.38-1.98-1.22a7.4 7.4 0 0 1-1.37-1.7c-.14-.25-.01-.38.1-.5.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.3-.02-.43-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.41-.55-.42h-.47c-.16 0-.43.06-.66.3-.22.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.13.16 1.73 2.64 4.2 3.7.59.25 1.04.4 1.4.52.59.18 1.12.16 1.54.1.47-.08 1.46-.6 1.67-1.17.2-.58.2-1.07.14-1.17-.06-.1-.22-.16-.47-.28Z" fill="white"/>
+                        </svg>
+                    </span>
+                    <div class="forgot-contact__info">
+                        <div class="forgot-contact__label" style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">WhatsApp</div>
+                        <div class="forgot-contact__value" style="font-size:13.5px;font-weight:700;color:#101828;margin-top:1px;">Escribir mensaje</div>
+                    </div>
+                </a>
+
+                <a class="forgot-contact" href="mailto:soluciones@emocheck.co" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;border:1px solid rgba(148,163,184,0.22);background:#F8FAFC;text-decoration:none;">
+                    <span class="forgot-contact__icon forgot-contact__icon--email" style="width:40px;height:40px;border-radius:12px;background:#155DFC;display:flex;align-items:center;justify-content:center;flex:0 0 40px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </span>
+                    <div class="forgot-contact__info">
+                        <div class="forgot-contact__label" style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">Correo electrónico</div>
+                        <div class="forgot-contact__value" style="font-size:13.5px;font-weight:700;color:#101828;margin-top:1px;">soluciones&#64;emocheck.co</div>
+                    </div>
+                </a>
+            </div>
+
+            <button class="forgot-modal__btn" type="button" (click)="showForgotModal = false" style="width:100%;height:44px;border-radius:14px;border:none;background:linear-gradient(135deg,#009689 0%,#155DFC 100%);color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
+                Entendido
+            </button>
+        </div>
+    </div>
+
 </div>

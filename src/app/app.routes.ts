@@ -24,9 +24,9 @@ export const appRoutes: Route[] = [
                 path: 'welcome',
                 data: {
                     seo: {
-                        title: 'Bienvenido',
-                        description: 'Descubre EmoCheck, la plataforma de bienestar emocional y salud mental laboral. Evalúa el estado emocional de tu equipo con tecnología de análisis facial e instrumentos psicológicos validados.',
-                        keywords: 'bienestar emocional, salud mental laboral, evaluación emocional, EmoCheck, bienvenida',
+                        title: 'EmoCheck - Tecnología que Escucha, Analiza y Cuida la Mente | Análisis Facial IA',
+                        description: '✨ Descubre EmoCheck, la plataforma líder en bienestar emocional y salud mental laboral. Análisis facial por IA, evaluación de riesgo psicosocial, clima organizacional y fatiga laboral. 🛡️ 100% SG-SST Normativo. Transforma el bienestar de tu equipo con ciencia de datos.',
+                        keywords: 'EmoCheck, bienestar emocional laboral, análisis facial IA, salud mental empresarial, riesgo psicosocial, clima organizacional, burnout, fatiga laboral, SG-SST, wellness corporativo, tecnología bienestar, evaluación emocional, análisis predictivo',
                         canonical: '/welcome',
                     }
                 },
@@ -36,8 +36,8 @@ export const appRoutes: Route[] = [
                 path: 'sign-in',
                 data: {
                     seo: {
-                        title: 'Iniciar Sesión',
-                        description: 'Accede a EmoCheck con tu cuenta para monitorear el bienestar emocional de tu organización.',
+                        title: 'Iniciar Sesión - EmoCheck | Accede a tu Plataforma de Bienestar Emocional',
+                        description: 'Accede a EmoCheck para monitorear el bienestar emocional de tu organización. Dashboard en tiempo real, análisis facial IA y gestión integral de salud mental laboral.',
                         canonical: '/sign-in',
                     }
                 },
