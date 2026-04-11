@@ -3,6 +3,7 @@ import { initialDataResolver } from 'app/app.resolvers';
 import { AuthGuard } from 'app/core/auth/guards/auth.guard';
 import { NoAuthGuard } from 'app/core/auth/guards/noAuth.guard';
 import { RoleGuard } from 'app/core/auth/guards/role.guard';
+import { ModuleGuard } from 'app/core/auth/guards/module.guard';
 import { LayoutComponent } from 'app/layout/layout.component';
 
 export const appRoutes: Route[] = [
@@ -164,22 +165,26 @@ export const appRoutes: Route[] = [
             },
             {
                 path: 'mental-health',
-                data: { seo: { title: 'Evaluación de Salud Mental', canonical: '/mental-health' } },
+                canActivate: [ModuleGuard],
+                data: { moduleId: 1, seo: { title: 'Evaluación de Salud Mental', canonical: '/mental-health' } },
                 loadChildren: () => import('app/modules/admin/pages/questions/mental-health/mental-health.routes'),
             },
             {
                 path: 'work-fatigue',
-                data: { seo: { title: 'Evaluación de Fatiga Laboral', canonical: '/work-fatigue' } },
+                canActivate: [ModuleGuard],
+                data: { moduleId: 2, seo: { title: 'Evaluación de Fatiga Laboral', canonical: '/work-fatigue' } },
                 loadChildren: () => import('app/modules/admin/pages/questions/work-fatigue/work-fatigue.routes'),
             },
             {
                 path: 'organizational-climate',
-                data: { seo: { title: 'Evaluación de Clima Organizacional', canonical: '/organizational-climate' } },
+                canActivate: [ModuleGuard],
+                data: { moduleId: 3, seo: { title: 'Evaluación de Clima Organizacional', canonical: '/organizational-climate' } },
                 loadChildren: () => import('app/modules/admin/pages/questions/organizational-climate/organizational-climate.routes'),
             },
             {
                 path: 'psychosocial-risk',
-                data: { seo: { title: 'Evaluación de Riesgo Psicosocial', canonical: '/psychosocial-risk' } },
+                canActivate: [ModuleGuard],
+                data: { moduleId: 4, seo: { title: 'Evaluación de Riesgo Psicosocial', canonical: '/psychosocial-risk' } },
                 loadChildren: () => import('app/modules/admin/pages/questions/psychosocial-risk/psychosocial-risk.routes'),
             },
         ]

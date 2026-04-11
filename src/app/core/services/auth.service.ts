@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError, of } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, of, forkJoin } from 'rxjs';
 import { catchError, finalize, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { ApiResponse, LoginRequest, LoginResponse, User } from '../models/auth.model';
 import { environment } from '../../../environments/environment';
@@ -67,6 +67,7 @@ export class AuthService {
             companyId: data?.companyID ?? data?.company?.id ?? undefined,
             companyName: data?.companyName ?? data?.company?.name ?? undefined,
             avatar: data?.profilePhotoUrl ?? data?.avatarUrl ?? data?.avatar ?? undefined,
+            enabledModuleIds: Array.isArray(data?.enabledModuleIds) ? data.enabledModuleIds.map(Number) : undefined,
         };
     }
 
@@ -88,20 +89,38 @@ export class AuthService {
 
     private fetchCurrentUserFromApi(): Observable<User> {
         // Backend V5: GET /api/users/me devuelve el perfil del usuario autenticado.
-        return this.httpClient.get<any>(`${this.apiUrl}/users/me`).pipe(
-            map((res: any) => {
+        // GET /api/user-modules/me devuelve los módulos habilitados para el usuario.
+        // Ambas llamadas se hacen en paralelo para poblar enabledModuleIds.
+        return forkJoin({
+            profile: this.httpClient.get<any>(`${this.apiUrl}/users/me`),
+            modules: this.httpClient.get<any>(`${this.apiUrl}/user-modules/me`).pipe(
+                catchError(() => of(null)) // si falla, seguimos sin módulos
+            ),
+        }).pipe(
+            map(({ profile, modules }) => {
                 // Handle both wrapped (ApiResponse with data) and flat response formats
-                const userData = res?.data ?? res;
+                const userData = profile?.data ?? profile;
 
                 // If wrapped response, check success flag
-                if (typeof res?.success === 'boolean' && !res.success) {
-                    throw { status: 400, message: res?.message || 'No fue posible obtener el usuario actual', errors: res?.errors };
+                if (typeof profile?.success === 'boolean' && !profile.success) {
+                    throw { status: 400, message: profile?.message || 'No fue posible obtener el usuario actual', errors: profile?.errors };
                 }
 
                 const user = this.mapApiUserToAuthUser(userData ?? {});
                 if (!user?.id || user.id <= 0) {
                     throw { status: 500, message: 'Respuesta inválida de /users/me (userID)' };
                 }
+
+                // Merge enabledModuleIds from /user-modules/me
+                if (modules !== null) {
+                    const raw = modules?.data ?? modules;
+                    if (Array.isArray(raw)) {
+                        user.enabledModuleIds = raw
+                            .filter((m: any) => m?.isEnabled === true)
+                            .map((m: any) => Number(m.moduleID));
+                    }
+                }
+
                 return user;
             })
         );
@@ -367,6 +386,21 @@ export class AuthService {
     /** Verdadero si el usuario autenticado tiene el rol HRManager (y NO SuperAdmin/SystemAdmin) */
     isHRManager(): boolean {
         return this.isCompanyScoped();
+    }
+
+    /**
+     * Verdadero si el usuario tiene acceso al módulo indicado.
+     * Los roles de administrador siempre tienen acceso.
+     * Para otros roles, verifica enabledModuleIds; si no está definido, permite acceso.
+     */
+    hasModuleAccess(moduleId: number): boolean {
+        const user = this.currentUserSubject.value;
+        if (!user) return false;
+        const roles = (user.roles ?? []).map(r => r.trim().toLowerCase());
+        const isAdmin = roles.some(r => ['superadmin', 'systemadmin', 'admin', 'companyadmin', 'hrmanager'].includes(r));
+        if (isAdmin) return true;
+        if (!Array.isArray(user.enabledModuleIds)) return true; // sin restricción explícita → permitir
+        return user.enabledModuleIds.includes(moduleId);
     }
 
     /**

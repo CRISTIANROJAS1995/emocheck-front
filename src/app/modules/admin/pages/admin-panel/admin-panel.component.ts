@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
 import { AdminUserListItemDto, AdminUsersService, AdminUpdateUserRequestDto, BulkUploadResult } from 'app/core/services/admin-users.service';
 import { AuthService } from 'app/core/services/auth.service';
+import { UserModulesService, UserModulePermission } from 'app/core/services/user-modules.service';
 import {
     AdminOrganizationService,
     CompanyDto, SiteDto, AreaDto, JobTypeDto, RoleDto,
@@ -86,6 +87,7 @@ export class AdminPanelComponent implements OnInit {
         private readonly orgService: AdminOrganizationService,
         private readonly alert: AlertService,
         private readonly auth: AuthService,
+        private readonly userModules: UserModulesService,
     ) { }
 
     ngOnInit(): void {
@@ -386,6 +388,11 @@ export class AdminPanelComponent implements OnInit {
     /** Flag para mostrar spinner mientras se cambia un rol individualmente */
     savingRole = false;
 
+    // ── Module Permissions ──
+    modulePermissions: UserModulePermission[] = [];
+    loadingModulePermissions = false;
+    savingModulePermissions = false;
+
     startEditUser(user: AdminUserListItemDto): void {
         this.editingUser = user;
         this.showEditForm = true;
@@ -423,12 +430,62 @@ export class AdminPanelComponent implements OnInit {
                 .map(roleName => this.roleOptions.find(r => r.name.toLowerCase() === roleName.toLowerCase())?.id)
                 .filter((id): id is number => id !== undefined)
         );
+        // Cargar permisos de módulos (solo SuperAdmin ve esta sección)
+        if (this.isSuperAdmin) {
+            this.loadModulePermissions(user.userId);
+        }
     }
 
     cancelEdit(): void {
         this.showEditForm = false;
         this.editingUser = null;
         this.editRoleIDs = new Set();
+        this.modulePermissions = [];
+    }
+
+    // ── Module Permissions ──
+
+    loadModulePermissions(userId: number): void {
+        this.loadingModulePermissions = true;
+        this.modulePermissions = [];
+        this.userModules.getUserModules(userId)
+            .pipe(finalize(() => (this.loadingModulePermissions = false)))
+            .subscribe({
+                next: (perms) => { this.modulePermissions = perms; },
+                error: () => { this.modulePermissions = []; },
+            });
+    }
+
+    isModuleEnabled(moduleId: number): boolean {
+        return this.modulePermissions.find(p => p.moduleID === moduleId)?.isEnabled ?? false;
+    }
+
+    toggleModulePermission(moduleId: number): void {
+        if (!this.editingUser) return;
+        const current = this.modulePermissions.find(p => p.moduleID === moduleId);
+        if (!current) return;
+        const newValue = !current.isEnabled;
+        this.savingModulePermissions = true;
+        this.userModules.toggleModule(this.editingUser.userId, moduleId, newValue)
+            .pipe(finalize(() => (this.savingModulePermissions = false)))
+            .subscribe({
+                next: () => {
+                    current.isEnabled = newValue;
+                },
+                error: (e) => this.alert.error(this.extractErrorMessage(e, 'No fue posible cambiar el permiso del módulo')),
+            });
+    }
+
+    saveModulePermissions(): void {
+        if (!this.editingUser || !this.modulePermissions.length) return;
+        this.savingModulePermissions = true;
+        const permissions = this.modulePermissions.map(p => ({ moduleID: p.moduleID, isEnabled: p.isEnabled }));
+        this.userModules.saveAllPermissions(this.editingUser.userId, permissions)
+            .pipe(finalize(() => (this.savingModulePermissions = false)))
+            .subscribe({
+                next: () => this.alert.success('Permisos de módulo actualizados. Los cambios tomarán efecto en la próxima sesión del usuario.'),
+                error: (e) => this.alert.error(this.extractErrorMessage(e, 'No fue posible guardar los permisos')),
+            });
     }
 
     hasEditRole(roleId: number): boolean {

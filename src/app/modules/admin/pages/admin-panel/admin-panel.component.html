@@ -184,8 +184,7 @@
                                 @if (createForm.get('companyID')?.invalid && createForm.get('companyID')?.touched) {
                                 <span class="editor-panel__field-error">La empresa es requerida</span>
                                 }
-                            </label>
-                            }
+                            </label> }
                             <label class="editor-panel__field" [class.editor-panel__field--invalid]="createForm.get('siteID')?.invalid && createForm.get('siteID')?.touched">
                                 <span>Sede *</span>
                                 <select formControlName="siteID">
@@ -279,8 +278,7 @@
                                     </mat-select>
                                 </mat-form-field>
                                 @if (createForm.get('roleIDs')?.invalid && createForm.get('roleIDs')?.touched) {
-                                <span class="editor-panel__field-error">Debe seleccionar al menos un rol</span>
-                                }
+                                <span class="editor-panel__field-error">Debe seleccionar al menos un rol</span> }
                             </div>
                         </div>
                     </div>
@@ -293,8 +291,7 @@
                             Datos del Evaluador Psicólogo
                         </div>
                         <p class="form-section__description">
-                            Completa los datos profesionales del psicólogo/a evaluador.
-                            Esta información quedará registrada en el sistema para su identificación y trazabilidad.
+                            Completa los datos profesionales del psicólogo/a evaluador. Esta información quedará registrada en el sistema para su identificación y trazabilidad.
                         </p>
                         <div class="editor-panel__grid">
                             <label class="editor-panel__field">
@@ -352,8 +349,7 @@
                     <!-- Sección: Datos sociodemográficos -->
                     <div class="form-section">
                         <div class="form-section__title">
-                            <mat-icon>people_alt</mat-icon> Datos Sociodemográficos <span
-                                class="form-section__optional">(opcionales)</span>
+                            <mat-icon>people_alt</mat-icon> Datos Sociodemográficos <span class="form-section__optional">(opcionales)</span>
                         </div>
                         <div class="editor-panel__grid">
                             <label class="editor-panel__field">
@@ -530,16 +526,14 @@
                 <mat-icon>table_view</mat-icon> Descargar Plantilla Excel (.xlsx)
             </button>
             <p class="section-help">
-                <strong>✨ Excel nativo:</strong> Archivo .xlsx real con formato, colores, anchos de columna optimizados
-                y 15 filas vacías listas para completar.
+                <strong>✨ Excel nativo:</strong> Archivo .xlsx real con formato, colores, anchos de columna optimizados y 15 filas vacías listas para completar.
             </p>
         </div>
         <!-- File Upload -->
         <div class="bulk-upload-section">
             <h4>📂 2. Subir Archivo Excel (.xlsx)</h4>
             <div class="file-upload-area">
-                <input type="file" id="bulk-upload-file" accept=".xlsx" (change)="onFileSelected($event)"
-                    style="display: none;" />
+                <input type="file" id="bulk-upload-file" accept=".xlsx" (change)="onFileSelected($event)" style="display: none;" />
                 <label for="bulk-upload-file" class="file-upload-button">
                     <mat-icon>attach_file</mat-icon>
                     {{ selectedFile ? selectedFile.name : 'Seleccionar archivo .xlsx' }}
@@ -817,20 +811,51 @@
                     <div class="form-section">
                         <div class="form-section__title">
                             <mat-icon>shield</mat-icon> Roles asignados @if (savingRole) {
-                            <mat-progress-spinner diameter="14" mode="indeterminate"
-                                style="display:inline-block;margin-left:6px"></mat-progress-spinner>
+                            <mat-progress-spinner diameter="14" mode="indeterminate" style="display:inline-block;margin-left:6px"></mat-progress-spinner>
                             }
                         </div>
                         <div class="editor-panel__roles-grid">
                             @for (role of roleOptions; track role.id) {
-                            <button type="button" class="role-toggle" [class.role-toggle--active]="hasEditRole(role.id)"
-                                [disabled]="savingRole" (click)="toggleEditRole(role.id)">
+                            <button type="button" class="role-toggle" [class.role-toggle--active]="hasEditRole(role.id)" [disabled]="savingRole" (click)="toggleEditRole(role.id)">
                                 <mat-icon>{{ hasEditRole(role.id) ? 'check_circle' : 'radio_button_unchecked'
                                     }}</mat-icon>
                                 {{ role.name }}
                             </button> }
                         </div>
                     </div>
+
+                    <!-- Módulos habilitados (solo visible para SuperAdmin) -->
+                    @if (isSuperAdmin) {
+                    <div class="form-section">
+                        <div class="form-section__title">
+                            <mat-icon>view_module</mat-icon> Módulos habilitados @if (loadingModulePermissions) {
+                            <mat-progress-spinner diameter="14" mode="indeterminate" style="display:inline-block;margin-left:6px"></mat-progress-spinner>
+                            } @if (savingModulePermissions) {
+                            <mat-progress-spinner diameter="14" mode="indeterminate" style="display:inline-block;margin-left:6px"></mat-progress-spinner>
+                            }
+                        </div>
+                        @if (!loadingModulePermissions && modulePermissions.length > 0) {
+                        <div class="editor-panel__modules-grid">
+                            @for (perm of modulePermissions; track perm.moduleID) {
+                            <div class="module-permission-row">
+                                <span class="module-permission-row__name">{{ perm.moduleName }}</span>
+                                <button type="button" class="module-toggle" [class.module-toggle--on]="perm.isEnabled" [disabled]="savingModulePermissions" (click)="toggleModulePermission(perm.moduleID)" [attr.aria-label]="(perm.isEnabled ? 'Deshabilitar' : 'Habilitar') + ' ' + perm.moduleName">
+                                    <mat-icon>{{ perm.isEnabled ? 'toggle_on' : 'toggle_off' }}</mat-icon>
+                                    {{ perm.isEnabled ? 'ON' : 'OFF' }}
+                                </button>
+                            </div>
+                            }
+                        </div>
+                        <div class="editor-panel__modules-actions">
+                            <button type="button" class="btn btn--sm btn--outline" [disabled]="savingModulePermissions || loadingModulePermissions" (click)="saveModulePermissions()">
+                                <mat-icon>save</mat-icon> Guardar permisos
+                            </button>
+                        </div>
+                        } @if (!loadingModulePermissions && modulePermissions.length === 0) {
+                        <p class="form-section__empty">No se pudieron cargar los permisos de módulo.</p>
+                        }
+                    </div>
+                    }
 
                 </form>
             </div>
@@ -849,26 +874,21 @@
     <div class="admin-filters">
         <div class="admin-filters__group">
             <mat-icon class="admin-filters__icon">search</mat-icon>
-            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()"
-                placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
+            <input type="text" [(ngModel)]="searchText" (ngModelChange)="applyFilter()" placeholder="Nombre, email, empresa o rol..." class="admin-filters__search" />
         </div>
         <div class="admin-filters__actions">
             <span class="admin-filters__count">{{ filteredUsers.length }} de {{ users.length }}</span>
             <button class="btn btn--outline btn--sm" (click)="loadUsers()" [disabled]="loading">
                 <mat-icon>refresh</mat-icon> Actualizar
-            </button>
-            @if (!isCompanyScoped) {
-            <button class="btn btn--secondary btn--sm"
-                (click)="showBulkUpload = !showBulkUpload; showCreateForm = false; showEditForm = false">
+            </button> @if (!isCompanyScoped) {
+            <button class="btn btn--secondary btn--sm" (click)="showBulkUpload = !showBulkUpload; showCreateForm = false; showEditForm = false">
                 <mat-icon>{{ showBulkUpload ? 'close' : 'upload' }}</mat-icon>
                 {{ showBulkUpload ? 'Cerrar' : 'Carga Masiva' }}
             </button>
-            <button class="btn btn--primary btn--sm"
-                (click)="showCreateForm = !showCreateForm; showEditForm = false; showBulkUpload = false">
+            <button class="btn btn--primary btn--sm" (click)="showCreateForm = !showCreateForm; showEditForm = false; showBulkUpload = false">
                 <mat-icon>{{ showCreateForm ? 'close' : 'person_add' }}</mat-icon>
                 {{ showCreateForm ? 'Cerrar' : 'Nuevo Usuario' }}
-            </button>
-            }
+            </button> }
         </div>
     </div>
 
@@ -911,8 +931,7 @@
                     <td>{{ u.areaName ?? '---' }}</td>
                     <td>
                         @for (role of (u.roles ?? []); track role) {
-                        <span class="badge badge--indigo" style="margin-right:4px;margin-bottom:2px">{{ role }}</span> }
-                        @if (!(u.roles ?? []).length) {
+                        <span class="badge badge--indigo" style="margin-right:4px;margin-bottom:2px">{{ role }}</span> } @if (!(u.roles ?? []).length) {
                         <span class="badge badge--neutral">Sin rol</span> }
                     </td>
                     <td>
@@ -922,27 +941,19 @@
                     </td>
                     <td class="actions-cell">
                         @if (!isCompanyScoped) {
-                        <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()"
-                            title="Editar">
+                        <button class="btn btn--outline btn--xs" (click)="startEditUser(u);$event.stopPropagation()" title="Editar">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()"
-                            [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
+                        <button class="btn btn--outline btn--xs" (click)="toggleActive(u);$event.stopPropagation()" [disabled]="saving" [title]="u.isActive ? 'Desactivar' : 'Activar'">
                             <mat-icon>{{ u.isActive ? 'person_off' : 'person' }}</mat-icon>
-                        </button>
-                        @if (isSuperAdmin) {
-                        <button class="btn btn--warning btn--xs" (click)="resetPassword(u);$event.stopPropagation()"
-                            [disabled]="saving" title="Restablecer contraseña">
+                        </button> @if (isSuperAdmin) {
+                        <button class="btn btn--warning btn--xs" (click)="resetPassword(u);$event.stopPropagation()" [disabled]="saving" title="Restablecer contraseña">
                             <mat-icon>lock_reset</mat-icon>
-                        </button>
-                        }
-                        <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()"
-                            [disabled]="saving" title="Eliminar">
+                        </button> }
+                        <button class="btn btn--danger btn--xs" (click)="deleteUser(u);$event.stopPropagation()" [disabled]="saving" title="Eliminar">
                             <mat-icon>delete</mat-icon>
-                        </button>
-                        } @else {
-                        <span class="badge badge--neutral">Solo lectura</span>
-                        }
+                        </button> } @else {
+                        <span class="badge badge--neutral">Solo lectura</span> }
                     </td>
                 </tr>
                 }

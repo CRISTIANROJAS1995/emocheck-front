@@ -11,6 +11,15 @@ import { AssessmentOutcome, AssessmentModuleId } from 'app/core/models/assessmen
 import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
 import { AssessmentService } from 'app/core/services/assessment.service';
 import { getAssessmentModuleDefinition } from 'app/core/constants/assessment-modules';
+import { AuthService } from 'app/core/services/auth.service';
+
+/** Mapeo de moduleID numérico (API) → AssessmentModuleId (frontend) */
+const MODULE_ID_MAP: Record<number, AssessmentModuleId> = {
+    1: 'mental-health',
+    2: 'work-fatigue',
+    3: 'organizational-climate',
+    4: 'psychosocial-risk',
+};
 
 interface Module extends ModuleCardData {
     route: string;
@@ -90,7 +99,8 @@ export class HomeComponent implements OnInit {
         private userService: UserService,
         private assessmentState: AssessmentStateService,
         private assessmentHydration: AssessmentHydrationService,
-        private assessmentService: AssessmentService
+        private assessmentService: AssessmentService,
+        private authService: AuthService,
     ) { }
 
     ngOnInit(): void {
@@ -99,7 +109,21 @@ export class HomeComponent implements OnInit {
 
         this.assessmentService.getActiveModuleIds().subscribe({
             next: (ids) => {
-                this.baseModules = ids.map((id) => {
+                // Filter by the user's enabled module permissions
+                const authUser = this.authService.getCurrentUser();
+                const enabledModuleIds = authUser?.enabledModuleIds;
+                const isAdmin = (authUser?.roles ?? []).some(r =>
+                    ['superadmin', 'systemadmin', 'admin', 'companyadmin', 'hrmanager'].includes(r.trim().toLowerCase())
+                );
+
+                const filteredIds = (enabledModuleIds && !isAdmin)
+                    ? ids.filter(id => {
+                        const numericId = Object.entries(MODULE_ID_MAP).find(([, v]) => v === id)?.[0];
+                        return numericId !== undefined && enabledModuleIds.includes(Number(numericId));
+                    })
+                    : ids;
+
+                this.baseModules = filteredIds.map((id) => {
                     const def = getAssessmentModuleDefinition(id);
                     return {
                         id: def.id,

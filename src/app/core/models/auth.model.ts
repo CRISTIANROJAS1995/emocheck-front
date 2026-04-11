@@ -21,6 +21,7 @@ export interface User {
   isActive?: boolean;
   createdAt?: string;
   avatar?: string; // 🖼️ URL del avatar (opcional)
+  enabledModuleIds?: number[]; // IDs de módulos habilitados para este usuario
 }
 
 // 📊 Response wrapper para APIs
