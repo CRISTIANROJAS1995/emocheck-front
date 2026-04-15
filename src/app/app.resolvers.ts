@@ -19,7 +19,7 @@ export const initialDataResolver = () => {
             forkJoin([
                 navigationService.get(),
                 userService.get().pipe(catchError(() => of(null))),
-            ])
+            ]).pipe(catchError(() => of([null, null])))
         )
     );
 };

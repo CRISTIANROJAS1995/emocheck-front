@@ -46,7 +46,7 @@ export class SignedInRedirectComponent implements OnInit {
                         catchError(() => of('/informed-consent'))
                     );
                 }),
-                catchError(() => of('/sign-in'))
+                catchError(() => of('/welcome'))
             )
             .subscribe((target) => {
                 this.router.navigateByUrl(target);

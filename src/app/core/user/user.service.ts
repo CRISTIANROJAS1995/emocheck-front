@@ -2,12 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { User } from 'app/core/user/user.types';
 import { catchError, map, Observable, ReplaySubject, tap, throwError } from 'rxjs';
 import { UsersService } from 'app/core/services/users.service';
-import { AuthService } from 'app/core/services/auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
     private _usersService = inject(UsersService);
-    private _authService = inject(AuthService);
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
 
     // -----------------------------------------------------------------------------------------------------
@@ -48,9 +46,6 @@ export class UserService {
                 return user;
             }),
             catchError((err) => {
-                if (err?.status === 401) {
-                    this._authService.logout();
-                }
                 return throwError(() => err);
             }),
             tap((user) => this._user.next(user))

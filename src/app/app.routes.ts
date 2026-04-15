@@ -33,17 +33,7 @@ export const appRoutes: Route[] = [
                 },
                 loadChildren: () => import('app/modules/landing/welcome/welcome.routes'),
             },
-            {
-                path: 'sign-in',
-                data: {
-                    seo: {
-                        title: 'Iniciar Sesión - EmoCheck | Accede a tu Plataforma de Bienestar Emocional',
-                        description: 'Accede a EmoCheck para monitorear el bienestar emocional de tu organización. Dashboard en tiempo real, análisis facial IA y gestión integral de salud mental laboral.',
-                        canonical: '/sign-in',
-                    }
-                },
-                loadChildren: () => import('app/modules/auth/sign-in/sign-in.routes'),
-            },
+            { path: 'sign-in', redirectTo: '/welcome', pathMatch: 'full' },
         ]
     },
 

@@ -9,7 +9,7 @@ export const AuthGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
     // Verificación síncrona directa: si hay token en localStorage la sesión es válida.
     // La rehidratación del usuario ocurre en background (initializeAuth).
     // Si el token está expirado/inválido, el error de la API llamará a logout() y
-    // redirigirá a /sign-in automáticamente.
+    // redirigirá a /welcome automáticamente.
     const hasToken = !!authService.getToken();
 
     if (!hasToken) {

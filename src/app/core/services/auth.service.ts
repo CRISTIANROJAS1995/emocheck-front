@@ -307,10 +307,16 @@ export class AuthService {
             );
     }
 
+    private isLoggingOut = false;
+
     /** Cerrar sesión */
     logout(): void {
+        if (this.isLoggingOut) return;
+        this.isLoggingOut = true;
         this.clearSession();
-        this.router.navigate(['/welcome']);
+        this.router.navigate(['/welcome']).finally(() => {
+            this.isLoggingOut = false;
+        });
     }
 
     /** Verificar si el usuario está autenticado */
@@ -367,13 +373,12 @@ export class AuthService {
                     // expiresIn no está en Swagger para refresh; mantenemos 0 (no usado en UI)
                     return { token: nextToken, refreshToken: nextRefresh, expiresIn: 0 };
                 }),
-                switchMap((data) => {
+                tap((data) => {
                     localStorage.setItem(environment.tokenStorageKey, data.token);
                     localStorage.setItem(environment.refreshTokenStorageKey, data.refreshToken);
                     this.isAuthenticatedSubject.next(true);
-
-                    // Fuente de verdad: /users/current
-                    return this.reloadCurrentUser().pipe(map(() => data));
+                    // No recargamos /users/me aquí: el usuario en memoria es válido.
+                    // Si /users/me falla por una razón temporal no debemos invalidar tokens buenos.
                 })
             );
     }

@@ -8,7 +8,7 @@ import {
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { Observable, catchError, finalize, map, shareReplay, switchMap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, shareReplay, switchMap, throwError, timeout } from 'rxjs';
 
 /**
  * AuthInterceptor
@@ -66,6 +66,7 @@ function refreshTokenOnce(authService: AuthService): Observable<string> {
 
   refresh$ = authService.refreshSession().pipe(
     map((data) => data.token),
+    timeout(10_000), // si el refresh tarda más de 10s, tratar como fallo
     shareReplay({ bufferSize: 1, refCount: false }),
     finalize(() => {
       refresh$ = null;
