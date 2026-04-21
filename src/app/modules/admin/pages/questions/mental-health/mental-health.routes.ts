@@ -26,6 +26,7 @@ export default [
     {
         path: 'instrument-results',
         component: InstrumentResultsComponent,
+        data: { moduleId: 'mental-health' },
     },
     {
         path: 'results',
