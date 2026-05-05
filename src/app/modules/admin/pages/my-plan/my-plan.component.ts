@@ -1,5 +1,6 @@
 ﻿import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
@@ -8,6 +9,10 @@ import { map, switchMap, tap } from 'rxjs/operators';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
 import { UserService } from 'app/core/user/user.service';
 import { ActionPlanService, ActionPlanStepDto } from 'app/core/services/action-plan.service';
+import { AssessmentHydrationService } from 'app/core/services/assessment-hydration.service';
+import { AssessmentStateService } from 'app/core/services/assessment-state.service';
+import { AssessmentModuleId, AssessmentResult } from 'app/core/models/assessment.model';
+import { MH_WEEKS, FL_WEEKS, PlanWeekData } from './my-plan-weeks.data';
 
 // â”€â”€ Interfaces â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -402,18 +407,21 @@ const STEP_KEY_SUFFIX: Record<string, string> = {
 
 type StaticSectionCfg = { id: string; title: string; children?: { id: string; title: string }[] };
 
-/** Secciones estáticas por moduleCode — fallback cuando la API no tiene datos para este usuario */
+/** Secciones estáticas por moduleCode — fallback cuando la API no tiene datos para este usuario.
+ *  NOTA: SALUD_MENTAL se genera dinámicamente por nivel de riesgo; ver _getMhSections().
+ */
 const STATIC_SECTIONS: Record<string, StaticSectionCfg[]> = {
     SALUD_MENTAL: [
+        // Placeholder — se sobreescribe por _getMhSections() con el nivel de riesgo real
         { id: 'mh-bienvenida', title: 'Bienvenida' },
-        { id: 'mh-s1', title: 'Semana #1: El universo del ánimo' },
-        { id: 'mh-s2', title: 'Semana #2: Decodificación' },
-        { id: 'mh-s3', title: 'Semana #3: El bucle del ánimo' },
-        { id: 'mh-s4', title: 'Semana #4: Tres pasos para el descanso' },
-        { id: 'mh-s5', title: 'Semana #5: P.A.C.O.' },
-        { id: 'mh-s6', title: 'Semana #6: Descarga 180°' },
-        { id: 'mh-s7', title: 'Semana #7: La habitación' },
-        { id: 'mh-s8', title: 'Semana #8: Pirámide de logros' },
+        { id: 'mh-s1', title: 'Semana #1' },
+        { id: 'mh-s2', title: 'Semana #2' },
+        { id: 'mh-s3', title: 'Semana #3' },
+        { id: 'mh-s4', title: 'Semana #4' },
+        { id: 'mh-s5', title: 'Semana #5' },
+        { id: 'mh-s6', title: 'Semana #6' },
+        { id: 'mh-s7', title: 'Semana #7' },
+        { id: 'mh-s8', title: 'Semana #8' },
         { id: 'mh-s9', title: 'Semana #9: Y tú emoción habla ¿La escuchas?' },
         { id: 'mh-s10', title: 'Semana #10: Interruptores del sueño' },
         { id: 'mh-s11', title: 'Semana #11: Ruta hacia el buen dormir' },
@@ -421,28 +429,20 @@ const STATIC_SECTIONS: Record<string, StaticSectionCfg[]> = {
         { id: 'mh-cierre', title: 'Cierre y certificado' },
     ],
     FATIGA: [
+        // Placeholder — se sobreescribe por _getFLSections() con el nivel de riesgo real
         { id: 'fl-bienvenida', title: 'Bienvenida' },
-        {
-            id: 'fl-aprende', title: 'Aprende', children: [
-                { id: 'fl-aprende-s1', title: 'Semana 1' },
-                { id: 'fl-aprende-s2', title: 'Semana 2' },
-                { id: 'fl-aprende-s3', title: 'Semana 3' },
-            ]
-        },
-        {
-            id: 'fl-conecta', title: 'Conecta', children: [
-                { id: 'fl-conecta-s1', title: 'Semana 4' },
-                { id: 'fl-conecta-s2', title: 'Semana 5' },
-                { id: 'fl-conecta-s3', title: 'Semana 6' },
-            ]
-        },
-        {
-            id: 'fl-actua', title: 'Actúa', children: [
-                { id: 'fl-actua-s1', title: 'Semana 7' },
-                { id: 'fl-actua-s2', title: 'Semana 8' },
-                { id: 'fl-actua-s3', title: 'Semana 9' },
-            ]
-        },
+        { id: 'fl-s1', title: 'Semana #1' },
+        { id: 'fl-s2', title: 'Semana #2' },
+        { id: 'fl-s3', title: 'Semana #3' },
+        { id: 'fl-s4', title: 'Semana #4' },
+        { id: 'fl-s5', title: 'Semana #5' },
+        { id: 'fl-s6', title: 'Semana #6' },
+        { id: 'fl-s7', title: 'Semana #7' },
+        { id: 'fl-s8', title: 'Semana #8' },
+        { id: 'fl-s9', title: 'Semana #9' },
+        { id: 'fl-s10', title: 'Semana #10' },
+        { id: 'fl-s11', title: 'Semana #11' },
+        { id: 'fl-s12', title: 'Semana #12' },
         { id: 'fl-cierre', title: 'Cierre y certificado' },
     ],
     RIESGO_PSICOSOCIAL: [
@@ -560,6 +560,14 @@ const STATIC_SECTIONS: Record<string, StaticSectionCfg[]> = {
     ],
 };
 
+/** Maps moduleCode (action-plan domain) to AssessmentModuleId (assessment domain) */
+const MODULE_CODE_TO_ASSESSMENT_ID: Partial<Record<string, AssessmentModuleId>> = {
+    SALUD_MENTAL: 'mental-health',
+    FATIGA: 'work-fatigue',
+    RIESGO_PSICOSOCIAL: 'psychosocial-risk',
+    CLIMA_ORGANIZACIONAL: 'organizational-climate',
+};
+
 // â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Component({
@@ -572,6 +580,9 @@ const STATIC_SECTIONS: Record<string, StaticSectionCfg[]> = {
 export class MyPlanComponent implements OnInit {
     private readonly _userService = inject(UserService);
     private readonly _actionPlanSvc = inject(ActionPlanService);
+    private readonly _hydrationSvc = inject(AssessmentHydrationService);
+    private readonly _assessmentState = inject(AssessmentStateService);
+    private readonly _destroyRef = inject(DestroyRef);
 
     // â”€â”€ View state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     view = signal<'intro' | 'module-intro' | 'module'>('intro');
@@ -583,16 +594,11 @@ export class MyPlanComponent implements OnInit {
     activeTab = signal<'aprende' | 'conecta' | 'actua'>('aprende');
     sliderIndex = signal<number>(0);
 
-    readonly MH_WEEK_IMAGES: Record<string, string[]> = {
-        'mh-s1': [
-            'https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I01_E.ANIMO_CONOCIMIENTO_ANSIEDAD+01.png',
-            'https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I01_E.ANIMO_CONOCIMIENTO_ANSIEDAD+02.png',
-            'https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I02_E.ANIMO_CONOCIMIENTO_DEPRESION+01.png',
-            'https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I02_E.ANIMO_CONOCIMIENTO_DEPRESION+02.png',
-            'https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I03_E.ANIMO_CONOCIMIENTO_ESTRES+01.png',
-            'https://material-adjunto.s3.us-east-2.amazonaws.com/imagenes/I03_E.ANIMO_CONOCIMIENTO_ESTRES+02.png',
-        ],
-    };
+    // Resetear slider al cambiar de semana
+    private readonly _sliderReset = effect(() => {
+        this.activeSectionId(); // track
+        this.sliderIndex.set(0);
+    });
 
     selectTab(tab: 'aprende' | 'conecta' | 'actua'): void {
         this.activeTab.set(tab);
@@ -611,7 +617,15 @@ export class MyPlanComponent implements OnInit {
         this.sliderIndex.set((this.sliderIndex() + 1) % imgs.length);
     }
 
-    readonly activeSlideImages = computed(() => this.MH_WEEK_IMAGES[this.activeSectionId()] ?? []);
+    readonly activeSlideImages = computed(() =>
+        this.activeMhWeek()?.conecta ?? this.activeFLWeek()?.conecta ?? []
+    );
+
+    mediaTypeOf(url: string): 'image' | 'video' | 'audio' {
+        if (url.includes('/audios/')) return 'audio';
+        if (url.includes('/videos/')) return 'video';
+        return 'image';
+    }
 
     // â”€â”€ Navigation signals (from API step detail) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     activeStepPrevID = signal<number | null>(null);
@@ -625,12 +639,88 @@ export class MyPlanComponent implements OnInit {
     // â”€â”€ Modules (populated from API) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     modules: PlanModule[] = [];
 
+    // â"€â"€ Risk / Assessment results â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
+    /** All completed evaluation results keyed by AssessmentModuleId */
+    riskResults = signal<Partial<Record<AssessmentModuleId, AssessmentResult>>>({});
+
+    /** Risk result for the currently active module (null if not evaluated) */
+    activeModuleRisk = computed<AssessmentResult | null>(() => {
+        const mod = this.activeModule;
+        if (!mod) return null;
+        const assessmentId = MODULE_CODE_TO_ASSESSMENT_ID[mod.moduleCode ?? ''];
+        if (!assessmentId) return null;
+        return this.riskResults()[assessmentId] ?? null;
+    });
+
+    /** true una vez que el endpoint /evaluation/my-completed ha respondido (éxito o vacío) */
+    evaluationsLoaded = signal<boolean>(false);
+
+    /** true si la carga terminó y el usuario no tiene ninguna evaluación completada */
+    hasNoEvaluations = computed(() =>
+        this.evaluationsLoaded() && Object.keys(this.riskResults()).length === 0
+    );
+
+    /** true si el módulo concreto NO tiene evaluación completada (y la carga ya terminó) */
+    moduleNeedsEvaluation(module: PlanModule): boolean {
+        if (!this.evaluationsLoaded()) return false;
+        const assessmentId = MODULE_CODE_TO_ASSESSMENT_ID[module.moduleCode ?? ''];
+        if (!assessmentId) return false; // módulo sin evaluación asociada → no bloquear
+        return !this.riskResults()[assessmentId];
+    }
+
+    /** Semana activa de Salud Mental según el nivel de riesgo del usuario.
+     *  Devuelve null cuando la sección activa no es una semana (mh-sN). */
+    activeMhWeek = computed<PlanWeekData | null>(() => {
+        const sectionId = this.activeSectionId();
+        if (!sectionId) return null;
+        const match = sectionId.match(/^mh-s(\d+)$/);
+        if (!match) return null;
+        const weekNum = parseInt(match[1], 10);
+        const outcome = this.riskResults()['mental-health']?.outcome ?? 'adequate';
+        return MH_WEEKS.find(w => w.riskTier === outcome && w.weekNum === weekNum) ?? null;
+    });
+
+    /** Semana activa de Fatiga Laboral según el nivel de riesgo del usuario.
+     *  Devuelve null cuando la sección activa no es una semana (fl-sN). */
+    activeFLWeek = computed<PlanWeekData | null>(() => {
+        const sectionId = this.activeSectionId();
+        if (!sectionId) return null;
+        const match = sectionId.match(/^fl-s(\d+)$/);
+        if (!match) return null;
+        const weekNum = parseInt(match[1], 10);
+        const outcome = this.riskResults()['work-fatigue']?.outcome ?? 'adequate';
+        return FL_WEEKS.find(w => w.riskTier === outcome && w.weekNum === weekNum) ?? null;
+    });
+
     // â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     ngOnInit(): void {
         this._userService.user$.subscribe(u => {
             if (u?.name) this.userName.set(u.name);
         });
         this.loadModules().subscribe({ error: () => this.loading.set(false) });
+
+        // Cargar resultados de riesgo laboral desde el sistema de evaluaciones
+        this._hydrationSvc.hydrateLatestCompletedResults().subscribe({
+            next: () => this.evaluationsLoaded.set(true),
+            error: () => this.evaluationsLoaded.set(true),
+        });
+        this._assessmentState.results$
+            .pipe(takeUntilDestroyed(this._destroyRef))
+            .subscribe(results => {
+                this.riskResults.set({ ...results });
+                // Actualizar secciones de Salud Mental con el nivel de riesgo real
+                const mhResult = results['mental-health'];
+                if (mhResult) {
+                    const mhModule = this.modules.find(m => m.moduleCode === 'SALUD_MENTAL');
+                    if (mhModule) this._applyStaticSections(mhModule);
+                }
+                // Actualizar secciones de Fatiga Laboral con el nivel de riesgo real
+                const flResult = results['work-fatigue'];
+                if (flResult) {
+                    const flModule = this.modules.find(m => m.moduleCode === 'FATIGA');
+                    if (flModule) this._applyStaticSections(flModule);
+                }
+            });
     }
 
     // â”€â”€ API loaders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -700,6 +790,11 @@ export class MyPlanComponent implements OnInit {
             this._applyStaticSections(module);
             return;
         }
+        // MH/FL: las semanas dependen del nivel de riesgo del usuario → siempre usar secciones locales
+        if (module.moduleCode === 'SALUD_MENTAL' || module.moduleCode === 'FATIGA') {
+            this._applyStaticSections(module);
+            return;
+        }
         // RP: load full 5-program structure in sidebar, then overlay API completion data
         if (module.moduleCode === 'RIESGO_PSICOSOCIAL' && module.programCode) {
             this._applyStaticSections(module);
@@ -736,9 +831,38 @@ export class MyPlanComponent implements OnInit {
         }
     }
 
+    /** Genera las secciones de Salud Mental según el nivel de riesgo del usuario */
+    private _getMhSections(outcome: 'adequate' | 'mild' | 'high-risk'): StaticSectionCfg[] {
+        const weeks = MH_WEEKS
+            .filter(w => w.riskTier === outcome)
+            .sort((a, b) => a.weekNum - b.weekNum);
+        return [
+            { id: 'mh-bienvenida', title: 'Bienvenida' },
+            ...weeks.map(w => ({ id: `mh-s${w.weekNum}`, title: `Semana #${w.weekNum}: ${w.nombre}` })),
+            { id: 'mh-cierre', title: 'Cierre y certificado' },
+        ];
+    }
+
+    /** Genera las secciones de Fatiga Laboral según el nivel de riesgo del usuario */
+    private _getFLSections(outcome: 'adequate' | 'mild' | 'high-risk'): StaticSectionCfg[] {
+        const weeks = FL_WEEKS
+            .filter(w => w.riskTier === outcome)
+            .sort((a, b) => a.weekNum - b.weekNum);
+        return [
+            { id: 'fl-bienvenida', title: 'Bienvenida' },
+            ...weeks.map(w => ({ id: `fl-s${w.weekNum}`, title: `Semana #${w.weekNum}: ${w.nombre}` })),
+            { id: 'fl-cierre', title: 'Cierre y certificado' },
+        ];
+    }
+
     private _applyStaticSections(module: PlanModule): void {
         const code = module.moduleCode ?? '';
-        module.sections = (STATIC_SECTIONS[code] ?? []).map(s => ({
+        const cfgs: StaticSectionCfg[] = code === 'SALUD_MENTAL'
+            ? this._getMhSections(this.riskResults()['mental-health']?.outcome ?? 'adequate')
+            : code === 'FATIGA'
+                ? this._getFLSections(this.riskResults()['work-fatigue']?.outcome ?? 'adequate')
+                : (STATIC_SECTIONS[code] ?? []);
+        module.sections = cfgs.map(s => ({
             ...s,
             childExpanded: false,
             children: s.children ? s.children.map(c => ({ ...c })) : undefined,
@@ -816,6 +940,7 @@ export class MyPlanComponent implements OnInit {
 
     openModule(module: PlanModule): void {
         if (module.disabled) return;  // Clima Organizacional: no hacer nada
+        if (this.moduleNeedsEvaluation(module)) return; // módulo sin evaluación completada
         const moduleId = module.id;
         this.activeModuleId.set(moduleId);
         module.expanded = true;

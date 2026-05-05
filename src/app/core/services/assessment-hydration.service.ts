@@ -450,9 +450,14 @@ export class AssessmentHydrationService {
 
     private mapRiskLevelToOutcome(risk: RiskLevel | null | undefined): AssessmentOutcome {
         const value = String(risk ?? '').toLowerCase();
+        // Inglés
         if (value.includes('green') || value.includes('low')) return 'adequate';
-        if (value.includes('yellow') || value.includes('medium')) return 'mild';
-        if (value.includes('red') || value.includes('high')) return 'high-risk';
+        if (value.includes('yellow') || value.includes('medium') || value.includes('moderate')) return 'mild';
+        if (value.includes('red') || value.includes('high') || value.includes('severe')) return 'high-risk';
+        // Español
+        if (value.includes('adecuado') || value.includes('bajo') || value.includes('normal')) return 'adequate';
+        if (value.includes('leve') || value.includes('moderado') || value.includes('medio')) return 'mild';
+        if (value.includes('severo') || value.includes('alto') || value.includes('critico') || value.includes('crítico')) return 'high-risk';
         return 'mild';
     }
 

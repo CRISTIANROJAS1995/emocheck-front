@@ -191,8 +191,150 @@
                 }
             }
 
+            <!-- ── NEUROPAUSAS: Visor de ejercicios ────────────────────────────── -->
+            @if (selectedStaticCategory === 'neuropausas' && currentNeuropausa) {
+            <section class="resources-section np-section">
+
+                <!-- Header del ejercicio -->
+                <div class="np-header">
+                    <span class="np-header__num">EJERCICIO #{{ currentNeuropausa.id | number:'2.0-0' }}</span>
+                    <span class="np-header__cat">
+                        <mat-icon class="np-header__cat-icon" svgIcon="heroicons_outline:bolt"></mat-icon>
+                        Categoría: {{ currentNeuropausa.categoria }}
+                    </span>
+                </div>
+
+                <!-- Título del ejercicio -->
+                <div class="np-title-bar">
+                    <div class="np-title-bar__left">
+                        <div class="np-title-bar__icon">
+                            <mat-icon svgIcon="heroicons_outline:puzzle-piece"></mat-icon>
+                        </div>
+                        <div class="np-title-bar__text">
+                            <span class="np-title-bar__name">{{ currentNeuropausa.nombre }}</span>
+                            <span class="np-title-bar__meta">{{ currentNeuropausa.tipo }} · {{ currentNeuropausa.funcionCognitiva }}</span>
+                        </div>
+                    </div>
+                    <div class="np-badge np-badge--{{ currentNeuropausa.dificultad | lowercase }}">
+                        <mat-icon svgIcon="heroicons_outline:star"></mat-icon>
+                        Dificultad {{ currentNeuropausa.dificultad }}
+                    </div>
+                </div>
+
+                <!-- Tres columnas -->
+                <div class="np-columns">
+
+                    <!-- Columna 1: Instrucciones -->
+                    <div class="np-panel np-panel--purple">
+                        <div class="np-panel__head">
+                            <span class="np-panel__dot np-panel__dot--purple"></span>
+                            <span class="np-panel__label">INSTRUCCIONES</span>
+                        </div>
+                        <div class="np-panel__body np-panel__body--img">
+                            @if (npImgLoading.instrucciones) {
+                            <div class="np-img-skeleton"></div>
+                            }
+                            <img class="np-panel__img np-panel__img--zoomable"
+                                 [class.np-panel__img--hidden]="npImgLoading.instrucciones"
+                                 [src]="currentNeuropausa.instruccionesImg"
+                                 alt="Instrucciones del ejercicio"
+                                 (load)="npImgLoaded('instrucciones')"
+                                 (click)="openLightbox(currentNeuropausa.instruccionesImg)" />
+                        </div>
+                        <div class="np-panel__footer">
+                            <mat-icon svgIcon="heroicons_outline:clock"></mat-icon>
+                            <span>Duración: {{ currentNeuropausa.duracion }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Tarjeta ejercicio -->
+                    <div class="np-panel np-panel--blue">
+                        <div class="np-panel__head">
+                            <span class="np-panel__dot np-panel__dot--blue"></span>
+                            <span class="np-panel__label">TARJETA EJERCICIO</span>
+                        </div>
+                        <div class="np-panel__body np-panel__body--img">
+                            @if (npImgLoading.problema) {
+                            <div class="np-img-skeleton"></div>
+                            }
+                            <img class="np-panel__img np-panel__img--zoomable"
+                                 [class.np-panel__img--hidden]="npImgLoading.problema"
+                                 [src]="currentNeuropausa.problemaImg"
+                                 alt="Ejercicio"
+                                 (load)="npImgLoaded('problema')"
+                                 (click)="openLightbox(currentNeuropausa.problemaImg)" />
+                        </div>
+                    </div>
+
+                    <!-- Columna 3: Tarjeta solución -->
+                    <div class="np-panel np-panel--green">
+                        <div class="np-panel__head">
+                            <span class="np-panel__dot np-panel__dot--green"></span>
+                            <span class="np-panel__label">TARJETA SOLUCIÓN</span>
+                        </div>
+                        <div class="np-panel__body np-panel__body--solution"
+                             [class.is-revealed]="neuropausaSolucionVisible"
+                             (click)="neuropausaSolucionVisible ? openLightbox(currentNeuropausa.solucionImg) : revealNeuropausaSolucion()">
+                            @if (npImgLoading.solucion) {
+                            <div class="np-img-skeleton"></div>
+                            }
+                            <img class="np-panel__img np-panel__img--solution"
+                                 [class.np-panel__img--zoomable]="neuropausaSolucionVisible"
+                                 [class.np-panel__img--hidden]="npImgLoading.solucion"
+                                 [src]="currentNeuropausa.solucionImg"
+                                 alt="Solución"
+                                 (load)="npImgLoaded('solucion')" />
+                            @if (!neuropausaSolucionVisible) {
+                            <div class="np-solution-lock">
+                                <mat-icon class="np-solution-lock__icon" svgIcon="heroicons_outline:lock-closed"></mat-icon>
+                                <span class="np-solution-lock__cta">Ver solución</span>
+                                <span class="np-solution-lock__hint">Toca aquí para revelar la respuesta</span>
+                            </div>
+                            }
+                        </div>
+                    </div>
+
+                </div><!-- /np-columns -->
+
+                <!-- Footer: etiquetas + navegación -->
+                <div class="np-footer">
+                    <div class="np-footer__tags">
+                        @for (tag of currentNeuropausa.etiquetas; track tag) {
+                        <span class="np-tag">{{ tag }}</span>
+                        }
+                    </div>
+                    <div class="np-footer__nav">
+                        <button class="np-nav-btn np-nav-btn--prev" type="button"
+                                [disabled]="neuropausaIndex === 0"
+                                (click)="neuropausaPrev()">
+                            <mat-icon svgIcon="heroicons_outline:arrow-left"></mat-icon>
+                            Anterior
+                        </button>
+                        <span class="np-footer__counter">{{ neuropausaIndex + 1 }} / {{ neuropausasEjercicios.length }}</span>
+                        <button class="np-nav-btn np-nav-btn--next" type="button"
+                                [disabled]="neuropausaIndex === neuropausasEjercicios.length - 1"
+                                (click)="neuropausaNext()">
+                            Siguiente
+                            <mat-icon svgIcon="heroicons_outline:arrow-right"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lightbox template — rendered via CDK Overlay at body level -->
+                <ng-template #lightboxTpl>
+                    <button class="np-lightbox__close" type="button" (click)="closeLightbox()" aria-label="Cerrar">
+                        <mat-icon svgIcon="heroicons_outline:x-mark"></mat-icon>
+                    </button>
+                    <div class="np-lightbox__stage">
+                        <img class="np-lightbox__img" [src]="lightboxUrl" alt="Imagen ampliada" />
+                    </div>
+                </ng-template>
+
+            </section>
+            }
+
             <!-- ── Otras categorías (vacías por ahora) ────────────────────────── -->
-            @if (selectedStaticCategory !== 'mindfulness') {
+            @if (selectedStaticCategory !== 'mindfulness' && selectedStaticCategory !== 'neuropausas') {
             <section class="resources-section">
                 <div class="resources-coming-soon">
                     <mat-icon svgIcon="heroicons_outline:clock"></mat-icon>

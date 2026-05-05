@@ -1426,3 +1426,472 @@ a.resources-hero__back mat-icon.resources-hero__back-icon {
         line-height: 1.6;
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  NEUROPAUSAS — visor de ejercicios
+// ─────────────────────────────────────────────────────────────────────────────
+
+.np-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// ── Header ──────────────────────────────────────────────────────────────────
+.np-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #00A896;
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: #fff;
+
+    &__num {
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.95;
+    }
+
+    &__cat {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    &__cat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+        color: #fff;
+    }
+}
+
+// ── Title bar ────────────────────────────────────────────────────────────────
+.np-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+
+    &__left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+        border-radius: 10px;
+        flex-shrink: 0;
+
+        mat-icon {
+            color: #7c3aed;
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    &__text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    &__name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: rgba(15, 23, 42, 0.9);
+    }
+
+    &__meta {
+        font-size: 0.8rem;
+        color: rgba(15, 23, 42, 0.5);
+    }
+}
+
+// ── Difficulty badge ─────────────────────────────────────────────────────────
+.np-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+    }
+
+    &--fácil {
+        background: #d1fae5;
+        color: #065f46;
+        mat-icon { color: #059669; }
+    }
+
+    &--media {
+        background: #fef3c7;
+        color: #92400e;
+        mat-icon { color: #d97706; }
+    }
+
+    &--alta {
+        background: #fee2e2;
+        color: #991b1b;
+        mat-icon { color: #dc2626; }
+    }
+}
+
+// ── Three columns ────────────────────────────────────────────────────────────
+.np-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+
+    @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ── Panel card ────────────────────────────────────────────────────────────────
+.np-panel {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &__head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    &__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+
+        &--purple { background: #7c3aed; }
+        &--blue   { background: #2563eb; }
+        &--green  { background: #059669; }
+    }
+
+    &__label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        color: rgba(15, 23, 42, 0.6);
+        text-transform: uppercase;
+    }
+
+    &__body {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        min-height: 280px;
+        position: relative;
+
+        &--img {
+            padding: 8px;
+        }
+
+        &--solution {
+            position: relative;
+            cursor: pointer;
+            padding: 8px;
+
+            &:not(.is-revealed) {
+                cursor: pointer;
+            }
+
+            &.is-revealed {
+                cursor: default;
+            }
+        }
+    }
+
+    &__img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        display: block;
+        object-fit: contain;
+
+        &--zoomable {
+            cursor: zoom-in;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+            &:hover {
+                transform: scale(1.02);
+                box-shadow: 0 4px 18px rgba(15, 23, 42, 0.15);
+            }
+        }
+
+        &--solution {
+            transition: filter 0.3s ease;
+        }
+
+        &--hidden {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+    }
+
+    &__footer {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 14px;
+        border-top: 1px solid rgba(148, 163, 184, 0.15);
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgba(15, 23, 42, 0.55);
+
+        mat-icon {
+            font-size: 15px;
+            width: 15px;
+            height: 15px;
+        }
+    }
+}
+
+// ── Image skeleton loader ─────────────────────────────────────────────────────
+.np-img-skeleton {
+    position: absolute;
+    inset: 10px;
+    border-radius: 8px;
+    background: linear-gradient(
+        90deg,
+        rgba(148, 163, 184, 0.15) 25%,
+        rgba(148, 163, 184, 0.30) 50%,
+        rgba(148, 163, 184, 0.15) 75%
+    );
+    background-size: 200% 100%;
+    animation: np-shimmer 1.4s infinite linear;
+}
+
+@keyframes np-shimmer {
+    from { background-position: 200% 0; }
+    to   { background-position: -200% 0; }
+}
+
+// ── Solution overlay ──────────────────────────────────────────────────────────
+.np-panel__body--solution:not(.is-revealed) .np-panel__img--solution {
+    filter: blur(12px);
+    user-select: none;
+    pointer-events: none;
+}
+
+.np-solution-lock {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    text-align: center;
+    padding: 16px;
+
+    &__icon {
+        color: #059669;
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
+    }
+
+    &__cta {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #059669;
+    }
+
+    &__hint {
+        font-size: 0.75rem;
+        color: rgba(15, 23, 42, 0.55);
+        line-height: 1.4;
+    }
+}
+
+// ── Footer: tags + navigation ─────────────────────────────────────────────────
+.np-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    &__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    &__nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: auto;
+    }
+
+    &__counter {
+        font-size: 0.8rem;
+        color: rgba(15, 23, 42, 0.5);
+        font-variant-numeric: tabular-nums;
+        min-width: 48px;
+        text-align: center;
+    }
+}
+
+.np-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #4338ca;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.np-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.18s, color 0.18s, opacity 0.18s;
+
+    mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+
+    &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    &--prev {
+        background: rgba(148, 163, 184, 0.15);
+        color: rgba(15, 23, 42, 0.7);
+
+        &:not(:disabled):hover {
+            background: rgba(148, 163, 184, 0.28);
+        }
+    }
+
+    &--next {
+        background: #7c3aed;
+        color: #fff;
+
+        &:not(:disabled):hover {
+            background: #6d28d9;
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  LIGHTBOX  (rendered via CDK Overlay — outside component DOM)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// CDK backdrop — must escape component encapsulation
+::ng-deep .np-lightbox-backdrop {
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: np-lb-fade-in 0.2s ease;
+}
+
+// Close button — fixed to top-right of viewport
+.np-lightbox__close {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.28);
+    }
+
+    mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+    }
+}
+
+// Stage — centers the image in the CDK overlay pane
+.np-lightbox__stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: np-lb-zoom-in 0.22s ease;
+}
+
+// Image — max viewport size, rounded shadow
+.np-lightbox__img {
+    display: block;
+    max-width: min(90vw, 1000px);
+    max-height: 88vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes np-lb-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes np-lb-zoom-in {
+    from { transform: scale(0.94); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}

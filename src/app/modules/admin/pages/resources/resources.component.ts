@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, NgZone } from '@angular/core';
+import { Component, OnDestroy, OnInit, NgZone, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,13 +12,16 @@ import {
     WellnessResourceDto,
 } from 'app/core/services/resources.service';
 import { BackgroundCirclesComponent } from 'app/shared/components/ui/background-circles/background-circles.component';
+import { Overlay, OverlayModule, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
 import { forkJoin, of, Subscription } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { NEUROPAUSAS_EJERCICIOS, NeuropausaExercise } from './neuropausas.data';
 
 @Component({
     selector: 'app-resources',
     standalone: true,
-    imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, BackgroundCirclesComponent],
+    imports: [CommonModule, RouterModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule, BackgroundCirclesComponent, OverlayModule],
     templateUrl: './resources.component.html',
     styleUrls: ['./resources.component.scss'],
 })
@@ -62,6 +65,78 @@ export class ResourcesComponent implements OnInit, OnDestroy {
 
     categorySliderIndex = 0;
     private _categorySliderTimer: ReturnType<typeof setInterval> | null = null;
+
+    // ── Neuropausas ───────────────────────────────────────────────────────
+    readonly neuropausasEjercicios: NeuropausaExercise[] = NEUROPAUSAS_EJERCICIOS;
+    neuropausaIndex = 0;
+    neuropausaSolucionVisible = false;
+    npImgLoading = { instrucciones: false, problema: false, solucion: false };
+
+    get currentNeuropausa(): NeuropausaExercise | null {
+        return this.neuropausasEjercicios[this.neuropausaIndex] ?? null;
+    }
+
+    private _resetNpLoading(): void {
+        this.npImgLoading = { instrucciones: true, problema: true, solucion: true };
+    }
+
+    npImgLoaded(key: 'instrucciones' | 'problema' | 'solucion'): void {
+        this.npImgLoading[key] = false;
+    }
+
+    neuropausaPrev(): void {
+        const prev = this.currentNeuropausa;
+        this.neuropausaIndex = (this.neuropausaIndex - 1 + this.neuropausasEjercicios.length) % this.neuropausasEjercicios.length;
+        this.neuropausaSolucionVisible = false;
+        this._resetNpLoadingComparing(prev);
+    }
+
+    neuropausaNext(): void {
+        const prev = this.currentNeuropausa;
+        this.neuropausaIndex = (this.neuropausaIndex + 1) % this.neuropausasEjercicios.length;
+        this.neuropausaSolucionVisible = false;
+        this._resetNpLoadingComparing(prev);
+    }
+
+    private _resetNpLoadingComparing(prev: NeuropausaExercise | null): void {
+        const next = this.currentNeuropausa;
+        if (!next) return;
+        this.npImgLoading = {
+            instrucciones: prev?.instruccionesImg !== next.instruccionesImg,
+            problema:      prev?.problemaImg      !== next.problemaImg,
+            solucion:      prev?.solucionImg      !== next.solucionImg,
+        };
+    }
+
+    revealNeuropausaSolucion(): void {
+        this.neuropausaSolucionVisible = true;
+    }
+
+    // ── Lightbox ──────────────────────────────────────────────────────────
+    @ViewChild('lightboxTpl') private lightboxTpl!: TemplateRef<unknown>;
+    lightboxUrl: string | null = null;
+    private _lightboxRef: OverlayRef | null = null;
+
+    openLightbox(url: string): void {
+        this.lightboxUrl = url;
+        if (this._lightboxRef?.hasAttached()) return;
+        this._lightboxRef = this.overlay.create({
+            hasBackdrop: true,
+            backdropClass: 'np-lightbox-backdrop',
+            positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically(),
+            scrollStrategy: this.overlay.scrollStrategies.block(),
+        });
+        this._lightboxRef.attach(new TemplatePortal(this.lightboxTpl, this.vcr));
+        this._lightboxRef.backdropClick().subscribe(() => this.closeLightbox());
+    }
+
+    closeLightbox(): void {
+        this.lightboxUrl = null;
+        if (this._lightboxRef) {
+            this._lightboxRef.dispose();
+            this._lightboxRef = null;
+        }
+    }
 
     get selectedCategoryName(): string | null {
         if (this.selectedCategoryId == null) return null;
@@ -110,7 +185,9 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         private readonly resourcesApi: ResourcesService,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
-        private readonly ngZone: NgZone
+        private readonly ngZone: NgZone,
+        private readonly overlay: Overlay,
+        private readonly vcr: ViewContainerRef,
     ) { }
 
     ngOnInit(): void {
@@ -192,6 +269,11 @@ export class ResourcesComponent implements OnInit, OnDestroy {
         this.selectedStaticCategory = cat;
         this._stopCategorySlider();
         this.categorySliderIndex = 0;
+        // Reset neuropausas state when leaving the section
+        if (cat !== 'neuropausas') {
+            this.neuropausaIndex = 0;
+            this.neuropausaSolucionVisible = false;
+        }
         // Auto-select first sub-item per category
         const defaults: Record<string, string> = {
             mindfulness: 'mindfulness-infografias',

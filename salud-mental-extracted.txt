@@ -1,0 +1,1853 @@
+﻿Leyendo documento Word: C:\Repositorios\emocheck-front\Salud mental\Modulo Salud Mental - EmoCheck (3) (1).docx
+================================================================================
+CONTENIDO DEL DOCUMENTO:
+================================================================================
+MODULO SALUD MENTAL
+
+Al dar clic sobre el m├│dulo de salud Mental emerger├í un espacio donde estar├í una breve explicaci├│n de que se trata el m├│dulo y en la parte posterior se encontrar├í   cinco cuadros donde se encontrar├í cada prueba.
+
+VENTANA INICIAL DE MODULO DE SALUD MENTAL 
+
+SALUD MENTAL 
+
+(Mensaje inicial debajo del nombre del m├│dulo en may├║scula) 
+
+Hola (Nombre del usuario)
+
+La salud mental no solo se trata de ÔÇ£estar bienÔÇØ, sino de aprender a escucharte, reconocer tus pensamientos y cuidar de tu bienestar emocional d├¡a a d├¡a.
+
+Este espacio te invita a hacer una pausa para ti. Aqu├¡ podr├ís encontrar peque├▒as acciones que te ayuden a recuperar tu equilibrio y serenidad interior. Antes de ello vamos a realizar unas pruebas para ayudarte a comprender que estas pasando en este momento con tu yo interior:
+
+(A continuaci├│n, se muestras las pruebas a usar solo debe aparece en tres espacios, estas son las siguientes pruebas que debe aparecer en la pantalla inicial activas para que el usuario:
+
+
+
+Inteligencia Emocional
+
+H├íbitos de sue├▒o
+
+Estado an├¡mico 
+
+
+
+VENTANA EMERGENTE DE LA PRUEBA QUE SE SELECCIONA 
+
+(En un primer pantallazo brindamos los acuerdos de confidencialidad para dar inicio con la explicaci├│n de la prueba, es importante poner cuadrito para dar clic para que apruebe o no el uso de los datos) 
+
+Antes de continuar, te invitamos a aceptar los acuerdos y condiciones relacionados con el manejo, protecci├│n y uso responsable de su informaci├│n personal, su privacidad y seguridad son una prioridad para nosotros:
+
+Autorizo de manera libre, previa e informada a Emocheck y a la empresa contratante el tratamiento de mis datos personales y de los resultados de la prueba que responder├®, conforme a la Ley 1581 de 2012. La informaci├│n ser├í tratada con confidencialidad y utilizada ├║nicamente para la elaboraci├│n de un plan de intervenci├│n orientado a mejorar los componentes evaluados, garantizando el ejercicio de mis derechos sobre los datos personales.
+
+Autorizo
+
+No autorizo 
+
+(En la siguiente pantalla explicara la prueba, le explicar├í que va a evaluar y le mostrara un video explicando como seleccionar.)
+
+(Nombre) Estado an├¡mico
+
+El DASS- 21 es una prueba que busca comprender tu estado emocional y reconocer posibles s├¡ntomas relacionados con el estr├®s, la ansiedad o la depresi├│n. Te invitamos a responder con sinceridad, ya que solo as├¡ nos permitir├í entender c├│mo te sientes y orientarte de manera m├ís efectiva.
+
+Piensa en la ├║ltima semana (incluido hoy) y marca la opci├│n que mejor describa lo que has sentido:
+
+(Debe aparecer cada pregunta y posteriormente las respuestas a cada una hasta que se respondan todas, en la parte superior debe esta una barrita que muestre la cantidad de preguntas y como va avanzando dependiendo de cuantas preguntas el usuario haya respondido)
+
+Video sin audio y de secuencia: Se debe mostrar c├│mo responder 
+
+(Pregunta) Me ha costado mucho descargar la tensi├│n.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Me di cuenta de que ten├¡a la boca seca.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) No pod├¡a sentir ning├║n sentimiento positivo.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Se me hizo dif├¡cil respirar.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+
+
+(Pregunta) Se me hizo dif├¡cil tomar la iniciativa para hacer cosas.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Reaccion├® exageradamente en ciertas situaciones.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Sent├¡ que mis manos temblaban.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) He sentido que estaba gastando una gran cantidad de energ├¡a.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Estaba preocupado por situaciones en las cuales pod├¡a tener p├ínico o en las que podr├¡a hacer el rid├¡culo.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) He sentido que no hab├¡a nada que me ilusionara.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Me he sentido inquieto.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Se me hizo dif├¡cil relajarme.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Me sent├¡ triste y deprimido.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) No toler├® nada que no me permitiera continuar con lo que estaba haciendo.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Sent├¡ que estaba al punto de p├ínico.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) No me pude entusiasmar por nada.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Sent├¡ que val├¡a muy poco como persona.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) He tendido a sentirme enfadado con facilidad.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Sent├¡ los latidos de mi coraz├│n a pesar de no haber hecho ning├║n esfuerzo f├¡sico.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Tuve miedo sin raz├│n.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+(Pregunta) Sent├¡ que la vida no ten├¡a ning├║n sentido.
+
+(Valor de la respuesta = 0) No me ha ocurrido
+
+(Valor de la respuesta = 1) Me ha ocurrido un poco
+
+(Valor de la respuesta = 2) Me ha ocurrido bastante
+
+(Valor de la respuesta = 3) Me ocurri├│ mucho o la mayor parte del tiempo
+
+
+
+(Mensaje para cerrar la prueba) Has finalizado
+
+Recuerda que cuidar tu salud mental no siempre implica grandes cambios, sino peque├▒os gestos de atenci├│n hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar c├│mo te sientes es tambi├®n una forma de sanar. Perm├¡tete estar presente, sin exigencias, sin juicios (Ser├¡a interesante agregar una ilustraci├│n). 
+
+Antes de ver tu resultado realicemos un ejercicio de creatividad.
+
+A continuaci├│n, encontraras una figura, ┬┐Qu├® crees que puedas crear? (Facilitar el mouse para que sea un l├ípiz dentro del recuadro)
+
+
+
+
+
+
+
+
+
+
+
+
+
+Excelentente.
+
+Cuando finalice se abre el espacio donde van las respuestas dependiendo los resultados. Primero se ver├í un cuadro comparativo donde muestre las tres variables evaluadas (Ansiedad, depresi├│n, Estr├®s) Teniendo en cuenta la severidad o levedad de los resultados.
+
+Estos son tus resultados:
+
+
+
+Depresi├│n 
+
+Ansiedad
+
+
+
+Respuesta 
+
+
+
+Respuesta
+
+Estr├®s
+
+
+
+
+
+Respuesta
+
+
+
+(Se deja un mensaje dando una conclusi├│n general sobre los resultados para abrir los ejercicios del plan personalizado)
+
+Ansiedad
+
+Riesgo
+
+Respuestas posibles
+
+Riesgo Bajo
+
+Actualmente parece que logras manejar las situaciones que generan tensi├│n. Esto habla de recursos internos que te est├ín acompa├▒ando. Cuidarlos te permitir├í seguir sinti├®ndote en equilibrio.
+
+Riesgo Moderado
+
+Hay se├▒ales de que la ansiedad est├í presente. Tal vez no siempre es evidente, pero puede estar ocupando m├ís espacio del que quisieras. Este es un buen momento para escucharte y darte peque├▒os espacios para respirar.
+
+Riesgo Alto
+
+Tu mente y tu cuerpo se encuentran en un estado de alerta constante. Puede sentirse agotador y abrumador. Reconocerlo es importante, porque tambi├®n abre la posibilidad de bajar el ritmo y buscar apoyos que te ayuden a recuperar calma. Hemos evidenciado algunos s├¡ntomas que consideramos son importante de evaluar a profundidad, a continuaci├│n, compartiremos contigo algunas preguntas para comprender mejor que es lo que estas viviendo en este momento.
+
+Riesgo Alto
+
+Riesgo Moderado
+
+Aplicaci├│n de la Prueba BAI
+
+
+
+Depresi├│n
+
+Riesgo
+
+Respuestas posibles
+
+Riesgo Bajo
+
+Tu estado emocional parece estar estable. Esto no significa que todo sea perfecto, sino que cuentas con herramientas que te ayudan a sostenerte. Seguir atenta a tu bienestar es parte de ese cuidado.
+
+Riesgo Moderado
+
+Hay se├▒ales de bajo ├ínimo que merecen ser escuchadas. Tal vez sigues adelante, pero con menos energ├¡a o motivaci├│n. Detenerte a mirarte con amabilidad puede marcar una diferencia.
+
+Riesgo Alto
+
+Actualmente te encuentras en circunstancias que pueden estar afectando tu bienestar emocional y la forma en que te comunicas con los dem├ís. Es posible que te sientas desconectado de ti mismo. Reconocerlo, querer ser escuchado y pedir ayuda son pasos importantes para proteger tu salud mental.  Hemos evidenciado algunos s├¡ntomas que consideramos son importante de evaluar a profundidad, a continuaci├│n, compartiremos contigo algunas preguntas para comprender mejor que es lo que estas viviendo en este momento.
+
+Riesgo Alto
+
+Riesgo Moderado
+
+Aplicaci├│n de la Prueba BDI
+
+
+
+Estr├®s
+
+Riesgo
+
+Respuestas posibles
+
+Riesgo Bajo
+
+Actualmente pareces manejar las exigencias de manera adecuada. Esto habla de recursos personales y estrategias que te est├ín funcionando. Mantener h├íbitos de autocuidado y l├¡mites saludables ayudar├í a conservar este bienestar.
+
+Riesgo Moderado
+
+Hay se├▒ales de que el estr├®s empieza a hacerse presente. Tal vez a├║n logras responder a las demandas, pero a costa de tu energ├¡a. Este es un buen momento para hacer ajustes y cuidar de ti antes de que el malestar aumente.
+
+Riesgo Alto
+
+En este momento parece que est├ís cargando m├ís de lo que es justo para ti. Tu cuerpo y tus emociones est├ín dando se├▒ales claras de cansancio. Es importante que no enfrentes esto solo/a buscar apoyo y hacer ajustes oportunos puede ayudarte a recuperar el equilibrio y proteger tu salud.
+
+
+
+Ventana emergente teniendo en cuenta la necesidad del cuestionario: INVENTARIO DE BECK PARA ANSIEDAD
+
+(En la siguiente pantalla explicara la prueba, le explicara que va a evaluar y le mostrara un video explicando como seleccionar.)
+
+El BAI (Beck Anxiety Inventory) es un instrumento dise├▒ado para identificar la presencia e intensidad de s├¡ntomas asociados a la ansiedad.
+
+Te invitamos a responder con sinceridad, ya que la informaci├│n proporcionada permitir├í comprender c├│mo se manifiestan estos s├¡ntomas y orientar de manera adecuada las acciones de acompa├▒amiento e intervenci├│n.
+
+Piensa en la ├║ltima semana (incluido hoy) y marca la opci├│n que mejor describa lo que has sentido:
+
+(Debe aparecer cada pregunta y posteriormente las respuestas a cada una hasta que se respondan todas, en la parte superior debe esta una barrita que muestre la cantidad de preguntas y como va avanzando dependiendo de cuantas preguntas el usuario haya respondido)
+
+Video sin audio y de secuencia: Se debe mostrar c├│mo responder 
+
+(Pregunta) Me he sentido torpe o entumecido.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido acalorado.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con temblor en las piernas.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido incapaz de relajarse.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con temor a que ocurra lo peor.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido mareado, o que se le va la cabeza.
+
+ (Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con latidos del coraz├│n fuertes y acelerados.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido inestable.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido atemorizado o asustado.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido nervioso.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con sensaci├│n de bloqueo.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con temblores en las manos.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido inquieto, inseguro.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con miedo a perder el control.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con sensaci├│n de ahogo.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con temor a morir.
+
+ (Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con miedo.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con problemas digestivos.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con desvanecimientos.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con rubor facial
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Pregunta) Me he sentido con sudores, fr├¡os o calientes.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+(Mensaje para cerrar la prueba) Has finalizado
+
+Recuerda que cuidar tu salud mental no siempre implica grandes cambios, sino peque├▒os gestos de atenci├│n hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar c├│mo te sientes es tambi├®n una forma de sanar. Perm├¡tete estar presente, sin exigencias, sin juicios (Ser├¡a interesante agregar una ilustraci├│n). 
+
+Antes de ver tu resultado realicemos un ejercicio de respiraci├│n:
+
+A continuaci├│n, aparecer├í un globo inflado, vas a tomar aire y lo vas a sostener como si tu fueras el globo, cada vez que aparezca los numero de forma descendente, vaso soltando aire hasta desinflar l globo. ┬íVamos!   
+
+
+
+3
+
+
+
+
+
+
+
+Excelentente. 
+
+Cuando finalice se abre el espacio donde van las respuestas dependiendo los resultados. Se Observar├í una imagen relacionada, que acompa├▒a la respuesta teniendo en cuenta la severidad o levedad de los resultados. 
+
+Estos son tus resultados:
+
+Riesgo
+
+Puntajes visibles 
+
+Respuestas inmediatas de acuerdo a la semaforizaci├│n
+
+Riesgo Bajo
+
+Puntaje propio bajo porcentaje %.
+
+Se identifican algunas se├▒ales emocionales de ansiedad, como inquietud o preocupaci├│n ocasional. Esto est├í interfiriendo de manera significativa en tu funcionamiento, es importante escucharlas y atenderlas con peque├▒as acciones de autocuidado.
+
+Riesgo Moderado
+
+Las se├▒ales de ansiedad comienzan a reflejarse tambi├®n en tu cuerpo, a trav├®s de tensi├│n, cansancio o molestias f├¡sicas. Esto indica que el malestar se est├í sosteniendo en el tiempo y merece atenci├│n para evitar que aumente.
+
+Riesgo Alto
+
+Actualmente la ansiedad parece estar afectando tanto tu estado emocional como f├¡sico, generando un nivel de malestar significativo. En este punto, es importante y necesario buscar el acompa├▒amiento de un profesional de la salud mental que te ayude a recuperar equilibrio y bienestar.
+
+Riesgo Bajo
+
+Riesgo Moderado
+
+Riesgo Alto
+
+
+
+Generador de alerta
+
+
+
+
+
+_________________________________________________________________________
+
+Ventana emergente teniendo en cuenta la necesidad del cuestionario: INVENTARIO DE BECK PARA DEPRESI├ôN
+
+(En la siguiente pantalla explicar├í la prueba, le explicara que va a evaluar y le mostrara un video explicando como seleccionar.)
+
+El BDI (Beck Depression Inventory) es un instrumento que permite identificar la presencia e intensidad de s├¡ntomas asociados a la depresi├│n, los cuales pueden influir en el bienestar personal, emocional y laboral.
+
+Te invitamos a responder con sinceridad, ya que la informaci├│n proporcionada facilitar├í una mejor comprensi├│n de tu estado actual y permitir├í orientar de manera adecuada las acciones de acompa├▒amiento e intervenci├│n.
+
+Piensa en la ├║ltima semana (incluido hoy) y marca la opci├│n que mejor describa lo que has sentido:
+
+(Debe aparecer cada pregunta y posteriormente las respuestas a cada una hasta que se respondan todas, en la parte superior debe esta una barrita que muestre la cantidad de preguntas y como va avanzando dependiendo de cuantas preguntas el usuario haya respondido)
+
+Video sin audio y de secuencia: Se debe mostrar c├│mo responder 
+
+Me he sentido con tristeza.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con pesimismo.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con sentimientos de fracaso.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con p├®rdida de placer.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con sentimientos de culpa.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con sentimientos de castigo.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con disconformidad con uno mismo.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con autocr├¡tica.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con pensamientos o deseos suicidas.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con llanto.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con agitaci├│n.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con p├®rdida de inter├®s.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con indecisi├│n.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con desvalorizaci├│n.
+
+ (Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con p├®rdida de energ├¡a.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con cambios en los h├íbitos de sue├▒o.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con irritabilidad.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con cambios en el apetito.
+
+ (Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con dificultad para concentrarse.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con cansancio o fatiga.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+Me he sentido con p├®rdida de inter├®s en el sexo.
+
+(Valor de la respuesta = 0) En absoluto
+
+(Valor de la respuesta = 1) Levemente
+
+(Valor de la respuesta = 2) Moderadamente
+
+(Valor de la respuesta = 3) Severamente
+
+
+
+(Mensaje para cerrar la prueba) Has finalizado
+
+Atender tu salud mental no requiere hacerlo todo a la vez; comenzar por escucharte, respetar tus l├¡mites y permitirte apoyo es ya un acto de cuidado. (Ser├¡a interesante agregar una ilustraci├│n). 
+
+Antes de ver tu resultado realicemos un ejercicio de atenci├│n y percepci├│n visual, Encuentra las diferencias 
+
+
+
+
+
+
+
+
+
+
+
+Riesgo
+
+Puntajes visibles 
+
+Respuestas inmediatas de acuerdo a la semaforizaci├│n
+
+Riesgo Bajo
+
+Puntaje propio bajo porcentaje %.
+
+Algunos aspectos emocionales asociados al bajo estado de ├ínimo, como desmotivaci├│n o sensaci├│n de desconexi├│n se pueden estar viviendo en este momento. Aunque estos no limitan de forma marcada tu d├¡a a d├¡a, es importante prestarles atenci├│n y cuidarte.
+
+Riesgo Moderado
+
+El malestar emocional comienza a manifestarse tambi├®n en lo f├¡sico, como cansancio persistente, cambios en el sue├▒o o falta de energ├¡a. Estas se├▒ales indican que tu bienestar se est├í viendo afectado y requiere ser atendido con mayor detalle.
+
+Riesgo Alto
+
+En este momento se observan se├▒ales que afectan tanto tu estado emocional como tu bienestar f├¡sico. Este nivel de malestar hace importante y necesario que te comuniques con un profesional de la salud mental, quien podr├í brindarte el acompa├▒amiento y apoyo adecuado.
+
+Riesgo Bajo
+
+Riesgo Moderado
+
+Riesgo Alto
+
+Seguimiento en la APP con monitoreo
+
+Generador de alerta
+
+
+
+
+
+_________________________________________________________________________
+
+Plan de intervenci├│n 
+
+
+
+Ventana emergente teniendo en cuenta el cuestionario para H├üBITOS DE SUE├æO 
+
+(Nombre) H├íbitos de sue├▒o
+
+En un primer pantallazo brindamos los acuerdos de confidencialidad para dar inicio con la explicaci├│n de la prueba: 
+
+(Se observa en la pantalla un mensaje para validad los datos sociodemogr├íficos, poner cuadrito para dar clic para que apruebe o no) Antes de continuar, te invitamos a aceptar los acuerdos y condiciones relacionados con el manejo, protecci├│n y uso responsable de tu informaci├│n personal. Tu privacidad y seguridad son una prioridad para nosotros.
+
+(En la siguiente pantalla explicara la prueba, le explicara que va a evaluar y le mostrara un video explicando como seleccionar.)
+
+ICSP-VC eval├║a la calidad del sue├▒o y sus posibles alteraciones. Responde considerando c├│mo ha sido tu descanso durante el ├║ltimo mes y marca la opci├│n que mejor describa lo que has sentido:
+
+Recuerda responder con sinceridad, ya que la informaci├│n proporcionada facilitar├í la comprensi├│n de tus h├íbitos de descanso, orientando acciones de acompa├▒amiento y mejora del bienestar.
+
+(Debe aparecer cada pregunta y posteriormente las respuestas a cada una hasta que se respondan todas, en la parte superior debe esta una barrita que muestre la cantidad de preguntas y como va avanzando dependiendo de cuantas preguntas el usuario haya respondido)
+
+1.(Pregunta) Durante el ├║ltimo mes, ┬┐Cu├íl ha sido normalmente su hora de acostarse?(Valor de la respuesta) El usuario asigna la hora en formato militar se brindan las 24 horas
+
+2.(Pregunta) ┬┐Cu├ínto tiempo ha tardado normalmente en dormirse cada noche durante el ├║ltimo mes?(Valor de la respuesta) Numero entero (En minutos)
+
+3.(Pregunta) Durante el ├║ltimo mes, ┬┐A qu├® hora se ha levantado habitualmente por la ma├▒ana?(Valor de la respuesta) El usuario asigna la hora en formato militar se brindan las 24 horas
+
+4.(Pregunta) ┬┐Cu├íntas horas calcula que ha dormido verdaderamente cada noche durante el ├║ltimo mes?(Valor de la respuesta) Numero entero 
+
+5. (Pregunta) Durante el mes pasado, ┬┐cu├íntas veces ha tenido usted problemas para dormir a causa de...? Marca la respuesta que mayormente represente su situaci├│n. 
+
+
+
+(Valor de la respuesta = 0) Ninguna vez en el ├║ltimo mes
+
+(Valor de la respuesta = 1) Menos de una vez a la semana
+
+(Valor de la respuesta = 2) Una o dos veces a la semana
+
+(Valor de la respuesta = 3) Tres o m├ís veces a la semana
+
+a. No poder quedarse dormido en la primera media hora
+
+
+
+
+
+
+
+
+
+b. Despertarse durante la noche o de madrugada
+
+
+
+
+
+
+
+
+
+c. Tener que levantarse para ir al ba├▒o
+
+
+
+
+
+
+
+
+
+d. No poder respirar bien
+
+
+
+
+
+
+
+
+
+e. Toser o roncar ruidosamente
+
+
+
+
+
+
+
+
+
+f. Sentir fr├¡o
+
+
+
+
+
+
+
+
+
+g. Sentir calor
+
+
+
+
+
+
+
+
+
+h. Tener ÔÇÿmalos sue├▒osÔÇÖ o pesadillas
+
+
+
+
+
+
+
+
+
+i. Tener dolores
+
+
+
+
+
+
+
+
+
+j. Otras razones
+
+
+
+
+
+
+
+
+
+Cuando el valor de la pregunta 5j. fue 2 o 3 se abre un espacio para que el usuario lo describa
+
+┬┐Cu├íl? ___________________(Respuesta Cualitativa)
+
+6.(Pregunta) Durante el ├║ltimo mes, ┬┐Cu├íntas veces ha tomado medicinas recetadas por el m├®dico o por su cuenta para dormir?(Valor de la respuesta = 0) Ninguna vez en el ├║ltimo mes
+
+(Valor de la respuesta = 1) Menos de una vez a la semana
+
+(Valor de la respuesta = 2) Una o dos veces a la semana
+
+(Valor de la respuesta = 3) Tres o m├ís veces a la semana
+
+7. (Pregunta) Durante el ├║ltimo mes, ┬┐Cu├íntas veces ha tenido problemas para permanecer despierto mientras conduc├¡a, com├¡a, trabajaba, estudiaba o desarrollaba alguna otra actividad social?
+
+(Valor de la respuesta = 0) Nada problem├ítico
+
+(Valor de la respuesta = 1) Solo ligeramente problem├ítico 
+
+(Valor de la respuesta = 2) Moderadamente problem├ítico
+
+(Valor de la respuesta = 3) Muy problem├ítico
+
+8.(Pregunta) Durante el ├║ltimo mes, ┬┐El ÔÇÿtener ├ínimosÔÇÖ, ┬┐qu├® tantos problemas le han tra├¡do a usted para realizar actividades como conducir, comer, trabajar, estudiar o alguna actividad social?(Valor de la respuesta = 0) Nada problem├ítico
+
+(Valor de la respuesta = 1) Solo ligeramente problem├ítico 
+
+(Valor de la respuesta = 2) Moderadamente problem├ítico
+
+(Valor de la respuesta = 3) Muy problem├ítico
+
+
+
+9.(Pregunta) Durante el ├║ltimo mes, ┬┐C├│mo calificar├¡a en conjunto la calidad de su sue├▒o?
+
+(Valor de la respuesta = 0) Muy buena
+
+(Valor de la respuesta = 1) Bastante buena
+
+(Valor de la respuesta = 2) Bastante mala
+
+(Valor de la respuesta = 3) Muy mala
+
+10.(Pregunta) ┬┐Tiene usted pareja o compa├▒ero/a de habitaci├│n?
+
+(Valor de la respuesta = Finaliza la prueba) No tengo pareja ni compa├▒ero/a de habitaci├│n.
+
+(Valor de la respuesta = Continua la prueba) Si tengo, pero duerme en otra habitaci├│n. 
+
+(Valor de la respuesta = Continua la prueba) Si tengo, pero duerme en la misma habitaci├│n y distinta cama.
+
+(Valor de la respuesta = Continua la prueba) Si tengo y duerme en la misma cama.
+
+
+
+Si usted tiene pareja o compa├▒ero/a de habitaci├│n, preg├║ntele si usted durante el ├║ltimo mes ha tenidoÔÇª
+
+
+
+
+
+(Valor de la respuesta = 0) Ninguna vez en el ├║ltimo mes
+
+(Valor de la respuesta = 1) Menos de una vez a la semana
+
+(Valor de la respuesta = 2) Una o dos veces a la semana
+
+(Valor de la respuesta = 3) Tres o m├ís veces a la semana
+
+a. Ronquidos ruidosos.
+
+
+
+
+
+
+
+
+
+b. Grandes pausas entre respiraciones, mientras duerme.
+
+
+
+
+
+
+
+
+
+c. Sacudidas o espasmos de piernas mientras duerme.
+
+
+
+
+
+
+
+
+
+d. Episodios de desorientaci├│n o confusi├│n mientras duerme
+
+
+
+
+
+
+
+
+
+e. Present├│ otros inconvenientes mientras dorm├¡a
+
+
+
+
+
+
+
+
+
+Cuando el valor de la pregunta fue 2 o 3 se abre un espacio para que el usuario lo describa
+
+┬┐Cu├íl? ___________________(Cualitativa)
+
+(Mensaje para cerrar la prueba) Has finalizado
+
+Recuerda que cuidar tu salud mental no siempre implica grandes cambios, sino peque├▒os gestos de atenci├│n hacia ti mismo/a. Detenerte, respirar, leer algo que te conecte o expresar c├│mo te sientes es tambi├®n una forma de sanar. Perm├¡tete estar presente, sin exigencias, sin juicios. 
+
+Antes de ver tu resultado realicemos un ejercicio de rapidez.
+
+A continuaci├│n, No dejes que el Extraterrestre se lleve al humano de su cama, ┬íS├ílvalo! 
+
+
+
+
+
+
+
+
+
+
+
+Excelentente.
+
+(Aqu├¡ va las respuestas dependiendo los resultados. Es importante recordar que en esta prueba los resultados se ver├ín en conjunto, no por componente.)
+
+Hemos evidenciado:
+
+
+
+
+
+
+
+ 
+
+Riesgo
+
+Caras
+
+Puntajes visibles 
+
+Respuestas inmediatas de acuerdo a la semaforizaci├│n
+
+Riesgo Bajo
+
+Descanso Adecuado
+
+
+
+Se realizar├í visualizaci├│n de los resultados para los trabajadores de forma general. Este se obtendr├í de la suma total de  los resultado de cada componente, el intervalo se encontrar├í entre 0 - 21 puntos/  cada riesgo ira representado de una cara.
+
+Cuentas con pr├ícticas y h├íbitos saludables para tu descanso, lo que permite contar con un sue├▒o adecuado y favorece tu bienestar general. Se sugiere continuar fortaleciendo estas pr├ícticas mediante actividades que contribuyan a su mantenimiento a lo largo del tiempo.
+
+Riesgo moderado
+
+Descanso interrumpido
+
+
+
+Podr├¡as estar atravesando situaciones que est├ín generando algunas variaciones en tu rutina de sue├▒o, las cuales pueden influir en tu bienestar y en las actividades diarias. Puede ser oportuno revisar h├íbitos de descanso y considerar estrategias que favorezcan espacios m├ís reparadores.
+
+Riesgo Alto
+
+Descanso No reparador.
+
+
+
+Posiblemente estas presenciando dificultades relevantes en el descanso, que podr├¡an estar influyendo de manera significativa en el bienestar diario. Profundizar en estos aspectos y valorar alternativas de acompa├▒amiento puede ser una decisi├│n adecuada en este momento.
+
+
+
+Generador de alerta
+
+
+
+_________________________________________________________________________ 
+
+Plan de intervenci├│n 
+
+_________________________________________________________________________ 
+
+Ventana emergente teniendo en cuenta el cuestionario para INTELIGENICA EMOCIONAL
+
+(Nombre) Inteligencia Emocional 
+
+En un primer pantallazo brindamos los acuerdos de confidencialidad para dar inicio con la explicaci├│n de la prueba: 
+
+(Se observa en la pantalla un mensaje para validar los datos sociodemogr├íficos, poner cuadrito para dar clic para que apruebe o no) Antes de continuar, te invitamos a aceptar los acuerdos y condiciones relacionados con el manejo, protecci├│n y uso responsable de tu informaci├│n personal. Tu privacidad y seguridad son una prioridad para nosotros.
+
+En la siguiente pantalla explicara la prueba, le explicara que va a evaluar y le mostrara un video explicando como seleccionar.
+
+TMMS- 24 Esta prueba busca comprender tu estado emocional y reconocer posibles s├¡ntomas relacionados con el estr├®s, la ansiedad o la depresi├│n. Te invitamos a responder con sinceridad, ya que solo as├¡ nos permitir├í entender c├│mo te sientes y orientarte de manera m├ís efectiva.
+
+Piensa en la ├║ltima semana (incluido hoy) y marca la opci├│n que mejor describa lo que has sentido
+
+(Debe aparecer cada pregunta y posteriormente las respuestas a cada una hasta que se respondan todas, en la parte superior debe esta una barrita que muestre la cantidad de preguntas y como va avanzando dependiendo de cuantas preguntas el usuario haya respondido)
+
+(Pregunta) Presto mucha atenci├│n a los sentimientos.
+
+(Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Normalmente me preocupo mucho por lo que siento.
+
+(Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Normalmente dedico tiempo a pensar en mis emociones.
+
+(Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Pienso que merece la pena prestar atenci├│n a mis emociones y estado de ├ínimo.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Dejo que mis sentimientos afecten a mis pensamientos.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta)Pienso en mi estado de ├ínimo constantemente.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) A menudo pienso en mis sentimientos.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta)Presto mucha atenci├│n a c├│mo me siento.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Tengo claros mis sentimientos.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Frecuentemente puedo definir mis sentimientos.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Casi siempre s├® c├│mo me siento.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Normalmente conozco mis sentimientos sobre las personas.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) A menudo me doy cuenta de mis sentimientos en diferentes situaciones.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Siempre puedo decir c├│mo me siento.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) A veces puedo decir cu├íles son mis emociones.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Puedo llegar a comprender mis sentimientos.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Aunque a veces me siento triste, suelo tener una visi├│n optimista.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Aunque me sienta mal, procuro pensar en cosas agradables.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Cuando estoy triste, pienso en todos los placeres de la vida.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Intento tener pensamientos positivos, aunque me sienta mal.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Si doy demasiadas vueltas a las cosas, complic├índolas, trato de calmarme.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Me preocupo por tener un buen estado de ├ínimo.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta)Tengo mucha energ├¡a cuando me siento feliz.
+
+ (Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Pregunta) Cuando estoy enfadado intento cambiar mi estado de ├ínimo.
+
+(Valor de la respuesta = 1) Nada de acuerdo
+
+(Valor de la respuesta = 2) Algo de acuerdo
+
+(Valor de la respuesta = 3) Bastante de acuerdo
+
+(Valor de la respuesta = 4) Muy de acuerdo
+
+(Valor de la respuesta = 5) Totalmente de acuerdo
+
+
+
+(Mensaje para cerrar la prueba) Has finalizado
+
+Identificar lo que sentimos, comprender por qu├® ocurre y responder de manera m├ís consciente y equilibrada ante distintas situaciones hace que reforcemos nuestra inteligencia emocional. Este proceso permite reflexionar sobre la forma en que se gestionan las emociones en la vida diaria y abre un espacio para reconocer fortalezas, as├¡ como aspectos que pueden seguir desarroll├índose.
+
+
+
+
+
+
+
+Tus resultados son: 
+
+
+
+Claridad emocional
+
+Atenci├│n a los sentimientos
+
+
+
+
+
+
+
+
+
+Reparaci├│n de las emociones
+
+
+
+
+
+
+
+Excelentente.
+
+(Aqu├¡ va las respuestas dependiendo los resultados. Es importante recordar que en esta prueba los resultados se ver├ín en conjunto, no por componente.)
+
+Atenci├│n a los sentimientos
+
+Amarillo
+
+No se evidenciar├í puntajes espec├¡ficos, sino la presencia y ausencia de cada componente, los resultados se mostrar├ín como una rompecabeza por colores Color A para presencia de Inteligencia emocional y Color B para ausencias en componentes de inteligencia emocional.
+
+Sueles tener dificultad para prestar atenci├│n a las propias emociones y las de los dem├ís, lo que puede limitar la comprensi├│n de los estados emocionales presentes en las interacciones personales y afectar la comunicaci├│n interpersonal.
+
+Verde
+
+Atiendes adecuadamente las emociones que experimenta en tu d├¡a d├¡a, as├¡ como sensibilidad frente a los estados emocionales de los dem├ís, lo que favorece relaciones interpersonales respetuosas en tu entorno.
+
+
+
+
+
+Claridad emocional
+
+
+
+Amarillo
+
+No se evidenciar├í puntajes espec├¡ficos, sino la presencia y ausencia de cada componente, los resultados se mostrar├ín como una rompecabeza por colores Color A para presencia de Inteligencia emocional y Color B para ausencias en componentes de inteligencia emocional.
+
+No sueles tener claridad respecto a lo que sientes, haciendo dif├¡cil comprender lo que deseas y desean los dem├ís, confundes las emociones que vives y entras en incertidumbre.
+
+
+
+Verde
+
+Cuentas con habilidades para recocer, comprender y clasificar tus emociones, igualmente que la de los dem├ís, Comprendiendo los espacios en los que convives con estrategias para ayudar y cuidarte.
+
+
+
+
+
+
+
+Reparaci├│n de las emociones
+
+
+
+Amarillo
+
+No se evidenciar├í puntajes espec├¡ficos, sino la presencia y ausencia de cada componente, los resultados se mostrar├ín como una rompecabeza por colores Color A para presencia de Inteligencia emocional y Color B para ausencias en componentes de inteligencia emocional.
+
+Te cuesta reparar y gestionar las emociones que experimentas t├║ y las personas a tu alrededor, lo que puede dificultar la recuperaci├│n emocional y la identificaci├│n de herramientas adecuadas para afrontar las situaciones que vives, recurriendo en ocasiones a actividades que pueden afectar tu bienestar.
+
+
+
+Verde
+
+Cuentas con un adecuado proceso de reparaci├│n emocional teniendo a disposici├│n estrategias para afrontar situaciones emocionalmente dif├¡ciles o intensas, buscando el equilibrio y la estabilidad personal y social
+
+
+
+
+
+_________________________________________________________________________
+
+Tu bienestar comienza cuando te escuchas con compasi├│n y te das el espacio para sentir y cuidar de tu mente, igual que cuidas de tu cuerpo.
+
+
+
+
+
+================================================================================
+MENSAJES/ADVERTENCIAS:
+================================================================================
+{
+  "type": "warning",
+  "message": "An unrecognised element was ignored: v:oval"
+}
+{
+  "type": "warning",
+  "message": "An unrecognised element was ignored: v:stroke"
+}
+{
+  "type": "warning",
+  "message": "An unrecognised element was ignored: v:path"
+}
+{
+  "type": "warning",
+  "message": "An unrecognised element was ignored: v:line"
+}
+
+Ô£à Contenido guardado en 'documento-modulo-salud-mental-emocheck-3-1.txt'
